@@ -31,8 +31,6 @@
 
 include ../make.mk
 
-$(info ************ EXAMPLES  ************)
-
 ##
 ##	flags
 ##
