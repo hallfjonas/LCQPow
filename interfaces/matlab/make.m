@@ -179,18 +179,20 @@ function [ doClean,fcnNames,userIFlags ] = analyseMakeArguments( nArgs,args )
         
         case 1
             if ( strcmp( args{1},'all' ) > 0 )
-                fcnNames = { 'qpOASES','qpOASES_sequence' };
+                fcnNames = { 'qpOASES','qpOASES_sequence', 'lcqpOASES' };
             elseif ( strcmp( args{1},'qpOASES' ) > 0 )
                 fcnNames = { 'qpOASES' };
             elseif ( strcmp( args{1},'qpOASES_sequence' ) > 0 )
                 fcnNames = { 'qpOASES_sequence' };
+            elseif ( strcmp( args{1},'lcqpOASES' ) > 0 )
+                fcnNames = { 'lcqpOASES' };
             elseif ( strcmp( args{1},'clean' ) > 0 )
                 doClean = 1;
             elseif ( strcmp( args{1}(1),'-' ) > 0 )
                 % make clean all with user-specified compiler flags
                 userIFlags = args{1};
                 doClean = 1;
-                fcnNames = { 'qpOASES','qpOASES_sequence' };
+                fcnNames = { 'qpOASES','qpOASES_sequence','lcqpOASES' };
             else
                 error( ['ERROR (',mfilename '.m): Invalid first argument (''',args{1},''')!'] );
             end
@@ -203,17 +205,19 @@ function [ doClean,fcnNames,userIFlags ] = analyseMakeArguments( nArgs,args )
             end
             
             if ( strcmp( args{2},'all' ) > 0 )
-                fcnNames = { 'qpOASES','qpOASES_sequence' };
+                fcnNames = { 'qpOASES','qpOASES_sequence','lcqpOASES' };
             elseif ( strcmp( args{2},'qpOASES' ) > 0 )
                 fcnNames = { 'qpOASES' };
             elseif ( strcmp( args{2},'qpOASES_sequence' ) > 0 )
                 fcnNames = { 'qpOASES_sequence' };
+            elseif ( strcmp( args{2},'lcqpOASES' ) > 0 )
+                fcnNames = { 'lcqpOASES' };
             else
                 error( ['ERROR (',mfilename '.m): Invalid second argument (''',args{2},''')!'] );
             end
             
         otherwise
-            fcnNames = { 'qpOASES','qpOASES_sequence' };
+            fcnNames = { 'qpOASES','qpOASES_sequence','lcqpOASES' };
             
     end
     

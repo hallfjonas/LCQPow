@@ -47,18 +47,23 @@ EXTRAFLAGS = -largeArrayDims -O -D__cpluplus -D__MATLAB__ -fexceptions
 
 QPOASES_OBJECT = qpOASES.${OBJEXT}
 QPOASES_SEQUENCE_OBJECT = qpOASES_sequence.${OBJEXT}
+LCQPOASES_OBJECT = lcqpOASES.${OBJEXT}
 
 ##
 ##	targets
 ##
 
-all: ${BINDIR}/qpOASES.${MEXEXT} ${BINDIR}/qpOASES_sequence.${MEXEXT} copyMs
+all: ${BINDIR}/qpOASES.${MEXEXT} ${BINDIR}/qpOASES_sequence.${MEXEXT} ${BINDIR}/lcqpOASES.${MEXEXT} copyMs
 
-${BINDIR}/qpOASES.${MEXEXT}: ${QPOASES_OBJECT} 
+${BINDIR}/qpOASES.${MEXEXT}: ${QPOASES_OBJECT}
 	@${ECHO} "Creating" $@
 	@${CPP} -shared -o $@ $? ${QPOASES_LINK} ${LINK_LIBRARIES} ${LINK_MATLAB_LIBS}
 
 ${BINDIR}/qpOASES_sequence.${MEXEXT}: ${QPOASES_SEQUENCE_OBJECT} 
+	@${ECHO} "Creating" $@
+	@${CPP} -shared -o $@ $? ${QPOASES_LINK} ${LINK_LIBRARIES} ${LINK_MATLAB_LIBS}
+
+${BINDIR}/lcqpOASES.${MEXEXT}: ${LCQPOASES_OBJECT}
 	@${ECHO} "Creating" $@
 	@${CPP} -shared -o $@ $? ${QPOASES_LINK} ${LINK_LIBRARIES} ${LINK_MATLAB_LIBS}
 

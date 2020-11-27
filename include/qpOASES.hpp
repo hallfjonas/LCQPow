@@ -50,6 +50,8 @@
 #include <Flipper.cpp>
 #include <QProblem.cpp>
 #include <SQProblem.cpp>
+#include <LCQProblemB.cpp>
+#include <LCQProblem.cpp>
 
 #if defined(SOLVER_MA27) || defined(SOLVER_MA57)
 #include <SparseSolver.cpp>

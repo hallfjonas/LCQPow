@@ -297,7 +297,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 	#endif
 
 	/* sparse matrix indices and values */
-	sparse_int_t *Hir=0, *Hjc=0, *Air=0, *Ajc=0, *Cir=0, *Cjc=0,;
+	sparse_int_t *Hir=0, *Hjc=0, *Air=0, *Ajc=0, *Cir=0, *Cjc=0;
 	real_t *Hv=0, *Av=0, *Cv;
 
 	/* I) CONSISTENCY CHECKS: */
@@ -581,20 +581,24 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 	if ( nC == 0 )
 	{
 		/* Call lcqpOASES (using QProblemB class). */
-		QProblemB_qpOASES(	nV,hessianType, nP,
-							H,g,
-							lb,ub,
-							nWSRin,maxCpuTimeIn,
-							x0,&options,
-							nlhs,plhs,
-							guessedBounds,R
-							);
+		LCQProblemB_qpOASES(	nV,hessianType, nP,
+                                H,g,
+                                lb,ub,C,
+                                nWSRin,maxCpuTimeIn,
+                                x0,&options,
+                                nlhs,plhs,
+                                guessedBounds,R
+                                );
 		
         if (R != 0) delete R;
 		if (H != 0) delete H;
+		if (C != 0) delete C;
 		if (Hv != 0) delete[] Hv;
 		if (Hjc != 0) delete[] Hjc;
 		if (Hir != 0) delete[] Hir;
+		if (Cv != 0) delete[] Cv;
+		if (Cjc != 0) delete[] Cjc;
+		if (Cir != 0) delete[] Cir;
 		return;
 	}
 	else
