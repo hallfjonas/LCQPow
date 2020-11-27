@@ -23,12 +23,12 @@
 
 
 /**
- *	\file interfaces/matlab/qpOASES.cpp
+ *	\file interfaces/matlab/lcqpOASES.cpp
  *	\author Hans Joachim Ferreau, Alexander Buchner (thanks to Aude Perrin)
  *	\version 3.2
  *	\date 2007-2017
  *
- *	Interface for Matlab(R) that enables to call qpOASES as a MEX function.
+ *	Interface for Matlab(R) that enables to call lcqpOASES as a MEX function.
  *
  */
 
@@ -52,36 +52,37 @@ static std::vector<QPInstance *> g_instances;
 /*
  *	Q P r o b l e m _ q p O A S E S
  */
-int_t QProblem_qpOASES(	int_t nV, int_t nC, HessianType hessianType, int_t nP,
-						SymmetricMatrix* H, double* g, Matrix* A,
-						double* lb, double* ub,
-						double* lbA, double* ubA,
-						int_t nWSRin, real_t maxCpuTimeIn,
-						const double* const x0, Options* options,
-						int_t nOutputs, mxArray* plhs[],
-						const double* const guessedBounds, const double* const guessedConstraints,
-						const double* const _R,
-						BooleanType isSparse
-						)
+int_t LCQProblem_qpOASES(	int_t nV, int_t nC, HessianType hessianType, int_t nP,
+							SymmetricMatrix* H, double* g, Matrix* A,
+							double* lb, double* ub,
+							double* lbA, double* ubA,
+							SymmetricMatrix* C,
+							int_t nWSRin, real_t maxCpuTimeIn,
+							const double* const x0, Options* options,
+							int_t nOutputs, mxArray* plhs[],
+							const double* const guessedBounds, const double* const guessedConstraints,
+							const double* const _R,
+							BooleanType isSparse
+							)
 {
 	int_t nWSRout;
 	real_t maxCpuTimeOut;
 	
-	/* 1) Setup initial QP. */
-	QProblem *QP;
+	/* 1) Setup initial LCQP. */
+	LCQProblem *LCQP;
 	if ( isSparse == BT_TRUE )
     {
         #ifdef SOLVER_MA57
-		QP = new SQProblemSchur ( nV,nC,hessianType );
+			throw ("Solver MA57 is incompatible with LCQP at the moment.")
         #else
-        QP = new QProblem ( nV,nC,hessianType );
+        LCQP = new LCQProblem ( nV,nC,hessianType );
         #endif
     }
 	else
-		QP = new QProblem ( nV,nC,hessianType );
-	QP->setOptions( *options );
+		LCQP = new LCQProblem ( nV,nC,hessianType );
+	LCQP->setOptions( *options );
 
-	/* 2) Solve initial QP. */
+	/* 2) Solve initial LCQP. */
 	returnValue returnvalue;
 
 	Bounds bounds(nV);
@@ -97,7 +98,7 @@ int_t QProblem_qpOASES(	int_t nV, int_t nC, HessianType hessianType, int_t nP,
 			} else {
 				char msg[MAX_STRING_LENGTH];
 				snprintf(msg, MAX_STRING_LENGTH,
-						"ERROR (qpOASES): Only {-1, 0, 1} allowed for status of bounds!");
+						"ERROR (lcqpOASES): Only {-1, 0, 1} allowed for status of bounds!");
 				myMexErrMsgTxt(msg);
 				return -1;
 			}
@@ -115,7 +116,7 @@ int_t QProblem_qpOASES(	int_t nV, int_t nC, HessianType hessianType, int_t nP,
 			} else {
 				char msg[MAX_STRING_LENGTH];
 				snprintf(msg, MAX_STRING_LENGTH,
-						"ERROR (qpOASES): Only {-1, 0, 1} allowed for status of constraints!");
+						"ERROR (lcqpOASES): Only {-1, 0, 1} allowed for status of constraints!");
 				myMexErrMsgTxt(msg);
 				return -1;
 			}
@@ -125,27 +126,27 @@ int_t QProblem_qpOASES(	int_t nV, int_t nC, HessianType hessianType, int_t nP,
 	nWSRout = nWSRin;
 	maxCpuTimeOut = (maxCpuTimeIn >= 0.0) ? maxCpuTimeIn : INFTY;
 
-	returnvalue = QP->init(	H,g,A,lb,ub,lbA,ubA,
-							nWSRout,&maxCpuTimeOut,
-							x0,0,
-							(guessedBounds != 0) ? &bounds : 0, (guessedConstraints != 0) ? &constraints : 0,
-							_R
+	returnvalue = LCQP->init(	H,g,A,lb,ub,lbA,ubA,C,
+								nWSRout,&maxCpuTimeOut,
+								x0,0,
+								(guessedBounds != 0) ? &bounds : 0, (guessedConstraints != 0) ? &constraints : 0,
+								_R
 							);
 
-	/* 3) Solve remaining QPs and assign lhs arguments. */
-	/*    Set up pointers to the current QP vectors */
+	/* 3) Solve remaining LCQPs and assign lhs arguments. */
+	/*    Set up pointers to the current LCQP vectors */
 	real_t* g_current   = g;
 	real_t* lb_current  = lb;
 	real_t* ub_current  = ub;
 	real_t* lbA_current = lbA;
 	real_t* ubA_current = ubA;
 
-	/* Loop through QP sequence. */
+	/* Loop through LCQP sequence. */
 	for ( int_t k=0; k<nP; ++k )
 	{
 		if ( k > 0 )
 		{
-			/* update pointers to the current QP vectors */
+			/* update pointers to the current LCQP vectors */
 			g_current = &(g[k*nV]);
 			if ( lb != 0 )
 				lb_current = &(lb[k*nV]);
@@ -158,17 +159,15 @@ int_t QProblem_qpOASES(	int_t nV, int_t nC, HessianType hessianType, int_t nP,
 
 			nWSRout = nWSRin;
 			maxCpuTimeOut = (maxCpuTimeIn >= 0.0) ? maxCpuTimeIn : INFTY;
-			returnvalue = QP->hotstart( g_current,lb_current,ub_current,lbA_current,ubA_current, nWSRout,&maxCpuTimeOut );
+			returnvalue = LCQP->hotstart( g_current,lb_current,ub_current,lbA_current,ubA_current, nWSRout,&maxCpuTimeOut );
 		}
 
 		/* write results into output vectors */
-		obtainOutputs(	k,QP,returnvalue,nWSRout,maxCpuTimeOut,
+		obtainOutputs(	k,LCQP,returnvalue,nWSRout,maxCpuTimeOut,
 						nOutputs,plhs,nV,nC );
 	}
 
-	//QP->writeQpDataIntoMatFile( "qpDataMat0.mat" );
-
-	delete QP;
+	delete LCQP;
 	return 0;
 }
 
@@ -177,9 +176,10 @@ int_t QProblem_qpOASES(	int_t nV, int_t nC, HessianType hessianType, int_t nP,
 /*
  *	Q P r o b l e m B _ q p O A S E S
  */
-int_t QProblemB_qpOASES(	int_t nV, HessianType hessianType, int_t nP,
+int_t LCQProblemB_qpOASES(	int_t nV, HessianType hessianType, int_t nP,
 							SymmetricMatrix *H, double* g,
 							double* lb, double* ub,
+							SymmetricMatrix* C,
 							int_t nWSRin, real_t maxCpuTimeIn,
 							const double* const x0, Options* options,
 							int_t nOutputs, mxArray* plhs[],
@@ -190,11 +190,11 @@ int_t QProblemB_qpOASES(	int_t nV, HessianType hessianType, int_t nP,
 	int_t nWSRout;
 	real_t maxCpuTimeOut;
 
-	/* 1) Setup initial QP. */
-	QProblemB QP( nV,hessianType );
-	QP.setOptions( *options );
+	/* 1) Setup initial LCQP. */
+	LCQProblemB LCQP( nV,hessianType );
+	LCQP.setOptions( *options );
 
-	/* 2) Solve initial QP. */
+	/* 2) Solve initial LCQP. */
 	returnValue returnvalue;
 
 	Bounds bounds(nV);
@@ -209,7 +209,7 @@ int_t QProblemB_qpOASES(	int_t nV, HessianType hessianType, int_t nP,
 			} else {
 				char msg[MAX_STRING_LENGTH];
 				snprintf(msg, MAX_STRING_LENGTH,
-						"ERROR (qpOASES): Only {-1, 0, 1} allowed for status of bounds!");
+						"ERROR (lcqpOASES): Only {-1, 0, 1} allowed for status of bounds!");
 				myMexErrMsgTxt(msg);
 				return -1;
 			}
@@ -219,25 +219,25 @@ int_t QProblemB_qpOASES(	int_t nV, HessianType hessianType, int_t nP,
 	nWSRout = nWSRin;
 	maxCpuTimeOut = (maxCpuTimeIn >= 0.0) ? maxCpuTimeIn : INFTY;
 	
-	returnvalue = QP.init(	H,g,lb,ub,
-							nWSRout,&maxCpuTimeOut,
-							x0,0,
-							(guessedBounds != 0) ? &bounds : 0,
-							_R
+	returnvalue = LCQP.init(	H,g,lb,ub,C,
+								nWSRout,&maxCpuTimeOut,
+								x0,0,
+								(guessedBounds != 0) ? &bounds : 0,
+								_R
 							);
 
-	/* 3) Solve remaining QPs and assign lhs arguments. */
-	/*    Set up pointers to the current QP vectors */
+	/* 3) Solve remaining LCQPs and assign lhs arguments. */
+	/*    Set up pointers to the current LCQP vectors */
 	real_t* g_current  = g;
 	real_t* lb_current = lb;
 	real_t* ub_current = ub;
 
-	/* Loop through QP sequence. */
+	/* Loop through LCQP sequence. */
 	for ( int_t k=0; k<nP; ++k )
 	{
 		if ( k > 0 )
 		{
-			/* update pointers to the current QP vectors */
+			/* update pointers to the current LCQP vectors */
 			g_current = &(g[k*nV]);
 			if ( lb != 0 )
 				lb_current = &(lb[k*nV]);
@@ -246,11 +246,11 @@ int_t QProblemB_qpOASES(	int_t nV, HessianType hessianType, int_t nP,
 
             nWSRout = nWSRin;
 			maxCpuTimeOut = (maxCpuTimeIn >= 0.0) ? maxCpuTimeIn : INFTY;
-			returnvalue = QP.hotstart( g_current,lb_current,ub_current, nWSRout,&maxCpuTimeOut );
+			returnvalue = LCQP.hotstart( g_current,lb_current,ub_current, nWSRout,&maxCpuTimeOut );
 		}
 
 		/* write results into output vectors */
-		obtainOutputs(	k,&QP,returnvalue,nWSRout,maxCpuTimeOut,
+		obtainOutputs(	k,&LCQP,returnvalue,nWSRout,maxCpuTimeOut,
 						nOutputs,plhs,nV );
 	}
 
@@ -269,11 +269,12 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 	Matrix *A=0;
 
 	real_t *g=0, *lb=0, *ub=0, *lbA=0, *ubA=0;
+	SymmetricMatrix *C=0;
 	HessianType hessianType = HST_UNKNOWN;
 	double *x0=0, *R=0, *R_for=0;
 	double *guessedBounds=0, *guessedConstraints=0;
 
-	int H_idx=-1, g_idx=-1, A_idx=-1, lb_idx=-1, ub_idx=-1, lbA_idx=-1, ubA_idx=-1;
+	int H_idx=-1, g_idx=-1, A_idx=-1, lb_idx=-1, ub_idx=-1, lbA_idx=-1, ubA_idx=-1, C_idx=-1;
 	int options_idx=-1, x0_idx=-1, auxInput_idx=-1;
 
     /* Setup default options */
@@ -296,26 +297,26 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 	#endif
 
 	/* sparse matrix indices and values */
-	sparse_int_t *Hir=0, *Hjc=0, *Air=0, *Ajc=0;
-	real_t *Hv=0, *Av=0;
+	sparse_int_t *Hir=0, *Hjc=0, *Air=0, *Ajc=0, *Cir=0, *Cjc=0,;
+	real_t *Hv=0, *Av=0, *Cv;
 
 	/* I) CONSISTENCY CHECKS: */
-	/* 1a) Ensure that qpOASES is called with a feasible number of input arguments. */
-	if ( ( nrhs < 4 ) || ( nrhs > 9 ) )
+	/* 1a) Ensure that lcqpOASES is called with a feasible number of input arguments. */
+	if ( ( nrhs < 5 ) || ( nrhs > 10 ) )
 	{
-		myMexErrMsgTxt( "ERROR (qpOASES): Invalid number of input arguments!\nType 'help qpOASES' for further information." );
+		myMexErrMsgTxt( "ERROR (lcqpOASES): Invalid number of input arguments!\nType 'help lcqpOASES' for further information." );
 		return;
 	}
     
 	/* 2) Check for proper number of output arguments. */
 	if ( nlhs > 6 )
 	{
-		myMexErrMsgTxt( "ERROR (qpOASES): At most six output arguments are allowed: \n    [x,fval,exitflag,iter,lambda,auxOutput]!" );
+		myMexErrMsgTxt( "ERROR (lcqpOASES): At most six output arguments are allowed: \n    [x,fval,exitflag,iter,lambda,auxOutput]!" );
 		return;
 	}
 	if ( nlhs < 1 )
 	{
-		myMexErrMsgTxt( "ERROR (qpOASES): At least one output argument is required: [x,...]!" );
+		myMexErrMsgTxt( "ERROR (lcqpOASES): At least one output argument is required: [x,...]!" );
 		return;
 	}
 
@@ -347,20 +348,20 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 	/* 0) Check whether options are specified .*/
 	if ( isSimplyBoundedQp == BT_TRUE )
 	{
-		if ( ( nrhs >= 5 ) && ( !mxIsEmpty(prhs[4]) ) && ( mxIsStruct(prhs[4]) ) )
-			options_idx = 4;
+		if ( ( nrhs >= 5 ) && ( !mxIsEmpty(prhs[5]) ) && ( mxIsStruct(prhs[6]) ) )
+			options_idx = 5;
 	}
 	else
 	{
 		/* Consistency check */
-		if ( ( !mxIsEmpty(prhs[4]) ) && ( mxIsStruct(prhs[4]) ) )
+		if ( ( !mxIsEmpty(prhs[5]) ) && ( mxIsStruct(prhs[5]) ) )
 		{
-			myMexErrMsgTxt( "ERROR (qpOASES): Fifth input argument must not be a struct when solving QP with general constraints!\nType 'help qpOASES' for further information." );
+			myMexErrMsgTxt( "ERROR (lcqpOASES): Sixth input argument must not be a struct when solving LCQP with general constraints!\nType 'help lcqpOASES' for further information." );
 			return;
 		}
 
-		if ( ( nrhs >= 8 ) && ( !mxIsEmpty(prhs[7]) ) && ( mxIsStruct(prhs[7]) ) )
-			options_idx = 7;
+		if ( ( nrhs >= 9 ) && ( !mxIsEmpty(prhs[8]) ) && ( mxIsStruct(prhs[9]) ) )
+			options_idx = 8;
 	}
 
 	// Is the third argument constraint Matrix A?
@@ -372,19 +373,20 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 	{
 		lb_idx   = 2;
 		ub_idx   = 3;
+		C_idx = 4;
 
-		if ( ( nrhs >= 6 ) && ( !mxIsEmpty(prhs[5]) ) )
+		if ( ( nrhs >= 7 ) && ( !mxIsEmpty(prhs[6]) ) )
 		{ 
 			/* auxInput specified */
-			if ( mxIsStruct(prhs[5]) )
+			if ( mxIsStruct(prhs[6]) )
 			{
-				auxInput_idx = 5;
+				auxInput_idx = 6;
 				x0_idx = -1;
 			}
 			else
 			{
 				auxInput_idx = -1;
-				x0_idx = 5;
+				x0_idx = 6;
 			}
 		}
 		else
@@ -396,8 +398,9 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 	else
 	{
 		A_idx = 2;
+		C_idx = 7;
 
-		/* If constraint matrix is empty, use a QProblemB object! */
+		/* If constraint matrix is empty, use a LCQProblemB object! */
 		if ( mxIsEmpty( prhs[ A_idx ] ) )
 		{
 			lb_idx   = 3;
@@ -415,18 +418,18 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 			nC = (int_t)mxGetM( prhs[ A_idx ] ); /* row number of constraint matrix */
 		}
 
-		if ( ( nrhs >= 9 ) && ( !mxIsEmpty(prhs[8]) ) )
+		if ( ( nrhs >= 10 ) && ( !mxIsEmpty(prhs[9]) ) )
 		{ 
 			/* auxInput specified */
-			if ( mxIsStruct(prhs[8]) )
+			if ( mxIsStruct(prhs[9]) )
 			{
-				auxInput_idx = 8;
+				auxInput_idx = 9;
 				x0_idx = -1;
 			}
 			else
 			{
 				auxInput_idx = -1;
-				x0_idx = 8;
+				x0_idx = 9;
 			}
 		}
 		else
@@ -436,16 +439,28 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 		}
 	}
 
+	/* ensure complementarity matrix is not empty and of consistent dimension */
+	if ( mxIsEmpty( prhs[ C_idx ] ) )
+	{
+		myMexErrMsgTxt( "ERROR (lcqpOASES): Complementarity matrix C can not be empty. Consider using qpOASES for this purpose!\nType 'help lcqpOASES' for further information." );
+		return;
+	}
 
 	/* ensure that data is given in real_t precision */
 	if ( ( ( H_idx >= 0 ) && ( mxIsDouble( prhs[ H_idx ] ) == 0 ) ) ||
 		 ( mxIsDouble( prhs[ g_idx ] ) == 0 ) )
 	{
-		myMexErrMsgTxt( "ERROR (qpOASES): All data has to be provided in double precision!" );
+		myMexErrMsgTxt( "ERROR (lcqpOASES): All data has to be provided in double precision!" );
 		return;
 	}
-
+	
+	if ( mxIsDouble( prhs[ C_idx ] ) == 0 )
+	{
+		myMexErrMsgTxt( "ERROR (lcqpOASES): All data has to be provided in double precision!" );
+		return;
+	}
 	/* check if supplied data contains 'NaN' or 'Inf' */
+	
 	if (containsNaNorInf( prhs,H_idx, 0 ) == BT_TRUE)
 		return;
 
@@ -458,13 +473,22 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 	if (containsNaNorInf( prhs,ub_idx, 1 ) == BT_TRUE)
 		return;
 
+	if (containsNaNorInf( prhs,C_idx, 0 ) == BT_TRUE)
+		return;
+
 	/* Check inputs dimensions and assign pointers to inputs. */
 	if ( ( H_idx >= 0 ) && ( ( mxGetN( prhs[ H_idx ] ) != nV ) || ( mxGetM( prhs[ H_idx ] ) != nV ) ) )
 	{
 		char msg[MAX_STRING_LENGTH]; 
-		snprintf(msg, MAX_STRING_LENGTH, "ERROR (qpOASES): Hessian matrix dimension mismatch (%ld != %d)!", 
+		snprintf(msg, MAX_STRING_LENGTH, "ERROR (lcqpOASES): Hessian matrix dimension mismatch (%ld != %d)!", 
 				(long int)mxGetN(prhs[H_idx]), (int)nV);
 		myMexErrMsgTxt(msg);
+		return;
+	}
+
+	if (mxGetM(prhs[ C_idx ]) != nV || mxGetN(prhs[ C_idx ]) != nV)
+	{
+		myMexErrMsgTxt( "ERROR (lcqpOASES): Complementarity matrix C must be of same dimension as Hessian matrix Q!\nType 'help lcqpOASES' for further information." );
 		return;
 	}
 
@@ -473,7 +497,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 		/* ensure that data is given in real_t precision */
 		if ( mxIsDouble( prhs[ A_idx ] ) == 0 )
 		{
-			myMexErrMsgTxt( "ERROR (qpOASES): All data has to be provided in real_t precision!" );
+			myMexErrMsgTxt( "ERROR (lcqpOASES): All data has to be provided in real_t precision!" );
 			return;
 		}
 
@@ -481,7 +505,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 		if ( mxGetN( prhs[ A_idx ] ) != nV )
 		{
 			char msg[MAX_STRING_LENGTH]; 
-			snprintf(msg, MAX_STRING_LENGTH, "ERROR (qpOASES): Constraint matrix input dimension mismatch (%ld != %d)!", 
+			snprintf(msg, MAX_STRING_LENGTH, "ERROR (lcqpOASES): Constraint matrix input dimension mismatch (%ld != %d)!", 
 					(long int)mxGetN(prhs[A_idx]), (int)nV);
 			myMexErrMsgTxt(msg);
 			return;
@@ -544,6 +568,8 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 	if ( ( nC > 0 ) && ( A_idx >= 0 ) )
 		setupConstraintMatrix( prhs[A_idx],nV,nC, &A,&Air,&Ajc,&Av );
 
+	setupComplementarityMatrix(	prhs[C_idx],nV, &C,&Cir,&Cjc,&Cv );
+
 	allocateOutputs( nlhs,plhs,nV,nC,nP );
 
 	/* check if QP is sparse */
@@ -554,7 +580,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
 	if ( nC == 0 )
 	{
-		/* Call qpOASES (using QProblemB class). */
+		/* Call lcqpOASES (using QProblemB class). */
 		QProblemB_qpOASES(	nV,hessianType, nP,
 							H,g,
 							lb,ub,
@@ -575,14 +601,14 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 	{
 		if ( A == 0 )
 		{
-			myMexErrMsgTxt( "ERROR (qpOASES): Internal interface error related to constraint matrix!" );
+			myMexErrMsgTxt( "ERROR (lcqpOASES): Internal interface error related to constraint matrix!" );
 			return;
 		}
 
-		/* Call qpOASES (using QProblem class). */
-		QProblem_qpOASES(	nV,nC,hessianType, nP,
+		/* Call lcqpOASES (using QProblem class). */
+		LCQProblem_qpOASES(	nV,nC,hessianType, nP,
 							H,g,A,
-							lb,ub,lbA,ubA,
+							lb,ub,lbA,ubA,C,
 							nWSRin,maxCpuTimeIn,
 							x0,&options,
 							nlhs,plhs,
@@ -593,12 +619,16 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 		if (R != 0) delete R;
 		if (A != 0) delete A;
 		if (H != 0) delete H;
+		if (C != 0) delete C;
 		if (Av != 0) delete[] Av;
 		if (Ajc != 0) delete[] Ajc;
 		if (Air != 0) delete[] Air;
 		if (Hv != 0) delete[] Hv;
 		if (Hjc != 0) delete[] Hjc;
 		if (Hir != 0) delete[] Hir;
+		if (Cv != 0) delete[] Cv;
+		if (Cjc != 0) delete[] Cjc;
+		if (Cir != 0) delete[] Cir;
 		return;
 	}
 }

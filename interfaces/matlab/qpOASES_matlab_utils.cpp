@@ -956,5 +956,76 @@ returnValue setupConstraintMatrix(	const mxArray* prhsA, int_t nV, int_t nC,
 
 
 /*
+ *	s e t u p C o m p l e m e n t a r i t y M a t r i x
+ */
+returnValue setupComplementarityMatrix(	const mxArray* prhsC, int_t nV,
+										SymmetricMatrix** C, sparse_int_t** Cir, sparse_int_t** Cjc, real_t** Cv
+										)
+{
+	if ( prhsC == 0 )
+		return SUCCESSFUL_RETURN;
+
+	if ( mxIsSparse( prhsC ) != 0 )
+	{
+		mwIndex *mat_ir = mxGetIr( prhsC );
+		mwIndex *mat_jc = mxGetJc( prhsC );
+		double *v = (double*)mxGetPr( prhsC );
+		sparse_int_t nfill = 0;
+		mwIndex i, j;
+		BooleanType needInsertDiag;
+
+		/* copy indices to avoid 64/32-bit integer confusion */
+		/* also add explicit zeros on diagonal for regularization strategy */
+		/* copy values, too */
+		*Cir = new sparse_int_t[mat_jc[nV] + nV];
+		*Cjc = new sparse_int_t[nV+1];
+		*Cv = new real_t[mat_jc[nV] + nV];
+        for (j = 0; j < nV; j++) 
+		{
+            needInsertDiag = BT_TRUE;
+                
+            (*Cjc)[j] = (sparse_int_t)(mat_jc[j]) + nfill;
+            /* fill up to diagonal */
+            for (i = mat_jc[j]; i < mat_jc[j+1]; i++) 
+			{
+                if ( mat_ir[i] == j )
+                    needInsertDiag = BT_FALSE;
+                    
+                /* add zero diagonal element if not present */
+                if ( ( mat_ir[i] > j ) && ( needInsertDiag == BT_TRUE ) )
+                {
+                    (*Cir)[i + nfill] = (sparse_int_t)j;
+                    (*Cv)[i + nfill] = 0.0;
+                    nfill++;
+                    /* only add diag once */
+                    needInsertDiag = BT_FALSE;
+                }
+                        
+				(*Cir)[i + nfill] = (sparse_int_t)(mat_ir[i]);
+				(*Cv)[i + nfill] = (real_t)(v[i]);
+			}
+		}
+		(*Cjc)[nV] = (sparse_int_t)(mat_jc[nV]) + nfill;
+
+		SymSparseMat *sC;
+		*C = sC = new SymSparseMat(nV, nV, *Cir, *Cjc, *Cv);
+		sC->createDiagInfo();
+	}
+	else
+	{
+		/* make a deep-copy in order to avoid modifying input data when regularising */
+		real_t* C_for = (real_t*) mxGetPr( prhsC );
+		real_t* C_mem = new real_t[nV*nV];
+		memcpy( C_mem,C_for, nV*nV*sizeof(real_t) );
+
+		*C = new SymDenseMat( nV,nV,nV, C_mem );
+		(*C)->doFreeMemory( );
+	}
+
+	return SUCCESSFUL_RETURN;
+}
+
+
+/*
  *	end of file
  */

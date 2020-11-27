@@ -34,7 +34,7 @@
 %Call
 %
 %    [x,fval,exitflag,iter,lambda,auxOutput] =
-%                     lcqpOASES( H,g,lb,ub{,options{,auxInput}} )
+%                     lcqpOASES( H,g,lb,ub,C{,options{,auxInput}} )
 %
 %for solving the above-mentioned LCQP without general constraints.
 %
