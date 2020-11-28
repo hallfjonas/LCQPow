@@ -210,7 +210,11 @@ function [ options ] = qpOASES_default_options( )
 						'numRefinementSteps',             1, ...
 						'epsIterRef',                     1.0e2*eps, ...
 						'epsLITests',                     1.0e5*eps, ...
-						'epsNZCTests',                    3.1e3*eps );
+						'epsNZCTests',                    3.1e3*eps, ...
+                        ...,
+                        'complementarityPenaltyUpdate',   2.0, ...
+                        'complementarityTolerance',       5.0e6*eps, ...
+                        'initialComplementarityPenalty',  1);
 
 end
 
@@ -225,6 +229,10 @@ function [ options ] = qpOASES_reliable_options( )
 	options.enableCholeskyRefactorisation =  1;
 
 	options.numRefinementSteps            =  2;
+    
+    options.complementarityPenaltyUpdate  = 2;
+	options.complementarityTolerance	  = options.terminationTolerance;
+	options.initialComplementarityPenalty = 1e-5;
 
 end
 
@@ -247,5 +255,9 @@ function [ options ] = qpOASES_MPC_options( )
 	options.initialStatusBounds           =  0;
 	options.numRegularisationSteps        =  1;
 	options.numRefinementSteps            =  0;
+    
+    options.complementarityPenaltyUpdate  = 2;
+	options.complementarityTolerance	  = options.terminationTolerance;
+	options.initialComplementarityPenalty = 1;
 
 end
