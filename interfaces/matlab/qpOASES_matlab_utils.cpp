@@ -836,6 +836,99 @@ returnValue obtainOutputs(	int_t k, QProblemB* qp, returnValue returnvalue, int_
 
 
 /*
+ *	o b t a i n O u t p u t s
+ */
+returnValue obtainOutputs(	int_t k, LCQProblemB* lcqp, returnValue returnvalue, int_t _nWSRout, double _cpuTime,
+							int nlhs, mxArray* plhs[], int_t nV, int_t nC = 0, int_t handle = -1
+							)
+{
+	/* Create output vectors and assign pointers to them. */
+	int_t curIdx = 0;
+
+	/* handle */
+	if ( handle >= 0 )
+		plhs[curIdx++] = mxCreateDoubleScalar( handle );
+
+	/* x */
+	double* x = mxGetPr( plhs[curIdx++] );
+	lcqp->getPrimalSolution( &(x[k*nV]) );
+
+	if ( nlhs > curIdx )
+	{
+		/* fval */
+		double* obj = mxGetPr( plhs[curIdx++] );
+		obj[k] = lcqp->getObjVal( );
+
+		if ( nlhs > curIdx )
+		{
+			/* exitflag */
+			double* status = mxGetPr( plhs[curIdx++] );
+			status[k] = (double)getSimpleStatus( returnvalue );
+
+			if ( nlhs > curIdx )
+			{
+				/* iter */
+				double* nWSRout = mxGetPr( plhs[curIdx++] );
+				nWSRout[k] = (double) _nWSRout;
+
+				if ( nlhs > curIdx )
+				{
+					/* lambda */
+					double* y = mxGetPr( plhs[curIdx++] );
+					lcqp->getDualSolution( &(y[k*(nV+nC)]) );
+
+					/* auxOutput */
+					if ( nlhs > curIdx )
+					{
+						LCQProblem* problemPointer;
+						problemPointer = dynamic_cast<LCQProblem*>(lcqp);
+
+						mxArray* auxOutput = plhs[curIdx];
+						mxArray* curField = 0;
+
+						/* working set bounds */
+						if ( nV > 0 )
+						{
+							curField = mxGetField( auxOutput,0,"workingSetB" );
+							double* workingSetB = mxGetPr(curField);
+
+							/* cast successful? */
+							if (problemPointer != NULL) {
+								problemPointer->getWorkingSetBounds( &(workingSetB[k*nV]) );
+							} else {
+								lcqp->getWorkingSetBounds( &(workingSetB[k*nV]) );
+							}
+						}
+
+						/* working set constraints */
+						if ( nC > 0 )
+						{
+							curField = mxGetField( auxOutput,0,"workingSetC" );
+							double* workingSetC = mxGetPr(curField);
+
+							/* cast successful? */
+							if (problemPointer != NULL) {
+								problemPointer->getWorkingSetConstraints( &(workingSetC[k*nC]) );
+							} else {
+								lcqp->getWorkingSetConstraints( &(workingSetC[k*nC]) );
+							}
+						}
+
+						/* cpu time */
+						curField = mxGetField( auxOutput,0,"cpuTime" );
+						double* cpuTime = mxGetPr(curField);
+						cpuTime[0] = (double) _cpuTime;
+					}
+				}
+			}
+		}
+	}
+	
+	return SUCCESSFUL_RETURN;
+}
+
+
+/*
  *	s e t u p H e s s i a n M a t r i x
  */
 returnValue setupHessianMatrix(	const mxArray* prhsH, int_t nV,
