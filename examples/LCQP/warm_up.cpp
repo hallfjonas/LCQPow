@@ -12,14 +12,21 @@ int main() {
     real_t g[2] = { -2.0, -2.0 };
     real_t lb[2] = { 0.0, 0.0 };
     real_t ub[2] = { 10000.0, 10000.0 };
-    real_t C[2*2] = { 0.0, 1.0, 1.0, 0.0 };
+    real_t S1[1*2] = {1.0, 0.0};
+    real_t S2[1*2] = {0.0, 1.0};
+
+    real_t A[1*2] = { 1.0, 0.0 };
+    real_t lbA[1] = { -10.0 };
+    real_t ubA[1] = { 100.0};
 
     // Initial guess
     real_t x0[2] = { 1.0 + EPS, 1.0 };
 
     int_t nV = 2;
+    int_t nC = 1;
+    int_t nComp = 1;
 
-    LCQProblemB lcqp( nV );
+    LCQProblem lcqp( nV, nC, nComp );
 
 	Options options;
     options.initialComplementarityPenalty = 1.5;
@@ -29,7 +36,13 @@ int main() {
 	int_t nWSR = 10000000;
 
     // Solve first LCQP
-	lcqp.init( H, g, lb, ub, C, nWSR, 0, x0 );
+	returnValue retVal = lcqp.solve( H, g, A, lb, ub, lbA, ubA, S1, S2, nWSR, 0, x0 );
+
+    if (retVal != SUCCESSFUL_RETURN)
+    {
+        printf("Termination ended without success.\n");
+        return 1;
+    }
 
     // Get solutions
     real_t xOpt[2];

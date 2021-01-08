@@ -72,7 +72,6 @@
 #include <qpOASES/extras/OQPinterface.hpp>
 #include <qpOASES/extras/SolutionAnalysis.hpp>
 
-#include <qpOASES/LCQProblemB.hpp>
 #include <qpOASES/LCQProblem.hpp>
 
 #endif
