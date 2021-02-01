@@ -72,21 +72,7 @@ clean:
 
 clobber: clean
 
-scilab:
-	@echo Compiling Scilab interface...
-	@cd ./interfaces/scilab/; ${MAKE} -s
-
-python: all
-	cd ./interfaces/python/ && python setup.py build_ext --inplace
-
-pythoninstall: all
-	cd ./interfaces/python/ && python setup.py install
-
-c_wrapper:
-	@echo Compiling C interface...
-	@cd ./interfaces/c/; ${MAKE} -s
-
-.PHONY : all src examples doc testing debugging clean clobber scilab python phythoninstall c_wrapper
+.PHONY : all src examples doc testing debugging clean clobber
 
 
 ##

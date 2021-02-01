@@ -16,34 +16,34 @@ int T = 2;                                      // Time span [0, T]
 int N = 75;                                     // Number of discretization nodes
 double h = (double)T/N;                         // Step size
 bool useIPOPT = false;                          // Use qpOASES LCQP or IPOPT NLP 
-real_t u_max = 1000;                            // Bound on control
-real_t controlPenalty = 1;                      // Penalty factor on control cost
-real_t constraintTol = 1e-7;                    // Terminal constraint tolerance
+double u_max = 1000;                            // Bound on control
+double controlPenalty = 1;                      // Penalty factor on control cost
+double constraintTol = 1e-7;                    // Terminal constraint tolerance
 
 // State space          
 int nu = 1;                                     // Number of control variables per node
 int nx = 2*nMasses + 1;                         // Number of state variables per node
 int nz = 2*nMasses;                             // Number of algebraic variables per node
-int_t NV = 1 + nx + N*(nu + nx + nz);           // Number of optimization variables
-int_t NComp = 4*N*nMasses;                      // Number of complementarity constraints
-int_t NConstr = N*nMasses + nx*N + nMasses;     // Number of constraints
-real_t* C = new real_t[NV*NV];                  // S1'*S2
+int NV = 1 + nx + N*(nu + nx + nz);           // Number of optimization variables
+int NComp = 4*N*nMasses;                      // Number of complementarity constraints
+int NConstr = N*nMasses + nx*N + nMasses;     // Number of constraints
+double* C = new double[NV*NV];                  // S1'*S2
 
 // Initial state of dynamic system
-real_t* x0 = new real_t[nx];
-real_t* u0 = new real_t[nu];
-real_t* z0 = new real_t[nz];
-real_t* lbx = new real_t[nx];
-real_t* ubx = new real_t[nx];
-real_t* lbu = new real_t[nu];
-real_t* ubu = new real_t[nu];
-real_t* lbz = new real_t[nz];
-real_t* ubz = new real_t[nz];
+double* x0 = new double[nx];
+double* u0 = new double[nu];
+double* z0 = new double[nz];
+double* lbx = new double[nx];
+double* ubx = new double[nx];
+double* lbu = new double[nu];
+double* ubu = new double[nu];
+double* lbz = new double[nz];
+double* ubz = new double[nz];
 
 // Complementarity matrices (Store a la data[row*ncol + col] = data)
-real_t* S1 = new real_t[NComp*NV];
-real_t* S2 = new real_t[NComp*NV];
-int_t compCounter = 0;
+double* S1 = new double[NComp*NV];
+double* S2 = new double[NComp*NV];
+int compCounter = 0;
 
 // State variables
 SX p = SX::sym("p", nMasses);
@@ -64,8 +64,8 @@ SX one = SX::sym("one", 1);
   
 // Trajectory variables, bounds and indices
 vector<SX> w_k;
-vector<real_t> lbw;
-vector<real_t> ubw;
+vector<double> lbw;
+vector<double> ubw;
 vector<int> ind_all;
 vector<int> ind_x;
 vector<int> ind_u;
@@ -73,11 +73,11 @@ vector<int> ind_z;
 
 // ODE constraints
 vector <SX> g_k;
-vector<real_t> lbg;
-vector<real_t> ubg;
+vector<double> lbg;
+vector<double> ubg;
 
 // Initial guess vector
-vector<real_t> w0;
+vector<double> w0;
 
 // Initialize cost function
 SX J = 0;
@@ -105,10 +105,10 @@ SX f(const SX& x, const SX& u, const SX& z) {
     return dot;
 }
 
-void FillC(const real_t* const S1, const real_t* const S2) {
+void FillC(const double* const S1, const double* const S2) {
     for (int i = 0; i < NV; i++) {
         for (int j = 0; j <= i; j++) {
-            real_t res = 0;
+            double res = 0;
             for (int k = 0; k < NComp; k++) {
                 res += S1[k*NV + i]*S2[k*NV + j];
             }
@@ -120,9 +120,9 @@ void FillC(const real_t* const S1, const real_t* const S2) {
 }
 
 void CreateQPfromCasADi(    SX J, SX g, SX w, 
-                            const real_t* const lbw, const real_t* const ubw, 
-                            const real_t* const lbg, const real_t* const ubg, 
-                            real_t* Q, real_t* d, real_t* A, real_t* lb, real_t* ub, real_t* lbA, real_t* ubA) {
+                            const double* const lbw, const double* const ubw, 
+                            const double* const lbg, const double* const ubg, 
+                            double* Q, double* d, double* A, double* lb, double* ub, double* lbA, double* ubA) {
     
     // Build zero argument
     vector<double> zero_vec;
@@ -162,7 +162,7 @@ void CreateQPfromCasADi(    SX J, SX g, SX w,
     }
 
     // Store constraints
-    real_t* Constr_const = new real_t[NConstr];
+    double* Constr_const = new double[NConstr];
     for (int i = 0; i < NConstr; i++) {
         // Adjust constraint bounds
         Constr_const[i] = Gk_zero_eval[i];
@@ -394,18 +394,18 @@ int main() {
     
     std::cout << "Calling LCQP solver ..." << endl;
 
-    real_t* b = new real_t[NComp];
+    double* b = new double[NComp];
     for (int i = 0; i < NComp; i++)
         b[i] = 1;
         
     // Allocate LCQP arrays to be filled
-    real_t* Q = new real_t[NV*NV];
-    real_t* d = new real_t[NV];
-    real_t* A = new real_t[NConstr*NV];
-    real_t* lbA = new real_t[NConstr];
-    real_t* ubA = new real_t[NConstr];
-    real_t* lb = new real_t[NV];
-    real_t* ub = new real_t[NV];
+    double* Q = new double[NV*NV];
+    double* d = new double[NV];
+    double* A = new double[NConstr*NV];
+    double* lbA = new double[NConstr];
+    double* ubA = new double[NConstr];
+    double* lb = new double[NV];
+    double* ub = new double[NV];
 
     // Interface to generate LCQP from CasADi functions and variables
     CreateQPfromCasADi(J, g, w, &lbw[0], &ubw[0], &lbg[0], &ubg[0], Q, d, A, lb, ub, lbA, ubA);
@@ -421,14 +421,14 @@ int main() {
     lcqp.setOptions( options );
 
     // Set maximum number of working set changes
-    int_t nWSR = 10000;
+    int nWSR = 10000;
 
     // Set maximum cpu time to unlimited
-    real_t* cputime = 0;
+    double* cputime = 0;
 
     // Solve LCQP
     lcqp.init(Q, d, A, lb, ub, lbA, ubA, C, nWSR, cputime, &w0[0]);
 
-    real_t* wk_opt = new real_t[NV];
+    double* wk_opt = new double[NV];
     lcqp.getPrimalSolution( wk_opt );
 }

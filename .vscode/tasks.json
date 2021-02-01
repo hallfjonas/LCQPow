@@ -11,7 +11,25 @@
                 "warm_up"
             ],
             "options": {
-                "cwd": "examples/LCQP"
+                "cwd": "examples"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+
+        {
+            "label": "clean debug",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "clean"
+            ],
+            "options": {
+                "cwd": "examples"
             },
             "group": "build",
             "presentation": {

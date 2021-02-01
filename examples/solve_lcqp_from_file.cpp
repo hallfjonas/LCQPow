@@ -5,8 +5,6 @@
 #include <qpOASES.hpp>
 #include <unistd.h>
 
-USING_NAMESPACE_QPOASES
-
 int main() {
     std::string inputdir = "examples/LCQP/example_data/";
 
@@ -26,8 +24,8 @@ int main() {
     std::string x0_file = inputdir + "x0.txt";
     std::string y0_file = inputdir + "y0.txt";
 
-    int_t nV = 0;
-    int_t nC = 0;
+    int nV = 0;
+    int nC = 0;
 
     std::string line;
 
@@ -40,7 +38,7 @@ int main() {
         nC++;
 
     // Read x0 value
-    real_t* x0 = new real_t[nV];
+    double* x0 = new double[nV];
     if (access( x0_file.c_str(), F_OK ) != -1 ) {
         readFromFile( x0, nV, &x0_file[0] );
     } else {
@@ -49,7 +47,7 @@ int main() {
     }
 
     // Read y0 value
-    real_t* y0 = new real_t[nV + nC];
+    double* y0 = new double[nV + nC];
     if (access( y0_file.c_str(), F_OK ) != -1 ) {
         readFromFile( y0, nV + nC, &y0_file[0] );
     } else {
@@ -62,16 +60,16 @@ int main() {
     options.initialComplementarityPenalty = 1.0;
     options.complementarityPenaltyUpdate = 2.0;
 
-    int_t nWSR = 10000000;
-    real_t* cputime = 0;
+    int nWSR = 10000000;
+    double* cputime = 0;
 
     if (nC == 0) {
         LCQProblemB lcqp( nV );
 	    lcqp.setOptions( options );
         lcqp.init( &H_file[0], &g_file[0], &lb_file[0], &ub_file[0], &C_file[0], nWSR, cputime, x0, y0 );
 
-        real_t* xOpt = new real_t[nV];
-        real_t* yOpt = new real_t[nV];
+        double* xOpt = new double[nV];
+        double* yOpt = new double[nV];
         lcqp.getPrimalSolution( xOpt );
         lcqp.getDualSolution( yOpt );
     } else {
@@ -79,8 +77,8 @@ int main() {
 	    lcqp.setOptions( options );
         lcqp.init( &H_file[0], &g_file[0], &A_file[0], &lb_file[0], &ub_file[0], &lbA_file[0], &ubA_file[0], &C_file[0], nWSR, cputime, x0, y0 );
 
-        real_t* xOpt = new real_t[nV];
-        real_t* yOpt = new real_t[nV];
+        double* xOpt = new double[nV];
+        double* yOpt = new double[nV];
         lcqp.getPrimalSolution( xOpt );
         lcqp.getDualSolution( yOpt );
     }

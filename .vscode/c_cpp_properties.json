@@ -3,7 +3,9 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/include/**",
+                "/usr/local/qpOASES/include/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

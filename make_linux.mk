@@ -38,12 +38,17 @@ SRCDIR = ${TOP}/src
 BINDIR = ${TOP}/bin
 DEBUGDIR = ${TOP}/debug
 
-# Matlab include directory (ADAPT TO YOUR LOCAL SETTINGS!)
-#MATLAB_IDIR   = ${HOME}/Programs/matlab/extern/include/
-MATLAB_IDIR   = /usr/local/matlab/extern/include/
-MATLAB_LIBDIR = /usr/local/matlab/bin/glnxa64/
+# Include directories (ADAPT TO YOUR LOCAL SETTINGS!)
+# 1) qpOASES
+QPOASES_IDIR   = /usr/local/qpOASES/include
+QPOASES_LIB_DIR = /usr/local/qpOASES/bin
+QPOASES_LINK   = -L${QPOASES_LIB_DIR} -Wl,-rpath=${QPOASES_LIB_DIR} -lqpOASES 
 
-# system or replacement BLAS/LAPACK
+# 2) CasADi
+CASADI_IDIR   = /usr/local/casadi/build
+CASADI_LIBDIR = /usr/local/casadi/build/lib
+
+# 3) Linear Algebra: System or Replacement BLAS/LAPACK
 REPLACE_LINALG = 1
 
 ifeq ($(REPLACE_LINALG), 1)
@@ -56,24 +61,6 @@ else
 #	LIB_LAPACK = ${MATLAB_LIBDIR}/libmwlapack.so
 endif
 
-# choice of sparse solver: NONE, MA27, or MA57
-# If choice is not 'NONE', BLAS and LAPACK replacements must not be used
-USE_SOLVER = NONE
-#USE_SOLVER = MA57
-
-ifeq ($(USE_SOLVER), MA57)
-	LIB_SOLVER = ${MATLAB_LIBDIR}/libmwma57.so
-	DEF_SOLVER = SOLVER_MA57
-	LINKHSL = -Wl,-rpath=${MATLAB_LIBDIR}
-else ifeq ($(USE_SOLVER), MA27)
-	LIB_SOLVER = /usr/local/lib/libhsl_ma27.a
-	DEF_SOLVER = SOLVER_MA27
-	LINKHSL =
-else
-	LIB_SOLVER =
-	DEF_SOLVER = SOLVER_NONE
-	LINKHSL =
-endif
 
 ################################################################################
 # do not touch this
@@ -96,32 +83,8 @@ MEXOCTEXT = mex
 DEF_TARGET = -o $@
 SHARED = -shared
 
-# 32 or 64 depending on target platform
-BITS = $(shell getconf LONG_BIT)
-
-# decide on MEX interface extension
-ifeq ($(BITS), 32)
-	MEXEXT = mexglx
-else
-	MEXEXT = mexa64
-endif
-
-
-
 CPPFLAGS = -Wall -pedantic -Wshadow -Wfloat-equal -O3 -Wconversion -Wsign-conversion -fPIC -DLINUX -D__USE_LONG_INTEGERS__ -D__USE_LONG_FINTS__ -D${DEF_SOLVER} -D__NO_COPYRIGHT__
 #          -g -D__DEBUG__ -D__NO_COPYRIGHT__ -D__SUPPRESSANYOUTPUT__ -D__USE_SINGLE_PRECISION__
-
-# libraries to link against when building qpOASES .so files
-LINK_LIBRARIES = ${LIB_LAPACK} ${LIB_BLAS} -lm ${LIB_SOLVER}
-LINK_LIBRARIES_WRAPPER = -lm ${LIB_SOLVER} -lstdc++
-
-# how to link against the qpOASES shared library
-QPOASES_LINK = -L${BINDIR} -Wl,-rpath=${BINDIR} ${LINKHSL} -lqpOASES
-QPOASES_LINK_WRAPPER = -L${BINDIR} -Wl,-rpath=${BINDIR} ${LINKHSL} -lqpOASES_wrapper
-
-# link dependencies when creating executables
-LINK_DEPENDS = ${LIB_LAPACK} ${LIB_BLAS} ${BINDIR}/libqpOASES.${LIBEXT} ${BINDIR}/libqpOASES.${DLLEXT}
-LINK_DEPENDS_WRAPPER = ${BINDIR}/libqpOASES_wrapper.${LIBEXT} ${BINDIR}/libqpOASES_wrapper.${DLLEXT}
 
 
 ##

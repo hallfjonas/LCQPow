@@ -33,445 +33,184 @@
  *	parametric quadratic programming.
  */
 
-BEGIN_NAMESPACE_QPOASES
 
-
-/*****************************************************************************
- *  P U B L I C                                                              *
- *****************************************************************************/
-/*
- *	g e t N C o m p
- */
-inline int_t LCQProblem::getNV( ) const
-{
-	return nV;
-}
-
-/*
- *	g e t N C o m p
- */
-inline int_t LCQProblem::getNC( ) const
-{
-	return nC;
-}
-
-/*
- *	g e t N C o m p
- */
-inline int_t LCQProblem::getNComp( ) const
-{
-	return nComp;
-}
-
-/*
- *	s e t H
- */
-inline returnValue LCQProblem::setH( SymmetricMatrix* H_new )
-{
-	if ( ( freeHessian == BT_TRUE ) && ( H != 0 ) )
+namespace lcqpOASES {
+	/*****************************************************************************
+	 *  P U B L I C                                                              *
+	 *****************************************************************************/
+	/*
+	*	g e t N C o m p
+	*/
+	inline int LCQProblem::getNV( ) const
 	{
-		delete H;
-		H = 0;
+		return nV;
 	}
 
-	H = H_new;
-	freeHessian = BT_FALSE;
 
-	return SUCCESSFUL_RETURN;
-}
-
-
-/*
- *	s e t H
- */
-inline returnValue LCQProblem::setH( const real_t* const H_new )
-{
-	int_t nV = getNV();
-	SymDenseMat* dH;
-
-	/* Not allowing 0 hessians here */
-	if ( H_new == 0 )
+	/*
+	*	g e t N C o m p
+	*/
+	inline int LCQProblem::getNC( ) const
 	{
-		return THROWERROR( RET_INVALID_ARGUMENTS );
-	}
-	
-	if ( ( freeHessian == BT_TRUE ) && ( H != 0 ) )
-		delete H;
-
-	H = dH = new SymDenseMat( nV, nV, nV, (real_t*) H_new );
-	freeHessian = BT_TRUE;
-
-
-	return SUCCESSFUL_RETURN;
-}
-
-/*
- *	s e t G
- */
-inline returnValue LCQProblem::setG( const real_t* const g_new )
-{
-	uint_t nV = (uint_t)getNV( );
-
-	if ( nV == 0 )
-		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
-
-	if ( g_new == 0 )
-		return THROWERROR( RET_INVALID_ARGUMENTS );
-
-	g = new real_t[nV];
-	memcpy( g, g_new, nV*sizeof(real_t) );
-
-	return SUCCESSFUL_RETURN;
-}
-
-
-/*
- *	s e t L B
- */
-inline returnValue LCQProblem::setLB( const real_t* const lb_new )
-{
-	uint_t i;
-	uint_t nV = (uint_t)getNV( );
-
-	if ( nV == 0 )
-		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
-
-	lb = new real_t[nV];
-
-	if ( lb_new != 0 )
-	{
-		memcpy( lb,lb_new,nV*sizeof(real_t) );
-	}
-	else
-	{
-		/* if no lower bounds are specified, set them to -infinity */
-		for( i=0; i<nV; ++i )
-			lb[i] = -INFTY;
+		return nC;
 	}
 
-	return SUCCESSFUL_RETURN;
-}
 
-
-/*
- *	s e t L B
- */
-inline returnValue LCQProblem::setLB( int_t number, real_t value )
-{
-	int_t nV = getNV( );
-
-	if ( nV == 0 )
-		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
-
-	if ( ( number >= 0 ) && ( number < nV ) )
+	/*
+	*	g e t N C o m p
+	*/
+	inline int LCQProblem::getNComp( ) const
 	{
-		lb[number] = value;
-		return SUCCESSFUL_RETURN;
-	}
-	else
-	{
-		return THROWERROR( RET_INDEX_OUT_OF_BOUNDS );
-	}
-}
-
-
-/*
- *	s e t U B
- */
-inline returnValue LCQProblem::setUB( const real_t* const ub_new )
-{
-	uint_t i;
-	uint_t nV = (uint_t)getNV( );
-
-	if ( nV == 0 )
-		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
-
-	ub = new real_t[nV];
-
-	if ( ub_new != 0 )
-	{
-		memcpy( ub,ub_new,nV*sizeof(real_t) );
-	}
-	else
-	{
-		/* if no upper bounds are specified, set them to infinity */
-		for( i=0; i<nV; ++i )
-			ub[i] = INFTY;
+		return nComp;
 	}
 
-	return SUCCESSFUL_RETURN;
-}
 
-
-/*
- *	s e t U B
- */
-inline returnValue LCQProblem::setUB( int_t number, real_t value )
-{
-	int_t nV = getNV( );
-
-	if ( nV == 0 )
-		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
-
-	if ( ( number >= 0 ) && ( number < nV ) )
+	/*
+	*	s e t H
+	*/
+	inline returnValue LCQProblem::setH( const double* const H_new )
 	{
-		ub[number] = value;
+		uint nV = (uint)getNV( );
 
-		return SUCCESSFUL_RETURN;
-	}
-	else
-	{
-		return THROWERROR( RET_INDEX_OUT_OF_BOUNDS );
-	}
-}
+		if (nV <= 0)
+			return returnValue::LCQPOBJECT_NOT_SETUP;
 
+		H = new double[nV*nV];
+		memcpy( H, H_new, nV*nV*sizeof(double) );
 
-/*
- *	s e t A
- */
-inline returnValue LCQProblem::setA( Matrix *A_new )
-{
-	int_t j;
-	int_t nV = getNV( );
-	int_t nC = getNC( );
-
-	if ( nV == 0 )
-		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
-
-	if ( A_new == 0 )
-		return THROWERROR( RET_INVALID_ARGUMENTS );
-
-	/* Set constraint matrix AND update member AX. */
-	if ( ( freeConstraintMatrix == BT_TRUE ) && ( A != 0 ) )
-	{
-		delete A;
-		A = 0;
-	}
-	A = A_new;
-	freeConstraintMatrix = BT_FALSE;
-
-	return SUCCESSFUL_RETURN;
-}
-
-
-/*
- *	s e t A
- */
-inline returnValue LCQProblem::setA( const real_t* const A_new, const int_t nRows )
-{
-	int_t j;
-	int_t nV = getNV( );
-	DenseMatrix* dA;
-
-	if ( nV == 0 )
-		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
-
-	if ( A_new == 0 )
-		return THROWERROR( RET_INVALID_ARGUMENTS );
-
-	/* Set constraint matrix AND update member AX. */
-	if ( ( freeConstraintMatrix == BT_TRUE ) && ( A != 0 ) )
-	{
-		delete A;
-		A = 0;
+		return returnValue::SUCCESSFUL_RETURN;
 	}
 
-	A = dA = new DenseMatrix(nRows, nV, nV, (real_t*) A_new);
-	freeConstraintMatrix = BT_TRUE;
 
-	return SUCCESSFUL_RETURN;
-}
-
-
-/*
- *	s e t L B A
- */
-inline returnValue LCQProblem::setLBA( const real_t* const lbA_new )
-{
-	uint_t i;
-	uint_t nV = (uint_t)getNV( );
-	uint_t nC = (uint_t)getNC( );
-
-	if ( nV == 0 )
-		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
-
-	lbA = new real_t[nC];
-
-	if ( lbA_new != 0 )
+	/*
+	*	s e t G
+	*/
+	inline returnValue LCQProblem::setG( const double* const g_new )
 	{
-		memcpy( lbA,lbA_new,nC*sizeof(real_t) );
-	}
-	else
-	{
-		/* if no lower constraints' bounds are specified, set them to -infinity */
-		for( i=0; i<nC; ++i )
-			lbA[i] = -INFTY;
+		uint nV = (uint)getNV( );
+
+		if ( nV == 0 )
+			return returnValue::LCQPOBJECT_NOT_SETUP;
+
+		if ( g_new == 0 )
+			return returnValue::ILLEGAL_ARGUMENT;
+
+		g = new double[nV];
+		memcpy( g, g_new, nV*sizeof(double) );
+
+		return returnValue::SUCCESSFUL_RETURN;
 	}
 
-	return SUCCESSFUL_RETURN;
-}
 
-
-/*
- *	s e t L B A
- */
-inline returnValue LCQProblem::setLBA( int_t number, real_t value )
-{
-	int_t nV = getNV( );
-	int_t nC = getNC( );
-
-	if ( nV == 0 )
-		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
-
-	if ( ( number >= 0 ) && ( number < nC ) )
+	/*
+	*	s e t L B
+	*/
+	inline returnValue LCQProblem::setLB( const double* const lb_new )
 	{
-		lbA[number] = value;
-		return SUCCESSFUL_RETURN;
-	}
-	else
-		return THROWERROR( RET_INDEX_OUT_OF_BOUNDS );
-}
+		uint i;
+		uint nV = (uint)getNV( );
 
+		if ( nV == 0 )
+			return returnValue::LCQPOBJECT_NOT_SETUP;
 
-/*
- *	s e t U B A
- */
-inline returnValue LCQProblem::setUBA( const real_t* const ubA_new )
-{
-	uint_t i;
-	uint_t nV = (uint_t)getNV( );
-	uint_t nC = (uint_t)getNC( );
+		lb = new double[nV];
 
-	if ( nV == 0 )
-		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
-
-	ubA = new real_t[nC];
-
-	if ( ubA_new != 0 )
-	{
-		memcpy( ubA,ubA_new,nC*sizeof(real_t) );
-	}
-	else
-	{
-		/* if no upper constraints' bounds are specified, set them to infinity */
-		for( i=0; i<nC; ++i )
-			ubA[i] = INFTY;
-	}
-
-	return SUCCESSFUL_RETURN;
-}
-
-
-/*
- *	s e t U B A
- */
-inline returnValue LCQProblem::setUBA( int_t number, real_t value )
-{
-	int_t nV = getNV( );
-	int_t nC = getNC( );
-
-	if ( nV == 0 )
-		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
-
-	if ( ( number >= 0 ) && ( number < nC ) )
-	{
-		ubA[number] = value;
-		return SUCCESSFUL_RETURN;
-	}
-	else
-		return THROWERROR( RET_INDEX_OUT_OF_BOUNDS );
-}
-
-
-/*
- *	s e t C o m p l e m e n t a r i t i e s
- */
-inline returnValue LCQProblem::setComplementarities( Matrix* S1_new, Matrix* S2_new )
-{
-	// Free space if required
-	if ( freeComplementarityMatrix == BT_TRUE )
-	{
-		if ( S1 != 0 ) {
-			delete S1;
-			S1 = 0;
+		if ( lb_new != 0 )
+		{
+			memcpy( lb,lb_new,nV*sizeof(double) );
+		}
+		else
+		{
+			/* if no lower bounds are specified, set them to -infinity */
+			for( i = 0; i < nV; i++ )
+				lb[i] = -INFINITY;
 		}
 
-		if ( S2 != 0 ) {
-			delete S2;
-			S2 = 0;
+		return returnValue::SUCCESSFUL_RETURN;
+	}
+
+
+	/*
+	*	s e t L B
+	*/
+	inline returnValue LCQProblem::setLB( int number, double value )
+	{
+		int nV = getNV( );
+
+		if ( nV == 0 )
+			return returnValue::LCQPOBJECT_NOT_SETUP;
+
+		if ( ( number >= 0 ) && ( number < nV ) )
+		{
+			lb[number] = value;
+			return returnValue::SUCCESSFUL_RETURN;
+		}
+		else
+		{
+			return returnValue::INDEX_OUT_OF_BOUNDS;
 		}
 	}
 
-	// Assign matrices
-	S1 = S1_new;
-	S2 = S2_new;
 
-	// Set complementarity matrix
-	setC();
-
-	return SUCCESSFUL_RETURN;
-}
-
-/*
- *	s e t C o m p l e m e n t a r i t i e s
- */
-inline returnValue LCQProblem::setComplementarities( const real_t* const S1_new,  const real_t* const S2_new )
-{
-	int_t j;
-	int_t nV = getNV( );
-	int_t nComp = getNComp( );
-	DenseMatrix* dS1;
-	DenseMatrix* dS2;
-
-	if ( nV == 0 || nComp == 0)
-		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
-
-	if ( S1_new == 0 || S2_new == 0 )
-		return THROWERROR( RET_INVALID_ARGUMENTS );
-
-	// Free space if required
-	if ( freeComplementarityMatrix == BT_TRUE )
+	/*
+	*	s e t U B
+	*/
+	inline returnValue LCQProblem::setUB( const double* const ub_new )
 	{
-		if ( S1 != 0 ) {
-			delete S1;
-			S1 = 0;
+		uint i;
+		uint nV = (uint)getNV( );
+
+		if ( nV == 0 )
+			return returnValue::LCQPOBJECT_NOT_SETUP;
+
+		ub = new double[nV];
+
+		if ( ub_new != 0 )
+		{
+			memcpy( ub,ub_new,nV*sizeof(double) );
+		}
+		else
+		{
+			/* if no upper bounds are specified, set them to infinity */
+			for( i=0; i<nV; ++i )
+				ub[i] = INFINITY;
 		}
 
-		if ( S2 != 0 ) {
-			delete S2;
-			S2 = 0;
+		return returnValue::SUCCESSFUL_RETURN;
+	}
+
+
+	/*
+	*	s e t U B
+	*/
+	inline returnValue LCQProblem::setUB( int number, double value )
+	{
+		int nV = getNV( );
+
+		if ( nV == 0 )
+			return returnValue::LCQPOBJECT_NOT_SETUP;
+
+		if ( ( number >= 0 ) && ( number < nV ) )
+		{
+			ub[number] = value;
+
+			return returnValue::SUCCESSFUL_RETURN;
+		}
+		else
+		{
+			return returnValue::INDEX_OUT_OF_BOUNDS;
 		}
 	}
 
-	// Assign values
-	S1 = dS1 = new DenseMatrix(nComp, nV, nV, (real_t*) S1_new);
-	S2 = dS2 = new DenseMatrix(nComp, nV, nV, (real_t*) S2_new);
-	freeComplementarityMatrix = BT_TRUE;
-
-	// Set complementarity matrix
-	setC();
-
-	return SUCCESSFUL_RETURN;
+	/*
+	 *	s e t O p t i o n s
+	 */
+	inline void LCQProblem::setOptions( const Options& _options )
+	{
+		options = _options;
+		options.ensureConsistency( );
+	}
 }
-
-
-/*
- *	s e t O p t i o n s
- */
-inline returnValue LCQProblem::setOptions(	const Options& _options
-											)
-{
-	options = _options;
-	options.ensureConsistency( );
-
-	setPrintLevel( options.printLevel );
-
-	return SUCCESSFUL_RETURN;
-}
-
-
-END_NAMESPACE_QPOASES
-
 
 /*
  *	end of file

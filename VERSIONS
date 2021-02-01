@@ -31,7 +31,7 @@ VERSION HISTORY
 
 + Addition of SQProblemSchur class implementing Schur complement approach
   for sparse QP problems
-+ Introduction of data types int_t and uint_t for integer-valued numbers
++ Introduction of data types int and uint for integer-valued numbers
 + Minor source code clean-up and bugfixes
 
 

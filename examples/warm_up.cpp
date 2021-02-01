@@ -1,30 +1,31 @@
 // Copyright 2020 Jonas Hall
 
 #include <iostream>
-#include <qpOASES.hpp>
-USING_NAMESPACE_QPOASES
+#include "LCQProblem.hpp"
+
+using namespace lcqpOASES;
 
 int main() {
     std::cout << "Preparing warm up problem...\n";
 
     /* Setup data of first QP. */
-    real_t H[2*2] = { 2.0, 0.0, 0.0, 2.0 };
-    real_t g[2] = { -2.0, -2.0 };
-    real_t lb[2] = { 0.0, 0.0 };
-    real_t ub[2] = { 10000.0, 10000.0 };
-    real_t S1[1*2] = {1.0, 0.0};
-    real_t S2[1*2] = {0.0, 1.0};
+    double H[2*2] = { 2.0, 0.0, 0.0, 2.0 };
+    double g[2] = { -2.0, -2.0 };
+    double lb[2] = { 0.0, 0.0 };
+    double ub[2] = { 10000.0, 10000.0 };
+    double S1[1*2] = {1.0, 0.0};
+    double S2[1*2] = {0.0, 1.0};
 
-    real_t A[1*2] = { 1.0, 0.0 };
-    real_t lbA[1] = { -10.0 };
-    real_t ubA[1] = { 100.0};
+    double A[1*2] = { 1.0, 0.0 };
+    double lbA[1] = { -10.0 };
+    double ubA[1] = { 100.0};
 
     // Initial guess
-    real_t x0[2] = { 1.0 + EPS, 1.0 };
+    double x0[2] = { 1.0, 1.0 };
 
-    int_t nV = 2;
-    int_t nC = 1;
-    int_t nComp = 1;
+    int nV = 2;
+    int nC = 1;
+    int nComp = 1;
 
     LCQProblem lcqp( nV, nC, nComp );
 
@@ -33,7 +34,7 @@ int main() {
     options.complementarityPenaltyUpdate = 2;
 	lcqp.setOptions( options );
 
-	int_t nWSR = 10000000;
+	int nWSR = 10000000;
 
     // Solve first LCQP
 	returnValue retVal = lcqp.solve( H, g, A, lb, ub, lbA, ubA, S1, S2, nWSR, 0, x0 );
@@ -45,8 +46,8 @@ int main() {
     }
 
     // Get solutions
-    real_t xOpt[2];
-	real_t yOpt[2];
+    double xOpt[2];
+	double yOpt[2];
 	lcqp.getPrimalSolution( xOpt );
 	lcqp.getDualSolution( yOpt );
 	printf( "\nxOpt = [ %e, %e ];  yOpt = [ %e, %e ];  objVal = %e\n\n",

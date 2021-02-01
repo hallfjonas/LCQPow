@@ -29,7 +29,7 @@
 ##	Date:      2007-2017
 ##
 
-include ../../make.mk
+include ../make.mk
 
 ##
 ##	flags
@@ -37,17 +37,17 @@ include ../../make.mk
 
 IFLAGS      =  -I. \
                -I${IDIR} \
-			   -I/home/jonas/Documents/casadi
+			   -I${QPOASES_IDIR}
 
-LFLAGS = -L/home/jonas/Documents/casadi/lib -lcasadi
+LFLAGS 		= ${QPOASES_LINK}
 
-DEBUGFLAGS = -g
+DEBUGFLAGS = -g -D__USE_LONG_INTEGERS__ 
 
 ##
 ##  files
 ##
 
-QPOASES_SRC = $(wildcard ${SRCDIR}/*.cpp)
+LCQPOASES_SRC = $(wildcard ${SRCDIR}/*.cpp)
 QPOASES_EXM = $(wildcard ./*.cpp)
 
 
@@ -87,8 +87,8 @@ ${BINDIR}/%${EXE}: %.${OBJEXT} ${LINK_DEPENDS}
 
 ${DEBUGDIR}/%${EXE}:
 	@${ECHO} "Building debug..." $@
-	${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${QPOASES_SRC} ${PLOT_SRC} ${DEF_TARGET} ${IFLAGS} ${LFLAGS}
-	@${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${QPOASES_SRC} ${PLOT_SRC} ${DEF_TARGET} ${IFLAGS} ${LFLAGS}
+	${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${LCQPOASES_SRC} ${PLOT_SRC} ${DEF_TARGET} ${IFLAGS} ${LFLAGS}
+	@${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${LCQPOASES_SRC} ${PLOT_SRC} ${DEF_TARGET} ${IFLAGS} ${LFLAGS}
 
 clean:
 	@${ECHO} "Cleaning up (examples)"
