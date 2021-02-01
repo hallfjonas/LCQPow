@@ -37,8 +37,7 @@
 #ifndef QPOASES_LCQPROBLEM_HPP
 #define QPOASES_LCQPROBLEM_HPP
 
-#include <qpOASES/QProblem.hpp>
-#include <qpOASES/Matrices.hpp>
+#include <qpOASES.hpp>
 
 
 BEGIN_NAMESPACE_QPOASES

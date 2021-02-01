@@ -29,7 +29,7 @@
 ##	Date:      2007-2017
 ##
 
-include ../make.mk
+include ../../make.mk
 
 ##
 ##	flags
@@ -37,79 +37,71 @@ include ../make.mk
 
 IFLAGS      =  -I. \
                -I${IDIR} \
-			   -I/home/jonas/Documents/casadi 
+			   -I/home/jonas/Documents/casadi
 
-LINK_CASADI = -L/home/jonas/Documents/casadi/lib -lcasadi
+LFLAGS = -L/home/jonas/Documents/casadi/lib -lcasadi
+
+DEBUGFLAGS = -g
+
+##
+##  files
+##
+
+QPOASES_SRC = $(wildcard ${SRCDIR}/*.cpp)
+QPOASES_EXM = $(wildcard ./*.cpp)
+
 
 QPOASES_EXES = \
-	${BINDIR}/example1${EXE} \
-	${BINDIR}/example1a${EXE} \
-	${BINDIR}/example1b${EXE} \
-	${BINDIR}/example2${EXE} \
-	${BINDIR}/example3${EXE} \
-	${BINDIR}/example3b${EXE} \
-	${BINDIR}/example4${EXE} \
-	${BINDIR}/example5${EXE} \
-	${BINDIR}/exampleLP${EXE} \
-	${BINDIR}/qrecipe${EXE} \
-	${BINDIR}/qrecipeSchur${EXE} \
-	${BINDIR}/LCQP/warm_up${EXE} \
-	${BINDIR}/LCQP/solve_lcqp_from_file${EXE} \
-	${BINDIR}/LCQP/moving_masses${EXE}
+	${BINDIR}/warm_up${EXE} \
+	${BINDIR}/warm_up_from_file${EXE} \
+	${BINDIR}/initial_value_OCP${EXE} \
+	${BINDIR}/michael_schumacher_problem${EXE} \
+	${BINDIR}/solve_lcqp_from_file${EXE}
 	
+QPOASES_DEBUG = $(wildcard ${DEBUGDIR}/*${EXE})
+
+WARM_UP = ${DEBUGDIR}/warm_up${EXE}
+
+MOVING_MASSES = ${DEBUGDIR}/moving_masses_condensed${EXE}
+
+LCQP_FROM_FILE = ${DEBUGDIR}/solve_lcqp_from_file${EXE}
+
+PLOTS = ${BINDIR}/minimal_matplotlib
+
 ##
 ##	targets
 ##
 
-all: ${QPOASES_EXES}
+all: ${QPOASES_DEBUG} ${QPOASES_EXES}
+
+.PHONY: moving_masses warm_up lcqp_from_file
+
+moving_masses: clean ${MOVING_MASSES}
+warm_up: clean ${WARM_UP}
+lcqp_from_file: clean ${LCQP_FROM_FILE}
 
 ${BINDIR}/%${EXE}: %.${OBJEXT} ${LINK_DEPENDS}
 	@${ECHO} "Creating" $@
+	${CPP} ${DEF_TARGET} ${CPPFLAGS} $< ${QPOASES_LINK} ${LINK_LIBRARIES}
 	@${CPP} ${DEF_TARGET} ${CPPFLAGS} $< ${QPOASES_LINK} ${LINK_LIBRARIES}
 
-${BINDIR}/example4${EXE}: example4.${OBJEXT} example4CP.cpp ${LINK_DEPENDS}
-	@${ECHO} "Creating" $@
-	@${CPP} ${DEF_TARGET} ${CPPFLAGS} $< ${QPOASES_LINK} ${LINK_LIBRARIES}
-
-${BINDIR}/qrecipe${EXE}: qrecipe.${OBJEXT} qrecipe_data.hpp ${LINK_DEPENDS}
-	@${ECHO} "Creating" $@
-	@${CPP} ${DEF_TARGET} ${CPPFLAGS} $< ${QPOASES_LINK} ${LINK_LIBRARIES}
-
-${BINDIR}/qrecipeSchur${EXE}: qrecipeSchur.${OBJEXT} qrecipe_data.hpp ${LINK_DEPENDS}
-	@${ECHO} "Creating" $@
-	@${CPP} ${DEF_TARGET} ${CPPFLAGS} $< ${QPOASES_LINK} ${LINK_LIBRARIES}
-
-${BINDIR}/LCQP/moving_masses${EXE}: LCQP/moving_masses.${OBJEXT}
-	@${ECHO} "Creating" $@
-	@${CPP} ${DEF_TARGET} ${CPPFLAGS} $< ${QPOASES_LINK} ${LINK_LIBRARIES} ${LINK_CASADI}
+${DEBUGDIR}/%${EXE}:
+	@${ECHO} "Building debug..." $@
+	${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${QPOASES_SRC} ${PLOT_SRC} ${DEF_TARGET} ${IFLAGS} ${LFLAGS}
+	@${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${QPOASES_SRC} ${PLOT_SRC} ${DEF_TARGET} ${IFLAGS} ${LFLAGS}
 
 clean:
 	@${ECHO} "Cleaning up (examples)"
-	@${RM} -f *.${OBJEXT} LCQP/*.${OBJEXT} ${QPOASES_EXES}
+	@${RM} -f *.${OBJEXT} ${QPOASES_EXES} ${QPOASES_DEBUG}
 
 clobber: clean
 
 ${LINK_DEPENDS}:
 	@cd ..; ${MAKE} -s src
 
-example4.${OBJEXT}: example4.cpp example4CP.cpp
-	@${ECHO} "Creating" $@
-	@${CPP} ${DEF_TARGET} -c ${IFLAGS} ${CPPFLAGS} $<
-
-qrecipe.${OBJEXT}: qrecipe.cpp qrecipe_data.hpp
-	@${ECHO} "Creating" $@
-	@${CPP} ${DEF_TARGET} ${IFLAGS} ${CPPFLAGS} -c $<
-
-qrecipeSchur.${OBJEXT}: qrecipeSchur.cpp qrecipe_data.hpp
-	@${ECHO} "Creating" $@
-	@${CPP} ${DEF_TARGET} ${IFLAGS} ${CPPFLAGS} -c $<
-
-LCQP/moving_masses.${OBJEXT}: LCQP/moving_masses.cpp
-	@${ECHO} "Creating" $@
-	@${CPP} ${DEF_TARGET} ${IFLAGS} ${CPPFLAGS} -c $<
-
 %.${OBJEXT}: %.cpp
 	@${ECHO} "Creating" $@
+	${CPP} ${DEF_TARGET} -c ${IFLAGS} ${CPPFLAGS} $<
 	@${CPP} ${DEF_TARGET} -c ${IFLAGS} ${CPPFLAGS} $<
 
 
