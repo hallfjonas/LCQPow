@@ -47,7 +47,6 @@ namespace lcqpOASES {
      *   c o p y
      */
     void Options::copy( const Options& rhs ) {
-
         complementarityTolerance = rhs.complementarityTolerance;
         initialComplementarityPenalty = rhs.initialComplementarityPenalty;
         complementarityPenaltyUpdate = rhs.complementarityPenaltyUpdate;
@@ -107,15 +106,15 @@ namespace lcqpOASES {
      *  M a t r i x S y m m e t r i z a t i o n P r o d u c t
      */
     void Utilities::MatrixSymmetrizationProduct(const double* const A, const double* const B, double* C, int m, int n) {
-        for (int i = 0; i < m; i++) {
+        for (int i = 0; i < n; i++) {
             for (int j = 0; j <= i; j++) {
-                C[i*m + j] = 0;
-                for (int k = 0; k < n; k++) {
-                    C[i*m + j] += A[k*n + i]*B[k*n + j] + B[k*n + i]*A[k*n + j]; 
+                C[i*n + j] = 0;
+                for (int k = 0; k < m; k++) {
+                    C[i*n + j] += A[k*n + i]*B[k*n + j] + B[k*n + i]*A[k*n + j]; 
                 }                
 
                 // Make symmetric
-                C[j*m + i] += C[i*m + j];
+                C[j*n + i] = C[i*n + j];
             }
         }
     }

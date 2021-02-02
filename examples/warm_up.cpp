@@ -37,7 +37,7 @@ int main() {
 	int nWSR = 10000000;
 
     // Solve first LCQP
-	returnValue retVal = lcqp.solve( H, g, A, lb, ub, lbA, ubA, S1, S2, nWSR, 0, x0 );
+	returnValue retVal = lcqp.solve( H, g, A, lb, ub, lbA, ubA, S1, S2, 0, x0 );
 
     if (retVal != SUCCESSFUL_RETURN)
     {

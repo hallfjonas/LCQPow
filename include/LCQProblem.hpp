@@ -93,10 +93,9 @@ namespace lcqpOASES {
 						RET_INIT_FAILED_UNBOUNDEDNESS \n
 						RET_MAX_NWSR_REACHED \n
 						RET_INVALID_ARGUMENTS */
-			returnValue solve(	const double* const _H,							/**< Hessian matrix (a shallow copy is made). \n
-																						If Hessian matrix is trivial, a NULL pointer can be passed. */
+			returnValue solve(	const double* const _H,							/**< Hessian matrix. */
 								const double* const _g,							/**< Gradient vector. */
-								const double* const _A,							/**< Constraint matrix (a shallow copy is made). */
+								const double* const _A,							/**< Constraint matrix. */
 								const double* const _lb,						/**< Lower bound vector (on variables). \n
 																						If no lower bounds exist, a NULL pointer can be passed. */
 								const double* const _ub,						/**< Upper bound vector (on variables). \n
@@ -107,8 +106,6 @@ namespace lcqpOASES {
 																						If no lower constraints' bounds exist, a NULL pointer can be passed. */
 								const double* const _S1,               			/**< LHS of complementarity product. */
 								const double* const _S2,               			/**< RHS of complementarity product. */
-								int& nWSR,										/**< Input: Maximum number of working set recalculations when using initial homotopy.
-																						Output: Number of performed working set recalculations. */
 								double* const cputime = 0,						/**< Input: Maximum CPU time allowed for QP initialisation. \n
 																						Output: CPU time spent for QP initialisation (if pointer passed). */
 								const double* const xOpt = 0,					/**< Optimal primal solution vector. \n
@@ -262,6 +259,12 @@ namespace lcqpOASES {
 									int qpIter = 0	 						/**< Number of iterations performed by subproblem solver. */
 									);
 
+			/** Print header every once in a while. */
+			void printHeader();
+
+			/** Print line (mainly for printing header). */
+			void printLine();
+
 
 			/** Sets dense Hessian matrix of the QP.
 			 *  If a null pointer is passed and
@@ -340,10 +343,6 @@ namespace lcqpOASES {
 		*	PROTECTED MEMBER VARIABLES
 		*/
 		protected:
-			double* S1;								/**< LHS of complementarity product. */
-			double* S2;								/**< RHS of complementarity product. */
-			double* C;								/**< Complementarity matrix (S1'*S2 + S2'*S1). */
-
 			Options options;						/**< Class for algorithmic options. */
 
 		private:				
@@ -360,6 +359,15 @@ namespace lcqpOASES {
 			double* A;								/**< Constraint matrix. */
 			double* lbA;							/**< Lower bound vector (on constraints). */
 			double* ubA;							/**< Upper bound vector (on constraints). */
+
+			double* S1;								/**< LHS of complementarity product. */
+			double* S2;								/**< RHS of complementarity product. */
+			double* C;								/**< Complementarity matrix (S1'*S2 + S2'*S1). */
+
+			double rho; 							/**< Current penalty value. */
+
+            static const int printDoubleLength = 10;
+            static const int printIntLength = 6;
 
 			QProblem qp;							/**< QP subproblem. */
 	};

@@ -68,10 +68,10 @@ namespace lcqpOASES {
             static void MatrixSymmetrizationProduct(const double* const A, const double* const B, double* C, int m, int n);
 
             // Read integral data from file
-            returnValue readFromFile(   int* data, int n, const char* datafilename);
+            static returnValue readFromFile(int* data, int n, const char* datafilename);
 
             // Read float data from file
-            returnValue readFromFile(   double* data, int n, const char* datafilename );
+            static returnValue readFromFile(double* data, int n, const char* datafilename );
 
             constexpr static const double EPS = 1.11e-16;
     };

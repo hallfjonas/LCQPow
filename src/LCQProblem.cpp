@@ -34,7 +34,14 @@
 
 
 #include "LCQProblem.hpp"
+#include <iostream>
+#include <iomanip>
 #include <qpOASES.hpp>
+
+using qpOASES::QProblem;
+using std::cout;
+using std::setw;
+using std::string;
 
 namespace lcqpOASES {
 
@@ -65,10 +72,7 @@ namespace lcqpOASES {
 		nC = _nC;
 		nComp = _nComp;
 
-		qpOASES::sparse_int_t a = _nV;
-		qpOASES::sparse_int_t b = _nC;
-
-		qpOASES::QProblem lp(a,b);
+		QProblem lp(nV, nC);
 		
 		int nc = lp.getNAC();
 
@@ -83,8 +87,7 @@ namespace lcqpOASES {
 									const double* const _lb, const double* const _ub,
 									const double* const _lbA, const double* const _ubA,
 									const double* const _S1, const double* const _S2,
-									int& nWSR, double* const cputime,
-									const double* const xOpt, const double* const yOpt
+									double* const cputime, const double* const xOpt, const double* const yOpt
 									)
 	{
 		setupLCQPdata(_H, _g, _A, _lb, _ub, _lbA, _ubA, _S1, _S2);
@@ -92,6 +95,18 @@ namespace lcqpOASES {
 		int nV = getNV();
 		int nC = getNC();
 		int nComp = getNComp();
+
+		qpOASES::int_t nwsr = 1000;
+
+		for (int i = 0; i < 20; i++) {
+			for (int k = 0; k < 30; k++) {
+				printIteration(i, 10, 100, 0.3, 0.00003, k, 2, 60);		
+			}
+		}
+		
+
+		if (options.solveZeroPenaltyFirst)
+			qpOASES::returnValue ret = qp.init(H, g, A, lb, ub, lbA, ubA, nwsr);		
 
 		// TODO: Write solver
 		return returnValue::NOT_YET_IMPLEMENTED;	
@@ -121,7 +136,7 @@ namespace lcqpOASES {
 	*	s e t C o n s t r a i n t s
 	*/
 	returnValue LCQProblem::setConstraints( 	const double* const A_new, const double* const S1_new, const double* const S2_new, 
-													const double* const lbA_new, const double* const ubA_new )
+												const double* const lbA_new, const double* const ubA_new )
 	{
 		int j;
 		int nV = getNV( );
@@ -181,19 +196,18 @@ namespace lcqpOASES {
 		if ( S1_new == 0 || S2_new == 0 )
 			return returnValue::ILLEGAL_ARGUMENT;
 
+		S1 = new double[nComp*nV];
+		S2 = new double[nComp*nV];
+
 		for (int i = 0; i < nComp*nV; i++) {
 			S1[i] = S1_new[i];
 			S2[i] = S2_new[i];
 		}
 
 		Utilities utils;
-		double* _C = new double[nV*nV];
-		utils.MatrixSymmetrizationProduct(S1_new, S2_new, _C, nComp, nV);
+		double* C = new double[nV*nV];
+		utils.MatrixSymmetrizationProduct(S1, S2, C, nComp, nV);
 		
-		for (int i = 0; i < nV*nV; i++) {
-			C[i] = _C[i];
-		}
-
 		return returnValue::SUCCESSFUL_RETURN;
 	}
 
@@ -239,6 +253,102 @@ namespace lcqpOASES {
 		return getDualSolution( yOpt );
 	}
 
+
+	/*
+	 *	 p r i n t I t e r a t i o n
+	 */
+	void LCQProblem::printIteration(	int outerIter,							/**< Number of current outer iteration. */
+										double stationarityValue,				/**< Stationarity value of outer loop problem. */
+										double complementarityValue,			/**< Current complementarity value. */
+										double penaltyValue,					/**< Current penalty value. */
+										double normStep,						/**< Euclidean distance to last iterate. */
+										int innerIter,							/**< Number of current inner iteration. */
+										double optimalStepLength,   			/**< Step length of current iteration computed via optimal step length approach. */
+										int qpIter		 						/**< Number of iterations performed by subproblem solver. */
+										) 
+	{
+		if (options.printLvl == printLevel::NONE)
+			return;
+
+		// Print header every 10 iters
+		bool headerInner = (options.printLvl >= printLevel::INNER_LOOP_ITERATES && innerIter % 10 == 0);
+		bool headerOuter = (options.printLvl == printLevel::OUTER_LOOP_ITERATES && outerIter % 10 == 0);
+		if (headerInner || headerOuter)
+			printHeader();	
+
+		int iL = printIntLength;
+		int dL = printDoubleLength;
+
+		// Print outer iterate
+		cout << setw(iL) << outerIter;
+
+		// Print innter iterate
+		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES)
+			cout << " | " << setw(iL) << innerIter;
+
+		cout << " | " << setw(dL) << stationarityValue;
+
+		cout << " | " << setw(dL) << penaltyValue;
+
+		cout << " | " << setw(dL) << normStep;
+
+		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES) {
+			cout << " | " << setw(dL) << optimalStepLength;
+			cout << " | " << setw(iL) << qpIter;
+		}	
+
+		cout << std::endl;		
+	}
+
+
+	void LCQProblem::printHeader() 
+	{
+		printLine();
+
+		int iL = printIntLength;
+		int dL = printDoubleLength;
+
+		cout << setw(iL) << "outer";
+
+		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES)
+			cout << " | " << setw(iL) << "inner";
+
+		cout << " | " << setw(dL) << "stat";
+		cout << " | " << setw(dL) << "penalty";
+		cout << " | " << setw(dL) << "norm p";
+
+		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES) {
+			cout << " | " << setw(dL) << "step len";
+			cout << " | " << setw(iL) << "sub it";
+		}	
+		cout << std::endl;		
+
+		printLine();
+	}
+
+	void LCQProblem::printLine() 
+	{
+	
+		int iL = printIntLength;
+		int dL = printDoubleLength;
+
+		// Print line
+		cout << setw(iL) << string(iL, '-');
+
+		// Print innter iterate
+		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES)
+			cout << "-+-" << setw(iL) << string(iL, '-');
+
+		cout << "-+-" << setw(dL) << string(dL, '-');
+		cout << "-+-" << setw(dL) << string(dL, '-');
+		cout << "-+-" << setw(dL) << string(dL, '-');
+
+		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES) {
+			cout << "-+-" << setw(dL) << string(dL, '-');
+			cout << "-+-" << setw(iL) << string(iL, '-');
+		}	
+		cout << std::endl;		
+	}
 
 	/*
 	*	s e t u p Q P d a t a
