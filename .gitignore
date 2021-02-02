@@ -4,6 +4,7 @@
 
 ### Directories ###
 build
+UnitTesting/googletest
 
 ### C ###
 # Prerequisites
