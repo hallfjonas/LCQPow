@@ -2,6 +2,9 @@
 # Created by https://www.gitignore.io/api/c,git,latex,matlab
 # Edit at https://www.gitignore.io/?templates=c,git,latex,matlab
 
+### Directories ###
+build
+
 ### C ###
 # Prerequisites
 *.d
@@ -369,16 +372,5 @@ codegen/
 
 # Octave session info
 octave-workspace
-
-/DOCS
-/TEX/thesis_main.pdf
-/CODE/MATLAB/saved_variables
-saved_variables
-/CODE/C++/qpOASES/bin
-/CODE/C++/qpOASES/debug
-**CODE/C++/qpOASES/debug
-**CODE/C++/qpOASES/bin
-CODE/C++/qpOASES/bin
-CODE/C++/qpOASES/debug
 
 # End of https://www.gitignore.io/api/c,git,latex,matlab
