@@ -20,7 +20,35 @@
             },
             "problemMatcher": []
         },
-
+        {
+            "label": "build test",
+            "type": "shell",
+            "command": "make",
+            "dependsOn": "cmake test",
+            "options": {
+                "cwd": "build"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "cmake test",
+            "type": "shell",
+            "command": "cmake ..",
+            "options": {
+                "cwd": "build"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
         {
             "label": "clean debug",
             "type": "shell",
