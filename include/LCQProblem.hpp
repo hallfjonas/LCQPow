@@ -316,7 +316,7 @@ namespace lcqpOASES {
 			/** Sets complementarity matrix (requires S1 and S2 to be set). \n
 			 *	\return SUCCESSFUL_RETURN \n
 			*			RET_INVALID_ARGUMENTS */
-			returnValue setC();
+			returnValue setC( );
 
 			/** Returns the NLP stationarity value. */
 			double* getPenaltyStationarity(	const double* const x_eval,
@@ -332,6 +332,37 @@ namespace lcqpOASES {
 			Options options;						/**< Class for algorithmic options. */
 
 		private:				
+
+			/** After problem is set up, call this function and solve LCQP. */
+			returnValue runSolver( );		
+
+			/** Solves the qp subproblem wrt H, gk, A, S1, S2 . */
+			returnValue solveQPSubproblem( bool initialSolve );
+
+			/** Check outer stationarity at current iterate xk. */
+			bool stationarityCheck( ); 
+
+			/** Check satisfaction of complementarity value. */
+			bool complementarityCheck( );
+
+			/** Transform the dual variables from penalty form to LCQP form. */
+			void transformDuals( );
+
+			/** Determine stationarity type of optimal solution. */
+			returnValue determineStationarityType( );
+
+			/** Perform penalty update. */
+			void updatePenalty( );
+
+			/** Get optimal step length. */
+			void getOptimalStepLength( );
+
+			/** Update xk and gk. */
+			void updateStep( );
+
+			/** Gradient perturbation method. */
+			void perturbGradient( );
+
 			int nV;									/**< Number of variables. */
 			int nC;									/**< Number of constraints. */
 			int nComp;								/**< Number of complementarity constraints. */
@@ -351,6 +382,22 @@ namespace lcqpOASES {
 			double* C;								/**< Complementarity matrix (S1'*S2 + S2'*S1). */
 
 			double rho; 							/**< Current penalty value. */
+
+			double* gk;								/**< Current objective linear term. */
+
+			double* xk;								/**< Current primal iterate. */
+			double* xnew;							/**< Current qpSubproblem solution. */
+			double* pk;								/**< xnew - xk. */
+
+			double* yk;								/**< Current dual vector. */
+			double* yk_bounds;						/**< Current dual iterate (wrt bounds). */
+			double* yk_A;							/**< Current dual iterate(wrt A). */
+			double* yk_S1;							/**< Current dual iterate(wrt S1). */
+			double* yk_S2;							/**< Current dual iterate(wrt S2). */
+
+			double alphak; 							/**< Optimal step length. */
+
+			double* Qk;								/**< H + rho*C, required for stationarity and optimal step length. */
 
             static const int printDoubleLength = 10;
             static const int printIntLength = 6;

@@ -24,9 +24,160 @@
 #include "LCQProblem.hpp"
 #include <gtest/gtest.h>
 
+// Testing standard and symmetrization matrix multiplications
+TEST(UtilitiesTest, MatrixMultiplicationTest) {
+    // A = [1 0 2; 3 1 1]
+    // B = [2 0; 1 0; 0 -1]
+    // C = A*B = [2 -2; 7 -1]
+    int m = 2;
+    int n = 3;
+
+    double* A = new double[m*n] { 1, 0, 2, 3, 1, 1 };
+    double* B = new double[n*m] { 2, 0, 1, 0, 0, -1 };
+    double* C = new double[m*m];
+
+    lcqpOASES::Utilities::MatrixMultiplication(A, B, C, m, n, m);
+    ASSERT_EQ(C[0], 2);
+    ASSERT_EQ(C[1], -2);
+    ASSERT_EQ(C[2], 7);
+    ASSERT_EQ(C[3], -1);
+}
+
+TEST(UtilitiesTest, MatrixSymmetrization) {
+    // A = [1 0 2; 3 1 1]
+    // B = [2 0 1; 0 0 -1]
+    // C = A'*B + B'*A = [4 1 -2; 1 0 0; -2 0 -4]
+    int m = 2;
+    int n = 3;
+
+    double* A = new double[m*n] { 1, 0, 2, 3, 1, 1 };
+    double* B = new double[n*m] { 2, 0, 1, 0, 0, -1 };
+    double* C = new double[n*n];
+    lcqpOASES::Utilities::MatrixSymmetrizationProduct(A, B, C, m, n);
+
+    ASSERT_EQ(C[0], 4);
+    ASSERT_EQ(C[1], 0);
+    ASSERT_EQ(C[2], 2);
+    ASSERT_EQ(C[3], 0);
+    ASSERT_EQ(C[4], 0);
+    ASSERT_EQ(C[5], -1);
+    ASSERT_EQ(C[6], 2);
+    ASSERT_EQ(C[7], -1);
+    ASSERT_EQ(C[8], 2);
+}
+
+// Testing standard and symmetrization matrix multiplications
+TEST(UtilitiesTest, AffineTransformation) {
+    // alpha = 2;
+    // A = [1 0 2; 3 1 1]
+    // b = [2 0 1]
+    // c = [-3; -3]
+    // d = [2; 8] = alpha*A*b + c
+
+    int m = 2;
+    int n = 3;
+
+    double alpha = 2;
+    double* A = new double[m*n] { 1, 0, 2, 3, 1, 1 };
+    double* b = new double[n*m] { 2, 0, 1 };
+    double* c = new double[m] { -3, -3 };
+    double* d = new double[m];
+
+    lcqpOASES::Utilities::AffineLinearTransformation(alpha, A, b, c, d, m, n);
+    ASSERT_EQ(d[0], 5);
+    ASSERT_EQ(d[1], 11);
+}
+
+// Testing vector add
+TEST(UtilitiesTest, VectorAdd) {
+    // alpha = 2;
+    // a = [0; 1; 2; 3]
+    // beta = -1;
+    // b = [10; 2; 0; 3]
+    // d = [-10; 0; 4; -3]
+
+    int m = 4;
+    
+    double alpha = 2;
+    double* a = new double[m] { 0, 1, 2, 3 };
+
+    double beta = -1;
+    double* b = new double[m] { 10, 2, 0, 3 };
+    double* d = new double[m];
+
+    lcqpOASES::Utilities::WeightedVectorAdd(alpha, a, beta, b, d, m);
+    ASSERT_EQ(d[0], -10);
+    ASSERT_EQ(d[1], 0);
+    ASSERT_EQ(d[2], 4);
+    ASSERT_EQ(d[3], 3);
+}
+
+// Testing Quadratic Form Product
+TEST(UtilitiesTest, QuadraticFormProduct) {
+    // p = [1; 2; 3]
+    // Q = [0 1 0; 1 2 1; 0 1 0]
+    // ret = [1 2 3]*[2; 8; 2] = 24
+
+    int m = 3;
+    double* p = new double[m] { 1, 2, 3 };
+    double* Q = new double[m*m] { 0, 1, 0, 1, 2, 1, 0, 1, 0 };
+    
+    double ret = lcqpOASES::Utilities::QuadraticFormProduct(Q, p, m);
+    ASSERT_EQ(ret, 24);
+}
+
+// Testing dot product
+TEST(UtilitiesTest, DotProduct) {
+    // a = [0; 1; 2; 3]
+    // b = [10; 2; 0; 3]
+    // ret = a'*b
+
+    int m = 4;
+    double* a = new double[m] { 0, 1, 2, 3 };
+    double* b = new double[m] { 10, 2, 0, 3 };
+    
+    double ret = lcqpOASES::Utilities::DotProduct(a, b, m);
+    ASSERT_EQ(ret, 11);
+}
+
+// Testing 1 norm
+TEST(UtilitiesTest, MaxAbs) {
+    int m = 4;
+
+    // a = [0; 1; 2; 3]
+    // ret = 3
+    double* a = new double[m] { 0, 1, 2, 3 };    
+    double ret = lcqpOASES::Utilities::MaxAbs(a, m);
+    ASSERT_EQ(ret, 3);
+
+    // a = [0; -1; 2; 0]
+    // ret = 2
+    a = new double[m] { 0, -1, 2, 0 };    
+    ret = lcqpOASES::Utilities::MaxAbs(a, m);
+    ASSERT_EQ(ret, 2);
+
+    // a = [0; -4; 2; 0]
+    // ret = 4
+    a = new double[m] { 0, -4, 2, 0 };    
+    ret = lcqpOASES::Utilities::MaxAbs(a, m);
+    ASSERT_EQ(ret, 4);
+}
+
+// Testing read from file functionality
+TEST(UtilitiesTest, ReadFromFile) {
+    const char* fpath = "../examples/example_data/C.txt";
+
+    double* C = new double[4];
+    lcqpOASES::Utilities::readFromFile(C, 4, fpath);
+
+    ASSERT_EQ(C[0], 0);
+    ASSERT_EQ(C[1], 1);
+    ASSERT_EQ(C[2], 1);
+    ASSERT_EQ(C[3], 0);
+}
+
 // Testing Options constructors, default settings, consistency
-TEST(OptionsTest, DefaultSetting) {
-    // Check constructor, default settings, consistency
+TEST(UtilitiesTest, Options) {
     lcqpOASES::Options opts;
     ASSERT_EQ(opts.ensureConsistency(), lcqpOASES::returnValue::SUCCESSFUL_RETURN);
     
@@ -42,58 +193,8 @@ TEST(OptionsTest, DefaultSetting) {
     ASSERT_EQ(opts2.complementarityPenaltyUpdate, 100);
 }
 
-// Testing standard and symmetrization matrix multiplications
-TEST(UtilitiesTest, MatrixMultiplicationTest) {
-    // 1) Standard matrix multiplication
-    // A = [1 0 2; 3 1 1]
-    // B = [2 0; 1 0; 0 -1]
-    // C = A*B = [2 -2; 7 -1]
-    int m = 2;
-    int n = 3;
-
-    double* A = new double[m*n] { 1, 0, 2, 3, 1, 1};
-    double* B = new double[n*m] { 2, 0, 1, 0, 0, -1};
-    double* C = new double[m*m];
-
-    lcqpOASES::Utilities::MatrixMultiplication(A, B, C, m, n, m);
-    ASSERT_EQ(C[0], 2);
-    ASSERT_EQ(C[1], -2);
-    ASSERT_EQ(C[2], 7);
-    ASSERT_EQ(C[3], -1);
-
-    // 2) Matrix Symmetrization
-    // A = [1 0 2; 3 1 1]
-    // B = [2 0 1; 0 0 -1]
-    // C = A'*B + B'*A = [4 1 -2; 1 0 0; -2 0 -4]
-    double* D = new double[n*n];
-    lcqpOASES::Utilities::MatrixSymmetrizationProduct(A, B, D, m, n);
-
-    ASSERT_EQ(D[0], 4);
-    ASSERT_EQ(D[1], 0);
-    ASSERT_EQ(D[2], 2);
-    ASSERT_EQ(D[3], 0);
-    ASSERT_EQ(D[4], 0);
-    ASSERT_EQ(D[5], -1);
-    ASSERT_EQ(D[6], 2);
-    ASSERT_EQ(D[7], -1);
-    ASSERT_EQ(D[8], 2);
-}
-
-// Testing read from file functionality
-TEST(ReadFromFileTest, ReadC) {
-    const char* fpath = "../examples/example_data/C.txt";
-
-    double* C = new double[4];
-    lcqpOASES::Utilities::readFromFile(C, 4, fpath);
-
-    ASSERT_EQ(C[0], 0);
-    ASSERT_EQ(C[1], 1);
-    ASSERT_EQ(C[2], 1);
-    ASSERT_EQ(C[3], 0);
-}
-
 // Testing lcqpOASES solver set up
-TEST(SolverSetUpTest, SetUpSolver) {
+TEST(SolverTest, SetUpSolver) {
     int nV = 2;
     int nC = 1;
     int nComp = 1;

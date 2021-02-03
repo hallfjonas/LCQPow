@@ -67,11 +67,17 @@ namespace lcqpOASES {
      *   c o p y
      */
     void Options::copy( const Options& rhs ) {
+        stationarityTolerance = rhs.stationarityTolerance;
         complementarityTolerance = rhs.complementarityTolerance;
         initialComplementarityPenalty = rhs.initialComplementarityPenalty;
         complementarityPenaltyUpdate = rhs.complementarityPenaltyUpdate;
         solveZeroPenaltyFirst = rhs.solveZeroPenaltyFirst;
+
+        maxOuterIterations = rhs.maxOuterIterations;
+        maxInnerIterations = rhs.maxInnerIterations;
+
         printLvl = rhs.printLvl;
+        qpSubSolver = rhs.qpSubSolver;
     }
 
 
@@ -89,6 +95,12 @@ namespace lcqpOASES {
         if (initialComplementarityPenalty <= 0)
             throw INVALID_INITIAL_PENALTY_VALUE;
 
+        if (maxOuterIterations <= 0)
+            throw INVALID_MAX_OUTER_ITERATIONS_VALUE;
+
+        if (maxInnerIterations <= 0)
+            throw INVALID_MAX_INNER_ITERATIONS_VALUE;
+
         return SUCCESSFUL_RETURN;
     }
 
@@ -97,11 +109,19 @@ namespace lcqpOASES {
      *   s e t T o D e f a u l t
      */
     void Options::setToDefault( ) {
-        complementarityTolerance      = 1.0e3 * Utilities::EPS;
+        complementarityTolerance = 1.0e3 * Utilities::EPS;
+        stationarityTolerance  = 1.0e3 * Utilities::EPS;
         initialComplementarityPenalty = 0.01;
     	complementarityPenaltyUpdate  = 2.0;
 
         solveZeroPenaltyFirst = true;
+
+        maxOuterIterations = 100;
+        maxInnerIterations = 1000;
+
+
+
+        qpSubSolver = qpSubproblemSolver::QPOASES;
 
         printLvl = printLevel::INNER_LOOP_ITERATES;
 
@@ -137,6 +157,82 @@ namespace lcqpOASES {
                 C[j*n + i] = C[i*n + j];
             }
         }
+    }
+
+    /*
+     *   A f f i n e L i n e a r T r a n s f o r m a t i o n
+     */
+    void Utilities::AffineLinearTransformation(const double alpha, const double* const A, const double* const b, const double* const c, double* d, int m, int n) {
+        for (int i = 0; i < m; i++) {
+            
+            double tmp = 0;
+            for (int k = 0; k < n; k++) {
+                tmp += A[i*n + k]*b[k]; 
+            }                
+
+            d[i] = alpha*tmp + c[i];
+        }
+    }
+
+    /*
+     *	r e a d F r o m F i l e
+     */
+    void Utilities::WeightedMatrixAdd(const double alpha, const double* const A, const double beta, const double* const B, double* C, int m, int n) {
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
+                C[i] = alpha*A[i] + beta*B[i];
+    }
+
+    /*
+     *	r e a d F r o m F i l e
+     */
+    void Utilities::WeightedVectorAdd(const double alpha, const double* const a, const double beta, const double* const b, double* c, int m) {
+        WeightedMatrixAdd(alpha, a, beta, b, c, m, 1);
+    }
+        
+
+    /*
+     *	Q u a d r a t i c F o r m P r o d u c t
+     */
+    double Utilities::QuadraticFormProduct(const double* const Q, const double* const p, int m) {
+        double ret = 0;
+        for (int i = 0; i < m; i++) {
+            double tmp = 0;
+            for (int j = 0; j < m; j++)
+                tmp += Q[i*m + j]*p[j];
+
+            ret += tmp*p[i];
+        }
+
+        return ret;   
+    }
+
+    /*
+     *	Q u a d r a t i c F o r m P r o d u c t
+     */
+    double Utilities::DotProduct(const double* const a, const double* const b, int m) {
+        double ret = 0;
+        for (int i = 0; i < m; i++)
+            ret += a[i]*b[i];
+
+        return ret;
+    }
+
+    /*
+     *	Q u a d r a t i c F o r m P r o d u c t
+     */
+    double Utilities::MaxAbs(const double* const a, int m) {
+        double max = 0;
+        double min = 0;
+
+        for (int i = 0; i < m; i++) {
+            if (a[i] > max)
+                max = a[i];
+            else if (a[i] < min)
+                min = a[i];            
+        }
+
+        return std::max(max, -min);
     }
 
     /*

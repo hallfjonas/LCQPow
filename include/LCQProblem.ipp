@@ -76,7 +76,7 @@ namespace lcqpOASES {
 			return returnValue::LCQPOBJECT_NOT_SETUP;
 
 		if ( g_new == 0 )
-			return returnValue::ILLEGAL_ARGUMENT;
+			return returnValue::INVALID_ARGUMENT;
 
 		g = new double[nV];
 		memcpy( g, g_new, nV*sizeof(double) );

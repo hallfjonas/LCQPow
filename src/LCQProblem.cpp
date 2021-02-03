@@ -23,6 +23,7 @@
 #include "LCQProblem.hpp"
 #include <iostream>
 #include <iomanip>
+#include <math.h>
 #include <qpOASES.hpp>
 
 using qpOASES::QProblem;
@@ -46,13 +47,13 @@ namespace lcqpOASES {
 		/* consistency checks */
 		if ( _nV <= 0 || _nComp <= 0)
 		{
-			throw( ILLEGAL_ARGUMENT );
+			throw( INVALID_ARGUMENT );
 		}
 
 		if ( _nC < 0 )
 		{
 			_nC = 0;
-			throw( ILLEGAL_ARGUMENT );
+			throw( INVALID_ARGUMENT );
 		}
 
 		nV = _nV;
@@ -78,25 +79,7 @@ namespace lcqpOASES {
 									)
 	{
 		setupLCQPdata(_H, _g, _A, _lb, _ub, _lbA, _ubA, _S1, _S2);
-
-		int nV = getNV();
-		int nC = getNC();
-		int nComp = getNComp();
-
-		qpOASES::int_t nwsr = 1000;
-
-		for (int i = 0; i < 20; i++) {
-			for (int k = 0; k < 30; k++) {
-				printIteration(i, 10, 100, 0.3, 0.00003, k, 2, 60);		
-			}
-		}
-		
-
-		if (options.solveZeroPenaltyFirst)
-			qpOASES::returnValue ret = qp.init(H, g, A, lb, ub, lbA, ubA, nwsr);		
-
-		// TODO: Write solver
-		return returnValue::NOT_YET_IMPLEMENTED;	
+		return runSolver();
 	}
 
 
@@ -134,7 +117,7 @@ namespace lcqpOASES {
 			return returnValue::LCQPOBJECT_NOT_SETUP;
 
 		if ( A_new == 0 && nC > 0)
-			return returnValue::ILLEGAL_ARGUMENT;
+			return returnValue::INVALID_ARGUMENT;
 
 		// Set up new constraint matrix (A; L; R)
 		A = new double[(nC + 2*nV)*nV];
@@ -181,7 +164,7 @@ namespace lcqpOASES {
 
 		// Set complementarities
 		if ( S1_new == 0 || S2_new == 0 )
-			return returnValue::ILLEGAL_ARGUMENT;
+			return returnValue::INVALID_ARGUMENT;
 
 		S1 = new double[nComp*nV];
 		S2 = new double[nComp*nV];
@@ -446,7 +429,213 @@ namespace lcqpOASES {
 
 		return returnValue::SUCCESSFUL_RETURN;
 	}
+
+
+	/*
+	 *	 r u n S o l v e r
+	 */
+	returnValue LCQProblem::runSolver( ) {
+		
+		int nV = getNV();
+		int nC = getNC();
+		int nComp = getNComp();
+
+		returnValue returnStatus = returnValue::PROBLEM_NOT_SOLVED;
+
+		// Initialization strategy
+		if (options.solveZeroPenaltyFirst) {
+			memccpy(gk, g, nV, sizeof(double));
+			solveQPSubproblem( true );
+			Utilities::AffineLinearTransformation(rho, C, xk, g, gk, nV, nV);
+			solveQPSubproblem( false );
+		} else {
+			Utilities::AffineLinearTransformation(rho, C, xk, g, gk, nV, nV);
+			solveQPSubproblem( true );
+		}
+
+		int outer = 0;
+		int inner = 0;
+
+		while ( true ) {
+
+			// Terminate, update pen, or continue inner loop
+			if (stationarityCheck()) {
+				if (complementarityCheck()) {
+					transformDuals();
+					return determineStationarityType();
+				} else {
+					updatePenalty();
+				}
+			}
+
+			// Step computation
+			solveQPSubproblem( false );
+
+			// Step length computation
+			getOptimalStepLength( );
+
+			// Update xk, gk, Qk, 
+			updateStep( );
+
+			if ( outer > options.maxOuterIterations )
+				return returnValue::MAX_OUTER_ITERATIONS_REACHED;
+
+			if ( inner > options.maxInnerIterations )
+				return returnValue::MAX_INNER_ITERATIONS_REACHED;
+		}
+
+		return returnStatus;
+	}
+
+
+	/*
+	 *	 s o l v e Q P S u b p r o b l e m
+	 */
+	returnValue LCQProblem::solveQPSubproblem(bool initialSolve) {
+		// For now, only implementing for qpOASES solver
+		qpOASES::returnValue ret;
+		int nwsr = 10000;
+
+		if (initialSolve) {
+			ret = qp.init(H, g, A, lb, ub, lbA, ubA, nwsr);
+		} else {
+			ret = qp.hotstart(gk, lb, ub, lbA, ubA, nwsr);
+		}	
+
+		if (ret != qpOASES::returnValue::SUCCESSFUL_RETURN)
+			return returnValue::SUBPROBLEM_SOLVER_ERROR;
+
+		// Update xnew, yk
+		qp.getPrimalSolution(xnew);
+		qp.getDualSolution(yk);
+
+		// Update pk
+		Utilities::WeightedVectorAdd(1, xnew, -1, xk, pk, nV);
+	}
+
+	
+	/*
+	 *	 s t a t i o n a r i t y C h e c k
+	 */
+	bool LCQProblem::stationarityCheck( ) {
+
+		int nV = getNV();
+
+		double* stat = new double[nV];
+
+		// Utilities::AffineLinearTransformation();
+
+		throw ( NOT_YET_IMPLEMENTED );
+	}
+
+
+	/*
+	 *	 c o m p l e m e n t a r i t y C h e c k
+	 */
+	bool LCQProblem::complementarityCheck( ) {
+		throw ( NOT_YET_IMPLEMENTED );
+	}
+
+
+	/*
+	 *	 t r a n s f o r m D u a l s
+	 */
+	void LCQProblem::transformDuals( ) {
+		throw ( NOT_YET_IMPLEMENTED );
+	}
+
+
+	/*
+	 *	 d e t e r m i n e S t a t i o n a r i t y T y p e
+	 */
+	returnValue LCQProblem::determineStationarityType( ) {
+		throw ( NOT_YET_IMPLEMENTED );
+	}
+
+
+	/*
+	 *	 u p d a t e P e n a l t y
+	 */
+	void LCQProblem::updatePenalty( ) {
+		rho *= options.complementarityPenaltyUpdate;
+	}
+
+
+	/*
+	 *	 g e t O p t i m a l S t e p L e n g t h
+	 */
+	void LCQProblem::getOptimalStepLength( ) {
+
+		double* Qk = new double[nV*nV];
+		double qk = Utilities::QuadraticFormProduct(Qk, pk, nV);
+
+		double* lk_tmp = new double[nV];
+		Utilities::AffineLinearTransformation(1, Qk, xk, g, lk_tmp, nV, nV);
+
+		double lk = Utilities::DotProduct(pk, lk_tmp, nV);
+		
+		alphak = 0;
+
+		// Non convex case
+		if (qk <= Utilities::EPS) {
+			if (qk + lk < 0)
+				alphak = 1;
+		} else {
+			// Descent + Convex
+			if (lk < 0) {
+				alphak = std::min(-lk/qk, 1.0);
+			}
+		}
+
+		// 0-Step Length:
+		if (Utilities::MaxAbs(pk, nV) < options.stationarityTolerance || complementarityCheck()) {
+			alphak = 1;
+		}
+	}
+
+
+	/*
+	 *	 u p d a t e S t e p
+	 */
+	void LCQProblem::updateStep( ) {
+		// Update penalty on rejected step
+		if (alphak == 0) {
+			updatePenalty( );
+		} else {
+			// xk = xk + alphak*pk
+			Utilities::WeightedVectorAdd(1, xk, alphak, pk, xk, nV);
+
+			// gk = new linearization + g
+			Utilities::AffineLinearTransformation(rho, C, xk, g, gk, nV, nV);
+
+			// Add some +/- EPS to each coordinate
+			perturbGradient();
+		}
+
+		// Update Qk
+		Utilities::WeightedMatrixAdd(1, H, rho, C, Qk, nV, nV);
+		
+	}
+
+
+	/*
+	 *	 p e r t u r b G r a d i e n t
+	 */
+	void LCQProblem::perturbGradient( ) {
+		
+		int randNum;
+		for (int i = 0; i < nV; i++) {
+			// Random number -1, 0, 1
+			randNum = (rand() % 3) - 1;
+
+			gk[i] += randNum*Utilities::EPS;
+		}
+			
+	}
 }
+
+
+	
 
 
 /*
