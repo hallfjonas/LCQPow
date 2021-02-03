@@ -38,45 +38,13 @@ include ../make.mk
 IFLAGS      =  -I. \
                -I${IDIR}
 
-QPOASES_OBJECTS = \
-	SQProblem.${OBJEXT} \
-	QProblem.${OBJEXT} \
-	QProblemB.${OBJEXT} \
-	LCQProblemB.${OBJEXT} \
+LCQPOASES_OBJECTS = \
 	LCQProblem.${OBJEXT} \
-	SQProblemSchur.${OBJEXT} \
-	Bounds.${OBJEXT} \
-	Constraints.${OBJEXT} \
-	SubjectTo.${OBJEXT} \
-	Indexlist.${OBJEXT} \
-	Flipper.${OBJEXT} \
-	Utils.${OBJEXT} \
-	Options.${OBJEXT} \
-	Matrices.${OBJEXT} \
-	MessageHandling.${OBJEXT} \
-	SparseSolver.${OBJEXT}
-
-
-QPOASES_EXTRAS_OBJECTS = \
-	SolutionAnalysis.${OBJEXT} \
-	OQPinterface.${OBJEXT}
+	Utilities.${OBJEXT}
 
 QPOASES_DEPENDS = \
-	${IDIR}/qpOASES.hpp \
-	${IDIR}/qpOASES/QProblem.hpp \
-	${IDIR}/qpOASES/Flipper.hpp \
-	${IDIR}/qpOASES/QProblemB.hpp \
-	${IDIR}/qpOASES/Bounds.hpp \
-	${IDIR}/qpOASES/Constraints.hpp \
-	${IDIR}/qpOASES/SubjectTo.hpp \
-	${IDIR}/qpOASES/Indexlist.hpp \
-	${IDIR}/qpOASES/Utils.hpp \
-	${IDIR}/qpOASES/Constants.hpp \
-	${IDIR}/qpOASES/Types.hpp \
-	${IDIR}/qpOASES/Options.hpp \
-	${IDIR}/qpOASES/Matrices.hpp \
-	${IDIR}/qpOASES/MessageHandling.hpp \
-	${IDIR}/qpOASES/UnitTesting.hpp
+	${IDIR}/LCQProblem.hpp \
+	${IDIR}/Utilities.hpp
 
 
 ##

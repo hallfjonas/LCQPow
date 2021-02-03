@@ -33,403 +33,433 @@
  */
 
 
-#include <qpOASES/LCQProblem.hpp>
-#include <qpOASES/ConstraintProduct.hpp>
-#include <qpOASES/LapackBlasReplacement.hpp>
+#include "LCQProblem.hpp"
+#include <iostream>
+#include <iomanip>
+#include <qpOASES.hpp>
 
+using qpOASES::QProblem;
+using std::cout;
+using std::setw;
+using std::string;
 
-BEGIN_NAMESPACE_QPOASES
+namespace lcqpOASES {
 
+	/*****************************************************************************
+	 *  P U B L I C                                                              *
+	 *****************************************************************************/
 
-/*****************************************************************************
- *  P U B L I C                                                              *
- *****************************************************************************/
-
-/*
- *	Q P r o b l e m
- */
-LCQProblem::LCQProblem( int_t _nV, int_t _nC, int_t _nComp, HessianType _hessianType, BooleanType allocDenseMats )
-{
-	int_t i;
-
-	/* consistency checks */
-	if ( _nV <= 0 || _nComp <= 0)
+	/*
+	*	Q P r o b l e m
+	*/
+	LCQProblem::LCQProblem( int _nV, int _nC, int _nComp )
 	{
-		_nV = 1; _nComp = 1;
-		THROWERROR( RET_INVALID_ARGUMENTS );
-	}
+		int i;
 
-	if ( _nC < 0 )
-	{
-		_nC = 0;
-		THROWERROR( RET_INVALID_ARGUMENTS );
-	}
+		/* consistency checks */
+		if ( _nV <= 0 || _nComp <= 0)
+		{
+			throw( ILLEGAL_ARGUMENT );
+		}
 
-	nV = _nV;
-	nC = _nC;
-	nComp = _nComp;
+		if ( _nC < 0 )
+		{
+			_nC = 0;
+			throw( ILLEGAL_ARGUMENT );
+		}
 
-	QProblem _qp(_nV, _nC, _hessianType, allocDenseMats);
-	qp = _qp;
-}
+		nV = _nV;
+		nC = _nC;
+		nComp = _nComp;
 
-
-/*
- *	i n i t
- */
-returnValue LCQProblem::solve(	SymmetricMatrix *_H, const real_t* const _g, Matrix *_A,
-								const real_t* const _lb, const real_t* const _ub,
-								const real_t* const _lbA, const real_t* const _ubA,
-								Matrix *_S1, Matrix *_S2, 
-								int_t& nWSR, real_t* const cputime,
-								const real_t* const xOpt, const real_t* const yOpt,
-								const Bounds* const guessedBounds, const Constraints* const guessedConstraints,
-								const real_t* const _R
-								)
-{
-	setupLCQPdata(_H, _g, _A, _lb, _ub, _lbA, _ubA, _S1, _S2);
-
-	int_t nV = getNV();
-	int_t nC = getNC();
-	int_t nComp = getNComp();
-
-	// TODO 
-}
-
-
-/*
- *	i n i t
- */
-returnValue LCQProblem::solve(	const real_t* const _H, const real_t* const _g, const real_t* const _A,
-								const real_t* const _lb, const real_t* const _ub,
-								const real_t* const _lbA, const real_t* const _ubA,
-								const real_t* const _S1, const real_t* const _S2,
-								int_t& nWSR, real_t* const cputime,
-								const real_t* const xOpt, const real_t* const yOpt,
-								const Bounds* const guessedBounds, const Constraints* const guessedConstraints,
-								const real_t* const _R
-								)
-{
-	setupLCQPdata(_H, _g, _A, _lb, _ub, _lbA, _ubA, _S1, _S2);
-
-	int_t nV = getNV();
-	int_t nC = getNC();
-	int_t nComp = getNComp();
-
-	// TODO: Write solver
-	return RET_NOT_YET_IMPLEMENTED;	
-}
-
-
-/*
- *	i n i t
- */
-returnValue LCQProblem::solve(	const char* const H_file, const char* const g_file, const char* const A_file,
-								const char* const lb_file, const char* const ub_file,
-								const char* const lbA_file, const char* const ubA_file,
-								const char* const S1_file, const char* const S2_file,
-								int_t& nWSR, real_t* const cputime,
-								const real_t* const xOpt, const real_t* const yOpt,
-								const Bounds* const guessedBounds, const Constraints* const guessedConstraints,
-								const char* const R_file
-								)
-{
-	// Internally set up data
-	setupLCQPdata(H_file, g_file, A_file, lb_file, ub_file, lbA_file, ubA_file, S1_file, S2_file);
-
-	// TODO: Write this
-	return SUCCESSFUL_RETURN;	
-}
-
-
-/*
- *	s e t P r i n t L e v e l
- */
-returnValue LCQProblem::setPrintLevel( PrintLevel _printLevel )
-{
-	#ifndef __SUPPRESSANYOUTPUT__
-		#ifndef __MATLAB__
-			if ( ( options.printLevel == PL_HIGH ) && ( options.printLevel != _printLevel ) )
-				THROWINFO( RET_PRINTLEVEL_CHANGED );
-		#endif /* __MATLAB__ */
-		options.printLevel = _printLevel;
-	#else
-	options.printLevel = PL_NONE;
-	#endif /* __SUPPRESSANYOUTPUT__ */
-
-	/* update message handler preferences */
- 	switch ( options.printLevel )
- 	{
- 		case PL_NONE:
- 			getGlobalMessageHandler( )->setErrorVisibilityStatus( VS_HIDDEN );
-			getGlobalMessageHandler( )->setWarningVisibilityStatus( VS_HIDDEN );
-			getGlobalMessageHandler( )->setInfoVisibilityStatus( VS_HIDDEN );
-			break;
-
-		case PL_TABULAR:
-		case PL_LOW:
-			getGlobalMessageHandler( )->setErrorVisibilityStatus( VS_VISIBLE );
-			getGlobalMessageHandler( )->setWarningVisibilityStatus( VS_HIDDEN );
-			getGlobalMessageHandler( )->setInfoVisibilityStatus( VS_HIDDEN );
-			break;
-
-		case PL_DEBUG_ITER:
-		case PL_MEDIUM:
-			getGlobalMessageHandler( )->setErrorVisibilityStatus( VS_VISIBLE );
-			getGlobalMessageHandler( )->setWarningVisibilityStatus( VS_VISIBLE );
-			getGlobalMessageHandler( )->setInfoVisibilityStatus( VS_HIDDEN );
-			break;
-
-		default: /* PL_HIGH */
-			getGlobalMessageHandler( )->setErrorVisibilityStatus( VS_VISIBLE );
-			getGlobalMessageHandler( )->setWarningVisibilityStatus( VS_VISIBLE );
-			getGlobalMessageHandler( )->setInfoVisibilityStatus( VS_VISIBLE );
-			break;
- 	}
-
-	return SUCCESSFUL_RETURN;
-}
-
-
-
-/*
- *	g e t O b j V a l
- */
-real_t LCQProblem::getObjVal( ) const
-{
-	return qp.getObjVal( );
-}
-
-
-/*
- *	g e t O b j V a l
- */
-real_t LCQProblem::getObjVal( const real_t* const _x ) const
-{
-	return qp.getObjVal( _x );
-}
-
-
-/*
- *	g e t P r i m a l S o l u t i o n
- */
-returnValue LCQProblem::getPrimalSolution( real_t* const xOpt ) const
-{
-	return qp.getPrimalSolution( xOpt );
-}
-
-
-/*
- *	g e t D u a l S o l u t i o n
- */
-returnValue LCQProblem::getDualSolution( real_t* const yOpt ) const
-{
-	// TODO: Implement transformation
-	return getDualSolution( yOpt );
-}
-
-
-/*
- *	s e t u p Q P d a t a
- */
-returnValue LCQProblem::setupLCQPdata(	SymmetricMatrix *_H, const real_t* const _g, Matrix *_A,
-										const real_t* const _lb, const real_t* const _ub,
-										const real_t* const _lbA, const real_t* const _ubA,
-										Matrix *_S1, Matrix *_S2
-										)
-{
-	setH( _H );
-	setG( _g );
-	setLB( _lb );
-	setUB( _ub );
-	setComplementarities(_S1, _S2);
-	setConstraints(_A, _lbA, _ubA);
-
-	return SUCCESSFUL_RETURN;
-}
-
-/*
- *	s e t u p Q P d a t a
- */
-returnValue LCQProblem::setupLCQPdata(	const real_t* const _H, const real_t* const _g, const real_t* const _A,
-										const real_t* const _lb, const real_t* const _ub,
-										const real_t* const _lbA, const real_t* const _ubA,
-										const real_t* const _S1, const real_t* const _S2
-										)
-{
-	setH( _H );
-	setG( _g );
-	setLB( _lb );
-	setUB( _ub );
-	setComplementarities(_S1, _S2);
-	setConstraints( _A, _lbA, _ubA );	
-
-	return SUCCESSFUL_RETURN;
-}
-
-
-/*
- *	s e t u p Q P d a t a F r o m F i l e
- */
-returnValue LCQProblem::setupLCQPdata(	const char* const H_file, const char* const g_file, const char* const A_file,
-										const char* const lb_file, const char* const ub_file,
-										const char* const lbA_file, const char* const ubA_file,
-										const char* const S1_file, const char* const S2_file
-										)
-{
-	int_t i;
-	int_t nV = getNV( );
-	int_t nC = getNC( );
-
-	returnValue returnvalue;
-
-	real_t* _H = new real_t[nV * nV];
-	returnvalue = readFromFile( _H, nV, nV, H_file );
-	if ( returnvalue != SUCCESSFUL_RETURN )
-	{
-		delete[] _H;
-		return THROWERROR( returnvalue );
-	}
-
-	returnvalue = readFromFile( g, nV, g_file );
-	if ( returnvalue != SUCCESSFUL_RETURN )
-			return THROWERROR( returnvalue );
-
-	returnvalue = readFromFile( lb, nV, lb_file );
-	if ( returnvalue != SUCCESSFUL_RETURN )
-			return THROWERROR( returnvalue );
-
-	returnvalue = readFromFile( ub, nV, ub_file );
-	if ( returnvalue != SUCCESSFUL_RETURN )
-			return THROWERROR( returnvalue );
-
-	real_t* _S1 = new real_t[nComp * nV];
-	returnvalue = readFromFile( _S1, nComp, nV, S1_file );
-	if ( returnvalue != SUCCESSFUL_RETURN )
-	{
-		delete[] _S1;
-		return THROWERROR( returnvalue );
-	}
-
-	real_t* _S2 = new real_t[nComp * nV];
-	returnvalue = readFromFile( _S2, nComp, nV, S2_file );
-	if ( returnvalue != SUCCESSFUL_RETURN )
-	{
-		delete[] _S2;
-		return THROWERROR( returnvalue );
-	}
-
-	real_t* _lbA = new real_t[nC];
-	returnvalue = readFromFile( _lbA, nC, lbA_file );
-	if ( returnvalue != SUCCESSFUL_RETURN )
-	{
-		delete[] _lbA;
-		return THROWERROR( returnvalue );
-	}
-
-	real_t* _ubA = new real_t[nC];
-	returnvalue = readFromFile( _ubA, nC, ubA_file );
-	if ( returnvalue != SUCCESSFUL_RETURN )
-	{
-		delete[] _ubA;
-		return THROWERROR( returnvalue );
-	}
-
-	real_t* _A = new real_t[nC * nV];
-	returnvalue = readFromFile( _A, nC, nV, A_file );
-	if ( returnvalue != SUCCESSFUL_RETURN )
-	{
-		delete[] _A;
-		return THROWERROR( returnvalue );
-	}
-	
-	// Fill vaues
-	setH( _H );
-	setComplementarities(_S1, _S2);
-	setConstraints( _A, _lbA, _ubA );
+		QProblem lp(nV, nC);
 		
-	H->doFreeMemory( );
+		int nc = lp.getNAC();
 
-	return SUCCESSFUL_RETURN;
-}
-
-
-
-returnValue LCQProblem::setC()
-{
-	int_t nV = getNV();
-	int_t nComp = getNComp();
-
-	real_t* C_new = new real_t[nV*nV];
-	
-	real_t* tmpS1 = S1->full();
-	real_t* tmpS2 = S2->full();
-
-	// tmp = S1'*S2
-	S1->transTimes(nV, 1.0, tmpS2, nComp, 0.0, C_new, nV);
-
-	// tmp = S2'*S1 + tmp 
-	S2->transTimes(nV, 1.0, tmpS1, nComp, 1.0, C_new, nV);
-
-	SymDenseMat* dC;
-	C = dC = new SymDenseMat( nV, nV, nV, (real_t*) C_new );
-}
-
-
-returnValue LCQProblem::setConstraints(	Matrix* A_new, const real_t* const lbA_new, const real_t* const ubA_new)
-{
-	return RET_NOT_YET_IMPLEMENTED;	
-}
-
-returnValue LCQProblem::setConstraints(	const real_t* const A_new, const real_t* const lbA_new, const real_t* const ubA_new)
-{
-
-	int_t nV = getNV( );
-	int_t nC = getNC( );
-	int_t nComp = getNComp( );
-
-	real_t* S1_full = S1->full();
-	real_t* S2_full = S2->full();
-
-	real_t* _A = new real_t[(nC + 2*nComp) * nV];
-	lbA = new real_t[nC + 2*nComp];
-	ubA = new real_t[nC + 2*nComp];
-
-	// First, fill constraint matrix
-	for (int i = 0; i < nC; i++) {
-		lbA[i] = lbA_new[i];
-		ubA[i] = ubA_new[i];
-
-		for (int j = 0; j < nV; j++)
-			_A[i*nV + j] = A_new[i*nV + j];	
+		qp = lp;
 	}
 
-	// Then, fill values according to complementarity matrices
-	for (int i = 0; i < nComp; i++) {
-		int_t rowS1 = nC + i;
-		int_t rowS2 = nC + nComp + i;
-	
-		// Fill lower bounds
-		lbA[rowS1] = 0;
-		lbA[rowS2] = 0;
 
-		// Fill upper bounds
-		ubA[rowS1] = INFINITY;
-		ubA[rowS2] = INFINITY;
+	/*
+	*	s o l v e
+	*/
+	returnValue LCQProblem::solve(	const double* const _H, const double* const _g, const double* const _A,
+									const double* const _lb, const double* const _ub,
+									const double* const _lbA, const double* const _ubA,
+									const double* const _S1, const double* const _S2,
+									double* const cputime, const double* const xOpt, const double* const yOpt
+									)
+	{
+		setupLCQPdata(_H, _g, _A, _lb, _ub, _lbA, _ubA, _S1, _S2);
 
-		// Fill matrix
-		for (int j = 0; j < nV; j++) {
-			_A[rowS1*nV + j] = S1_full[i*nV + j];	
-			_A[rowS2*nV + j] = S2_full[i*nV + j];
-		}				
+		int nV = getNV();
+		int nC = getNC();
+		int nComp = getNComp();
+
+		qpOASES::int_t nwsr = 1000;
+
+		for (int i = 0; i < 20; i++) {
+			for (int k = 0; k < 30; k++) {
+				printIteration(i, 10, 100, 0.3, 0.00003, k, 2, 60);		
+			}
+		}
+		
+
+		if (options.solveZeroPenaltyFirst)
+			qpOASES::returnValue ret = qp.init(H, g, A, lb, ub, lbA, ubA, nwsr);		
+
+		// TODO: Write solver
+		return returnValue::NOT_YET_IMPLEMENTED;	
 	}
 
-	setA( _A, nC + 2*nComp );
 
-	return SUCCESSFUL_RETURN;	
+	/*
+	*	i n i t
+	*/
+	returnValue LCQProblem::solve(	const char* const H_file, const char* const g_file, const char* const A_file,
+									const char* const lb_file, const char* const ub_file,
+									const char* const lbA_file, const char* const ubA_file,
+									const char* const S1_file, const char* const S2_file,
+									int& nWSR, double* const cputime,
+									const double* const xOpt, const double* const yOpt
+									)
+	{
+		// Internally set up data
+		setupLCQPdata(H_file, g_file, A_file, lb_file, ub_file, lbA_file, ubA_file, S1_file, S2_file);
+
+		// TODO: Write this
+		return returnValue::SUCCESSFUL_RETURN;	
+	}
+
+
+	/*
+	*	s e t C o n s t r a i n t s
+	*/
+	returnValue LCQProblem::setConstraints( 	const double* const A_new, const double* const S1_new, const double* const S2_new, 
+												const double* const lbA_new, const double* const ubA_new )
+	{
+		int j;
+		int nV = getNV( );
+		int nC = getNC( );
+		int nComp = getNComp( );
+		
+		if ( nV == 0 || nComp == 0 )
+			return returnValue::LCQPOBJECT_NOT_SETUP;
+
+		if ( A_new == 0 && nC > 0)
+			return returnValue::ILLEGAL_ARGUMENT;
+
+		// Set up new constraint matrix (A; L; R)
+		A = new double[(nC + 2*nV)*nV];
+
+		for (int i = 0; i < nC*nV; i++) 
+			A[i] = A_new[i];
+
+		for (int i = 0; i < nComp*nV; i++)
+			A[i + nC*nV] = S1_new[i];
+
+		for (int i = 0; i < nComp*nV; i++)
+			A[i + nC*nV + nComp*nV] = S2_new[i];
+
+		// Set up new constraint bounds (lbA; 0; 0) & (ubA; INFINITY; INFINITY)
+		lbA = new double[nC + 2*nComp];
+		ubA = new double[nC + 2*nComp];
+
+		if ( lbA_new != 0 )
+		{
+			for (int i = 0; i < nC; i++)
+				lbA[i] = lbA_new[i];
+		}
+		else
+		{
+			for (int i = 0; i < nC; i++)
+				lbA[i] = -INFINITY;
+		}
+
+		if ( ubA_new != 0 )
+		{
+			for (int i = 0; i < nC; i++)
+				ubA[i] = ubA_new[i];
+		}
+		else
+		{
+			for (int i = 0; i < nC; i++)
+				ubA[i] = INFINITY;
+		}
+
+		for (int i = 0; i < 2*nComp; i++) {
+			lbA[i + nC] = 0;
+			ubA[i + nC] = INFINITY;
+		}
+
+		// Set complementarities
+		if ( S1_new == 0 || S2_new == 0 )
+			return returnValue::ILLEGAL_ARGUMENT;
+
+		S1 = new double[nComp*nV];
+		S2 = new double[nComp*nV];
+
+		for (int i = 0; i < nComp*nV; i++) {
+			S1[i] = S1_new[i];
+			S2[i] = S2_new[i];
+		}
+
+		Utilities utils;
+		double* C = new double[nV*nV];
+		utils.MatrixSymmetrizationProduct(S1, S2, C, nComp, nV);
+		
+		return returnValue::SUCCESSFUL_RETURN;
+	}
+
+
+	/*
+	*	g e t O b j V a l
+	*/
+	double LCQProblem::getObjVal( ) const
+	{
+		return qp.getObjVal( );
+	}
+
+
+	/*
+	*	g e t O b j V a l
+	*/
+	double LCQProblem::getObjVal( const double* const _x ) const
+	{
+		return qp.getObjVal( _x );
+	}
+
+
+	/*
+	*	g e t P r i m a l S o l u t i o n
+	*/
+	returnValue LCQProblem::getPrimalSolution( double* const xOpt ) const
+	{
+		qpOASES::returnValue qpRet = qp.getPrimalSolution( xOpt );
+
+		if (qpRet == qpOASES::returnValue::SUCCESSFUL_RETURN)
+			return returnValue::SUCCESSFUL_RETURN;
+
+		return returnValue::SUBPROBLEM_SOLVER_ERROR;
+	}
+
+
+	/*
+	*	g e t D u a l S o l u t i o n
+	*/
+	returnValue LCQProblem::getDualSolution( double* const yOpt ) const
+	{
+		// TODO: Implement transformation
+		return getDualSolution( yOpt );
+	}
+
+
+	/*
+	 *	 p r i n t I t e r a t i o n
+	 */
+	void LCQProblem::printIteration(	int outerIter,							/**< Number of current outer iteration. */
+										double stationarityValue,				/**< Stationarity value of outer loop problem. */
+										double complementarityValue,			/**< Current complementarity value. */
+										double penaltyValue,					/**< Current penalty value. */
+										double normStep,						/**< Euclidean distance to last iterate. */
+										int innerIter,							/**< Number of current inner iteration. */
+										double optimalStepLength,   			/**< Step length of current iteration computed via optimal step length approach. */
+										int qpIter		 						/**< Number of iterations performed by subproblem solver. */
+										) 
+	{
+		if (options.printLvl == printLevel::NONE)
+			return;
+
+		// Print header every 10 iters
+		bool headerInner = (options.printLvl >= printLevel::INNER_LOOP_ITERATES && innerIter % 10 == 0);
+		bool headerOuter = (options.printLvl == printLevel::OUTER_LOOP_ITERATES && outerIter % 10 == 0);
+		if (headerInner || headerOuter)
+			printHeader();	
+
+		int iL = printIntLength;
+		int dL = printDoubleLength;
+
+		// Print outer iterate
+		cout << setw(iL) << outerIter;
+
+		// Print innter iterate
+		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES)
+			cout << " | " << setw(iL) << innerIter;
+
+		cout << " | " << setw(dL) << stationarityValue;
+
+		cout << " | " << setw(dL) << penaltyValue;
+
+		cout << " | " << setw(dL) << normStep;
+
+		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES) {
+			cout << " | " << setw(dL) << optimalStepLength;
+			cout << " | " << setw(iL) << qpIter;
+		}	
+
+		cout << std::endl;		
+	}
+
+
+	void LCQProblem::printHeader() 
+	{
+		printLine();
+
+		int iL = printIntLength;
+		int dL = printDoubleLength;
+
+		cout << setw(iL) << "outer";
+
+		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES)
+			cout << " | " << setw(iL) << "inner";
+
+		cout << " | " << setw(dL) << "stat";
+		cout << " | " << setw(dL) << "penalty";
+		cout << " | " << setw(dL) << "norm p";
+
+		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES) {
+			cout << " | " << setw(dL) << "step len";
+			cout << " | " << setw(iL) << "sub it";
+		}	
+		cout << std::endl;		
+
+		printLine();
+	}
+
+	void LCQProblem::printLine() 
+	{
+	
+		int iL = printIntLength;
+		int dL = printDoubleLength;
+
+		// Print line
+		cout << setw(iL) << string(iL, '-');
+
+		// Print innter iterate
+		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES)
+			cout << "-+-" << setw(iL) << string(iL, '-');
+
+		cout << "-+-" << setw(dL) << string(dL, '-');
+		cout << "-+-" << setw(dL) << string(dL, '-');
+		cout << "-+-" << setw(dL) << string(dL, '-');
+
+		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES) {
+			cout << "-+-" << setw(dL) << string(dL, '-');
+			cout << "-+-" << setw(iL) << string(iL, '-');
+		}	
+		cout << std::endl;		
+	}
+
+	/*
+	*	s e t u p Q P d a t a
+	*/
+	returnValue LCQProblem::setupLCQPdata(	const double* const _H, const double* const _g, const double* const _A,
+											const double* const _lb, const double* const _ub,
+											const double* const _lbA, const double* const _ubA,
+											const double* const _S1, const double* const _S2
+											)
+	{
+		setH( _H );
+		setG( _g );
+		setLB( _lb );
+		setUB( _ub );
+		setConstraints( _A, _S1, S2, _lbA, _ubA );	
+
+		return returnValue::SUCCESSFUL_RETURN;
+	}
+
+
+	/*
+	*	s e t u p Q P d a t a F r o m F i l e
+	*/
+	returnValue LCQProblem::setupLCQPdata(	const char* const H_file, const char* const g_file, const char* const A_file,
+											const char* const lb_file, const char* const ub_file,
+											const char* const lbA_file, const char* const ubA_file,
+											const char* const S1_file, const char* const S2_file
+											)
+	{
+		int i;
+		int nV = getNV( );
+		int nC = getNC( );
+
+		returnValue returnvalue;
+		Utilities utils;
+
+		double* _H = new double[nV*nV];
+		returnvalue = utils.readFromFile( _H, nV*nV, H_file );
+		if ( returnvalue != SUCCESSFUL_RETURN ) {
+			delete _H;
+			throw( returnvalue );
+		}
+			
+
+		double* _g = new double[nV];
+		returnvalue = utils.readFromFile( _g, nV, g_file );
+		if ( returnvalue != SUCCESSFUL_RETURN ) {
+			delete _g;
+			throw( returnvalue );
+		}
+
+		double* _lb = new double[nV];
+		returnvalue = utils.readFromFile( _lb, nV, lb_file );
+		if ( returnvalue != SUCCESSFUL_RETURN ) {
+			delete _lb;
+			throw( returnvalue );
+		}
+
+		double* _ub = new double[nV];
+		returnvalue = utils.readFromFile( _ub, nV, ub_file );
+		if ( returnvalue != SUCCESSFUL_RETURN ) {
+			delete _ub;
+			throw( returnvalue );
+		}
+
+		double* _A = new double[nC*nV];
+		returnvalue = utils.readFromFile( _A, nC*nV, A_file );
+		if ( returnvalue != SUCCESSFUL_RETURN ) {
+			delete _A;
+			throw( returnvalue );
+		}
+				
+		double* _lbA = new double[nC];
+		returnvalue = utils.readFromFile( _lbA, nC, lbA_file );
+		if ( returnvalue != SUCCESSFUL_RETURN ) {
+			delete _lbA;
+			throw( returnvalue );
+		}
+
+		double* _ubA = new double[nC];
+		returnvalue = utils.readFromFile( _ubA, nC, ubA_file );
+		if ( returnvalue != SUCCESSFUL_RETURN ) {
+			delete _ubA;
+			throw( returnvalue );
+		}
+
+		double* _S1 = new double[nComp*nV];
+		returnvalue = utils.readFromFile( _S1, nComp*nV, S1_file );
+		if ( returnvalue != SUCCESSFUL_RETURN ) {
+			delete _S1;
+			throw( returnvalue );
+		}
+
+		double* _S2 = new double[nComp*nV];
+		returnvalue = utils.readFromFile( _S2, nComp*nV, S2_file );
+		if ( returnvalue != SUCCESSFUL_RETURN ) {
+			delete _S2;
+			throw( returnvalue );
+		}
+
+
+		// Fill vaues
+		setH( _H );
+		setG( _g );
+		setLB( _lb );
+		setUB( _ub );
+		setConstraints( _A, _S1, _S2, _lbA, _ubA );
+
+		return returnValue::SUCCESSFUL_RETURN;
+	}
 }
-
-END_NAMESPACE_QPOASES
 
 
 /*
