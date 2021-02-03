@@ -1,37 +1,23 @@
 /*
- *	This file is part of qpOASES.
+ *	This file is part of lcqpOASES.
  *
- *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2017 by Hans Joachim Ferreau, Andreas Potschka,
- *	Christian Kirches et al. All rights reserved.
+ *	lcqpOASES -- A Solver for Quadratic Programs with Commplementarity Constraints.
+ *	Copyright (C) 2020 - 2021 by Jonas Hall et al.
  *
- *	qpOASES is free software; you can redistribute it and/or
+ *	lcqpOASES is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
  *	License as published by the Free Software Foundation; either
  *	version 2.1 of the License, or (at your option) any later version.
  *
- *	qpOASES is distributed in the hope that it will be useful,
+ *	lcqpOASES is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
- *	License along with qpOASES; if not, write to the Free Software
+ *	License along with lcqpOASES; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- *
  */
-
-
-/**
- *	\file include/qpOASES/LCQProblem.hpp
- *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.2
- *	\date 2007-2017
- *
- *	Declaration of the LCQProblem class which is able to use the newly
- *	developed online active set strategy for parametric quadratic programming.
- */
-
 
 
 #ifndef LCQPOASES_LCQPROBLEM_HPP
