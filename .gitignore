@@ -5,6 +5,8 @@
 ### Directories ###
 build
 UnitTesting/googletest
+src/qpOASES
+debug
 
 ### C ###
 # Prerequisites

@@ -43,6 +43,7 @@ TEST(UtilitiesTest, MatrixMultiplicationTest) {
     ASSERT_EQ(C[3], -1);
 }
 
+// Testing the matrix symmetrization product
 TEST(UtilitiesTest, MatrixSymmetrization) {
     // A = [1 0 2; 3 1 1]
     // B = [2 0 1; 0 0 -1]
@@ -179,7 +180,7 @@ TEST(UtilitiesTest, ReadFromFile) {
 // Testing Options constructors, default settings, consistency
 TEST(UtilitiesTest, Options) {
     lcqpOASES::Options opts;
-    ASSERT_EQ(opts.ensureConsistency(), lcqpOASES::returnValue::SUCCESSFUL_RETURN);
+    ASSERT_EQ(opts.ensureConsistency(), lcqpOASES::SUCCESSFUL_RETURN);
     
     // Check changed values
     opts.initialComplementarityPenalty = 100;

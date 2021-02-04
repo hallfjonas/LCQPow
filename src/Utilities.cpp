@@ -247,7 +247,7 @@ namespace lcqpOASES {
         if ( ( datafile = fopen( datafilename, "r" ) ) == 0 )
         {
             fclose( datafile );
-            return returnValue::UNABLE_TO_READ_FILE;
+            return UNABLE_TO_READ_FILE;
         }
 
         /* 2) Read data from file. */
@@ -256,7 +256,7 @@ namespace lcqpOASES {
             if ( fscanf( datafile, "%d\n", &(data[i]) ) == 0 )
             {
                 fclose( datafile );
-                return returnValue::UNABLE_TO_READ_FILE;
+                return UNABLE_TO_READ_FILE;
             }
         }
 
@@ -279,7 +279,7 @@ namespace lcqpOASES {
         if ( ( datafile = fopen( datafilename, "r" ) ) == 0 )
         {
             fclose( datafile );
-            return returnValue::UNABLE_TO_READ_FILE;
+            return UNABLE_TO_READ_FILE;
         }
 
         /* 2) Read data from file. */
@@ -288,7 +288,7 @@ namespace lcqpOASES {
             if ( fscanf( datafile, "%lf\n", &(data[i]) ) == 0 )
             {
                 fclose( datafile );
-                return returnValue::UNABLE_TO_READ_FILE;
+                return UNABLE_TO_READ_FILE;
             }
         }
 

@@ -6,28 +6,28 @@
 #include <unistd.h>
 
 int main() {
-    std::string inputdir = "examples/LCQP/example_data/";
+    auto inputdir = "examples/LCQP/example_data/";
 
     // Required files
-    std::string H_file = inputdir + "H.txt";
-    std::string g_file = inputdir + "g.txt";
-    std::string lb_file = inputdir + "lb.txt";
-    std::string ub_file = inputdir + "ub.txt";
-    std::string C_file = inputdir + "C.txt";
+    auto H_file = inputdir + "H.txt";
+    auto g_file = inputdir + "g.txt";
+    auto lb_file = inputdir + "lb.txt";
+    auto ub_file = inputdir + "ub.txt";
+    auto C_file = inputdir + "C.txt";
 
     // Contraints (optional files, but if A exists then all are required)
-    std::string A_file = inputdir + "A.txt";
-    std::string lbA_file = inputdir + "lbA.txt";
-    std::string ubA_file = inputdir + "ubA.txt";
+    auto A_file = inputdir + "A.txt";
+    auto lbA_file = inputdir + "lbA.txt";
+    auto ubA_file = inputdir + "ubA.txt";
 
     // Initial primal and dual guess (optional)
-    std::string x0_file = inputdir + "x0.txt";
-    std::string y0_file = inputdir + "y0.txt";
+    auto x0_file = inputdir + "x0.txt";
+    auto y0_file = inputdir + "y0.txt";
 
     int nV = 0;
     int nC = 0;
 
-    std::string line;
+    auto line;
 
     std::ifstream lbfile(lb_file);
     while (std::getline(lbfile, line))

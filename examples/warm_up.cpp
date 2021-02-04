@@ -54,10 +54,8 @@ int main() {
     options.complementarityPenaltyUpdate = 2;
 	lcqp.setOptions( options );
 
-	int nWSR = 10000000;
-
     // Solve first LCQP
-	returnValue retVal = lcqp.solve( H, g, A, lb, ub, lbA, ubA, S1, S2, 0, x0 );
+	returnValue retVal = lcqp.solve( H, g, A, lb, ub, lbA, ubA, S1, S2, x0 );
 
     if (retVal != SUCCESSFUL_RETURN)
     {
@@ -70,8 +68,8 @@ int main() {
 	double yOpt[2];
 	lcqp.getPrimalSolution( xOpt );
 	lcqp.getDualSolution( yOpt );
-	printf( "\nxOpt = [ %e, %e ];  yOpt = [ %e, %e ];  objVal = %e\n\n",
-			xOpt[0],xOpt[1],yOpt[0],yOpt[1],lcqp.getObjVal() );
+	printf( "\nxOpt = [ %e, %e ];  yOpt = [ %e, %e ]; \n\n",
+			xOpt[0],xOpt[1],yOpt[0],yOpt[1] );
 
     return 0;
 }

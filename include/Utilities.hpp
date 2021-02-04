@@ -32,16 +32,14 @@ namespace lcqpOASES {
         // Success
         SUCCESSFUL_RETURN = 0,						/**< Successful return. */
         
-        // Algorithmic status
-        PROBLEM_NOT_SOLVED = 10,
-        MAX_OUTER_ITERATIONS_REACHED = 11,
-        MAX_INNER_ITERATIONS_REACHED = 12,
-
         // Generic Errors
         LCQPOBJECT_NOT_SETUP = 300,                   /**< Constructor has not been called. */
         INDEX_OUT_OF_BOUNDS = 301,                    /**< Index out of bounds. */
         SUBPROBLEM_SOLVER_ERROR = 302,
         UNABLE_TO_READ_FILE = 303,
+        MAX_OUTER_ITERATIONS_REACHED = 304,
+        MAX_INNER_ITERATIONS_REACHED = 305,
+        INITIAL_SUBPROBLEM_FAILED = 306,
 
         // Invalid arguments
         INVALID_ARGUMENT = 100,
@@ -49,12 +47,14 @@ namespace lcqpOASES {
         INVALID_COMPLEMENTARITY_TOLERANCE = 102,
         INVALID_INITIAL_PENALTY_VALUE = 103,
         INVALID_MAX_OUTER_ITERATIONS_VALUE = 104,
-        INVALID_MAX_INNER_ITERATIONS_VALUE = 105,
+        INVALID_MAX_INNER_ITERATIONS_VALUE = 105
+    };
 
-        // Stationarity types
-        W_STATIONARY_SOLUTION = 200,
-        C_STATIONARY_SOLUTION = 201,
-        S_STATIONARY_SOLUTION = 202        
+    enum algorithmStatus {
+        PROBLEM_NOT_SOLVED = 0,
+        C_STATIONARY_SOLUTION = 1,
+        M_STATIONARY_SOLUTION = 2,
+        S_STATIONARY_SOLUTION = 3
     };
 
     enum printLevel {

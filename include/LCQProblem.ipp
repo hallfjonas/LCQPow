@@ -22,46 +22,17 @@
 
 namespace lcqpOASES {
 	/*
-	*	g e t N C o m p
-	*/
-	inline int LCQProblem::getNV( ) const
-	{
-		return nV;
-	}
-
-
-	/*
-	*	g e t N C o m p
-	*/
-	inline int LCQProblem::getNC( ) const
-	{
-		return nC;
-	}
-
-
-	/*
-	*	g e t N C o m p
-	*/
-	inline int LCQProblem::getNComp( ) const
-	{
-		return nComp;
-	}
-
-
-	/*
 	*	s e t H
 	*/
 	inline returnValue LCQProblem::setH( const double* const H_new )
 	{
-		uint nV = (uint)getNV( );
-
 		if (nV <= 0)
-			return returnValue::LCQPOBJECT_NOT_SETUP;
+			return LCQPOBJECT_NOT_SETUP;
 
 		H = new double[nV*nV];
 		memcpy( H, H_new, nV*nV*sizeof(double) );
 
-		return returnValue::SUCCESSFUL_RETURN;
+		return SUCCESSFUL_RETURN;
 	}
 
 
@@ -70,18 +41,16 @@ namespace lcqpOASES {
 	*/
 	inline returnValue LCQProblem::setG( const double* const g_new )
 	{
-		uint nV = (uint)getNV( );
-
 		if ( nV == 0 )
-			return returnValue::LCQPOBJECT_NOT_SETUP;
+			return LCQPOBJECT_NOT_SETUP;
 
 		if ( g_new == 0 )
-			return returnValue::INVALID_ARGUMENT;
+			return INVALID_ARGUMENT;
 
 		g = new double[nV];
 		memcpy( g, g_new, nV*sizeof(double) );
 
-		return returnValue::SUCCESSFUL_RETURN;
+		return SUCCESSFUL_RETURN;
 	}
 
 
@@ -90,11 +59,8 @@ namespace lcqpOASES {
 	*/
 	inline returnValue LCQProblem::setLB( const double* const lb_new )
 	{
-		uint i;
-		uint nV = (uint)getNV( );
-
 		if ( nV == 0 )
-			return returnValue::LCQPOBJECT_NOT_SETUP;
+			return LCQPOBJECT_NOT_SETUP;
 
 		lb = new double[nV];
 
@@ -105,11 +71,11 @@ namespace lcqpOASES {
 		else
 		{
 			/* if no lower bounds are specified, set them to -infinity */
-			for( i = 0; i < nV; i++ )
+			for( int i = 0; i < nV; i++ )
 				lb[i] = -INFINITY;
 		}
 
-		return returnValue::SUCCESSFUL_RETURN;
+		return SUCCESSFUL_RETURN;
 	}
 
 
@@ -118,19 +84,17 @@ namespace lcqpOASES {
 	*/
 	inline returnValue LCQProblem::setLB( int number, double value )
 	{
-		int nV = getNV( );
-
 		if ( nV == 0 )
-			return returnValue::LCQPOBJECT_NOT_SETUP;
+			return LCQPOBJECT_NOT_SETUP;
 
 		if ( ( number >= 0 ) && ( number < nV ) )
 		{
 			lb[number] = value;
-			return returnValue::SUCCESSFUL_RETURN;
+			return SUCCESSFUL_RETURN;
 		}
 		else
 		{
-			return returnValue::INDEX_OUT_OF_BOUNDS;
+			return INDEX_OUT_OF_BOUNDS;
 		}
 	}
 
@@ -140,11 +104,8 @@ namespace lcqpOASES {
 	*/
 	inline returnValue LCQProblem::setUB( const double* const ub_new )
 	{
-		uint i;
-		uint nV = (uint)getNV( );
-
 		if ( nV == 0 )
-			return returnValue::LCQPOBJECT_NOT_SETUP;
+			return LCQPOBJECT_NOT_SETUP;
 
 		ub = new double[nV];
 
@@ -155,11 +116,11 @@ namespace lcqpOASES {
 		else
 		{
 			/* if no upper bounds are specified, set them to infinity */
-			for( i=0; i<nV; ++i )
+			for( int i=0; i<nV; ++i )
 				ub[i] = INFINITY;
 		}
 
-		return returnValue::SUCCESSFUL_RETURN;
+		return SUCCESSFUL_RETURN;
 	}
 
 
@@ -168,21 +129,46 @@ namespace lcqpOASES {
 	*/
 	inline returnValue LCQProblem::setUB( int number, double value )
 	{
-		int nV = getNV( );
-
 		if ( nV == 0 )
-			return returnValue::LCQPOBJECT_NOT_SETUP;
+			return LCQPOBJECT_NOT_SETUP;
 
 		if ( ( number >= 0 ) && ( number < nV ) )
 		{
 			ub[number] = value;
 
-			return returnValue::SUCCESSFUL_RETURN;
+			return SUCCESSFUL_RETURN;
 		}
 		else
 		{
-			return returnValue::INDEX_OUT_OF_BOUNDS;
+			return INDEX_OUT_OF_BOUNDS;
 		}
+	}
+
+	/*
+	 *	 s e t I n i t i a l G u e s s
+	 */
+	inline returnValue LCQProblem::setInitialGuess( const double* const _x0, const double* const _y0 ) 
+	{
+		if ( nV == 0 || nComp == 0)
+			return LCQPOBJECT_NOT_SETUP;
+
+		xk = new double[nV];
+
+		if (_x0 != 0) {
+			memcpy(xk, _x0, nV*sizeof(double));
+		} else {
+			for (int i = 0; i < nV; i++)
+				xk[i] = 0;
+		}
+			
+		if (_y0 != 0) {
+			yk = new double[nV + nC + 2*nComp];
+			memcpy(yk, _y0, (nV + nC + 2*nComp)*sizeof(double));
+		} else {
+			yk = (double*)0;
+		}
+
+		return SUCCESSFUL_RETURN;
 	}
 
 	/*

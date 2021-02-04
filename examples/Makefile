@@ -41,7 +41,9 @@ IFLAGS      =  -I. \
 
 LFLAGS 		= ${QPOASES_LINK}
 
-DEBUGFLAGS = -g -D__USE_LONG_INTEGERS__ 
+DEBUGFLAGS = -g -D__USE_LONG_INTEGERS__ -Wall -pedantic -Wshadow -Wfloat-equal
+
+QPOASES_SRC = $(wildcard ${SRCDIR}/qpOASES/*.cpp)
 
 ##
 ##  files
@@ -87,8 +89,8 @@ ${BINDIR}/%${EXE}: %.${OBJEXT} ${LINK_DEPENDS}
 
 ${DEBUGDIR}/%${EXE}:
 	@${ECHO} "Building debug..." $@
-	${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${LCQPOASES_SRC} ${PLOT_SRC} ${DEF_TARGET} ${IFLAGS} ${LFLAGS}
-	@${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${LCQPOASES_SRC} ${PLOT_SRC} ${DEF_TARGET} ${IFLAGS} ${LFLAGS}
+	${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${LCQPOASES_SRC} ${QPOASES_SRC} ${PLOT_SRC} ${DEF_TARGET} ${IFLAGS}
+	@${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${LCQPOASES_SRC} ${QPOASES_SRC} ${PLOT_SRC} ${DEF_TARGET} ${IFLAGS}
 
 clean:
 	@${ECHO} "Cleaning up (examples)"
@@ -101,7 +103,7 @@ ${LINK_DEPENDS}:
 
 %.${OBJEXT}: %.cpp
 	@${ECHO} "Creating" $@
-	${CPP} ${DEF_TARGET} -c ${IFLAGS} ${CPPFLAGS} $<
+	${CPP} ${DEF_TARGET} -c ${IFLAGS}/usr/local/qpOASES/${CPPFLAGS} $<
 	@${CPP} ${DEF_TARGET} -c ${IFLAGS} ${CPPFLAGS} $<
 
 

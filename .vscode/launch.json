@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Launch Debugging",
+            "name": "(gdb) Build and Launch Debugging",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/debug/warm_up",
@@ -16,6 +16,25 @@
             "externalConsole": false,
             "MIMode": "gdb",
             "preLaunchTask": "build debug",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(gdb) Launch Debugging",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/debug/warm_up",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",

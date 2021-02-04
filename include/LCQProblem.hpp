@@ -92,8 +92,6 @@ namespace lcqpOASES {
 																						If no lower constraints' bounds exist, a NULL pointer can be passed. */
 								const double* const _S1,               			/**< LHS of complementarity product. */
 								const double* const _S2,               			/**< RHS of complementarity product. */
-								double* const cputime = 0,						/**< Input: Maximum CPU time allowed for QP initialisation. \n
-																						Output: CPU time spent for QP initialisation (if pointer passed). */
 								const double* const xOpt = 0,					/**< Optimal primal solution vector. \n
 																						(If a null pointer is passed, the old primal solution is kept!) */
 								const double* const yOpt = 0					/**< Optimal dual solution vector. \n
@@ -134,44 +132,30 @@ namespace lcqpOASES {
 																						If no lower constraints' bounds exist, a NULL pointer can be passed. */
 								const char* const ubA_file,						/**< Name of file where upper constraints' bound vector. \n
 																						If no upper constraints' bounds exist, a NULL pointer can be passed. */
-								const char* const _S1,               			/**< Name of file where LHS of complementarity product is stored. */
-								const char* const _S2,               			/**< Name of file where RHS of complementarity product is stored. */
-								int& nWSR,										/**< Input: Maximum number of working set recalculations when using initial homotopy.
-																						Output: Number of performed working set recalculations. */
-								double* const cputime = 0,						/**< Input: Maximum CPU time allowed for QP initialisation. \n
-																						Output: CPU time spent for QP initialisation (if pointer passed). */
-								const double* const xOpt = 0,					/**< Optimal primal solution vector. \n
+								const char* const S1_file,             			/**< Name of file where LHS of complementarity product is stored. */
+								const char* const S2_file,             			/**< Name of file where RHS of complementarity product is stored. */
+								const char* const x0_file = 0,					/**< Optimal primal solution vector. \n
 																						(If a null pointer is passed, the old primal solution is kept!) */
-								const double* const yOpt = 0					/**< Optimal dual solution vector. \n
+								const char* const y0_file = 0					/**< Optimal dual solution vector. \n
 																						(If a null pointer is passed, the old dual solution is kept!) */
 								);
 
 			/** Returns the dual solution vector of the LCQP (deep copy).
 			 *	\return SUCCESSFUL_RETURN \n
 						RET_QP_NOT_SOLVED */
-			virtual returnValue getPrimalSolution(	double* const xOpt	/**< Output: Primal solution vector (if QP has been solved). */
-													) const;
+			virtual algorithmStatus getPrimalSolution(	double* const xOpt	/**< Output: Primal solution vector (if QP has been solved). */
+														) const;
 
 			/** Returns the dual solution vector of the LCQP (deep copy).
 			 *	\return SUCCESSFUL_RETURN \n
 						RET_QP_NOT_SOLVED */
-			virtual returnValue getDualSolution(	double* const yOpt	/**< Output: Dual solution vector (if QP has been solved). */
-													) const;
+			virtual algorithmStatus getDualSolution(	double* const yOpt	/**< Output: Dual solution vector (if QP has been solved). */
+														) const;
 
 			/** Overrides current options with given ones.
 			 *	\return SUCCESSFUL_RETURN */
 			inline void setOptions(	const Options& _options	/**< New options. */
 									);
-
-			/** Returns the optimal objective function value.
-			 *	\return finite value: Optimal objective function value (QP was solved) \n
-						+infinity:	  QP was not yet solved */
-			double getObjVal( ) const;
-
-			/** Returns the objective function value at an arbitrary point x.
-			 *	\return Objective function value at point x */
-			double getObjVal(	const double* const _x	/**< Point at which the objective function shall be evaluated. */
-								) const;
 
 
 		/*
@@ -207,7 +191,9 @@ namespace lcqpOASES {
 										const double* const _ubA,		/**< Upper constraints' bound vector. \n
 																			If no lower constraints' bounds exist, a NULL pointer can be passed. */
 										const double* const _S1,      	/**< LHS of complementarity product. */
-										const double* const _S2      	/**< RHS of complementarity product. */
+										const double* const _S2,      	/**< RHS of complementarity product. */
+										const double* const _x0,		/**< Initial guess. */
+										const double* const _y0			/**< Initial dual guess. */
 										);
 
 			/** Sets up internal QP data by loading it from files. If the current Hessian
@@ -231,19 +217,13 @@ namespace lcqpOASES {
 										const char* const ubA_file,			/**< Name of file where upper constraints' bounds, of neighbouring QP to be solved, is stored. \n
 																					If no upper constraints' bounds exist, a NULL pointer can be passed. */
 										const char* const S1_file,			/**< Name of file where LHS of complementarity product is stored. */
-										const char* const S2_file
+										const char* const S2_file,			/**< Name of file where RHS of complementarity product is stored. */
+										const char* const x0_file,			/**< Name of file where initial guess is stored. */
+										const char* const y0_file			/**< Name of file where initial dual guess is stored. */
 										);
 
 			/** Prints concise information on the current iteration. */
-			void printIteration(	int outerIter,							/**< Number of current outer iteration. */
-									double stationarityValue,				/**< Stationarity value of outer loop problem. */
-									double complementarityValue,			/**< Current complementarity value. */
-									double penaltyValue,					/**< Current penalty value. */
-									double normStep,						/**< Euclidean distance to last iterate. */
-									int innerIter = 0,						/**< Number of current inner iteration. */
-									double optimalStepLength = 0,			/**< Step length of current iteration computed via optimal step length approach. */
-									int qpIter = 0	 						/**< Number of iterations performed by subproblem solver. */
-									);
+			void printIteration( );
 
 			/** Print header every once in a while. */
 			void printHeader();
@@ -301,22 +281,13 @@ namespace lcqpOASES {
 												const double* const ubA			/**< New upper bounds for A. */
 												);
 
-			/** Returns number of complementarity constraints. \n
-			 * 	\return SUCCESSFUL_RETURN  */
-			inline int getNV( ) const;
-
-					/** Returns number of complementarity constraints. \n
-			 * 	\return SUCCESSFUL_RETURN  */
-			inline int getNC( ) const;
-
-			/** Returns number of complementarity constraints. \n
-			 * 	\return SUCCESSFUL_RETURN  */
-			inline int getNComp( ) const;
-
 			/** Sets complementarity matrix (requires S1 and S2 to be set). \n
 			 *	\return SUCCESSFUL_RETURN \n
 			*			RET_INVALID_ARGUMENTS */
 			returnValue setC( );
+
+			/** Sets the initial guess x0 and y0. */
+			inline returnValue setInitialGuess( const double* const _x0, const double* const _y0 );
 
 			/** Returns the NLP stationarity value. */
 			double* getPenaltyStationarity(	const double* const x_eval,
@@ -336,6 +307,9 @@ namespace lcqpOASES {
 			/** After problem is set up, call this function and solve LCQP. */
 			returnValue runSolver( );		
 
+			/** Called in runSolver to initialize variables. */
+			void initializeSolver( );
+
 			/** Solves the qp subproblem wrt H, gk, A, S1, S2 . */
 			returnValue solveQPSubproblem( bool initialSolve );
 
@@ -349,7 +323,7 @@ namespace lcqpOASES {
 			void transformDuals( );
 
 			/** Determine stationarity type of optimal solution. */
-			returnValue determineStationarityType( );
+			algorithmStatus determineStationarityType( );
 
 			/** Perform penalty update. */
 			void updatePenalty( );
@@ -386,23 +360,23 @@ namespace lcqpOASES {
 			double* gk;								/**< Current objective linear term. */
 
 			double* xk;								/**< Current primal iterate. */
+			double* yk;								/**< Current dual vector. */
 			double* xnew;							/**< Current qpSubproblem solution. */
 			double* pk;								/**< xnew - xk. */
-
-			double* yk;								/**< Current dual vector. */
-			double* yk_bounds;						/**< Current dual iterate (wrt bounds). */
-			double* yk_A;							/**< Current dual iterate(wrt A). */
-			double* yk_S1;							/**< Current dual iterate(wrt S1). */
-			double* yk_S2;							/**< Current dual iterate(wrt S2). */
 
 			double alphak; 							/**< Optimal step length. */
 
 			double* Qk;								/**< H + rho*C, required for stationarity and optimal step length. */
+			double* statk;							/**< Stationarity of current iterate. */
 
-            static const int printDoubleLength = 10;
-            static const int printIntLength = 6;
+			int outerIter;							/**< Outer iterate. */
+			int innerIter;							/**< Inner iterate- */
+
+			algorithmStatus algoStat;				/**< Status of algorithm. */
 
 			QProblem qp;							/**< QP subproblem. */
+			qpOASES::HessianType hessianType; 		/**< Hessian type (get this from initial solve). */
+			int qpIterk;							/**< Iterations taken by qpSolver to solve subproblem. */
 	};
 }
 
