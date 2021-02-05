@@ -180,7 +180,7 @@ namespace lcqpOASES {
     void Utilities::WeightedMatrixAdd(const double alpha, const double* const A, const double beta, const double* const B, double* C, int m, int n) {
         for (int i = 0; i < m; i++)
             for (int j = 0; j < n; j++)
-                C[i] = alpha*A[i] + beta*B[i];
+                C[i*n + j] = alpha*A[i*n+j] + beta*B[i*n+j];
     }
 
     /*

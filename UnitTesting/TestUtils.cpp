@@ -89,6 +89,33 @@ TEST(UtilitiesTest, AffineTransformation) {
     ASSERT_EQ(d[1], 11);
 }
 
+// Testing matrix add
+TEST(UtilitiesTest, MatrixAdd) {
+    // alpha = -1;
+    // A = [0 1; 3 1; 10 1]
+    // beta = 0.5;
+    // B = [2 0; 0 4; 2 2]
+    // C = [1 -1; -3 1; -9 0]
+
+    int m = 3;
+    int n = 2;
+    
+    double alpha = -1;
+    double* A = new double[m*n] { 0, 1, 3, 1, 10, 1 };
+
+    double beta = 0.5;
+    double* B = new double[m*n] { 2, 0, 0, 4, 2, 2 };
+    double* C = new double[m*n];
+
+    lcqpOASES::Utilities::WeightedMatrixAdd(alpha, A, beta, B, C, m, n);
+    ASSERT_EQ(C[0], 1);
+    ASSERT_EQ(C[1], -1);
+    ASSERT_EQ(C[2], -3);
+    ASSERT_EQ(C[3], 1);
+    ASSERT_EQ(C[4], -9);
+    ASSERT_EQ(C[5], 0);
+}
+
 // Testing vector add
 TEST(UtilitiesTest, VectorAdd) {
     // alpha = 2;
