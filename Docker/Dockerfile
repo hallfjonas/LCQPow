@@ -31,7 +31,7 @@ ENV TZ=Europe/Berlin
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Get git, g++, make
-RUN apt-get install -y gcc g++ gfortran git subversion make cmake liblapack-dev pkg-config --install-recommends
+RUN apt-get install -y gcc g++ gfortran subversion git make cmake liblapack-dev pkg-config --install-recommends
 
 # Get qpOASES and CasADi
 RUN svn co https://projects.coin-or.org/svn/qpOASES/stable/3.2 /usr/local/qpOASES

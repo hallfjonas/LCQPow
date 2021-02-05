@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/include/**",
-                "/usr/local/qpOASES/include/**"
+                "/usr/local/qpOASES/include/**",
+                "/usr/local/casadi/**"
             ],
             "defines": [],
             "cStandard": "gnu11",

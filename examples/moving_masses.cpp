@@ -24,12 +24,16 @@
 #include <fstream>
 #include <ctime>
 #include <iomanip>
-#include <qpOASES.hpp>
-#include "casadi/casadi.hpp"
+#include <LCQProblem.hpp>
+#include <casadi/casadi.hpp>
 
-using namespace qpOASES;
-using namespace casadi;
-using namespace std;
+using casadi::SX;
+using casadi::DM;
+using casadi::Function;
+using std::vector;
+using std::endl;
+using std::string;
+using lcqpOASES::LCQProblem;
 
 // Settings and flags
 int nMasses = 2;                                // Number of masses
@@ -208,8 +212,8 @@ int main() {
     // Bounds and initial guess for states
     for (int i = 0; i < nx; i++) {
         x0[i] = i % 2;
-        lbx[i] = -inf;
-        ubx[i] = inf;
+        lbx[i] = -casadi::inf;
+        ubx[i] = casadi::inf;
     }
     x0[nx - 1] = 0;
 
@@ -228,7 +232,7 @@ int main() {
 
         // Bounds on lambda0
         lbz[nMasses + j] = 0;
-        ubz[nMasses + j] = inf;
+        ubz[nMasses + j] = casadi::inf;
         
         // Initial guess
         if (x0[nMasses + j] < 0) {
@@ -266,7 +270,7 @@ int main() {
     // Node loop
     for (int k = 0; k < N; k++) {
         // New index name suffix
-        string nameInd = to_string(k);
+        string nameInd = std::to_string(k);
 
         SX uk = SX::sym("u_" + nameInd, nu);
         if (nu > 0) {
@@ -360,7 +364,7 @@ int main() {
         for (int i = 0; i < nMasses; i++) {
             gj(i) = xkj(nMasses + i) + zkj(nMasses + i);
             lbg.push_back(0);
-            ubg.push_back(inf);
+            ubg.push_back(casadi::inf);
         }
 
         g_k.push_back(gj);
@@ -432,11 +436,10 @@ int main() {
     CreateQPfromCasADi(J, g, w, &lbw[0], &ubw[0], &lbg[0], &ubg[0], Q, d, A, lb, ub, lbA, ubA);
 
     // Initialize LCQP solver
-    LCQProblem lcqp( NV, NConstr);
+    LCQProblem lcqp( NV, NConstr, NComp);
 
-    // qpOASES options and settings      
-    Options options;
-    options.setToMPC();
+    // lcqpOASES options and settings      
+    lcqpOASES::Options options;
     options.initialComplementarityPenalty = 1.0;
     options.complementarityPenaltyUpdate = 10.0;
     lcqp.setOptions( options );
@@ -448,7 +451,7 @@ int main() {
     double* cputime = 0;
 
     // Solve LCQP
-    lcqp.init(Q, d, A, lb, ub, lbA, ubA, C, nWSR, cputime, &w0[0]);
+    lcqp.solve(Q, d, lb, ub, S1, S2, A, lbA, ubA, &w0[0]);
 
     double* wk_opt = new double[NV];
     lcqp.getPrimalSolution( wk_opt );

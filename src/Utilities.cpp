@@ -119,8 +119,6 @@ namespace lcqpOASES {
         maxOuterIterations = 100;
         maxInnerIterations = 1000;
 
-
-
         qpSubSolver = qpSubproblemSolver::QPOASES;
 
         printLvl = printLevel::INNER_LOOP_ITERATES;
