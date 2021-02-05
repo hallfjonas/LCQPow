@@ -29,18 +29,6 @@
 
 using qpOASES::QProblem;
 
-/**
- *	\brief Implements the online active set strategy for QPs with general constraints.
- *
- *	A class for setting up and solving quadratic programs. The main feature is
- *	the possibily to use the newly developed online active set strategy for
- * 	parametric quadratic programming.
- *
- *	\author Jonas Hall
- *	\version 1.0
- *	\date 2020 - 2021
- */
-
 namespace lcqpOASES {
 	class LCQProblem
 	{

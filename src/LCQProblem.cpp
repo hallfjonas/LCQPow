@@ -353,7 +353,7 @@ namespace lcqpOASES {
 		
 		// Initialization strategy
 		if (options.solveZeroPenaltyFirst) {
-			memcpy(gk, g, nV*sizeof(double));
+			memcpy(gk, g, (uint)nV*sizeof(double));
 
 			if (solveQPSubproblem( true ) != SUCCESSFUL_RETURN) {
 				return INITIAL_SUBPROBLEM_FAILED;
@@ -739,7 +739,7 @@ namespace lcqpOASES {
 
 		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES) {
 			printf("%s%10.3g", sep, alphak);
-			printf("%s%6d", sep, qpIterk);
+			printf("%s%6ld", sep, qpIterk);
 		}
 
 		printf(" \n");
