@@ -36,7 +36,7 @@ include make.mk
 ##
 
 
-all: src examples
+all: src examples test
 #src_aw testing
 
 src:
