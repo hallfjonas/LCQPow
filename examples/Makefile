@@ -29,6 +29,7 @@ IFLAGS      =  -I. \
                -I${IDIR} \
 			   -I${QPOASES_IDIR}
 
+
 LFLAGS 		= ${QPOASES_LINK}
 
 DEBUGFLAGS = -g -D__USE_LONG_INTEGERS__ -Wall -pedantic -Wshadow -Wfloat-equal
@@ -43,28 +44,16 @@ LCQPOASES_SRC = $(wildcard ${SRCDIR}/*.cpp)
 QPOASES_EXM = $(wildcard ./*.cpp)
 
 
-QPOASES_EXES = \
-	${BINDIR}/warm_up${EXE} \
-	${BINDIR}/warm_up_from_file${EXE} \
-	${BINDIR}/initial_value_OCP${EXE} \
-	${BINDIR}/michael_schumacher_problem${EXE} \
-	${BINDIR}/solve_lcqp_from_file${EXE}
+LCQPOASES_EXAMPLES = \
+	${BINDIR}/warm_up${EXE}
 	
-QPOASES_DEBUG = $(wildcard ${DEBUGDIR}/*${EXE})
-
-WARM_UP = ${DEBUGDIR}/warm_up${EXE}
-
-MOVING_MASSES = ${DEBUGDIR}/moving_masses_condensed${EXE}
-
-LCQP_FROM_FILE = ${DEBUGDIR}/solve_lcqp_from_file${EXE}
-
-PLOTS = ${BINDIR}/minimal_matplotlib
+LCQPOASES_DEBUG = $(wildcard ${DEBUGDIR}/*${EXE})
 
 ##
 ##	targets
 ##
 
-all: ${QPOASES_DEBUG} ${QPOASES_EXES}
+all: ${LCQPOASES_DEBUG} ${LCQPOASES_EXAMPLES}
 
 .PHONY: moving_masses warm_up lcqp_from_file
 
@@ -75,19 +64,17 @@ lcqp_from_file: clean ${LCQP_FROM_FILE}
 ${BINDIR}/%${EXE}: %.${OBJEXT} ${LINK_DEPENDS}
 	@mkdir -p ${BINDIR}
 	@${ECHO} "Creating" $@
-	${CPP} ${DEF_TARGET} ${CPPFLAGS} $< ${QPOASES_LINK} ${LINK_LIBRARIES}
-	@${CPP} ${DEF_TARGET} ${CPPFLAGS} $< ${QPOASES_LINK} ${LINK_LIBRARIES}
+	@${CPP} ${DEF_TARGET} ${CPPFLAGS} $< ${LINK_LIBRARIES} ${LCQPOASES_LINK}
 
 # If we need to debug and step into qpOASES: Replace LFLAGS with QPOASES_SRC and move to front
 ${DEBUGDIR}/%${EXE}:
 	@mkdir -p ${DEBUGDIR}
 	@${ECHO} "Building debug..." $@
-	${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${LCQPOASES_SRC} ${PLOT_SRC} ${DEF_TARGET} ${IFLAGS} ${LFLAGS}
 	@${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${LCQPOASES_SRC} ${PLOT_SRC} ${DEF_TARGET} ${IFLAGS} ${LFLAGS}
 
 clean:
 	@${ECHO} "Cleaning up (examples)"
-	@${RM} -f *.${OBJEXT} ${QPOASES_EXES} ${QPOASES_DEBUG}
+	@${RM} -f *.${OBJEXT} ${LCQPOASES_EXAMPLES} ${LCQPOASES_DEBUG}
 
 clobber: clean
 
@@ -96,8 +83,7 @@ ${LINK_DEPENDS}:
 
 %.${OBJEXT}: %.cpp
 	@${ECHO} "Creating" $@
-	${CPP} ${DEF_TARGET} -c ${IFLAGS}/usr/local/qpOASES/${CPPFLAGS} $<
-	@${CPP} ${DEF_TARGET} -c ${IFLAGS} ${CPPFLAGS} $<
+	@${CPP} ${DEF_TARGET} -c ${IFLAGS} ${CPPFLAGS} $< ${LCQPOASES_LINK}
 
 
 ##

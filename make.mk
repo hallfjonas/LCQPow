@@ -23,12 +23,12 @@
 # 1) qpOASES
 QPOASES_IDIR   = /usr/local/qpOASES/include
 QPOASES_LIB_DIR = /usr/local/qpOASES/bin
-QPOASES_LINK   = -L${QPOASES_LIB_DIR} -Wl,-rpath=${QPOASES_LIB_DIR} -lqpOASES 
+QPOASES_LINK   = -L${QPOASES_LIB_DIR} -lqpOASES 
 
 # 2) CasADi
 CASADI_IDIR   = /usr/local/casadi
-CASADI_LINK = -L/usr/local/casadi/build/lib -lcasadi
-
+CASADI_LIB_DIR = /usr/local/casadi/build/lib
+CASADI_LINK = -L${CASADI_LIB_DIR} -lcasadi
 
 ## Do not touch this
 # include directories, relative
@@ -36,7 +36,9 @@ TOP = $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 IDIR =   ${TOP}/include
 SRCDIR = ${TOP}/src
 BINDIR = ${TOP}/bin
+LIBDIR = ${TOP}/lib
 DEBUGDIR = ${TOP}/debug
+BUILDDIR = ${TOP}/build
 
 # Compiler flags
 CPP = g++
@@ -47,7 +49,8 @@ F77 = gfortran
 ECHO = echo
 CD = cd
 CP = cp
-CPPFLAGS = -Wall -pedantic -Wshadow -Wfloat-equal -O3 -Wconversion -Wsign-conversion -fPIC -DLINUX -D__USE_LONG_INTEGERS__ -D__USE_LONG_FINTS__ -D${DEF_SOLVER} -D__NO_COPYRIGHT__
+CMAKE = cmake
+CPPFLAGS = -Wall -pedantic -Wshadow -Wfloat-equal -O3 -Wconversion -Wsign-conversion -fPIC -DLINUX -D__USE_LONG_INTEGERS__ -D__USE_LONG_FINTS__ -D__NO_COPYRIGHT__
 
 # file extensions
 OBJEXT = o
@@ -60,7 +63,8 @@ SHARED = -shared
 
 # Links to libraries
 LINK_LIBRARIES = ${QPOASES_LINK} ${CASADI_LINK}
-LINK_DEPENDS = ${BINDIR}/liblcqpOASES.${LIBEXT} ${BINDIR}/liblcqpOASES.${DLLEXT}
+LINK_DEPENDS = ${LIBDIR}/liblcqpOASES.${LIBEXT} ${LIBDIR}/liblcqpOASES.${DLLEXT}
+LCQPOASES_LINK = -L${LIBDIR} -llcqpOASES
 
 
 ##

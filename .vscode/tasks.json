@@ -24,10 +24,6 @@
             "label": "build project",
             "type": "shell",
             "command": "make",
-            "args": [
-                "all",
-                "clean"
-            ],
             "group": "build",
             "presentation": {
                 "reveal": "always",
@@ -65,15 +61,12 @@
             "problemMatcher": []
         },
         {
-            "label": "clean debug",
+            "label": "clean",
             "type": "shell",
             "command": "make",
             "args": [
                 "clean"
             ],
-            "options": {
-                "cwd": "examples"
-            },
             "group": "build",
             "presentation": {
                 "reveal": "always",

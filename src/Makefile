@@ -43,13 +43,13 @@ LCQPOASES_OBJECTS = \
 all: ${LINK_DEPENDS}
 
 
-${BINDIR}/liblcqpOASES.${LIBEXT}: ${LCQPOASES_OBJECTS}
-	@mkdir -p ${BINDIR}
+${LIBDIR}/liblcqpOASES.${LIBEXT}: ${LCQPOASES_OBJECTS}
+	@mkdir -p ${LIBDIR}
 	@${ECHO} "Creating static lib" $@
 	@${AR} r $@ $^
 
-${BINDIR}/liblcqpOASES.${DLLEXT}: ${LCQPOASES_OBJECTS}
-	@mkdir -p ${BINDIR}
+${LIBDIR}/liblcqpOASES.${DLLEXT}: ${LCQPOASES_OBJECTS}
+	@mkdir -p ${LIBDIR}
 	@${ECHO} "Creating shared lib" $@
 	@${CPP} ${DEF_TARGET} ${SHARED} $^ ${LINK_LIBRARIES}
 

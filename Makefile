@@ -42,20 +42,17 @@ all: src examples
 src:
 	@cd $@; ${MAKE} -s 
 
-#src_aw:
-#	@cd $@; ${MAKE} -s 
-
 examples: src
 	@cd $@; ${MAKE} -s
 
 doc:
 	@cd $@; ${MAKE} -s 
 
-testing: src
-	@cd testing/cpp; ${MAKE} -s
-
-test: testing
-	@cd testing/cpp; ${MAKE} -s runTests
+test:
+	@mkdir -p ${BUILDDIR}
+	@cd build && ${CMAKE} .. 
+	@cd build && ${MAKE}
+	build/TestUtils
 
 debugging:
 	@cd $@; ${MAKE} -s 
@@ -63,12 +60,9 @@ debugging:
 clean:
 	@cd src               && ${MAKE} -s clean
 	@cd examples          && ${MAKE} -s clean
-	@cd bin               && ${RM} -f *.* *{EXE}
-	@cd testing/cpp       && ${MAKE} -s clean
-
-#	&& cd src_aw            && ${MAKE} -s clean && cd .. \
-#	&& cd debugging         && ${MAKE} -s clean && cd .. \
-
+	@${ECHO} "Cleaning up (debug)"  && ${RM} -rf debug
+	@${ECHO} "Cleaning up (bin)"  && ${RM} -rf bin	
+	@${ECHO} "Cleaning up (build)"  && ${RM} -rf build	
 
 clobber: clean
 
