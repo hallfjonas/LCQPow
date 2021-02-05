@@ -21,6 +21,21 @@
             "problemMatcher": []
         },
         {
+            "label": "build project",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "all",
+                "clean"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "build test",
             "type": "shell",
             "command": "make",
