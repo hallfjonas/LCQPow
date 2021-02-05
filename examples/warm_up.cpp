@@ -36,26 +36,23 @@ int main() {
     double S1[1*2] = {1.0, 0.0};
     double S2[1*2] = {0.0, 1.0};
 
-    double A[1*2] = { 1.0, 0.0 };
-    double lbA[1] = { -10.0 };
-    double ubA[1] = { 100.0};
-
     // Initial guess
     double x0[2] = { 1.0, 1.0 };
 
     int nV = 2;
-    int nC = 1;
+    int nC = 0;
     int nComp = 1;
 
     LCQProblem lcqp( nV, nC, nComp );
 
 	Options options;
-    options.initialComplementarityPenalty = 1.5;
+    options.initialComplementarityPenalty = 0.5;
     options.complementarityPenaltyUpdate = 2;
+    options.printLvl = printLevel::NONE;
 	lcqp.setOptions( options );
 
     // Solve first LCQP
-	returnValue retVal = lcqp.solve( H, g, A, lb, ub, lbA, ubA, S1, S2, x0 );
+	returnValue retVal = lcqp.solve( H, g, lb, ub, S1, S2, (double*)0, (double*)0, (double*)0, x0);
 
     if (retVal != SUCCESSFUL_RETURN)
     {
@@ -64,12 +61,12 @@ int main() {
     }
 
     // Get solutions
-    double xOpt[2];
-	double yOpt[2];
+    double* xOpt = new double[2];
+	double* yOpt = new double[nV + nC + 2*nComp];
 	lcqp.getPrimalSolution( xOpt );
 	lcqp.getDualSolution( yOpt );
-	printf( "\nxOpt = [ %e, %e ];  yOpt = [ %e, %e ]; \n\n",
-			xOpt[0],xOpt[1],yOpt[0],yOpt[1] );
+	printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g, %g, %g ]; \n\n",
+			xOpt[0],xOpt[1],yOpt[0],yOpt[1],yOpt[2],yOpt[3] );
 
     return 0;
 }

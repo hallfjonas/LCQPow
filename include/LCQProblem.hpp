@@ -25,6 +25,7 @@
 
 #include "qpOASES.hpp"
 #include "Utilities.hpp"
+#include <vector>
 
 using qpOASES::QProblem;
 
@@ -81,17 +82,18 @@ namespace lcqpOASES {
 						RET_INVALID_ARGUMENTS */
 			returnValue solve(	const double* const _H,							/**< Hessian matrix. */
 								const double* const _g,							/**< Gradient vector. */
-								const double* const _A,							/**< Constraint matrix. */
 								const double* const _lb,						/**< Lower bound vector (on variables). \n
 																						If no lower bounds exist, a NULL pointer can be passed. */
 								const double* const _ub,						/**< Upper bound vector (on variables). \n
 																						If no upper bounds exist, a NULL pointer can be passed. */
-								const double* const _lbA,						/**< Lower constraints' bound vector. \n
-																						If no lower constraints' bounds exist, a NULL pointer can be passed. */
-								const double* const _ubA,						/**< Upper constraints' bound vector. \n
-																						If no lower constraints' bounds exist, a NULL pointer can be passed. */
 								const double* const _S1,               			/**< LHS of complementarity product. */
 								const double* const _S2,               			/**< RHS of complementarity product. */
+								const double* const _A = 0,						/**< Constraint matrix.
+																						If no constraints exist, a NULL pointer can be passed. */
+								const double* const _lbA = 0,					/**< Lower constraints' bound vector. \n
+																						If no lower constraints' bounds exist, a NULL pointer can be passed. */
+								const double* const _ubA = 0,					/**< Upper constraints' bound vector. \n
+																						If no lower constraints' bounds exist, a NULL pointer can be passed. */
 								const double* const xOpt = 0,					/**< Optimal primal solution vector. \n
 																						(If a null pointer is passed, the old primal solution is kept!) */
 								const double* const yOpt = 0					/**< Optimal dual solution vector. \n
@@ -123,17 +125,18 @@ namespace lcqpOASES {
 			returnValue solve(	const char* const H_file,						/**< Name of file where Hessian matrix is stored. \n
 																						If Hessian matrix is trivial, a NULL pointer can be passed. */
 								const char* const g_file,						/**< Name of file where gradient vector is stored. */
-								const char* const A_file,						/**< Name of file where constraint matrix is stored. */
 								const char* const lb_file,						/**< Name of file where lower bound vector. \n
 																						If no lower bounds exist, a NULL pointer can be passed. */
 								const char* const ub_file,						/**< Name of file where upper bound vector. \n
 																						If no upper bounds exist, a NULL pointer can be passed. */
-								const char* const lbA_file,						/**< Name of file where lower constraints' bound vector. \n
-																						If no lower constraints' bounds exist, a NULL pointer can be passed. */
-								const char* const ubA_file,						/**< Name of file where upper constraints' bound vector. \n
-																						If no upper constraints' bounds exist, a NULL pointer can be passed. */
 								const char* const S1_file,             			/**< Name of file where LHS of complementarity product is stored. */
 								const char* const S2_file,             			/**< Name of file where RHS of complementarity product is stored. */
+								const char* const A_file = 0,					/**< Name of file where constraint matrix is stored.
+																						If no constraints exist, a NULL pointer can be passed. */
+								const char* const lbA_file = 0,					/**< Name of file where lower constraints' bound vector. \n
+																						If no lower constraints' bounds exist, a NULL pointer can be passed. */
+								const char* const ubA_file = 0,					/**< Name of file where upper constraints' bound vector. \n
+																						If no upper constraints' bounds exist, a NULL pointer can be passed. */
 								const char* const x0_file = 0,					/**< Optimal primal solution vector. \n
 																						(If a null pointer is passed, the old primal solution is kept!) */
 								const char* const y0_file = 0					/**< Optimal dual solution vector. \n
@@ -319,12 +322,6 @@ namespace lcqpOASES {
 			/** Check satisfaction of complementarity value. */
 			bool complementarityCheck( );
 
-			/** Transform the dual variables from penalty form to LCQP form. */
-			void transformDuals( );
-
-			/** Determine stationarity type of optimal solution. */
-			algorithmStatus determineStationarityType( );
-
 			/** Perform penalty update. */
 			void updatePenalty( );
 
@@ -336,6 +333,15 @@ namespace lcqpOASES {
 
 			/** Gradient perturbation method. */
 			void perturbGradient( );
+
+			/** Transform the dual variables from penalty form to LCQP form. */
+			void transformDuals( );
+
+			/** Determine stationarity type of optimal solution. */
+			void determineStationarityType( );
+
+			/** Get indices of weak complementarites. */
+			std::vector<int> getWeakComplementarities( );
 
 			int nV;									/**< Number of variables. */
 			int nC;									/**< Number of constraints. */

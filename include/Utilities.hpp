@@ -52,9 +52,10 @@ namespace lcqpOASES {
 
     enum algorithmStatus {
         PROBLEM_NOT_SOLVED = 0,
-        C_STATIONARY_SOLUTION = 1,
-        M_STATIONARY_SOLUTION = 2,
-        S_STATIONARY_SOLUTION = 3
+        W_STATIONARY_SOLUTION = 1,
+        C_STATIONARY_SOLUTION = 2,
+        M_STATIONARY_SOLUTION = 3,
+        S_STATIONARY_SOLUTION = 4
     };
 
     enum printLevel {

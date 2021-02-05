@@ -81,10 +81,10 @@ namespace lcqpOASES {
 	/*
 	*	i n i t
 	*/
-	returnValue LCQProblem::solve(	const char* const H_file, const char* const g_file, const char* const A_file,
+	returnValue LCQProblem::solve(	const char* const H_file, const char* const g_file,
 									const char* const lb_file, const char* const ub_file,
-									const char* const lbA_file, const char* const ubA_file,
 									const char* const S1_file, const char* const S2_file,
+									const char* const A_file, const char* const lbA_file, const char* const ubA_file,
 									const char* const x0_file, const char* const y0_file
 									)
 	{
@@ -101,10 +101,10 @@ namespace lcqpOASES {
 	/*
 	*	s e t u p Q P d a t a
 	*/
-	returnValue LCQProblem::setupLCQPdata(	const double* const _H, const double* const _g, const double* const _A,
+	returnValue LCQProblem::setupLCQPdata(	const double* const _H, const double* const _g, 
 											const double* const _lb, const double* const _ub,
-											const double* const _lbA, const double* const _ubA,
 											const double* const _S1, const double* const _S2,
+											const double* const _A, const double* const _lbA, const double* const _ubA,
 											const double* const _x0, const double* const _y0
 											)
 	{
@@ -389,7 +389,7 @@ namespace lcqpOASES {
 					transformDuals();
 
 					// Determine C-,M-,S-Stationarity					
-					algoStat = determineStationarityType();
+					determineStationarityType();
 
 					return SUCCESSFUL_RETURN;
 				} else {
@@ -397,7 +397,7 @@ namespace lcqpOASES {
 
 					// Update iterate counters
 					outerIter++;
-					innerIter = 0;
+					innerIter = -1;
 				}
 			}
 
@@ -473,6 +473,7 @@ namespace lcqpOASES {
 		// Update xnew, yk
 		qp.getPrimalSolution(xnew);
 		qp.getDualSolution(yk);
+		qpIterk = nwsr;
 
 		// Update pk
 		Utilities::WeightedVectorAdd(1, xnew, -1, xk, pk, nV);
@@ -493,38 +494,6 @@ namespace lcqpOASES {
 	 */
 	bool LCQProblem::complementarityCheck( ) {
 		return Utilities::QuadraticFormProduct(C, xk, nV) < 2*options.complementarityTolerance;
-	}
-
-
-	/*
-	 *	 t r a n s f o r m D u a l s
-	 */
-	void LCQProblem::transformDuals( ) {
-
-		double* tmp = new double[nV];
-		
-		// y_S1 = y - rho*S2*xk
-		Utilities::MatrixMultiplication(S2, xk, tmp, nV, nComp, 1);
-		for (int i = 0; i < nComp; i++) {
-			yk[nC + i] = yk[nC + i] - rho*tmp[i];
-		}
-
-		// y_S2 = y - rho*S1*xk
-		Utilities::MatrixMultiplication(S1, xk, tmp, nComp, nV, 1);
-		for (int i = 0; i < nComp; i++) {
-			yk[nC + i] = yk[nC + i] - rho*tmp[i];
-		}
-	}
-
-
-	/*
-	 *	 d e t e r m i n e S t a t i o n a r i t y T y p e
-	 */
-	algorithmStatus LCQProblem::determineStationarityType( ) {
-		//TODO: Need to get weakly active constraints first
-		std::cout << "NOT YET IMPLEMENTED" << std::endl;
-		
-		return algorithmStatus::C_STATIONARY_SOLUTION;
 	}
 
 
@@ -594,13 +563,15 @@ namespace lcqpOASES {
 		Utilities::WeightedMatrixAdd(1, H, rho, C, Qk, nV, nV);
 
 		// stat = Qk*xk + g - A*yk
-		// 1) Qk*xk
-		Utilities::MatrixMultiplication(Qk, xk, statk, nV, nV, 1);
+		// 1) Objective contribution: Qk*xk + g
+		Utilities::AffineLinearTransformation(1, Qk, xk, g, statk, nV, nV);
 
-		// 2) -1*A*yk + g
-		double* tmp_stat = new double[nV];
-		Utilities::AffineLinearTransformation(-1, A, yk, g, tmp_stat, nV, nC + 2*nComp);
-		Utilities::WeightedVectorAdd(1, tmp_stat, 1, statk, statk, nV);		
+		// 2) Constraint contribution: A*yk
+		double* constr_stat = new double[nV];
+		Utilities::MatrixMultiplication(A, yk, constr_stat, nV, nC + 2*nComp, 1);
+		
+		// 1) - 2)
+		Utilities::WeightedVectorAdd(1, statk, -1, constr_stat, statk, nV);
 	}
 
 
@@ -618,6 +589,95 @@ namespace lcqpOASES {
 		}
 	}
 
+
+	/*
+	 *	 t r a n s f o r m D u a l s
+	 */
+	void LCQProblem::transformDuals( ) {
+
+		double* tmp = new double[nComp];
+		
+		// y_S1 = y - rho*S2*xk
+		Utilities::MatrixMultiplication(S2, xk, tmp, nComp, nV, 1);
+		for (int i = 0; i < nComp; i++) {
+			yk[nV + nC + i] = yk[nV + nC + i] - rho*tmp[i];
+		}
+
+		// y_S2 = y - rho*S1*xk
+		Utilities::MatrixMultiplication(S1, xk, tmp, nComp, nV, 1);
+		for (int i = 0; i < nComp; i++) {
+			yk[nV + 2*nC + i] = yk[nV + 2*nC + i] - rho*tmp[i];
+		}
+	}
+
+
+	/*
+	 *	 d e t e r m i n e S t a t i o n a r i t y T y p e
+	 */
+	void LCQProblem::determineStationarityType( ) {
+		
+		std::vector<int> weakComp = getWeakComplementarities( );
+
+		bool s_stationary = true;
+		bool m_stationary = true;
+
+		for (int i : weakComp) {
+			double dualProd = yk[nV + nC + i]*yk[nV + 2*nC + i];
+			double dualMin = std::min(yk[nV + nC + i], yk[nV + 2*nC + i]);
+
+			// Check failure of s-stationarity
+			if (dualMin < 0)
+				s_stationary = false;
+
+			// Check failure of m-/c-stationarity
+			if (std::abs(dualProd) >= options.complementarityTolerance && dualMin <= 0) {
+
+				// Check failure of c-stationarity
+				if (dualProd <= options.complementarityTolerance) {
+					algoStat = algorithmStatus::W_STATIONARY_SOLUTION;
+					return;
+				}
+
+				m_stationary = false;
+			}
+		}
+
+		if (s_stationary) {
+			algoStat = algorithmStatus::S_STATIONARY_SOLUTION;
+			return;
+		}
+			
+
+		if (m_stationary) {
+			algoStat = algorithmStatus::M_STATIONARY_SOLUTION;
+			return;
+		}
+			
+		algoStat = algorithmStatus::C_STATIONARY_SOLUTION;
+		return;
+	}
+
+
+	/*
+	 *	 g e t W e a k C o m p l e m e n t a r i t i e s
+	 */
+	std::vector<int> LCQProblem::getWeakComplementarities( ) {
+		double* S1x = new double[nComp];
+		double* S2x = new double[nComp];
+
+		Utilities::MatrixMultiplication(S1, xk, S1x, nComp, nV, 1);
+		Utilities::MatrixMultiplication(S2, xk, S2x, nComp, nV, 1);
+
+		std::vector<int> indices;
+
+		for (int i = 0; i < nComp; i++) {
+			if (S1x[i] <= options.complementarityTolerance)
+				if (S2x[i] <= options.complementarityTolerance)
+					indices.push_back(i);
+		}
+
+		return indices;
+	}
 
 
 	/*
@@ -640,7 +700,7 @@ namespace lcqpOASES {
 	algorithmStatus LCQProblem::getDualSolution( double* const yOpt ) const
 	{
 		if (algoStat != algorithmStatus::PROBLEM_NOT_SOLVED) {
-			for (int i = 0; i < nC + 2*nComp; i++)
+			for (int i = 0; i < nV + nC + 2*nComp; i++)
 				yOpt[i] = yk[i];
 		}
 		
@@ -663,7 +723,7 @@ namespace lcqpOASES {
 		if (headerInner || headerOuter)
 			printHeader();	
 
-		auto sep = " | ";
+		const char* sep = " | ";
 
 		// Print outer iterate
 		printf("%6d", outerIter);
@@ -672,11 +732,15 @@ namespace lcqpOASES {
 		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES)
 			printf("%s%*d", sep, 6, innerIter);
 
-		printf("%s%10.3e%s%10.3e%s%10.3e", sep, Utilities::MaxAbs(statk, nV), sep, rho, sep, Utilities::MaxAbs(pk, nV));
+		printf("%s%10.3g", sep, Utilities::MaxAbs(statk, nV));
+		printf("%s%10.3g", sep, Utilities::QuadraticFormProduct(C, xk, nV)/2.0);
+		printf("%s%10.3g", sep, rho);
+		printf("%s%10.3g", sep, Utilities::MaxAbs(pk, nV));
 
 		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES) {
-			printf("%s%10.3e%s%*d", sep, alphak, sep, 6, qpIterk);
-		}	
+			printf("%s%10.3g", sep, alphak);
+			printf("%s%6d", sep, qpIterk);
+		}
 
 		printf(" \n");
 	}
@@ -688,21 +752,25 @@ namespace lcqpOASES {
 	{
 		printLine();
 
-		auto sep = " | ";
-		auto outer = " outer";
-		auto inner = " inner";
-		auto stat = "   stat   ";
-		auto pen = "  penalty ";
-		auto np = "  norm p  ";
-		auto sl = " step len ";
-		auto subIt = "sub it";
+		const char* sep = " | ";
+		const char* outer = " outer";
+		const char* inner = " inner";
+		const char* stat = "  station ";
+		const char* comp = "  complem ";
+		const char* pen = "    rho   ";
+		const char* np = "  norm p  ";
+		const char* sl = "   alpha  ";
+		const char* subIt = "sub it";
 
 		printf("%s",outer);
 
 		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES)
 			printf("%s%s", sep, inner);
 
-		printf("%s%s%s%s%s%s", sep, stat, sep, pen, sep, np);
+		printf("%s%s", sep, stat);
+		printf("%s%s", sep, comp);
+		printf("%s%s", sep, pen);
+		printf("%s%s", sep, np);
 
 		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES) {
 			printf("%s%s%s%s", sep, sl, sep, subIt);
@@ -718,9 +786,9 @@ namespace lcqpOASES {
 	 */ 
 	void LCQProblem::printLine() 
 	{
-		auto iSep = "------";
-		auto dSep = "----------";
-		auto node = "-+-";
+		const char* iSep = "------";
+		const char* dSep = "----------";
+		const char* node = "-+-";
 
 		printf("%s", iSep);
 
@@ -728,7 +796,10 @@ namespace lcqpOASES {
 		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES)
 			printf("%s%s", node, iSep);
 
-		printf("%s%s%s%s%s%s", node, dSep, node, dSep, node, dSep);
+		printf("%s%s", node, dSep);
+		printf("%s%s", node, dSep);
+		printf("%s%s", node, dSep);
+		printf("%s%s", node, dSep);
 
 		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES) {
 			printf("%s%s%s%s", node, dSep, node, iSep);
