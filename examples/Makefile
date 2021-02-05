@@ -83,14 +83,17 @@ warm_up: clean ${WARM_UP}
 lcqp_from_file: clean ${LCQP_FROM_FILE}
 
 ${BINDIR}/%${EXE}: %.${OBJEXT} ${LINK_DEPENDS}
+	@mkdir -p ${BINDIR}
 	@${ECHO} "Creating" $@
 	${CPP} ${DEF_TARGET} ${CPPFLAGS} $< ${QPOASES_LINK} ${LINK_LIBRARIES}
 	@${CPP} ${DEF_TARGET} ${CPPFLAGS} $< ${QPOASES_LINK} ${LINK_LIBRARIES}
 
+# If we need to debug and step into qpOASES: Replace LFLAGS with QPOASES_SRC and move to front
 ${DEBUGDIR}/%${EXE}:
+	@mkdir -p ${DEBUGDIR}
 	@${ECHO} "Building debug..." $@
-	${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${LCQPOASES_SRC} ${QPOASES_SRC} ${PLOT_SRC} ${DEF_TARGET} ${IFLAGS}
-	@${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${LCQPOASES_SRC} ${QPOASES_SRC} ${PLOT_SRC} ${DEF_TARGET} ${IFLAGS}
+	${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${LCQPOASES_SRC} ${PLOT_SRC} ${DEF_TARGET} ${IFLAGS} ${LFLAGS}
+	@${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${LCQPOASES_SRC} ${PLOT_SRC} ${DEF_TARGET} ${IFLAGS} ${LFLAGS}
 
 clean:
 	@${ECHO} "Cleaning up (examples)"

@@ -34,11 +34,6 @@ LCQPOASES_OBJECTS = \
 	LCQProblem.${OBJEXT} \
 	Utilities.${OBJEXT}
 
-QPOASES_DEPENDS = \
-	${IDIR}/LCQProblem.hpp \
-	${IDIR}/Utilities.hpp
-
-
 ##
 ##	targets
 ##
@@ -46,11 +41,13 @@ QPOASES_DEPENDS = \
 all: ${LINK_DEPENDS}
 
 
-${BINDIR}/libqpOASES.${LIBEXT}: ${QPOASES_OBJECTS} ${QPOASES_EXTRAS_OBJECTS}
+${BINDIR}/liblcqpOASES.${LIBEXT}: ${LCQPOASES_OBJECTS}
+	@mkdir -p ${BINDIR}
 	@${ECHO} "Creating static lib" $@
 	@${AR} r $@ $^
 
-${BINDIR}/libqpOASES.${DLLEXT}: ${QPOASES_OBJECTS} ${QPOASES_EXTRAS_OBJECTS}
+${BINDIR}/liblcqpOASES.${DLLEXT}: ${LCQPOASES_OBJECTS}
+	@mkdir -p ${BINDIR}
 	@${ECHO} "Creating shared lib" $@
 	@${CPP} ${DEF_TARGET} ${SHARED} $^ ${LINK_LIBRARIES}
 
@@ -60,7 +57,7 @@ clean:
 
 clobber: clean
 
-%.${OBJEXT}: %.cpp ${QPOASES_DEPENDS}
+%.${OBJEXT}: %.cpp
 	@${ECHO} "Creating" $@
 	@${CPP} ${DEF_TARGET} -c ${IFLAGS} ${CPPFLAGS} $<
 

@@ -24,39 +24,41 @@
 FROM ubuntu:latest
 
 # Update apps on the base image
-RUN apt-get -y update
+RUN apt-get -y update && apt-get -y upgrade
 
 # Create time zone variables for tzdata config
 ENV TZ=Europe/Berlin
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Get git, g++, make
-RUN apt-get install -y gcc g++ gfortran git make cmake liblapack-dev pkg-config --install-recommends
+RUN apt-get install -y gcc g++ gfortran git subversion make cmake liblapack-dev pkg-config --install-recommends
 
-# Get and build CasADi
-RUN git clone https://github.com/casadi/casadi.git -b master casadi
-RUN mkdir build
-WORKDIR "/casadi/build"
+# Get qpOASES and CasADi
+RUN svn co https://projects.coin-or.org/svn/qpOASES/stable/3.2 /usr/local/qpOASES
+RUN git clone --depth 1 --branch 3.5.5 https://github.com/casadi/casadi.git /usr/local/casadi
+
+# Build qpOASES
+WORKDIR "/usr/local/qpOASES"
+RUN make
+
+# Build CasADi
+RUN mkdir "/usr/local/casadi/build"
+WORKDIR "/usr/local/casadi/build"
 RUN cmake ..
 RUN make
 RUN make install
-RUN echo "." >> /etc/ld.so.conf
+
+# Add include paths to ld config
+RUN echo "/usr/local/qpOASES/include" >> /etc/ld.so.conf
+RUN echo "/usr/local/casadi/build" >> /etc/ld.so.conf
 RUN ldconfig
-WORKDIR "/"
 
 # Clone git repo
-RUN git clone https://gitlab.syscop.de/jonas.hall/lcqpOASES.git
+RUN git clone https://gitlab.syscop.de/jonas.hall/lcqpOASES.git -b master /usr/local/lcqpOASES
 
 # Change working directory
-WORKDIR "/lcqpOASES"
-
-# Create directories (kept empty in git repo, thus need to create manually)
-RUN mkdir bin
-RUN mkdir bin/LCQP
-
-# Compile code
+WORKDIR "/usr/local/lcqpOASES"
 RUN make
 
 # Run example
-CMD ./bin/LCQP/warm_up
-
+CMD bin/warm_up

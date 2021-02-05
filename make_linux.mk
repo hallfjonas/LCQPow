@@ -48,20 +48,6 @@ QPOASES_LINK   = -L${QPOASES_LIB_DIR} -Wl,-rpath=${QPOASES_LIB_DIR} -lqpOASES
 CASADI_IDIR   = /usr/local/casadi/build
 CASADI_LIBDIR = /usr/local/casadi/build/lib
 
-# 3) Linear Algebra: System or Replacement BLAS/LAPACK
-REPLACE_LINALG = 1
-
-ifeq ($(REPLACE_LINALG), 1)
-	LIB_BLAS =   ${SRCDIR}/BLASReplacement.o
-	LIB_LAPACK = ${SRCDIR}/LAPACKReplacement.o
-else
-	LIB_BLAS =   /usr/lib/libblas.so.3gf
-	LIB_LAPACK = /usr/lib/liblapack.so.3gf
-#	LIB_BLAS = ${MATLAB_LIBDIR}/libmwblas.so
-#	LIB_LAPACK = ${MATLAB_LIBDIR}/libmwlapack.so
-endif
-
-
 ################################################################################
 # do not touch this
 
@@ -85,6 +71,9 @@ SHARED = -shared
 
 CPPFLAGS = -Wall -pedantic -Wshadow -Wfloat-equal -O3 -Wconversion -Wsign-conversion -fPIC -DLINUX -D__USE_LONG_INTEGERS__ -D__USE_LONG_FINTS__ -D${DEF_SOLVER} -D__NO_COPYRIGHT__
 #          -g -D__DEBUG__ -D__NO_COPYRIGHT__ -D__SUPPRESSANYOUTPUT__ -D__USE_SINGLE_PRECISION__
+
+LINK_LIBRARIES = ${QPOASES_LINK}
+LINK_DEPENDS = ${BINDIR}/liblcqpOASES.${LIBEXT} ${BINDIR}/liblcqpOASES.${DLLEXT}
 
 
 ##
