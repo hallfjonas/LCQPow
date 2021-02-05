@@ -193,7 +193,7 @@ TEST(UtilitiesTest, MaxAbs) {
 
 // Testing read from file functionality
 TEST(UtilitiesTest, ReadFromFile) {
-    const char* fpath = "../examples/example_data/C.txt";
+    const char* fpath = "examples/example_data/C.txt";
 
     double* C = new double[4];
     lcqpOASES::Utilities::readFromFile(C, 4, fpath);
