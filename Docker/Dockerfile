@@ -49,8 +49,7 @@ RUN make
 RUN make install
 
 # Clone git repo
-RUN echo "ECHO"
-RUN git clone https://gitlab.syscop.de/jonas.hall/lcqpOASES.git -b master /usr/local/lcqpOASES
+RUN git clone https://gitlab.syscop.de/jonas.hall/lcqpOASES.git -b stable /usr/local/lcqpOASES
 
 # Change working directory
 WORKDIR "/usr/local/lcqpOASES"
