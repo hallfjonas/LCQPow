@@ -26,8 +26,8 @@ QPOASES_LIB_DIR = /usr/local/qpOASES/bin
 QPOASES_LINK   = -L${QPOASES_LIB_DIR} -Wl,-rpath=${QPOASES_LIB_DIR} -lqpOASES 
 
 # 2) CasADi
-CASADI_IDIR   = /usr/local/casadi/build
-CASADI_LIBDIR = /usr/local/casadi/build/lib
+CASADI_IDIR   = /usr/local/casadi
+CASADI_LINK = -L/usr/local/casadi/build/lib -lcasadi
 
 
 ## Do not touch this
@@ -59,7 +59,7 @@ DEF_TARGET = -o $@
 SHARED = -shared
 
 # Links to libraries
-LINK_LIBRARIES = ${QPOASES_LINK}
+LINK_LIBRARIES = ${QPOASES_LINK} ${CASADI_LINK}
 LINK_DEPENDS = ${BINDIR}/liblcqpOASES.${LIBEXT} ${BINDIR}/liblcqpOASES.${DLLEXT}
 
 

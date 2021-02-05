@@ -28,7 +28,9 @@ include ../make.mk
 ##
 
 IFLAGS      =  -I. \
-               -I${IDIR}
+               -I${IDIR} \
+			   -I${QPOASES_IDIR} \
+			   -I${CASADI_IDIR}
 
 LCQPOASES_OBJECTS = \
 	LCQProblem.${OBJEXT} \

@@ -48,12 +48,8 @@ RUN cmake ..
 RUN make
 RUN make install
 
-# Add include paths to ld config
-RUN echo "/usr/local/qpOASES/include" >> /etc/ld.so.conf
-RUN echo "/usr/local/casadi/build" >> /etc/ld.so.conf
-RUN ldconfig
-
 # Clone git repo
+RUN echo "ECHO"
 RUN git clone https://gitlab.syscop.de/jonas.hall/lcqpOASES.git -b master /usr/local/lcqpOASES
 
 # Change working directory
