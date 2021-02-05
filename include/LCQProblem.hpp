@@ -23,8 +23,8 @@
 #ifndef LCQPOASES_LCQPROBLEM_HPP
 #define LCQPOASES_LCQPROBLEM_HPP
 
-#include "qpOASES.hpp"
-#include "Utilities.hpp"
+#include <qpOASES.hpp>
+#include <Utilities.hpp>
 #include <vector>
 
 using qpOASES::QProblem;
@@ -382,7 +382,7 @@ namespace lcqpOASES {
 
 			QProblem qp;							/**< QP subproblem. */
 			qpOASES::HessianType hessianType; 		/**< Hessian type (get this from initial solve). */
-			int qpIterk;							/**< Iterations taken by qpSolver to solve subproblem. */
+			long int qpIterk;						/**< Iterations taken by qpSolver to solve subproblem. */
 	};
 }
 
