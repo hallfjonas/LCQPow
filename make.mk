@@ -19,7 +19,7 @@
 ##	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ##
 
-## user configuration (adapt to your local settings)
+## User Configuration (adapt to your local settings)
 ## NOTE: We assume all external libraries to be placed into /usr/local/lib, such that no further linking is required.
 ##    	If you desire to link an external library from elsewhere,
 ## 		please do so by adding the path via -L/path-to-external-lib-dir -lexternal
