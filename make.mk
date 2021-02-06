@@ -20,15 +20,19 @@
 ##
 
 ## user configuration (adapt to your local settings)
+## NOTE: We assume all external libraries to be placed into /usr/local/lib, such that no further linking is required.
+##    	If you desire to link an external library from elsewhere,
+## 		please do so by adding the path via -L/path-to-external-lib-dir -lexternal
+## 		In this case, make sure that your system can find this library (e.g. by setting the LD_LIBRARY_PATH)
+
 # 1) qpOASES
 QPOASES_IDIR   = /usr/local/qpOASES/include
-QPOASES_LIB_DIR = /usr/local/qpOASES/bin
-QPOASES_LINK   = -L${QPOASES_LIB_DIR} -lqpOASES 
+QPOASES_LINK   = -lqpOASES 
 
 # 2) CasADi
 CASADI_IDIR   = /usr/local/casadi
 CASADI_LIB_DIR = /usr/local/casadi/build/lib
-CASADI_LINK = -L${CASADI_LIB_DIR} -lcasadi
+CASADI_LINK = -lcasadi
 
 ## Do not touch this
 # include directories, relative
@@ -62,8 +66,7 @@ DEF_TARGET = -o $@
 SHARED = -shared
 
 # Links to libraries
-LINK_LIBRARIES = ${QPOASES_LINK} ${CASADI_LINK}
-LINK_DEPENDS = ${LIBDIR}/liblcqpOASES.${LIBEXT} ${LIBDIR}/liblcqpOASES.${DLLEXT}
+LCQPOASES_LIB = ${LIBDIR}/liblcqpOASES.${LIBEXT} ${LIBDIR}/liblcqpOASES.${DLLEXT}
 LCQPOASES_LINK = -L${LIBDIR} -llcqpOASES
 
 

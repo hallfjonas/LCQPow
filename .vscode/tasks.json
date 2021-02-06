@@ -8,7 +8,7 @@
             "type": "shell",
             "command": "make",
             "args": [
-                "warm_up"
+                "debug"
             ],
             "options": {
                 "cwd": "examples"
@@ -50,9 +50,21 @@
             "label": "cmake test",
             "type": "shell",
             "command": "cmake ..",
+            "dependsOn": "create build directory",
             "options": {
                 "cwd": "build"
             },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "create build directory",
+            "type": "shell",
+            "command": "mkdir -p build",
             "group": "build",
             "presentation": {
                 "reveal": "always",

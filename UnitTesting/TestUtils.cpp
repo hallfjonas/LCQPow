@@ -222,28 +222,45 @@ TEST(UtilitiesTest, Options) {
 }
 
 // Testing lcqpOASES solver set up
-TEST(SolverTest, SetUpSolver) {
-    int nV = 2;
-    int nC = 1;
-    int nComp = 1;
-
+TEST(SolverTest, RunWarmUp) {
     double H[2*2] = { 2.0, 0.0, 0.0, 2.0 };
     double g[2] = { -2.0, -2.0 };
-    double lb[2] = { 0.0, 0.0 };
-    double ub[2] = { 10000.0, 10000.0 };
+    double lb[2] = { 0, 0 };
+    double ub[2] = { INFINITY, INFINITY };
     double S1[1*2] = {1.0, 0.0};
     double S2[1*2] = {0.0, 1.0};
-    double A[1*2] = { 1.0, 0.0 };
-    double lbA[1] = { -10.0 };
-    double ubA[1] = { 100.0};
+    double x0[2] = { 1.0, 1.0 };
+    int nV = 2;
+    int nC = 0;
+    int nComp = 1;
 
-    // Maximal working set iterations (internally for qpOASES)
-    int nwsr = 10000;
+    lcqpOASES::LCQProblem lcqp( nV, nC, nComp );
 
-    // TODO: Linking qpOASES fails here :'(
-    // lcqpOASES::LCQProblem lcqp(nV, nC, nComp);
-    // TODO: Test solve
-    // lcqp.solve(H, g, A, lb, ub, lbA, ubA, S1, S2, nwsr);
+	lcqpOASES::Options options;
+    options.printLvl = lcqpOASES::printLevel::NONE;
+    lcqp.setOptions( options );
+
+	lcqpOASES::returnValue retVal = lcqp.solve( H, g, lb, ub, S1, S2, (double*)0, (double*)0, x0);
+
+    ASSERT_EQ(retVal, lcqpOASES::SUCCESSFUL_RETURN);
+
+    // Get solutions
+    double* xOpt = new double[2];
+	double* yOpt = new double[nV + nC + 2*nComp];
+
+	lcqp.getPrimalSolution( xOpt );
+	lcqp.getDualSolution( yOpt );
+
+    bool sStat1Found = (std::abs(xOpt[0] - 1) <= options.stationarityTolerance) && (std::abs(xOpt[1]) <= options.stationarityTolerance);
+    bool sStat2Found = (std::abs(xOpt[1] - 1) <= options.stationarityTolerance) && (std::abs(xOpt[0]) <= options.stationarityTolerance);
+
+    ASSERT_TRUE(  sStat1Found || sStat2Found );
+
+    bool stat1 = std::abs(2*xOpt[0] - 2 - yOpt[0] - yOpt[2]) <= options.stationarityTolerance;
+    bool stat2 = std::abs(2*xOpt[1] - 2 - yOpt[1] - yOpt[3]) <= options.stationarityTolerance;
+    
+    ASSERT_TRUE( stat1 );
+    ASSERT_TRUE( stat2 );
 }
 
 int main(int argc, char* argv[])

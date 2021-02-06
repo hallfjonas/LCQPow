@@ -31,8 +31,8 @@ int main() {
     /* Setup data of first QP. */
     double H[2*2] = { 2.0, 0.0, 0.0, 2.0 };
     double g[2] = { -2.0, -2.0 };
-    double lb[2] = { 0.0, 0.0 };
-    double ub[2] = { 10000.0, 10000.0 };
+    double lb[2] = { 0, 0 };
+    double ub[2] = { INFINITY, INFINITY };
     double S1[1*2] = {1.0, 0.0};
     double S2[1*2] = {0.0, 1.0};
 
@@ -46,9 +46,7 @@ int main() {
     LCQProblem lcqp( nV, nC, nComp );
 
 	Options options;
-    options.initialComplementarityPenalty = 0.5;
-    options.complementarityPenaltyUpdate = 2;
-    options.printLvl = printLevel::NONE;
+    options.printLvl = printLevel::INNER_LOOP_ITERATES;
 	lcqp.setOptions( options );
 
     // Solve first LCQP

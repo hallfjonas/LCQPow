@@ -34,43 +34,47 @@ LFLAGS 		= ${QPOASES_LINK}
 
 DEBUGFLAGS = -g -D__USE_LONG_INTEGERS__ -Wall -pedantic -Wshadow -Wfloat-equal
 
-QPOASES_SRC = $(wildcard ${SRCDIR}/qpOASES/*.cpp)
+QPOASES_SRC = $(wildcard ${QPOASESDIR}/src/*.cpp)
 
 ##
 ##  files
 ##
 
-LCQPOASES_SRC = $(wildcard ${SRCDIR}/*.cpp)
-QPOASES_EXM = $(wildcard ./*.cpp)
-
-
 LCQPOASES_EXAMPLES = \
 	${BINDIR}/warm_up${EXE}
-	
-LCQPOASES_DEBUG = $(wildcard ${DEBUGDIR}/*${EXE})
+
+LCQPOASES_DEBUG = \
+	${DEBUGDIR}/warm_up${EXE}
+
+LCQPOASES_SRC = $(wildcard ${SRCDIR}/*.cpp)
 
 ##
 ##	targets
 ##
 
-all: ${LCQPOASES_DEBUG} ${LCQPOASES_EXAMPLES}
+all: clean ${LCQPOASES_DEBUG} ${LCQPOASES_EXAMPLES}
 
-.PHONY: moving_masses warm_up lcqp_from_file
+.PHONY: debug examples
+
+debug: clean ${LCQPOASES_DEBUG} 
+
+examples: clean ${LCQPOASES_EXAMPLES}
 
 moving_masses: clean ${MOVING_MASSES}
 warm_up: clean ${WARM_UP}
 lcqp_from_file: clean ${LCQP_FROM_FILE}
 
-${BINDIR}/%${EXE}: %.${OBJEXT} ${LINK_DEPENDS}
+${BINDIR}/%${EXE}: %.${OBJEXT} ${LCQPOASES_LIB}
 	@mkdir -p ${BINDIR}
 	@${ECHO} "Creating" $@
-	@${CPP} ${DEF_TARGET} ${CPPFLAGS} $< ${LINK_LIBRARIES} ${LCQPOASES_LINK}
+	@${CPP} ${DEF_TARGET} ${CPPFLAGS} $< ${LCQPOASES_LINK} ${LFLAGS} 
 
 # If we need to debug and step into qpOASES: Replace LFLAGS with QPOASES_SRC and move to front
-${DEBUGDIR}/%${EXE}:
+${DEBUGDIR}/%${EXE}: 
 	@mkdir -p ${DEBUGDIR}
 	@${ECHO} "Building debug..." $@
-	@${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${LCQPOASES_SRC} ${PLOT_SRC} ${DEF_TARGET} ${IFLAGS} ${LFLAGS}
+	${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${LCQPOASES_SRC} ${DEF_TARGET} ${IFLAGS} ${LFLAGS}
+	@${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${LCQPOASES_SRC} ${DEF_TARGET} ${IFLAGS} ${LFLAGS}
 
 clean:
 	@${ECHO} "Cleaning up (examples)"
@@ -78,12 +82,12 @@ clean:
 
 clobber: clean
 
-${LINK_DEPENDS}:
+${LCQPOASES_LIB}:
 	@cd ..; ${MAKE} -s src
 
 %.${OBJEXT}: %.cpp
 	@${ECHO} "Creating" $@
-	@${CPP} ${DEF_TARGET} -c ${IFLAGS} ${CPPFLAGS} $< ${LCQPOASES_LINK}
+	@${CPP} ${DEF_TARGET} -c ${IFLAGS} ${CPPFLAGS} $<
 
 
 ##
