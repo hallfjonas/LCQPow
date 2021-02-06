@@ -4,7 +4,6 @@
 
 ### Directories ###
 build
-UnitTesting/googletest
 src/qpOASES
 debug
 
