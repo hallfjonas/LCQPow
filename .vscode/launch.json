@@ -28,7 +28,9 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/debug/solve_lcqp_from_file",
-            "args": [],
+            "args": [
+                "examples/example_data"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
