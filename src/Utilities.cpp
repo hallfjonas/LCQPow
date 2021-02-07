@@ -342,6 +342,18 @@ namespace lcqpOASES {
                 printf("ERROR: Invalid argument passed.");
                 break;
 
+            case INVALID_NUMBER_OF_OPTIM_VARS:
+                printf("ERROR: Invalid optimization variable dimension passed (required to be > 0).");
+                break;
+
+            case INVALID_NUMBER_OF_COMP_VARS:
+                printf("ERROR: Invalid complementarity dimension passed (required to be > 0).");
+                break;
+
+            case INVALID_NUMBER_OF_CONSTRAINT_VARS:
+                printf("ERROR: Invalid number of optimization variables passed (required to be >= 0).");
+                break;
+
             case INVALID_COMPLEMENTARITY_TOLERANCE:
                 printf("ERROR: Invalid argument passed (complementarity tolerance).");
                 break;
