@@ -11,7 +11,7 @@
  *
  *	lcqpOASES is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
@@ -22,32 +22,35 @@
 
 #include <iostream>
 #include <fstream>
-#include <qpOASES.hpp>
+#include <LCQProblem.hpp>
 #include <unistd.h>
 
 int main() {
-    auto inputdir = "examples/LCQP/example_data/";
+    char* inputdir = "examples/LCQP/example_data/";
 
     // Required files
-    auto H_file = inputdir + "H.txt";
-    auto g_file = inputdir + "g.txt";
-    auto lb_file = inputdir + "lb.txt";
-    auto ub_file = inputdir + "ub.txt";
-    auto C_file = inputdir + "C.txt";
+    const char* H_file = strcat(inputdir, "H.txt");
+    const char* g_file = strcat(inputdir, "g.txt");
+    const char* lb_file = strcat(inputdir, "lb.txt");
+    const char* ub_file = strcat(inputdir, "ub.txt");
+    const char* S1_file = strcat(inputdir, "S1.txt");
+    const char* S2_file = strcat(inputdir, "S2.txt");
 
     // Contraints (optional files, but if A exists then all are required)
-    auto A_file = inputdir + "A.txt";
-    auto lbA_file = inputdir + "lbA.txt";
-    auto ubA_file = inputdir + "ubA.txt";
+    const char* A_file = strcat(inputdir, "A.txt");
+    const char* lbA_file = strcat(inputdir, "lbA.txt");
+    const char* ubA_file = strcat(inputdir, "ubA.txt");
 
     // Initial primal and dual guess (optional)
-    auto x0_file = inputdir + "x0.txt";
-    auto y0_file = inputdir + "y0.txt";
+    const char* x0_file = strcat(inputdir, "x0.txt");
+    const char* y0_file = strcat(inputdir, "y0.txt");
 
     int nV = 0;
     int nC = 0;
+    int nComp = 0;
 
-    auto line;
+    // Count dimensions
+    std::string line;
 
     std::ifstream lbfile(lb_file);
     while (std::getline(lbfile, line))
@@ -57,49 +60,15 @@ int main() {
     while (std::getline(lbAfile, line))
         nC++;
 
-    // Read x0 value
-    double* x0 = new double[nV];
-    if (access( x0_file.c_str(), F_OK ) != -1 ) {
-        readFromFile( x0, nV, &x0_file[0] );
-    } else {
-        for (int i = 0; i < nV; i++)
-            x0[i] = 0;
-    }
+    std::ifstream S1file(S1_file);
+    while (std::getline(S1file, line))
+        nComp++;
 
-    // Read y0 value
-    double* y0 = new double[nV + nC];
-    if (access( y0_file.c_str(), F_OK ) != -1 ) {
-        readFromFile( y0, nV + nC, &y0_file[0] );
-    } else {
-        for (int i = 0; i < nV + nC; i++)
-            y0[i] = 0;
-    }
+    lcqpOASES::LCQProblem lcqp( nV, nC, nComp );
+	lcqp.solve( H_file, g_file, lb_file, ub_file, S1_file, S2_file );
 
-    Options options;
-    options.setToDefault();
-    options.initialComplementarityPenalty = 1.0;
-    options.complementarityPenaltyUpdate = 2.0;
-
-    int nWSR = 10000000;
-    double* cputime = 0;
-
-    if (nC == 0) {
-        LCQProblemB lcqp( nV );
-	    lcqp.setOptions( options );
-        lcqp.init( &H_file[0], &g_file[0], &lb_file[0], &ub_file[0], &C_file[0], nWSR, cputime, x0, y0 );
-
-        double* xOpt = new double[nV];
-        double* yOpt = new double[nV];
-        lcqp.getPrimalSolution( xOpt );
-        lcqp.getDualSolution( yOpt );
-    } else {
-        LCQProblem lcqp( nV, nC );
-	    lcqp.setOptions( options );
-        lcqp.init( &H_file[0], &g_file[0], &A_file[0], &lb_file[0], &ub_file[0], &lbA_file[0], &ubA_file[0], &C_file[0], nWSR, cputime, x0, y0 );
-
-        double* xOpt = new double[nV];
-        double* yOpt = new double[nV];
-        lcqp.getPrimalSolution( xOpt );
-        lcqp.getDualSolution( yOpt );
-    }
+    double* xOpt = new double[nV];
+    double* yOpt = new double[nV];
+    lcqp.getPrimalSolution( xOpt );
+    lcqp.getDualSolution( yOpt );
 }

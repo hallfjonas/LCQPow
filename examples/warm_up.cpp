@@ -11,7 +11,7 @@
  *
  *	lcqpOASES is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
@@ -36,9 +36,6 @@ int main() {
     double S1[1*2] = {1.0, 0.0};
     double S2[1*2] = {0.0, 1.0};
 
-    // Initial guess
-    double x0[2] = { 1.0, 1.0 };
-
     int nV = 2;
     int nC = 0;
     int nComp = 1;
@@ -50,7 +47,7 @@ int main() {
 	lcqp.setOptions( options );
 
     // Solve first LCQP
-	returnValue retVal = lcqp.solve( H, g, lb, ub, S1, S2, (double*)0, (double*)0, (double*)0, x0);
+	returnValue retVal = lcqp.solve( H, g, lb, ub, S1, S2 );
 
     if (retVal != SUCCESSFUL_RETURN)
     {
