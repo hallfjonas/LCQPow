@@ -26,24 +26,15 @@
 #include <unistd.h>
 
 int main() {
-    char* inputdir = "examples/LCQP/example_data/";
+    std::string inputdir = "examples/example_data/";
 
     // Required files
-    const char* H_file = strcat(inputdir, "H.txt");
-    const char* g_file = strcat(inputdir, "g.txt");
-    const char* lb_file = strcat(inputdir, "lb.txt");
-    const char* ub_file = strcat(inputdir, "ub.txt");
-    const char* S1_file = strcat(inputdir, "S1.txt");
-    const char* S2_file = strcat(inputdir, "S2.txt");
-
-    // Contraints (optional files, but if A exists then all are required)
-    const char* A_file = strcat(inputdir, "A.txt");
-    const char* lbA_file = strcat(inputdir, "lbA.txt");
-    const char* ubA_file = strcat(inputdir, "ubA.txt");
-
-    // Initial primal and dual guess (optional)
-    const char* x0_file = strcat(inputdir, "x0.txt");
-    const char* y0_file = strcat(inputdir, "y0.txt");
+    std::string H_file = inputdir + "H.txt";
+    std::string g_file = inputdir + "g.txt";
+    std::string lb_file = inputdir + "lb.txt";
+    std::string ub_file = inputdir + "ub.txt";
+    std::string S1_file = inputdir + "S1.txt";
+    std::string S2_file = inputdir + "S2.txt";
 
     int nV = 0;
     int nC = 0;
@@ -56,16 +47,14 @@ int main() {
     while (std::getline(lbfile, line))
         nV++;
 
-    std::ifstream lbAfile(lbA_file);
-    while (std::getline(lbAfile, line))
-        nC++;
-
     std::ifstream S1file(S1_file);
     while (std::getline(S1file, line))
         nComp++;
 
+    nComp = nComp/nV;
+
     lcqpOASES::LCQProblem lcqp( nV, nC, nComp );
-	lcqp.solve( H_file, g_file, lb_file, ub_file, S1_file, S2_file );
+	lcqp.solve( &H_file[0], &g_file[0], &lb_file[0], &ub_file[0], &S1_file[0], &S2_file[0] );
 
     double* xOpt = new double[nV];
     double* yOpt = new double[nV];

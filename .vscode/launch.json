@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Build and Launch Debugging",
+            "name": "(gdb) Launch warm up",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/debug/warm_up",
@@ -15,7 +15,6 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "preLaunchTask": "build debug",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -25,10 +24,10 @@
             ]
         },
         {
-            "name": "(gdb) Launch Debugging",
+            "name": "(gdb) Launch LCQP from file",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/debug/warm_up",
+            "program": "${workspaceFolder}/debug/solve_lcqp_from_file",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

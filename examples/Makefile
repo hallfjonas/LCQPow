@@ -11,7 +11,7 @@
 ##
 ##	lcqpOASES is distributed in the hope that it will be useful,
 ##	but WITHOUT ANY WARRANTY; without even the implied warranty of
-##	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+##	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ##	See the GNU Lesser General Public License for more details.
 ##
 ##	You should have received a copy of the GNU Lesser General Public
@@ -41,10 +41,12 @@ QPOASES_SRC = $(wildcard ${QPOASESDIR}/src/*.cpp)
 ##
 
 LCQPOASES_EXAMPLES = \
-	${BINDIR}/warm_up${EXE}
+	${BINDIR}/warm_up${EXE} \
+	${BINDIR}/solve_lcqp_from_file${EXE}
 
 LCQPOASES_DEBUG = \
-	${DEBUGDIR}/warm_up${EXE}
+	${DEBUGDIR}/warm_up${EXE} \
+	${DEBUGDIR}/solve_lcqp_from_file${EXE}
 
 LCQPOASES_SRC = $(wildcard ${SRCDIR}/*.cpp)
 
@@ -56,7 +58,7 @@ all: clean ${LCQPOASES_DEBUG} ${LCQPOASES_EXAMPLES}
 
 .PHONY: debug examples
 
-debug: clean ${LCQPOASES_DEBUG} 
+debug: clean ${LCQPOASES_DEBUG}
 
 examples: clean ${LCQPOASES_EXAMPLES}
 
@@ -67,10 +69,10 @@ lcqp_from_file: clean ${LCQP_FROM_FILE}
 ${BINDIR}/%${EXE}: %.${OBJEXT} ${LCQPOASES_LIB}
 	@mkdir -p ${BINDIR}
 	@${ECHO} "Creating" $@
-	@${CPP} ${DEF_TARGET} ${CPPFLAGS} $< ${LCQPOASES_LINK} ${LFLAGS} 
+	@${CPP} ${DEF_TARGET} ${CPPFLAGS} $< ${LCQPOASES_LINK} ${LFLAGS}
 
 # If we need to debug and step into qpOASES: Replace LFLAGS with QPOASES_SRC and move to front
-${DEBUGDIR}/%${EXE}: 
+${DEBUGDIR}/%${EXE}:
 	@mkdir -p ${DEBUGDIR}
 	@${ECHO} "Building debug..." $@
 	${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${LCQPOASES_SRC} ${DEF_TARGET} ${IFLAGS} ${LFLAGS}
