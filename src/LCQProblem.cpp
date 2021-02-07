@@ -11,7 +11,7 @@
  *
  *	lcqpOASES is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
@@ -21,6 +21,7 @@
 
 
 #include "LCQProblem.hpp"
+#include "Utilities.hpp"
 #include <iostream>
 #include <string>
 #include <math.h>
@@ -72,9 +73,9 @@ namespace lcqpOASES {
 		returnValue ret = setupLCQPdata(_H, _g, _A, _lb, _ub, _lbA, _ubA, _S1, _S2, _x0, _y0);
 
 		if (ret != SUCCESSFUL_RETURN)
-			return ret;
+			return MessageHandler::PrintMessage( ret );
 
-		return runSolver( );
+		return MessageHandler::PrintMessage( runSolver( ) );
 	}
 
 
@@ -94,14 +95,14 @@ namespace lcqpOASES {
 		if (ret != SUCCESSFUL_RETURN)
 			return ret;
 
-		return runSolver( );	
+		return MessageHandler::PrintMessage( runSolver( ) );
 	}
 
 
 	/*
 	*	s e t u p Q P d a t a
 	*/
-	returnValue LCQProblem::setupLCQPdata(	const double* const _H, const double* const _g, 
+	returnValue LCQProblem::setupLCQPdata(	const double* const _H, const double* const _g,
 											const double* const _lb, const double* const _ub,
 											const double* const _S1, const double* const _S2,
 											const double* const _A, const double* const _lbA, const double* const _ubA,
@@ -113,32 +114,32 @@ namespace lcqpOASES {
 		ret = setH( _H );
 
 		if (ret != SUCCESSFUL_RETURN)
-			return ret;	
+			return ret;
 
 		ret = setG( _g );
 
 		if (ret != SUCCESSFUL_RETURN)
-			return ret;	
+			return ret;
 
 		ret = setLB( _lb );
 
 		if (ret != SUCCESSFUL_RETURN)
-			return ret;	
+			return ret;
 
 		ret = setUB( _ub );
 
 		if (ret != SUCCESSFUL_RETURN)
-			return ret;	
+			return ret;
 
-		ret = setConstraints( _A, _S1, _S2, _lbA, _ubA );	
-		
+		ret = setConstraints( _A, _S1, _S2, _lbA, _ubA );
+
 		if (ret != SUCCESSFUL_RETURN)
-			return ret;	
-		
+			return ret;
+
 		ret = setInitialGuess( _x0, _y0 );
 
 		if (ret != SUCCESSFUL_RETURN)
-			return ret;	
+			return ret;
 
 		return SUCCESSFUL_RETURN;
 	}
@@ -154,14 +155,14 @@ namespace lcqpOASES {
 											)
 	{
 		returnValue returnvalue;
-		
+
 		double* _H = new double[nV*nV];
 		returnvalue = Utilities::readFromFile( _H, nV*nV, H_file );
 		if ( returnvalue != SUCCESSFUL_RETURN ) {
 			delete _H;
 			return returnvalue;
 		}
-			
+
 
 		double* _g = new double[nV];
 		returnvalue = Utilities::readFromFile( _g, nV, g_file );
@@ -190,7 +191,7 @@ namespace lcqpOASES {
 			delete _A;
 			return returnvalue;
 		}
-				
+
 		double* _lbA = new double[nC];
 		returnvalue = Utilities::readFromFile( _lbA, nC, lbA_file );
 		if ( returnvalue != SUCCESSFUL_RETURN ) {
@@ -235,35 +236,35 @@ namespace lcqpOASES {
 
 		// Fill vaues
 		returnvalue = setH( _H );
-		
+
 		if (returnvalue != SUCCESSFUL_RETURN)
 			return returnvalue;
 
 		returnvalue = setG( _g );
-		
+
 		if (returnvalue != SUCCESSFUL_RETURN)
 			return returnvalue;
-			
+
 		returnvalue = setLB( _lb );
-		
+
 		if (returnvalue != SUCCESSFUL_RETURN)
 			return returnvalue;
-			
+
 		returnvalue = setUB( _ub );
-		
+
 		if (returnvalue != SUCCESSFUL_RETURN)
 			return returnvalue;
-			
+
 		returnvalue = setConstraints( _A, _S1, _S2, _lbA, _ubA );
-		
+
 		if (returnvalue != SUCCESSFUL_RETURN)
 			return returnvalue;
 
 		returnvalue = setInitialGuess( _x0, _y0 );
-		
+
 		if (returnvalue != SUCCESSFUL_RETURN)
 			return returnvalue;
-			
+
 		return SUCCESSFUL_RETURN;
 	}
 
@@ -272,7 +273,7 @@ namespace lcqpOASES {
 	/*
 	*	s e t C o n s t r a i n t s
 	*/
-	returnValue LCQProblem::setConstraints( 	const double* const A_new, const double* const S1_new, const double* const S2_new, 
+	returnValue LCQProblem::setConstraints( 	const double* const A_new, const double* const S1_new, const double* const S2_new,
 												const double* const lbA_new, const double* const ubA_new )
 	{
 		if ( nV == 0 || nComp == 0 )
@@ -284,7 +285,7 @@ namespace lcqpOASES {
 		// Set up new constraint matrix (A; L; R)
 		A = new double[(nC + 2*nComp)*nV];
 
-		for (int i = 0; i < nC*nV; i++) 
+		for (int i = 0; i < nC*nV; i++)
 			A[i] = A_new[i];
 
 		for (int i = 0; i < nComp*nV; i++)
@@ -338,7 +339,7 @@ namespace lcqpOASES {
 
 		C = new double[nV*nV];
 		Utilities::MatrixSymmetrizationProduct(S1, S2, C, nComp, nV);
-		
+
 		return SUCCESSFUL_RETURN;
 	}
 
@@ -347,10 +348,10 @@ namespace lcqpOASES {
 	 *	 r u n S o l v e r
 	 */
 	returnValue LCQProblem::runSolver( ) {
-		
+
 		// Initialize variables
 		initializeSolver();
-		
+
 		// Initialization strategy
 		if (options.solveZeroPenaltyFirst) {
 			memcpy(gk, g, (uint)nV*sizeof(double));
@@ -358,19 +359,19 @@ namespace lcqpOASES {
 			if (solveQPSubproblem( true ) != SUCCESSFUL_RETURN) {
 				return INITIAL_SUBPROBLEM_FAILED;
 			}
-			
+
 			Utilities::AffineLinearTransformation(rho, C, xk, g, gk, nV, nV);
 
 			if (solveQPSubproblem( false ) != SUCCESSFUL_RETURN) {
 				return SUBPROBLEM_SOLVER_ERROR;
 			}
-				
+
 		} else {
 			Utilities::AffineLinearTransformation(rho, C, xk, g, gk, nV, nV);
-			
+
 			if (solveQPSubproblem( true ) != SUCCESSFUL_RETURN) {
 				return INITIAL_SUBPROBLEM_FAILED;
-			}			
+			}
 		}
 
 		// Outer and inner loop in one
@@ -388,8 +389,12 @@ namespace lcqpOASES {
 					// Switch from penalized to LCQP duals
 					transformDuals();
 
-					// Determine C-,M-,S-Stationarity					
+					// Determine C-,M-,S-Stationarity
 					determineStationarityType();
+
+					// Print solution type
+					if (options.printLvl > printLevel::NONE)
+						MessageHandler::PrintSolution( algoStat );
 
 					return SUCCESSFUL_RETURN;
 				} else {
@@ -429,11 +434,11 @@ namespace lcqpOASES {
 		gk = new double[nV];
 		xnew = new double[nV];
 		pk = new double[nV];
-		statk = new double[nV];		
-		
+		statk = new double[nV];
+
 		// Initialize variables and counters
 		alphak = 1;
-		rho = options.initialComplementarityPenalty;		
+		rho = options.initialComplementarityPenalty;
 		outerIter = 0;
 		innerIter = 0;
 		algoStat = algorithmStatus::PROBLEM_NOT_SOLVED;
@@ -465,7 +470,7 @@ namespace lcqpOASES {
 			qp.setHessianType(hessianType);
 
 			ret = qp.hotstart(gk, lb, ub, lbA, ubA, nwsr);
-		}	
+		}
 
 		if (ret != qpOASES::SUCCESSFUL_RETURN)
 			return SUBPROBLEM_SOLVER_ERROR;
@@ -480,7 +485,7 @@ namespace lcqpOASES {
 		return SUCCESSFUL_RETURN;
 	}
 
-	
+
 	/*
 	 *	 s t a t i o n a r i t y C h e c k
 	 */
@@ -516,7 +521,7 @@ namespace lcqpOASES {
 		Utilities::AffineLinearTransformation(1, Qk, xk, g, lk_tmp, nV, nV);
 
 		double lk = Utilities::DotProduct(pk, lk_tmp, nV);
-		
+
 		alphak = 0;
 
 		// Non convex case
@@ -569,7 +574,7 @@ namespace lcqpOASES {
 		// 2) Constraint contribution: A*yk
 		double* constr_stat = new double[nV];
 		Utilities::MatrixMultiplication(A, yk, constr_stat, nV, nC + 2*nComp, 1);
-		
+
 		// 1) - 2)
 		Utilities::WeightedVectorAdd(1, statk, -1, constr_stat, statk, nV);
 	}
@@ -579,7 +584,7 @@ namespace lcqpOASES {
 	 *	 p e r t u r b G r a d i e n t
 	 */
 	void LCQProblem::perturbGradient( ) {
-		
+
 		int randNum;
 		for (int i = 0; i < nV; i++) {
 			// Random number -1, 0, 1
@@ -596,7 +601,7 @@ namespace lcqpOASES {
 	void LCQProblem::transformDuals( ) {
 
 		double* tmp = new double[nComp];
-		
+
 		// y_S1 = y - rho*S2*xk
 		Utilities::MatrixMultiplication(S2, xk, tmp, nComp, nV, 1);
 		for (int i = 0; i < nComp; i++) {
@@ -615,7 +620,7 @@ namespace lcqpOASES {
 	 *	 d e t e r m i n e S t a t i o n a r i t y T y p e
 	 */
 	void LCQProblem::determineStationarityType( ) {
-		
+
 		std::vector<int> weakComp = getWeakComplementarities( );
 
 		bool s_stationary = true;
@@ -646,13 +651,13 @@ namespace lcqpOASES {
 			algoStat = algorithmStatus::S_STATIONARY_SOLUTION;
 			return;
 		}
-			
+
 
 		if (m_stationary) {
 			algoStat = algorithmStatus::M_STATIONARY_SOLUTION;
 			return;
 		}
-			
+
 		algoStat = algorithmStatus::C_STATIONARY_SOLUTION;
 		return;
 	}
@@ -689,7 +694,7 @@ namespace lcqpOASES {
 			for (int i = 0; i < nV; i++)
 				xOpt[i] = xk[i];
 		}
-		
+
 		return algoStat;
 	}
 
@@ -703,7 +708,7 @@ namespace lcqpOASES {
 			for (int i = 0; i < nV + nC + 2*nComp; i++)
 				yOpt[i] = yk[i];
 		}
-		
+
 		return algoStat;
 	}
 
@@ -711,7 +716,7 @@ namespace lcqpOASES {
 	/*
 	 *	 p r i n t I t e r a t i o n
 	 */
-	void LCQProblem::printIteration( ) 
+	void LCQProblem::printIteration( )
 	{
 		if (options.printLvl == printLevel::NONE)
 			return;
@@ -719,9 +724,9 @@ namespace lcqpOASES {
 		// Print header every 10 iters
 		bool headerInner = (options.printLvl >= printLevel::INNER_LOOP_ITERATES && innerIter % 10 == 0);
 		bool headerOuter = (options.printLvl == printLevel::OUTER_LOOP_ITERATES && outerIter % 10 == 0);
-		
+
 		if (headerInner || headerOuter)
-			printHeader();	
+			printHeader();
 
 		const char* sep = " | ";
 
@@ -746,9 +751,9 @@ namespace lcqpOASES {
 	}
 
 	/*
-	 * 	 p r i n t H e a d e r 
-	 */ 
-	void LCQProblem::printHeader() 
+	 * 	 p r i n t H e a d e r
+	 */
+	void LCQProblem::printHeader()
 	{
 		printLine();
 
@@ -774,7 +779,7 @@ namespace lcqpOASES {
 
 		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES) {
 			printf("%s%s%s%s", sep, sl, sep, subIt);
-		}	
+		}
 
 		printf(" \n");
 
@@ -783,8 +788,8 @@ namespace lcqpOASES {
 
 	/*
 	 * 	 p r i n t L i n e
-	 */ 
-	void LCQProblem::printLine() 
+	 */
+	void LCQProblem::printLine()
 	{
 		const char* iSep = "------";
 		const char* dSep = "----------";
@@ -803,14 +808,14 @@ namespace lcqpOASES {
 
 		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES) {
 			printf("%s%s%s%s", node, dSep, node, iSep);
-		}	
-		
+		}
+
 		printf("-\n");
 	}
 }
 
 
-	
+
 
 
 /*

@@ -11,7 +11,7 @@
  *
  *	lcqpOASES is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
@@ -24,14 +24,14 @@
 #define LCQPOASES_UTILITIES_HPP
 
 namespace lcqpOASES {
-    
+
     enum returnValue {
         // Not implemented
         NOT_YET_IMPLEMENTED = -1,                   /**< Not yet implemented (internal use only). */
 
         // Success
         SUCCESSFUL_RETURN = 0,						/**< Successful return. */
-        
+
         // Generic Errors
         LCQPOBJECT_NOT_SETUP = 300,                   /**< Constructor has not been called. */
         INDEX_OUT_OF_BOUNDS = 301,                    /**< Index out of bounds. */
@@ -59,7 +59,7 @@ namespace lcqpOASES {
     };
 
     enum printLevel {
-        NONE = 0,                                   /**< No Output. */                    
+        NONE = 0,                                   /**< No Output. */
         OUTER_LOOP_ITERATES = 1,                    /**< Print stats for each outer loop iterate. */
         INNER_LOOP_ITERATES = 2,                    /**< Print stats for each inner loop iterate. */
         VERBOSE = 3                                 /**< Print stats for each inner loop (and possibly output of subproblem solver). */
@@ -92,8 +92,8 @@ namespace lcqpOASES {
             double stationarityTolerance;           /**< Tolerance for 1-Norm of stationarity violation. */
             double complementarityTolerance;		/**< Complementarity tolerance. */
             double initialComplementarityPenalty;	/**< Start value for complementarity penalty term. */
-            double complementarityPenaltyUpdate;	/**< Factor for updating penaltised complementarity term. */          
-            
+            double complementarityPenaltyUpdate;	/**< Factor for updating penaltised complementarity term. */
+
             bool solveZeroPenaltyFirst;             /**< Flag indicating whether first QP should ignore penalization. */
 
             int maxOuterIterations;                 /**< Maximum number of outer iterations to be performed. */
@@ -105,7 +105,6 @@ namespace lcqpOASES {
         protected:
             void copy( const Options& rhs );        /**< Copy each property. */
     };
-
 
     class Utilities {
         public:
@@ -120,7 +119,7 @@ namespace lcqpOASES {
 
             // C = alpha*A + beta*B
             static void WeightedMatrixAdd(const double alpha, const double* const A, const double beta, const double* const B, double* C, int m, int n);
-            
+
             // c = alpha*a + beta*b
             static void WeightedVectorAdd(const double alpha, const double* const a, const double beta, const double* const b, double* c, int m);
 
@@ -140,6 +139,15 @@ namespace lcqpOASES {
             static returnValue readFromFile(double* data, int n, const char* datafilename );
 
             constexpr static const double EPS = 1.11e-16;
+    };
+
+    class MessageHandler {
+        public:
+            static returnValue PrintMessage( returnValue ret );
+
+            static algorithmStatus PrintSolution( algorithmStatus algoStat );
+
+            static void PrintSolutionLine( );
     };
 }
 

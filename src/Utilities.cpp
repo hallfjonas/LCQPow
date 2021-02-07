@@ -11,7 +11,7 @@
  *
  *	lcqpOASES is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
@@ -85,7 +85,7 @@ namespace lcqpOASES {
      *  e n s u r e C o n s i s t e n c y
      */
     returnValue Options::ensureConsistency( ) {
-        
+
         if (complementarityPenaltyUpdate <= 1)
             throw INVALID_PENALTY_UPDATE_VALUE;
 
@@ -133,8 +133,8 @@ namespace lcqpOASES {
             for (int j = 0; j < p; j++) {
                 C[i*m + j] = 0;
                 for (int k = 0; k < n; k++) {
-                    C[i*m + j] += A[i*n + k]*B[k*p + j]; 
-                }                
+                    C[i*m + j] += A[i*n + k]*B[k*p + j];
+                }
             }
         }
     }
@@ -148,8 +148,8 @@ namespace lcqpOASES {
             for (int j = 0; j <= i; j++) {
                 C[i*n + j] = 0;
                 for (int k = 0; k < m; k++) {
-                    C[i*n + j] += A[k*n + i]*B[k*n + j] + B[k*n + i]*A[k*n + j]; 
-                }                
+                    C[i*n + j] += A[k*n + i]*B[k*n + j] + B[k*n + i]*A[k*n + j];
+                }
 
                 // Make symmetric
                 C[j*n + i] = C[i*n + j];
@@ -162,11 +162,11 @@ namespace lcqpOASES {
      */
     void Utilities::AffineLinearTransformation(const double alpha, const double* const A, const double* const b, const double* const c, double* d, int m, int n) {
         for (int i = 0; i < m; i++) {
-            
+
             double tmp = 0;
             for (int k = 0; k < n; k++) {
-                tmp += A[i*n + k]*b[k]; 
-            }                
+                tmp += A[i*n + k]*b[k];
+            }
 
             d[i] = alpha*tmp + c[i];
         }
@@ -187,7 +187,7 @@ namespace lcqpOASES {
     void Utilities::WeightedVectorAdd(const double alpha, const double* const a, const double beta, const double* const b, double* c, int m) {
         WeightedMatrixAdd(alpha, a, beta, b, c, m, 1);
     }
-        
+
 
     /*
      *	Q u a d r a t i c F o r m P r o d u c t
@@ -202,7 +202,7 @@ namespace lcqpOASES {
             ret += tmp*p[i];
         }
 
-        return ret;   
+        return ret;
     }
 
     /*
@@ -227,7 +227,7 @@ namespace lcqpOASES {
             if (a[i] > max)
                 max = a[i];
             else if (a[i] < min)
-                min = a[i];            
+                min = a[i];
         }
 
         return std::max(max, -min);
@@ -295,5 +295,109 @@ namespace lcqpOASES {
 
         return SUCCESSFUL_RETURN;
     }
+
+
+    /*
+     *   P r i n t M e s s a g e
+     */
+    returnValue MessageHandler::PrintMessage( returnValue ret) {
+
+        switch (ret) {
+            case SUCCESSFUL_RETURN:
+                break;
+
+            case NOT_YET_IMPLEMENTED:
+                printf("This method has not yet been implemented.");
+                break;
+
+            case LCQPOBJECT_NOT_SETUP:
+                printf("ERROR: The LCQP object has not been set up correctly.");
+                break;
+
+            case INDEX_OUT_OF_BOUNDS:
+                printf("ERROR: Index out of bounds.");
+                break;
+
+            case SUBPROBLEM_SOLVER_ERROR:
+                printf("ERROR: The subproblem solver produced an error.");
+                break;
+
+            case UNABLE_TO_READ_FILE:
+                printf("ERROR: Unable to read file.");
+                break;
+
+            case MAX_OUTER_ITERATIONS_REACHED:
+                printf("ERROR: Maximum number of outer iterations reached.");
+                break;
+
+            case MAX_INNER_ITERATIONS_REACHED:
+                printf("ERROR: Maximum number of inner iterations reached.");
+                break;
+
+            case INITIAL_SUBPROBLEM_FAILED:
+                printf("ERROR: Failed to solve initial QP.");
+                break;
+
+            case INVALID_ARGUMENT:
+                printf("ERROR: Invalid argument passed.");
+                break;
+
+            case INVALID_COMPLEMENTARITY_TOLERANCE:
+                printf("ERROR: Invalid argument passed (complementarity tolerance).");
+                break;
+
+            case INVALID_INITIAL_PENALTY_VALUE:
+                printf("ERROR: Invalid argument passed (initial penalty value).");
+                break;
+
+            case INVALID_PENALTY_UPDATE_VALUE:
+                printf("ERROR: Invalid argument passed (penalty update value).");
+                break;
+
+            case INVALID_MAX_OUTER_ITERATIONS_VALUE:
+                printf("ERROR: Invalid argument passed (maximum outer iterations).");
+                break;
+
+            case INVALID_MAX_INNER_ITERATIONS_VALUE:
+                printf("ERROR: Invalid argument passed (maximum inner iterations).");
+                break;
+        }
+
+        return ret;
+    }
+
+    algorithmStatus MessageHandler::PrintSolution( algorithmStatus algoStat ) {
+
+        if ( algoStat != PROBLEM_NOT_SOLVED)
+            printf("\n\n#################################\n");
+
+        switch (algoStat) {
+            case PROBLEM_NOT_SOLVED:
+                printf("The LCQP has not been solved.");
+                break;
+
+            case W_STATIONARY_SOLUTION:
+                printf("## W-Stationary solution found ##\n");
+                break;
+
+            case C_STATIONARY_SOLUTION:
+                printf("## C-Stationary solution found ##\n");
+                break;
+
+            case M_STATIONARY_SOLUTION:
+                printf("## M-Stationary solution found ##\n");
+                break;
+
+            case S_STATIONARY_SOLUTION:
+                printf("## S-Stationary solution found ##\n");
+                break;
+        }
+
+        if ( algoStat != PROBLEM_NOT_SOLVED)
+            printf("#################################\n\n");
+
+        return algoStat;
+    }
+
 }
 
