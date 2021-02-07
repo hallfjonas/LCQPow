@@ -41,15 +41,23 @@ namespace lcqpOASES {
 	LCQProblem::LCQProblem( int _nV, int _nC, int _nComp )
 	{
 		/* consistency checks */
-		if ( _nV <= 0 || _nComp <= 0)
+		if ( _nV <= 0 )
 		{
-			throw( INVALID_ARGUMENT );
+			MessageHandler::PrintMessage( INVALID_NUMBER_OF_OPTIM_VARS );
+			return;
+		}
+
+		if ( _nComp <= 0 )
+		{
+			MessageHandler::PrintMessage( INVALID_NUMBER_OF_OPTIM_VARS );
+			return;
 		}
 
 		if ( _nC < 0 )
 		{
 			_nC = 0;
-			throw( INVALID_ARGUMENT );
+			MessageHandler::PrintMessage( INVALID_NUMBER_OF_CONSTRAINT_VARS );
+			return;
 		}
 
 		nV = _nV;
@@ -93,7 +101,7 @@ namespace lcqpOASES {
 		returnValue ret = setupLCQPdata(H_file, g_file, A_file, lb_file, ub_file, lbA_file, ubA_file, S1_file, S2_file, x0_file, y0_file);
 
 		if (ret != SUCCESSFUL_RETURN)
-			return ret;
+			return MessageHandler::PrintMessage( ret );
 
 		return MessageHandler::PrintMessage( runSolver( ) );
 	}
@@ -131,7 +139,7 @@ namespace lcqpOASES {
 		if (ret != SUCCESSFUL_RETURN)
 			return ret;
 
-		ret = setConstraints( _A, _S1, _S2, _lbA, _ubA );
+		ret = setConstraints( _S1, _S2, _A, _lbA, _ubA );
 
 		if (ret != SUCCESSFUL_RETURN)
 			return ret;
@@ -185,27 +193,6 @@ namespace lcqpOASES {
 			return returnvalue;
 		}
 
-		double* _A = new double[nC*nV];
-		returnvalue = Utilities::readFromFile( _A, nC*nV, A_file );
-		if ( returnvalue != SUCCESSFUL_RETURN ) {
-			delete _A;
-			return returnvalue;
-		}
-
-		double* _lbA = new double[nC];
-		returnvalue = Utilities::readFromFile( _lbA, nC, lbA_file );
-		if ( returnvalue != SUCCESSFUL_RETURN ) {
-			delete _lbA;
-			return returnvalue;
-		}
-
-		double* _ubA = new double[nC];
-		returnvalue = Utilities::readFromFile( _ubA, nC, ubA_file );
-		if ( returnvalue != SUCCESSFUL_RETURN ) {
-			delete _ubA;
-			return returnvalue;
-		}
-
 		double* _S1 = new double[nComp*nV];
 		returnvalue = Utilities::readFromFile( _S1, nComp*nV, S1_file );
 		if ( returnvalue != SUCCESSFUL_RETURN ) {
@@ -220,18 +207,54 @@ namespace lcqpOASES {
 			return returnvalue;
 		}
 
-		double* _x0 = new double[nC + 2*nComp];
-		returnvalue = Utilities::readFromFile( _x0, nC + 2*nComp, x0_file );
-		if ( returnvalue != SUCCESSFUL_RETURN ) {
-			delete _S1;
-			return returnvalue;
+		double* _A = 0;
+		if (A_file != 0) {
+			_A = new double[nC*nV];
+			returnvalue = Utilities::readFromFile( _A, nC*nV, A_file );
+			if ( returnvalue != SUCCESSFUL_RETURN ) {
+				delete _A;
+				return returnvalue;
+			}
 		}
 
-		double* _y0 = new double[nC + 2*nComp];
-		returnvalue = Utilities::readFromFile( _y0, nC + 2*nComp, y0_file );
-		if ( returnvalue != SUCCESSFUL_RETURN ) {
-			delete _S2;
-			return returnvalue;
+		double* _lbA = 0;
+		if (lbA_file != 0) {
+			_lbA = new double[nC];
+			returnvalue = Utilities::readFromFile( _lbA, nC, lbA_file );
+			if ( returnvalue != SUCCESSFUL_RETURN ) {
+				delete _lbA;
+				return returnvalue;
+			}
+		}
+
+		double* _ubA = 0;
+		if (ubA_file != 0) {
+			_ubA = new double[nC];
+			returnvalue = Utilities::readFromFile( _ubA, nC, ubA_file );
+			if ( returnvalue != SUCCESSFUL_RETURN ) {
+				delete _ubA;
+				return returnvalue;
+			}
+		}
+
+		double* _x0 = 0;
+		if (x0_file != 0) {
+			_x0 = new double[nC + 2*nComp];
+			returnvalue = Utilities::readFromFile( _x0, nC + 2*nComp, x0_file );
+			if ( returnvalue != SUCCESSFUL_RETURN ) {
+				delete _S1;
+				return returnvalue;
+			}
+		}
+
+		double* _y0 = 0;
+		if (y0_file != 0) {
+			_y0 = new double[nC + 2*nComp];
+			returnvalue = Utilities::readFromFile( _y0, nC + 2*nComp, y0_file );
+			if ( returnvalue != SUCCESSFUL_RETURN ) {
+				delete _S2;
+				return returnvalue;
+			}
 		}
 
 		// Fill vaues
@@ -255,7 +278,7 @@ namespace lcqpOASES {
 		if (returnvalue != SUCCESSFUL_RETURN)
 			return returnvalue;
 
-		returnvalue = setConstraints( _A, _S1, _S2, _lbA, _ubA );
+		returnvalue = setConstraints( _S1, _S2, _A, _lbA, _ubA );
 
 		if (returnvalue != SUCCESSFUL_RETURN)
 			return returnvalue;
@@ -273,8 +296,8 @@ namespace lcqpOASES {
 	/*
 	*	s e t C o n s t r a i n t s
 	*/
-	returnValue LCQProblem::setConstraints( 	const double* const A_new, const double* const S1_new, const double* const S2_new,
-												const double* const lbA_new, const double* const ubA_new )
+	returnValue LCQProblem::setConstraints( 	const double* const S1_new, const double* const S2_new,
+												const double* const A_new, const double* const lbA_new, const double* const ubA_new )
 	{
 		if ( nV == 0 || nComp == 0 )
 			return LCQPOBJECT_NOT_SETUP;

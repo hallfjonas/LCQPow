@@ -265,9 +265,9 @@ namespace lcqpOASES {
 										double value	/**< New value for entry of upper bound vector. */
 										);
 
-			inline returnValue setConstraints(  const double* const A_new,		/**< New constraint matrix. */
-												const double* const S1_new,		/**< New lhs complementarity matrix. */
+			inline returnValue setConstraints(  const double* const S1_new,		/**< New lhs complementarity matrix. */
 												const double* const S2_new,		/**< New rhs complementarity matrix. */
+												const double* const A_new,		/**< New constraint matrix. */
 												const double* const lbA,		/**< New lower bounds for A. */
 												const double* const ubA			/**< New upper bounds for A. */
 												);
