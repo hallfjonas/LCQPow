@@ -11,7 +11,7 @@
  *
  *	lcqpOASES is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
@@ -99,7 +99,7 @@ TEST(UtilitiesTest, MatrixAdd) {
 
     int m = 3;
     int n = 2;
-    
+
     double alpha = -1;
     double* A = new double[m*n] { 0, 1, 3, 1, 10, 1 };
 
@@ -125,7 +125,7 @@ TEST(UtilitiesTest, VectorAdd) {
     // d = [-10; 0; 4; -3]
 
     int m = 4;
-    
+
     double alpha = 2;
     double* a = new double[m] { 0, 1, 2, 3 };
 
@@ -149,7 +149,7 @@ TEST(UtilitiesTest, QuadraticFormProduct) {
     int m = 3;
     double* p = new double[m] { 1, 2, 3 };
     double* Q = new double[m*m] { 0, 1, 0, 1, 2, 1, 0, 1, 0 };
-    
+
     double ret = lcqpOASES::Utilities::QuadraticFormProduct(Q, p, m);
     ASSERT_EQ(ret, 24);
 }
@@ -163,7 +163,7 @@ TEST(UtilitiesTest, DotProduct) {
     int m = 4;
     double* a = new double[m] { 0, 1, 2, 3 };
     double* b = new double[m] { 10, 2, 0, 3 };
-    
+
     double ret = lcqpOASES::Utilities::DotProduct(a, b, m);
     ASSERT_EQ(ret, 11);
 }
@@ -174,19 +174,19 @@ TEST(UtilitiesTest, MaxAbs) {
 
     // a = [0; 1; 2; 3]
     // ret = 3
-    double* a = new double[m] { 0, 1, 2, 3 };    
+    double* a = new double[m] { 0, 1, 2, 3 };
     double ret = lcqpOASES::Utilities::MaxAbs(a, m);
     ASSERT_EQ(ret, 3);
 
     // a = [0; -1; 2; 0]
     // ret = 2
-    a = new double[m] { 0, -1, 2, 0 };    
+    a = new double[m] { 0, -1, 2, 0 };
     ret = lcqpOASES::Utilities::MaxAbs(a, m);
     ASSERT_EQ(ret, 2);
 
     // a = [0; -4; 2; 0]
     // ret = 4
-    a = new double[m] { 0, -4, 2, 0 };    
+    a = new double[m] { 0, -4, 2, 0 };
     ret = lcqpOASES::Utilities::MaxAbs(a, m);
     ASSERT_EQ(ret, 4);
 }
@@ -208,13 +208,13 @@ TEST(UtilitiesTest, ReadFromFile) {
 TEST(UtilitiesTest, Options) {
     lcqpOASES::Options opts;
     ASSERT_EQ(opts.ensureConsistency(), lcqpOASES::SUCCESSFUL_RETURN);
-    
+
     // Check changed values
     opts.initialComplementarityPenalty = 100;
     opts.complementarityPenaltyUpdate = 100;
     ASSERT_EQ(opts.initialComplementarityPenalty, 100);
     ASSERT_EQ(opts.complementarityPenaltyUpdate, 100);
- 
+
     // Check copy constructor
     lcqpOASES::Options opts2(opts);
     ASSERT_EQ(opts2.initialComplementarityPenalty, 100);
@@ -258,7 +258,7 @@ TEST(SolverTest, RunWarmUp) {
 
     bool stat1 = std::abs(2*xOpt[0] - 2 - yOpt[0] - yOpt[2]) <= options.stationarityTolerance;
     bool stat2 = std::abs(2*xOpt[1] - 2 - yOpt[1] - yOpt[3]) <= options.stationarityTolerance;
-    
+
     ASSERT_TRUE( stat1 );
     ASSERT_TRUE( stat2 );
 }

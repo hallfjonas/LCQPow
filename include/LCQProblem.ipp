@@ -11,7 +11,7 @@
  *
  *	lcqpOASES is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
@@ -147,7 +147,7 @@ namespace lcqpOASES {
 	/*
 	 *	 s e t I n i t i a l G u e s s
 	 */
-	inline returnValue LCQProblem::setInitialGuess( const double* const _x0, const double* const _y0 ) 
+	inline returnValue LCQProblem::setInitialGuess( const double* const _x0, const double* const _y0 )
 	{
 		if ( nV == 0 || nComp == 0)
 			return LCQPOBJECT_NOT_SETUP;
@@ -160,7 +160,7 @@ namespace lcqpOASES {
 			for (int i = 0; i < nV; i++)
 				xk[i] = 0;
 		}
-			
+
 		if (_y0 != 0) {
 			yk = new double[nV + nC + 2*nComp];
 			memcpy(yk, _y0, (uint)(nV + nC + 2*nComp)*sizeof(double));

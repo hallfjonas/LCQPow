@@ -11,7 +11,7 @@
  *
  *	lcqpOASES is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
@@ -293,10 +293,10 @@ namespace lcqpOASES {
 		protected:
 			Options options;						/**< Class for algorithmic options. */
 
-		private:				
+		private:
 
 			/** After problem is set up, call this function and solve LCQP. */
-			returnValue runSolver( );		
+			returnValue runSolver( );
 
 			/** Called in runSolver to initialize variables. */
 			void initializeSolver( );
@@ -305,7 +305,7 @@ namespace lcqpOASES {
 			returnValue solveQPSubproblem( bool initialSolve );
 
 			/** Check outer stationarity at current iterate xk. */
-			bool stationarityCheck( ); 
+			bool stationarityCheck( );
 
 			/** Check satisfaction of complementarity value. */
 			bool complementarityCheck( );

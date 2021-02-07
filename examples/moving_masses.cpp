@@ -11,7 +11,7 @@
  *
  *	lcqpOASES is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
@@ -40,12 +40,12 @@ int nMasses = 2;                                // Number of masses
 int T = 2;                                      // Time span [0, T]
 int N = 75;                                     // Number of discretization nodes
 double h = (double)T/N;                         // Step size
-bool useIPOPT = false;                          // Use qpOASES LCQP or IPOPT NLP 
+bool useIPOPT = false;                          // Use qpOASES LCQP or IPOPT NLP
 double u_max = 1000;                            // Bound on control
 double controlPenalty = 1;                      // Penalty factor on control cost
 double constraintTol = 1e-7;                    // Terminal constraint tolerance
 
-// State space          
+// State space
 int nu = 1;                                     // Number of control variables per node
 int nx = 2*nMasses + 1;                         // Number of state variables per node
 int nz = 2*nMasses;                             // Number of algebraic variables per node
@@ -86,7 +86,7 @@ SX z = vertcat(y, lambda0);
 
 // Parameters
 SX one = SX::sym("one", 1);
-  
+
 // Trajectory variables, bounds and indices
 vector<SX> w_k;
 vector<double> lbw;
@@ -144,16 +144,16 @@ void FillC(const double* const S1, const double* const S2) {
     }
 }
 
-void CreateQPfromCasADi(    SX J, SX g, SX w, 
-                            const double* const lbw, const double* const ubw, 
-                            const double* const lbg, const double* const ubg, 
+void CreateQPfromCasADi(    SX J, SX g, SX w,
+                            const double* const lbw, const double* const ubw,
+                            const double* const lbg, const double* const ubg,
                             double* Q, double* d, double* A, double* lb, double* ub, double* lbA, double* ubA) {
-    
+
     // Build zero argument
     vector<double> zero_vec;
     for (int i = 0; i < NV; i++) {
         zero_vec.push_back(0);
-    }    
+    }
     vector<DM> arg_zero = {reshape(DM(zero_vec), NV, 1)};
 
     // Create QP
@@ -173,7 +173,7 @@ void CreateQPfromCasADi(    SX J, SX g, SX w,
     SX jacG = jacobian(g, w, dict);
     Function G("G", {w}, {g});
     Function JacG("JacG", {w}, {jacG});
-    
+
     // Evaluate constraint linarization at 0
     vector<double> Gk_zero_eval = G(arg_zero).at(0).get_elements();
     vector<double> JacGk_eval = JacG(arg_zero).at(0).get_elements();
@@ -183,7 +183,7 @@ void CreateQPfromCasADi(    SX J, SX g, SX w,
         d[i] = GradJ_eval[i];
         for (int j = 0; j < NV; j++){
             Q[i*NV + j] = HessJ_eval[i*NV + j];
-        }       
+        }
     }
 
     // Store constraints
@@ -233,7 +233,7 @@ int main() {
         // Bounds on lambda0
         lbz[nMasses + j] = 0;
         ubz[nMasses + j] = casadi::inf;
-        
+
         // Initial guess
         if (x0[nMasses + j] < 0) {
             z0[nMasses + j] = -x0[nMasses + j];
@@ -241,9 +241,9 @@ int main() {
         } else {
             z0[nMasses + j] = 0;
             z0[j] = 0;
-        }        
+        }
     }
-    
+
     // Begin with parameters (one)
     w_k.push_back(one);
     w0.push_back(1);
@@ -295,7 +295,7 @@ int main() {
 
         // New state variables
         SX xkj = SX::sym("x_" + nameInd, nx);
-        w_k.push_back(xkj);            
+        w_k.push_back(xkj);
         int new_x_start_ind = ind_all.back() + 1;
         for (int i = 0; i < nx; i++) {
             // Add to initial guess
@@ -335,24 +335,24 @@ int main() {
             int vInd = new_x_start_ind + nMasses + i;
 
             // y*lambda0
-            S1[compCounter*NV + yInd] = 1;      
+            S1[compCounter*NV + yInd] = 1;
             S2[compCounter*NV + lam0Ind] = 1;
             compCounter++;
 
             // lambda0*y (for symmetry)
-            S2[compCounter*NV + yInd] = 1;      
+            S2[compCounter*NV + yInd] = 1;
             S1[compCounter*NV + lam0Ind] = 1;
             compCounter++;
 
             // (1-y)*(lambda0 + v)
-            S1[compCounter*NV + 0] = 1;    
-            S1[compCounter*NV + yInd] = -1;     
-            S2[compCounter*NV + lam0Ind] = 1;     
+            S1[compCounter*NV + 0] = 1;
+            S1[compCounter*NV + yInd] = -1;
+            S2[compCounter*NV + lam0Ind] = 1;
             S2[compCounter*NV + vInd] = 1;
             compCounter++;
 
             // (lambda0 + v)*(1-y) (for symmetry)
-            S2[compCounter*NV + 0] = 1;    
+            S2[compCounter*NV + 0] = 1;
             S2[compCounter*NV + yInd] = -1;
             S1[compCounter*NV + lam0Ind] = 1;
             S1[compCounter*NV + vInd] = 1;
@@ -386,13 +386,13 @@ int main() {
             lbg.push_back(0);
             ubg.push_back(0);
         }
-            
+
         g_k.push_back(gj);
 
         for (int i = 0; i < nx; i++) {
             xk_end(i) += 2*xkj(i);
             xk(i) = xk_end(i);
-        }            
+        }
     }
 
     // Terminal constraint
@@ -403,7 +403,7 @@ int main() {
         lbg.push_back(-constraintTol);
         ubg.push_back(constraintTol);
     }
-        
+
     g_k.push_back(gj);
 
     std::cout << "Building moving masses LCQP done ..." << endl;
@@ -416,13 +416,13 @@ int main() {
 
     vector<double> xopt;
 
-    
+
     std::cout << "Calling LCQP solver ..." << endl;
 
     double* b = new double[NComp];
     for (int i = 0; i < NComp; i++)
         b[i] = 1;
-        
+
     // Allocate LCQP arrays to be filled
     double* Q = new double[NV*NV];
     double* d = new double[NV];
@@ -438,7 +438,7 @@ int main() {
     // Initialize LCQP solver
     LCQProblem lcqp( NV, NConstr, NComp);
 
-    // lcqpOASES options and settings      
+    // lcqpOASES options and settings
     lcqpOASES::Options options;
     options.initialComplementarityPenalty = 1.0;
     options.complementarityPenaltyUpdate = 10.0;
