@@ -193,15 +193,15 @@ TEST(UtilitiesTest, MaxAbs) {
 
 // Testing read from file functionality
 TEST(UtilitiesTest, ReadFromFile) {
-    const char* fpath = "examples/example_data/C.txt";
+    const char* fpath = "examples/example_data/H.txt";
 
-    double* C = new double[4];
-    lcqpOASES::Utilities::readFromFile(C, 4, fpath);
+    double* H = new double[4];
+    lcqpOASES::Utilities::readFromFile(H, 4, fpath);
 
-    ASSERT_EQ(C[0], 0);
-    ASSERT_EQ(C[1], 1);
-    ASSERT_EQ(C[2], 1);
-    ASSERT_EQ(C[3], 0);
+    ASSERT_EQ(H[0], 2);
+    ASSERT_EQ(H[1], 0);
+    ASSERT_EQ(H[2], 0);
+    ASSERT_EQ(H[3], 2);
 }
 
 // Testing Options constructors, default settings, consistency
