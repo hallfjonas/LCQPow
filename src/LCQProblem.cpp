@@ -432,9 +432,9 @@ namespace lcqpOASES {
 		S2_sparse = tmpS2;
 
 		qpOASES::SymSparseMat tmpC1;
-		S1_sparse.transTimes(nV, 1, S2, nComp, 0, tmpC1, nV);
+		// S1_sparse.transTimes(nV, 1, S2, nComp, 0,
 
-		qpOASES::SparseMatrix tmpS2(nComp, nV, S2_i, S2_p, S2_data);
+		// qpOASES::SparseMatrix tmpS2(nComp, nV, S2_i, S2_p, S2_data);
 		S2_sparse = tmpS2;
 
 		qpOASES::SparseMatrix tmpS2(nComp, nV, S2_i, S2_p, S2_data);
