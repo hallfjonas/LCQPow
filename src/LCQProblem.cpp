@@ -78,7 +78,34 @@ namespace lcqpOASES {
 									const double* const _S1, const double* const _S2, const double* const _x0, const double* const _y0
 									)
 	{
-		returnValue ret = setupLCQPdata(_H, _g, _A, _lb, _ub, _lbA, _ubA, _S1, _S2, _x0, _y0);
+		returnValue ret;
+
+		ret = setH( _H );
+
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
+
+		ret = setG( _g );
+
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
+
+		ret = setLB( _lb );
+
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
+
+		ret = setUB( _ub );
+
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
+
+		ret = setConstraints( _S1, _S2, _A, _lbA, _ubA );
+
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
+
+		ret = setInitialGuess( _x0, _y0 );
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
@@ -88,7 +115,7 @@ namespace lcqpOASES {
 
 
 	/*
-	*	i n i t
+	*	s o l v e
 	*/
 	returnValue LCQProblem::solve(	const char* const H_file, const char* const g_file,
 									const char* const lb_file, const char* const ub_file,
@@ -97,200 +124,182 @@ namespace lcqpOASES {
 									const char* const x0_file, const char* const y0_file
 									)
 	{
-		// Internally set up data
-		returnValue ret = setupLCQPdata(H_file, g_file, A_file, lb_file, ub_file, lbA_file, ubA_file, S1_file, S2_file, x0_file, y0_file);
-
-		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
-
-		return MessageHandler::PrintMessage( runSolver( ) );
-	}
-
-
-	/*
-	*	s e t u p Q P d a t a
-	*/
-	returnValue LCQProblem::setupLCQPdata(	const double* const _H, const double* const _g,
-											const double* const _lb, const double* const _ub,
-											const double* const _S1, const double* const _S2,
-											const double* const _A, const double* const _lbA, const double* const _ubA,
-											const double* const _x0, const double* const _y0
-											)
-	{
 		returnValue ret;
 
-		ret = setH( _H );
-
-		if (ret != SUCCESSFUL_RETURN)
-			return ret;
-
-		ret = setG( _g );
-
-		if (ret != SUCCESSFUL_RETURN)
-			return ret;
-
-		ret = setLB( _lb );
-
-		if (ret != SUCCESSFUL_RETURN)
-			return ret;
-
-		ret = setUB( _ub );
-
-		if (ret != SUCCESSFUL_RETURN)
-			return ret;
-
-		ret = setConstraints( _S1, _S2, _A, _lbA, _ubA );
-
-		if (ret != SUCCESSFUL_RETURN)
-			return ret;
-
-		ret = setInitialGuess( _x0, _y0 );
-
-		if (ret != SUCCESSFUL_RETURN)
-			return ret;
-
-		return SUCCESSFUL_RETURN;
-	}
-
-	/*
-	*	s e t u p Q P d a t a F r o m F i l e
-	*/
-	returnValue LCQProblem::setupLCQPdata(	const char* const H_file, const char* const g_file, const char* const A_file,
-											const char* const lb_file, const char* const ub_file,
-											const char* const lbA_file, const char* const ubA_file,
-											const char* const S1_file, const char* const S2_file,
-											const char* const x0_file, const char* const y0_file
-											)
-	{
-		returnValue returnvalue;
-
 		double* _H = new double[nV*nV];
-		returnvalue = Utilities::readFromFile( _H, nV*nV, H_file );
-		if ( returnvalue != SUCCESSFUL_RETURN ) {
+		ret = Utilities::readFromFile( _H, nV*nV, H_file );
+		if ( ret != SUCCESSFUL_RETURN ) {
 			delete _H;
-			return returnvalue;
+			return MessageHandler::PrintMessage( ret );
 		}
 
-
 		double* _g = new double[nV];
-		returnvalue = Utilities::readFromFile( _g, nV, g_file );
-		if ( returnvalue != SUCCESSFUL_RETURN ) {
+		ret = Utilities::readFromFile( _g, nV, g_file );
+		if ( ret != SUCCESSFUL_RETURN ) {
 			delete _g;
-			return returnvalue;
+			return MessageHandler::PrintMessage( ret );
 		}
 
 		double* _lb = new double[nV];
-		returnvalue = Utilities::readFromFile( _lb, nV, lb_file );
-		if ( returnvalue != SUCCESSFUL_RETURN ) {
+		ret = Utilities::readFromFile( _lb, nV, lb_file );
+		if ( ret != SUCCESSFUL_RETURN ) {
 			delete _lb;
-			return returnvalue;
+			return MessageHandler::PrintMessage( ret );
 		}
 
 		double* _ub = new double[nV];
-		returnvalue = Utilities::readFromFile( _ub, nV, ub_file );
-		if ( returnvalue != SUCCESSFUL_RETURN ) {
+		ret = Utilities::readFromFile( _ub, nV, ub_file );
+		if ( ret != SUCCESSFUL_RETURN ) {
 			delete _ub;
-			return returnvalue;
+			return MessageHandler::PrintMessage( ret );
 		}
 
 		double* _S1 = new double[nComp*nV];
-		returnvalue = Utilities::readFromFile( _S1, nComp*nV, S1_file );
-		if ( returnvalue != SUCCESSFUL_RETURN ) {
+		ret = Utilities::readFromFile( _S1, nComp*nV, S1_file );
+		if ( ret != SUCCESSFUL_RETURN ) {
 			delete _S1;
-			return returnvalue;
+			return MessageHandler::PrintMessage( ret );
 		}
 
 		double* _S2 = new double[nComp*nV];
-		returnvalue = Utilities::readFromFile( _S2, nComp*nV, S2_file );
-		if ( returnvalue != SUCCESSFUL_RETURN ) {
+		ret = Utilities::readFromFile( _S2, nComp*nV, S2_file );
+		if ( ret != SUCCESSFUL_RETURN ) {
 			delete _S2;
-			return returnvalue;
+			return MessageHandler::PrintMessage( ret );
 		}
 
 		double* _A = 0;
 		if (A_file != 0) {
 			_A = new double[nC*nV];
-			returnvalue = Utilities::readFromFile( _A, nC*nV, A_file );
-			if ( returnvalue != SUCCESSFUL_RETURN ) {
+			ret = Utilities::readFromFile( _A, nC*nV, A_file );
+			if ( ret != SUCCESSFUL_RETURN ) {
 				delete _A;
-				return returnvalue;
+				return MessageHandler::PrintMessage( ret );
 			}
 		}
 
 		double* _lbA = 0;
 		if (lbA_file != 0) {
 			_lbA = new double[nC];
-			returnvalue = Utilities::readFromFile( _lbA, nC, lbA_file );
-			if ( returnvalue != SUCCESSFUL_RETURN ) {
+			ret = Utilities::readFromFile( _lbA, nC, lbA_file );
+			if ( ret != SUCCESSFUL_RETURN ) {
 				delete _lbA;
-				return returnvalue;
+				return MessageHandler::PrintMessage( ret );
 			}
 		}
 
 		double* _ubA = 0;
 		if (ubA_file != 0) {
 			_ubA = new double[nC];
-			returnvalue = Utilities::readFromFile( _ubA, nC, ubA_file );
-			if ( returnvalue != SUCCESSFUL_RETURN ) {
+			ret = Utilities::readFromFile( _ubA, nC, ubA_file );
+			if ( ret != SUCCESSFUL_RETURN ) {
 				delete _ubA;
-				return returnvalue;
+				return MessageHandler::PrintMessage( ret );
 			}
 		}
 
 		double* _x0 = 0;
 		if (x0_file != 0) {
 			_x0 = new double[nC + 2*nComp];
-			returnvalue = Utilities::readFromFile( _x0, nC + 2*nComp, x0_file );
-			if ( returnvalue != SUCCESSFUL_RETURN ) {
+			ret = Utilities::readFromFile( _x0, nC + 2*nComp, x0_file );
+			if ( ret != SUCCESSFUL_RETURN ) {
 				delete _S1;
-				return returnvalue;
+				return MessageHandler::PrintMessage( ret );
 			}
 		}
 
 		double* _y0 = 0;
 		if (y0_file != 0) {
 			_y0 = new double[nC + 2*nComp];
-			returnvalue = Utilities::readFromFile( _y0, nC + 2*nComp, y0_file );
-			if ( returnvalue != SUCCESSFUL_RETURN ) {
+			ret = Utilities::readFromFile( _y0, nC + 2*nComp, y0_file );
+			if ( ret != SUCCESSFUL_RETURN ) {
 				delete _S2;
-				return returnvalue;
+				return MessageHandler::PrintMessage( ret );
 			}
 		}
 
 		// Fill vaues
-		returnvalue = setH( _H );
+		ret = setH( _H );
 
-		if (returnvalue != SUCCESSFUL_RETURN)
-			return returnvalue;
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
 
-		returnvalue = setG( _g );
+		ret = setG( _g );
 
-		if (returnvalue != SUCCESSFUL_RETURN)
-			return returnvalue;
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
 
-		returnvalue = setLB( _lb );
+		ret = setLB( _lb );
 
-		if (returnvalue != SUCCESSFUL_RETURN)
-			return returnvalue;
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
 
-		returnvalue = setUB( _ub );
+		ret = setUB( _ub );
 
-		if (returnvalue != SUCCESSFUL_RETURN)
-			return returnvalue;
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
 
-		returnvalue = setConstraints( _S1, _S2, _A, _lbA, _ubA );
+		ret = setConstraints( _S1, _S2, _A, _lbA, _ubA );
 
-		if (returnvalue != SUCCESSFUL_RETURN)
-			return returnvalue;
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
 
-		returnvalue = setInitialGuess( _x0, _y0 );
+		ret = setInitialGuess( _x0, _y0 );
 
-		if (returnvalue != SUCCESSFUL_RETURN)
-			return returnvalue;
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
 
-		return SUCCESSFUL_RETURN;
+		// Call solver
+		return MessageHandler::PrintMessage( runSolver( ) );
 	}
 
+	
+	/*
+	*	s o l v e
+	*/
+	returnValue LCQProblem::solve(	double* _H_data, int _H_nnx, int* _H_i, int* _H_p, 
+									double* _g, double* _lb, double* _ub,
+									double* _S1_data, int _S1_nnx, int* _S1_i, int* _S1_p,			
+									double* _S2_data, int _S2_nnx, int* _S2_i, int* _S2_p,			
+									double* _A_data, int _A_nnx, int* _A_i, int* _A_p,		
+									double* _lbA, double* _ubA,	double* _x0, double* _y0
+									) 
+	{
+		returnValue ret;
+
+		ret = setH( _H_data, _H_nnx, _H_i, _H_p );
+
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
+
+		ret = setG( _g );
+
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
+
+		ret = setLB( _lb );
+
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
+
+		ret = setUB( _ub );
+
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
+
+		ret = setConstraints( _S1_data, _S1_nnx, _S1_i, _S1_p, _S2_data, _S2_nnx, _S2_i, _S2_p, _A_data, _A_nnx, _A_i, _A_p, _lbA, _ubA );
+
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
+
+		ret = setInitialGuess( _x0, _y0 );
+
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
+
+		return MessageHandler::PrintMessage( runSolver( ) );
+
+	}
 
 
 	/*
@@ -364,6 +373,87 @@ namespace lcqpOASES {
 		Utilities::MatrixSymmetrizationProduct(S1, S2, C, nComp, nV);
 
 		return SUCCESSFUL_RETURN;
+	}
+
+
+	/*
+	 *	 s e t C o n s t r a i n t s
+	 */
+	returnValue LCQProblem::setConstraints( double* S1_data, int S1_nnx, int* S1_i, int* S1_p,
+											double* S2_data, int S2_nnx, int* S2_i, int* S2_p, 
+											double* A_data, int A_nnx, int* A_i, int* A_p,
+											double* lbA, double* ubA
+											)
+	{
+
+		int tmpA_nnx = A_nnx + S1_nnx + S2_nnx;
+		double* tmpA_data = new double[tmpA_nnx];
+		int* tmpA_i = new int[tmpA_nnx];
+		int* tmpA_p = new int[nV+1];
+
+		int index_data = 0;
+
+		// Iterate over columns
+		for (int i = 0; i < nV; i++) {
+			// Start index of column
+			tmpA_p[i] = A_p[i];
+
+			// First handle rows of A
+			for (int j = A_p[i]; j < A_p[i+1]; j++) {
+				tmpA_data[index_data] = A_data[A_p[i]+j];
+				tmpA_i[index_data] = A_i[A_p[i]+j];
+				index_data++;
+			}
+
+			// Then rows of S1
+			for (int j = S1_p[i]; j < S1_p[i+1]; j++) {
+				tmpA_data[index_data] = S1_data[S2_p[i]+j];
+				tmpA_i[index_data] = S1_i[S2_p[i]+j];
+				index_data++;
+			}
+			// Then rows of S2
+			for (int j = S2_p[i]; j < S2_p[i+1]; j++) {
+				tmpA_data[index_data] = S2_data[S2_p[i]+j];
+				tmpA_i[index_data] = S2_i[S2_p[i]+j];
+				index_data++;
+			}
+		}
+
+		// End index of column
+		tmpA_p[nV] = S2_p[nV] + nC + nComp;
+		
+		qpOASES::SparseMatrix tmpA(nC + 2*nComp, nV, tmpA_i, tmpA_p, tmpA_data);
+		A_sparse = tmpA;
+
+		qpOASES::SparseMatrix tmpS1(nComp, nV, S1_i, S1_p, S1_data);
+		S1_sparse = tmpS1;
+
+		qpOASES::SparseMatrix tmpS2(nComp, nV, S2_i, S2_p, S2_data);
+		S2_sparse = tmpS2;
+
+		qpOASES::SymSparseMat tmpC1;
+		S1_sparse.transTimes(nV, 1, S2, nComp, 0, tmpC1, nV);
+
+		qpOASES::SparseMatrix tmpS2(nComp, nV, S2_i, S2_p, S2_data);
+		S2_sparse = tmpS2;
+
+		qpOASES::SparseMatrix tmpS2(nComp, nV, S2_i, S2_p, S2_data);
+		S2_sparse = tmpS2;
+
+		
+	}
+
+
+	/*
+	 *	 s e t S p a r s e M a t r i x
+	 */
+	returnValue LCQProblem::setH( double* H_data, int H_nnx, int* H_i, int* H_p )
+	{
+		if (nV <= 0)
+			return LCQPOBJECT_NOT_SETUP;
+
+		qpOASES::SymSparseMat tmp(nV, nV, H_i, H_p, H_data);
+		H_sparse = tmp;
 	}
 
 

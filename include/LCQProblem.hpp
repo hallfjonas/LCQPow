@@ -36,38 +36,14 @@ namespace lcqpOASES {
 		*	PUBLIC MEMBER FUNCTIONS
 		*/
 		public:
-			/** Constructor which takes the QP dimension and Hessian type
-			 *  information. If the Hessian is the zero (i.e. HST_ZERO) or the
-			 *  identity matrix (i.e. HST_IDENTITY), respectively, no memory
-			 *  is allocated for it and a NULL pointer can be passed for it
-			 *  to the init() functions. */
+			/** TODO: Write description. */
 			LCQProblem(	int _nV,	  							/**< Number of variables. */
 						int _nC,		  						/**< Number of constraints. */
 						int _nComp 								/**< Number of complementarity constraints. */
 						);
 
 
-			/** Initialises a QP problem with given QP data and tries to solve it
-			 *	using at most nWSR iterations. Depending on the parameter constellation it: \n
-			*	1. 0,    0,    0    : starts with xOpt = 0, yOpt = 0 and gB/gC empty (or all implicit equality bounds), \n
-			*	2. xOpt, 0,    0    : starts with xOpt, yOpt = 0 and obtain gB/gC by "clipping", \n
-			*	3. 0,    yOpt, 0    : starts with xOpt = 0, yOpt and obtain gB/gC from yOpt != 0, \n
-			*	4. 0,    0,    gB/gC: starts with xOpt = 0, yOpt = 0 and gB/gC, \n
-			*	5. xOpt, yOpt, 0    : starts with xOpt, yOpt and obtain gB/gC from yOpt != 0, \n
-			*	6. xOpt, 0,    gB/gC: starts with xOpt, yOpt = 0 and gB/gC, \n
-			*	7. xOpt, yOpt, gB/gC: starts with xOpt, yOpt and gB/gC (assume them to be consistent!)
-			*
-			*  Note: This function internally calls solveInitialLCQP for initialisation!
-			*
-			*	\return SUCCESSFUL_RETURN \n
-						RET_INIT_FAILED \n
-						RET_INIT_FAILED_CHOLESKY \n
-						RET_INIT_FAILED_TQ \n
-						RET_INIT_FAILED_HOTSTART \n
-						RET_INIT_FAILED_INFEASIBILITY \n
-						RET_INIT_FAILED_UNBOUNDEDNESS \n
-						RET_MAX_NWSR_REACHED \n
-						RET_INVALID_ARGUMENTS */
+			/** TODO: Write description. */
 			returnValue solve(	const double* const _H,							/**< Hessian matrix. */
 								const double* const _g,							/**< Gradient vector. */
 								const double* const _lb,						/**< Lower bound vector (on variables). \n
@@ -88,30 +64,8 @@ namespace lcqpOASES {
 																						(If a null pointer is passed, the old dual solution is kept!) */
 								);
 
-			/** Initialises a QP problem with given data to be read from files and solves it
-			 *	using at most nWSR iterations. Depending on the parameter constellation it: \n
-			*	1. 0,    0,    0    : starts with xOpt = 0, yOpt = 0 and gB/gC empty (or all implicit equality bounds), \n
-			*	2. xOpt, 0,    0    : starts with xOpt, yOpt = 0 and obtain gB/gC by "clipping", \n
-			*	3. 0,    yOpt, 0    : starts with xOpt = 0, yOpt and obtain gB/gC from yOpt != 0, \n
-			*	4. 0,    0,    gB/gC: starts with xOpt = 0, yOpt = 0 and gB/gC, \n
-			*	5. xOpt, yOpt, 0    : starts with xOpt, yOpt and obtain gB/gC from yOpt != 0, \n
-			*	6. xOpt, 0,    gB/gC: starts with xOpt, yOpt = 0 and gB/gC, \n
-			*	7. xOpt, yOpt, gB/gC: starts with xOpt, yOpt and gB/gC (assume them to be consistent!)
-			*
-			*  Note: This function internally calls solveInitialLCQP for initialisation!
-			*
-			*	\return SUCCESSFUL_RETURN \n
-						RET_INIT_FAILED \n
-						RET_INIT_FAILED_CHOLESKY \n
-						RET_INIT_FAILED_TQ \n
-						RET_INIT_FAILED_HOTSTART \n
-						RET_INIT_FAILED_INFEASIBILITY \n
-						RET_INIT_FAILED_UNBOUNDEDNESS \n
-						RET_MAX_NWSR_REACHED \n
-						RET_UNABLE_TO_READ_FILE \n
-						RET_INVALID_ARGUMENTS */
-			returnValue solve(	const char* const H_file,						/**< Name of file where Hessian matrix is stored. \n
-																						If Hessian matrix is trivial, a NULL pointer can be passed. */
+			/** TODO: Write description. */
+			returnValue solve(	const char* const H_file,						/**< Name of file where Hessian matrix is stored. */
 								const char* const g_file,						/**< Name of file where gradient vector is stored. */
 								const char* const lb_file,						/**< Name of file where lower bound vector. \n
 																						If no lower bounds exist, a NULL pointer can be passed. */
@@ -131,20 +85,63 @@ namespace lcqpOASES {
 																						(If a null pointer is passed, the old dual solution is kept!) */
 								);
 
-			/** Returns the dual solution vector of the LCQP (deep copy).
-			 *	\return SUCCESSFUL_RETURN \n
-						RET_QP_NOT_SOLVED */
+			/** TODO: Write description. */
+			returnValue solve(	double* _H_data,						/**< Non-zero Hessian matrix values. */
+								int _H_nnx,								/**< Number of non-zero values of Hessian. */
+								int* _H_i,								/**< Row indicies of non-zero values. */
+								int* _H_p,								/**< Pointer to column starts. */
+								double* _g,								/**< Gradient vector. */
+								double* _lb,							/**< Lower bound vector (on variables). */
+								double* _ub,							/**< Upper bound vector (on variables). */
+								double* _S1_data,          				/**< Non-zero values of LHS of complementarity product. */
+								int _S1_nnx,							/**< Number of non-zero values of S1. */
+								int* _S1_i,								/**< Row indicies of non-zero values. */
+								int* _S1_p,								/**< Pointer to column starts. */
+								double* _S2_data,	          			/**< Non-zero values of RHS of complementarity product. */
+								int _S2_nnx,							/**< Number of non-zero values of S2. */
+								int* _S2_i,								/**< Row indicies of non-zero values. */
+								int* _S2_p,								/**< Pointer to column starts. */
+								double* _A_data = 0,					/**< Constraint matrix. */
+								int _A_nnx = 0,							/**< Number of non-zero values of Hessian. */
+								int* _A_i = 0,							/**< Row indicies of non-zero values. */
+								int* _A_p = 0,							/**< Pointer to column starts. */
+								double* _lbA = 0,						/**< Lower constraints' bound vector. */
+								double* _ubA = 0,						/**< Upper constraints' bound vector. */
+								double* _x0 = 0,						/**< Optimal primal solution vector. */
+								double* _y0 = 0							/**< Optimal dual solution vector. */
+								);
+
+			/** TODO: Write description. */
+			returnValue solve(	const char* const H_data_file,					/**< Non-zero Hessian matrix values. */
+								const char* const H_i_file,						/**< Row indicies of non-zero values. */
+								const char* const H_p_file,						/**< Pointer to column starts. */
+								const char* const g_file,						/**< Gradient vector. */
+								const char* const lb_file,						/**< Lower bound vector (on variables). */
+								const char* const ub_file,						/**< Upper bound vector (on variables). */
+								const char* const S1_data_file,          		/**< Non-zero values of LHS of complementarity product. */
+								const char* const S1_i_file,					/**< Row indicies of non-zero values. */
+								const char* const S1_p_file,					/**< Pointer to column starts. */
+								const char* const S2_data_file,          		/**< Non-zero values of RHS of complementarity product. */
+								const char* const S2_i_file,					/**< Row indicies of non-zero values. */
+								const char* const S2_p_file,					/**< Pointer to column starts. */
+								const char* const A_data_file = 0,				/**< Constraint matrix. */
+								const char* const A_i_file = 0,					/**< Row indicies of non-zero values. */
+								const char* const A_p_file = 0,					/**< Pointer to column starts. */
+								const char* const lbA_file = 0,					/**< Lower constraints' bound vector. */
+								const char* const ubA_file = 0,					/**< Upper constraints' bound vector. */
+								const char* const x0_file = 0,					/**< Optimal primal solution vector. */
+								const char* const y0_file = 0					/**< Optimal dual solution vector. */
+								);
+
+			/** TODO: Write description. */
 			virtual algorithmStatus getPrimalSolution(	double* const xOpt	/**< Output: Primal solution vector (if QP has been solved). */
 														) const;
 
-			/** Returns the dual solution vector of the LCQP (deep copy).
-			 *	\return SUCCESSFUL_RETURN \n
-						RET_QP_NOT_SOLVED */
+			/** TODO: Write description. */
 			virtual algorithmStatus getDualSolution(	double* const yOpt	/**< Output: Dual solution vector (if QP has been solved). */
 														) const;
 
-			/** Overrides current options with given ones.
-			 *	\return SUCCESSFUL_RETURN */
+			/** TODO: Write description. */
 			inline void setOptions(	const Options& _options	/**< New options. */
 									);
 
@@ -153,65 +150,13 @@ namespace lcqpOASES {
 		*	PROTECTED MEMBER FUNCTIONS
 		*/
 		protected:
-			/** Frees all allocated memory.
-			 *  \return SUCCESSFUL_RETURN */
+			/** TODO: Write description. */
 			returnValue clear( );
 
-			/** Copies all members from given rhs object.
-			 *  \return SUCCESSFUL_RETURN */
+
+			/** TODO: Write description. */
 			returnValue copy(	const LCQProblem& rhs	/**< Rhs object. */
 								);
-
-
-			/** Sets up dense internal QP data. If the current Hessian is trivial
-			 *  (i.e. HST_ZERO or HST_IDENTITY) but a non-trivial one is given,
-			 *  memory for Hessian is allocated and it is set to the given one.
-			 *	\return SUCCESSFUL_RETURN \n
-						RET_INVALID_ARGUMENTS \n
-						RET_UNKNONW_BUG */
-			returnValue setupLCQPdata(	const double* const _H, 		/**< Hessian matrix. \n
-																			If Hessian matrix is trivial,a NULL pointer can be passed. */
-										const double* const _g, 		/**< Gradient vector. */
-										const double* const _A,  		/**< Constraint matrix. */
-										const double* const _lb,		/**< Lower bound vector (on variables). \n
-																			If no lower bounds exist, a NULL pointer can be passed. */
-										const double* const _ub,		/**< Upper bound vector (on variables). \n
-																			If no upper bounds exist, a NULL pointer can be passed. */
-										const double* const _lbA,		/**< Lower constraints' bound vector. \n
-																			If no lower constraints' bounds exist, a NULL pointer can be passed. */
-										const double* const _ubA,		/**< Upper constraints' bound vector. \n
-																			If no lower constraints' bounds exist, a NULL pointer can be passed. */
-										const double* const _S1,      	/**< LHS of complementarity product. */
-										const double* const _S2,      	/**< RHS of complementarity product. */
-										const double* const _x0,		/**< Initial guess. */
-										const double* const _y0			/**< Initial dual guess. */
-										);
-
-			/** Sets up internal QP data by loading it from files. If the current Hessian
-			 *  is trivial (i.e. HST_ZERO or HST_IDENTITY) but a non-trivial one is given,
-			 *  memory for Hessian is allocated and it is set to the given one.
-			 *	\return SUCCESSFUL_RETURN \n
-						RET_UNABLE_TO_OPEN_FILE \n
-						RET_UNABLE_TO_READ_FILE \n
-						RET_INVALID_ARGUMENTS \n
-						RET_UNKNONW_BUG */
-			returnValue setupLCQPdata(	const char* const H_file, 			/**< Name of file where Hessian matrix, of neighbouring QP to be solved, is stored. \n
-																					If Hessian matrix is trivial,a NULL pointer can be passed. */
-										const char* const g_file, 			/**< Name of file where gradient, of neighbouring QP to be solved, is stored. */
-										const char* const A_file,			/**< Name of file where constraint matrix, of neighbouring QP to be solved, is stored. */
-										const char* const lb_file, 			/**< Name of file where lower bounds, of neighbouring QP to be solved, is stored. \n
-																					If no lower bounds exist, a NULL pointer can be passed. */
-										const char* const ub_file, 			/**< Name of file where upper bounds, of neighbouring QP to be solved, is stored. \n
-																					If no upper bounds exist, a NULL pointer can be passed. */
-										const char* const lbA_file, 		/**< Name of file where lower constraints' bounds, of neighbouring QP to be solved, is stored. \n
-																					If no lower constraints' bounds exist, a NULL pointer can be passed. */
-										const char* const ubA_file,			/**< Name of file where upper constraints' bounds, of neighbouring QP to be solved, is stored. \n
-																					If no upper constraints' bounds exist, a NULL pointer can be passed. */
-										const char* const S1_file,			/**< Name of file where LHS of complementarity product is stored. */
-										const char* const S2_file,			/**< Name of file where RHS of complementarity product is stored. */
-										const char* const x0_file,			/**< Name of file where initial guess is stored. */
-										const char* const y0_file			/**< Name of file where initial dual guess is stored. */
-										);
 
 			/** Prints concise information on the current iteration. */
 			void printIteration( );
@@ -223,48 +168,39 @@ namespace lcqpOASES {
 			void printLine();
 
 
-			/** Sets dense Hessian matrix of the QP.
-			 *  If a null pointer is passed and
-			 *  a) hessianType is HST_IDENTITY, nothing is done,
-			 *  b) hessianType is not HST_IDENTITY, Hessian matrix is set to zero.
-			 *	\return SUCCESSFUL_RETURN */
+			/** TODO: Write description. */
 			inline returnValue setH(	const double* const H_new	/**< New dense Hessian matrix (with correct dimension!), a shallow copy is made. */
 										);
 
-										/** Changes gradient vector of the QP.
-			 *	\return SUCCESSFUL_RETURN \n
-			*			RET_INVALID_ARGUMENTS */
+			inline returnValue setH(	double* H_data, 
+										int H_nnx,
+										int* H_i,
+										int* H_p 
+										);
+
+			/** TODO: Write description. */
 			inline returnValue setG(	const double* const g_new	/**< New gradient vector (with correct dimension!). */
 										);
 
-			/** Changes lower bound vector of the QP.
-			 *	\return SUCCESSFUL_RETURN \n
-			*			RET_QPOBJECT_NOT_SETUP */
+			/** TODO: Write description. */
 			inline returnValue setLB(	const double* const lb_new	/**< New lower bound vector (with correct dimension!). */
 										);
 
-			/** Changes single entry of lower bound vector of the QP.
-			 *	\return SUCCESSFUL_RETURN \n
-			*			RET_QPOBJECT_NOT_SETUP \n
-			*			RET_INDEX_OUT_OF_BOUNDS */
+			/** TODO: Write description. */
 			inline returnValue setLB(	int number,	/**< Number of entry to be changed. */
 										double value	/**< New value for entry of lower bound vector. */
 										);
 
-			/** Changes upper bound vector of the QP.
-			 *	\return SUCCESSFUL_RETURN \n
-			*			RET_QPOBJECT_NOT_SETUP */
+			/** TODO: Write description. */
 			inline returnValue setUB(	const double* const ub_new	/**< New upper bound vector (with correct dimension!). */
 										);
 
-			/** Changes single entry of upper bound vector of the QP.
-			 *	\return SUCCESSFUL_RETURN \n
-			*			RET_QPOBJECT_NOT_SETUP \n
-			*			RET_INDEX_OUT_OF_BOUNDS */
+			/** TODO: Write description. */
 			inline returnValue setUB(	int number,	/**< Number of entry to be changed. */
 										double value	/**< New value for entry of upper bound vector. */
 										);
 
+			/** TODO: Write description. */
 			inline returnValue setConstraints(  const double* const S1_new,		/**< New lhs complementarity matrix. */
 												const double* const S2_new,		/**< New rhs complementarity matrix. */
 												const double* const A_new,		/**< New constraint matrix. */
@@ -272,13 +208,45 @@ namespace lcqpOASES {
 												const double* const ubA			/**< New upper bounds for A. */
 												);
 
-			/** Sets complementarity matrix (requires S1 and S2 to be set). \n
-			 *	\return SUCCESSFUL_RETURN \n
-			*			RET_INVALID_ARGUMENTS */
+			/** TODO: Write description. */
+			inline returnValue setConstraints(  double* S1_data,		/**< New lhs complementarity matrix. */
+												int S1_nnx,
+												int* S1_i,
+												int* S1_p,
+												double* S2_data,		/**< New rhs complementarity matrix. */
+												int S2_nnx,
+												int* S2_i,
+												int* S2_p,
+												double* A_data,		/**< New constraint matrix. */
+												int A_nnx,
+												int* A_i,
+												int* A_p,
+												double* lbA,		/**< New lower bounds for A. */
+												double* ubA			/**< New upper bounds for A. */
+												);
+
+			/** TODO: Write description. */
 			returnValue setC( );
 
 			/** Sets the initial guess x0 and y0. */
 			inline returnValue setInitialGuess( const double* const _x0, const double* const _y0 );
+
+
+			/** TODO: Write description. */
+			inline returnValue setSparseMatrix(	const double* const _M_data,
+												const int _M_nnx,
+												const int* const _M_i,
+												const int* const _M_p,
+												qpOASES::SparseMatrix Mat
+												);
+
+			/** TODO: Write description. */
+			inline returnValue setSparseMatrix(	const double* const _M_data,
+												const int _M_nnx,
+												const int* const _M_i,
+												const int* const _M_p,
+												qpOASES::SymSparseMat Mat
+												);
 
 			/** Returns the NLP stationarity value. */
 			double* getPenaltyStationarity(	const double* const x_eval,
@@ -368,6 +336,14 @@ namespace lcqpOASES {
 
 			algorithmStatus algoStat;				/**< Status of algorithm. */
 
+			// Sparse matrices
+			qpOASES::SymSparseMat H_sparse;
+			qpOASES::SparseMatrix A_sparse;
+			qpOASES::SparseMatrix S1_sparse;
+			qpOASES::SparseMatrix S2_sparse;
+			qpOASES::SymSparseMat C_sparse;
+
+			// Subproblem solvers
 			QProblem qp;							/**< QP subproblem. */
 			qpOASES::HessianType hessianType; 		/**< Hessian type (get this from initial solve). */
 			long int qpIterk;						/**< Iterations taken by qpSolver to solve subproblem. */
