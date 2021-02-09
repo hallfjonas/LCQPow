@@ -438,9 +438,7 @@ namespace lcqpOASES {
 		S2_sparse = tmpS2;
 
 		qpOASES::SparseMatrix tmpS2(nComp, nV, S2_i, S2_p, S2_data);
-		S2_sparse = tmpS2;
-
-		
+		S2_sparse = tmpS2;		
 	}
 
 
