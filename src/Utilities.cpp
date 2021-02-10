@@ -307,11 +307,11 @@ namespace lcqpOASES {
                 break;
 
             case NOT_YET_IMPLEMENTED:
-                printf("This method has not yet been implemented.");
+                printf("This method has not yet been implemented.\n");
                 break;
 
             case LCQPOBJECT_NOT_SETUP:
-                printf("ERROR: The LCQP object has not been set up correctly.");
+                printf("ERROR: The LCQP object has not been set up correctly.\n");
                 break;
 
             case INDEX_OUT_OF_BOUNDS:
@@ -319,59 +319,59 @@ namespace lcqpOASES {
                 break;
 
             case SUBPROBLEM_SOLVER_ERROR:
-                printf("ERROR: The subproblem solver produced an error.");
+                printf("ERROR: The subproblem solver produced an error.\n");
                 break;
 
             case UNABLE_TO_READ_FILE:
-                printf("ERROR: Unable to read file.");
+                printf("ERROR: Unable to read file.\n");
                 break;
 
             case MAX_OUTER_ITERATIONS_REACHED:
-                printf("ERROR: Maximum number of outer iterations reached.");
+                printf("ERROR: Maximum number of outer iterations reached.\n");
                 break;
 
             case MAX_INNER_ITERATIONS_REACHED:
-                printf("ERROR: Maximum number of inner iterations reached.");
+                printf("ERROR: Maximum number of inner iterations reached.\n");
                 break;
 
             case INITIAL_SUBPROBLEM_FAILED:
-                printf("ERROR: Failed to solve initial QP.");
+                printf("ERROR: Failed to solve initial QP.\n");
                 break;
 
             case INVALID_ARGUMENT:
-                printf("ERROR: Invalid argument passed.");
+                printf("ERROR: Invalid argument passed.\n");
                 break;
 
             case INVALID_NUMBER_OF_OPTIM_VARS:
-                printf("ERROR: Invalid optimization variable dimension passed (required to be > 0).");
+                printf("ERROR: Invalid optimization variable dimension passed (required to be > 0).\n");
                 break;
 
             case INVALID_NUMBER_OF_COMP_VARS:
-                printf("ERROR: Invalid complementarity dimension passed (required to be > 0).");
+                printf("ERROR: Invalid complementarity dimension passed (required to be > 0).\n");
                 break;
 
             case INVALID_NUMBER_OF_CONSTRAINT_VARS:
-                printf("ERROR: Invalid number of optimization variables passed (required to be >= 0).");
+                printf("ERROR: Invalid number of optimization variables passed (required to be >= 0).\n");
                 break;
 
             case INVALID_COMPLEMENTARITY_TOLERANCE:
-                printf("ERROR: Invalid argument passed (complementarity tolerance).");
+                printf("ERROR: Invalid argument passed (complementarity tolerance).\n");
                 break;
 
             case INVALID_INITIAL_PENALTY_VALUE:
-                printf("ERROR: Invalid argument passed (initial penalty value).");
+                printf("ERROR: Invalid argument passed (initial penalty value).\n");
                 break;
 
             case INVALID_PENALTY_UPDATE_VALUE:
-                printf("ERROR: Invalid argument passed (penalty update value).");
+                printf("ERROR: Invalid argument passed (penalty update value).\n");
                 break;
 
             case INVALID_MAX_OUTER_ITERATIONS_VALUE:
-                printf("ERROR: Invalid argument passed (maximum outer iterations).");
+                printf("ERROR: Invalid argument passed (maximum outer iterations).\n");
                 break;
 
             case INVALID_MAX_INNER_ITERATIONS_VALUE:
-                printf("ERROR: Invalid argument passed (maximum inner iterations).");
+                printf("ERROR: Invalid argument passed (maximum inner iterations).\n");
                 break;
         }
 
@@ -385,7 +385,7 @@ namespace lcqpOASES {
 
         switch (algoStat) {
             case PROBLEM_NOT_SOLVED:
-                printf("The LCQP has not been solved.");
+                printf("The LCQP has not been solved.\n");
                 break;
 
             case W_STATIONARY_SOLUTION:
