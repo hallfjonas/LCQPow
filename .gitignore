@@ -23,6 +23,7 @@
 build
 src/qpOASES
 debug
+examples/example_data/ivocp
 
 ### C ###
 # Prerequisites
