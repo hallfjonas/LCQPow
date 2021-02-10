@@ -6,7 +6,8 @@
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/include/**",
                 "/usr/local/qpOASES/include/**",
-                "/usr/local/casadi/**"
+                "/usr/local/casadi/**",
+                "/usr/local/include/**"
             ],
             "defines": [],
             "cStandard": "gnu11",
