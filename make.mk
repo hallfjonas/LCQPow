@@ -29,7 +29,11 @@
 QPOASES_IDIR   = /usr/local/qpOASES/include
 QPOASES_LINK   = -lqpOASES 
 
-# 2) CasADi
+# 2) OSQP
+OSQP_IDIR   = /usr/local/include/osqp
+OSQP_LINK   = -losqp
+
+# 3) CasADi
 CASADI_IDIR   = /usr/local/casadi
 CASADI_LIB_DIR = /usr/local/casadi/build/lib
 CASADI_LINK = -lcasadi

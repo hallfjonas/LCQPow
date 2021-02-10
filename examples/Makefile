@@ -27,10 +27,11 @@ include ../make.mk
 
 IFLAGS      =  -I. \
                -I${IDIR} \
-			   -I${QPOASES_IDIR}
+			   -I${QPOASES_IDIR}\
+			   -I${OSQP_IDIR}
 
 
-LFLAGS 		= ${QPOASES_LINK}
+LFLAGS 		= ${QPOASES_LINK} ${OSQP_LINK}
 
 DEBUGFLAGS = -g -D__USE_LONG_INTEGERS__ -Wall -pedantic -Wshadow -Wfloat-equal
 

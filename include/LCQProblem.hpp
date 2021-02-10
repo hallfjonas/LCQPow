@@ -23,8 +23,10 @@
 #ifndef LCQPOASES_LCQPROBLEM_HPP
 #define LCQPOASES_LCQPROBLEM_HPP
 
-#include <qpOASES.hpp>
 #include <Utilities.hpp>
+#include <Subsolver.hpp>
+
+#include <qpOASES.hpp>
 #include <vector>
 
 using qpOASES::QProblem;
@@ -36,6 +38,9 @@ namespace lcqpOASES {
 		*	PUBLIC MEMBER FUNCTIONS
 		*/
 		public:
+			/** Default constructor. */
+			LCQProblem( );
+
 			/** TODO: Write description. */
 			LCQProblem(	int _nV,	  							/**< Number of variables. */
 						int _nC,		  						/**< Number of constraints. */
@@ -201,29 +206,29 @@ namespace lcqpOASES {
 										);
 
 			/** TODO: Write description. */
-			inline returnValue setConstraints(  const double* const S1_new,		/**< New lhs complementarity matrix. */
-												const double* const S2_new,		/**< New rhs complementarity matrix. */
-												const double* const A_new,		/**< New constraint matrix. */
-												const double* const lbA,		/**< New lower bounds for A. */
-												const double* const ubA			/**< New upper bounds for A. */
-												);
+			returnValue setConstraints( const double* const S1_new,		/**< New lhs complementarity matrix. */
+										const double* const S2_new,		/**< New rhs complementarity matrix. */
+										const double* const A_new,		/**< New constraint matrix. */
+										const double* const lbA,		/**< New lower bounds for A. */
+										const double* const ubA			/**< New upper bounds for A. */
+										);
 
 			/** TODO: Write description. */
-			inline returnValue setConstraints(  double* S1_data,		/**< New lhs complementarity matrix. */
-												int S1_nnx,
-												int* S1_i,
-												int* S1_p,
-												double* S2_data,		/**< New rhs complementarity matrix. */
-												int S2_nnx,
-												int* S2_i,
-												int* S2_p,
-												double* A_data,		/**< New constraint matrix. */
-												int A_nnx,
-												int* A_i,
-												int* A_p,
-												double* lbA,		/**< New lower bounds for A. */
-												double* ubA			/**< New upper bounds for A. */
-												);
+			returnValue setConstraints(	double* S1_data,		/**< New lhs complementarity matrix. */
+										int S1_nnx,
+										int* S1_i,
+										int* S1_p,
+										double* S2_data,		/**< New rhs complementarity matrix. */
+										int S2_nnx,
+										int* S2_i,
+										int* S2_p,
+										double* A_data,		/**< New constraint matrix. */
+										int A_nnx,
+										int* A_i,
+										int* A_p,
+										double* lbA,		/**< New lower bounds for A. */
+										double* ubA			/**< New upper bounds for A. */
+										);
 
 			/** TODO: Write description. */
 			returnValue setC( );
@@ -323,6 +328,7 @@ namespace lcqpOASES {
 
 			double* xk;								/**< Current primal iterate. */
 			double* yk;								/**< Current dual vector. */
+			double* yk_A;							/**< Current dual vector w.r.t A. */
 			double* xnew;							/**< Current qpSubproblem solution. */
 			double* pk;								/**< xnew - xk. */
 
@@ -334,19 +340,17 @@ namespace lcqpOASES {
 			int outerIter;							/**< Outer iterate. */
 			int innerIter;							/**< Inner iterate- */
 
+			int qpIterk;						/**< Iterations taken by qpSolver to solve subproblem. */
+
 			algorithmStatus algoStat;				/**< Status of algorithm. */
 
 			// Sparse matrices
-			qpOASES::SymSparseMat H_sparse;
-			qpOASES::SparseMatrix A_sparse;
-			qpOASES::SparseMatrix S1_sparse;
-			qpOASES::SparseMatrix S2_sparse;
-			qpOASES::SymSparseMat C_sparse;
-
+			csc* H_sparse;
+			csc* A_sparse;
+			
 			// Subproblem solvers
-			QProblem qp;							/**< QP subproblem. */
-			qpOASES::HessianType hessianType; 		/**< Hessian type (get this from initial solve). */
-			long int qpIterk;						/**< Iterations taken by qpSolver to solve subproblem. */
+            Subsolver subsolver;
+
 	};
 }
 

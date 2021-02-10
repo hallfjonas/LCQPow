@@ -30,11 +30,16 @@ include ../make.mk
 IFLAGS      =  -I. \
                -I${IDIR} \
 			   -I${QPOASES_IDIR} \
-			   -I${CASADI_IDIR}
+			   -I${CASADI_IDIR} \
+			   -I${OSQP_IDIR}
 
 LCQPOASES_OBJECTS = \
 	LCQProblem.${OBJEXT} \
-	Utilities.${OBJEXT}
+	Utilities.${OBJEXT} \
+	Subsolver.${OBJEXT} \
+	SubsolverOSQP.${OBJEXT} \
+	SubsolverQPOASES.${OBJEXT} \
+	SubsolverBase.${OBJEXT}
 
 ##
 ##	targets

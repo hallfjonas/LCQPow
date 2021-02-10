@@ -20,8 +20,11 @@
  */
 
 
-#include "LCQProblem.hpp"
-#include "Utilities.hpp"
+#include <LCQProblem.hpp>
+#include <Utilities.hpp>
+#include <SubsolverQPOASES.hpp>
+#include <SubsolverOSQP.hpp>
+
 #include <iostream>
 #include <string>
 #include <math.h>
@@ -34,6 +37,8 @@ namespace lcqpOASES {
 	/*****************************************************************************
 	 *  P U B L I C                                                              *
 	 *****************************************************************************/
+
+	LCQProblem::LCQProblem( ) { }
 
 	/*
 	*	Q P r o b l e m
@@ -63,19 +68,17 @@ namespace lcqpOASES {
 		nV = _nV;
 		nC = _nC;
 		nComp = _nComp;
-
-		QProblem lp(nV, nC, qpOASES::HessianType::HST_POSDEF);
-		qp = lp;
 	}
 
 
 	/*
 	*	s o l v e
 	*/
-	returnValue LCQProblem::solve(	const double* const _H, const double* const _g, const double* const _A,
+	returnValue LCQProblem::solve(	const double* const _H, const double* const _g,
 									const double* const _lb, const double* const _ub,
-									const double* const _lbA, const double* const _ubA,
-									const double* const _S1, const double* const _S2, const double* const _x0, const double* const _y0
+									const double* const _S1, const double* const _S2,
+									 const double* const _A, const double* const _lbA, const double* const _ubA,
+									const double* const _x0, const double* const _y0
 									)
 	{
 		returnValue ret;
@@ -110,6 +113,10 @@ namespace lcqpOASES {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
+		// USe qpOASES in dense formulations
+		Subsolver tmp( nV, nC + 2*nComp, H, A );
+		subsolver = tmp;
+
 		return MessageHandler::PrintMessage( runSolver( ) );
 	}
 
@@ -129,42 +136,42 @@ namespace lcqpOASES {
 		double* _H = new double[nV*nV];
 		ret = Utilities::readFromFile( _H, nV*nV, H_file );
 		if ( ret != SUCCESSFUL_RETURN ) {
-			delete _H;
+			delete[] _H;
 			return MessageHandler::PrintMessage( ret );
 		}
 
 		double* _g = new double[nV];
 		ret = Utilities::readFromFile( _g, nV, g_file );
 		if ( ret != SUCCESSFUL_RETURN ) {
-			delete _g;
+			delete[] _g;
 			return MessageHandler::PrintMessage( ret );
 		}
 
 		double* _lb = new double[nV];
 		ret = Utilities::readFromFile( _lb, nV, lb_file );
 		if ( ret != SUCCESSFUL_RETURN ) {
-			delete _lb;
+			delete[] _lb;
 			return MessageHandler::PrintMessage( ret );
 		}
 
 		double* _ub = new double[nV];
 		ret = Utilities::readFromFile( _ub, nV, ub_file );
 		if ( ret != SUCCESSFUL_RETURN ) {
-			delete _ub;
+			delete[] _ub;
 			return MessageHandler::PrintMessage( ret );
 		}
 
 		double* _S1 = new double[nComp*nV];
 		ret = Utilities::readFromFile( _S1, nComp*nV, S1_file );
 		if ( ret != SUCCESSFUL_RETURN ) {
-			delete _S1;
+			delete[] _S1;
 			return MessageHandler::PrintMessage( ret );
 		}
 
 		double* _S2 = new double[nComp*nV];
 		ret = Utilities::readFromFile( _S2, nComp*nV, S2_file );
 		if ( ret != SUCCESSFUL_RETURN ) {
-			delete _S2;
+			delete[] _S2;
 			return MessageHandler::PrintMessage( ret );
 		}
 
@@ -173,7 +180,7 @@ namespace lcqpOASES {
 			_A = new double[nC*nV];
 			ret = Utilities::readFromFile( _A, nC*nV, A_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
-				delete _A;
+				delete[] _A;
 				return MessageHandler::PrintMessage( ret );
 			}
 		}
@@ -183,7 +190,7 @@ namespace lcqpOASES {
 			_lbA = new double[nC];
 			ret = Utilities::readFromFile( _lbA, nC, lbA_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
-				delete _lbA;
+				delete[] _lbA;
 				return MessageHandler::PrintMessage( ret );
 			}
 		}
@@ -193,7 +200,7 @@ namespace lcqpOASES {
 			_ubA = new double[nC];
 			ret = Utilities::readFromFile( _ubA, nC, ubA_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
-				delete _ubA;
+				delete[] _ubA;
 				return MessageHandler::PrintMessage( ret );
 			}
 		}
@@ -203,7 +210,7 @@ namespace lcqpOASES {
 			_x0 = new double[nC + 2*nComp];
 			ret = Utilities::readFromFile( _x0, nC + 2*nComp, x0_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
-				delete _S1;
+				delete[] _S1;
 				return MessageHandler::PrintMessage( ret );
 			}
 		}
@@ -213,7 +220,7 @@ namespace lcqpOASES {
 			_y0 = new double[nC + 2*nComp];
 			ret = Utilities::readFromFile( _y0, nC + 2*nComp, y0_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
-				delete _S2;
+				delete[] _S2;
 				return MessageHandler::PrintMessage( ret );
 			}
 		}
@@ -248,6 +255,9 @@ namespace lcqpOASES {
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
+
+		// USe qpOASES in dense formulations
+		subsolver = Subsolver( nV, nC + 2*nComp, H, A );
 
 		// Call solver
 		return MessageHandler::PrintMessage( runSolver( ) );
@@ -287,8 +297,8 @@ namespace lcqpOASES {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
-		ret = setConstraints( _S1_data, _S1_nnx, _S1_i, _S1_p, _S2_data, _S2_nnx, _S2_i, _S2_p, _A_data, _A_nnx, _A_i, _A_p, _lbA, _ubA );
-
+		setConstraints( _S1_data, _S1_nnx, _S1_i, _S1_p, _S2_data, _S2_nnx, _S2_i, _S2_p, _A_data, _A_nnx, _A_i, _A_p, _lbA, _ubA );
+		
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
@@ -297,6 +307,9 @@ namespace lcqpOASES {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
+		// USe OSQP in sparse formulations
+		subsolver = Subsolver(nV, nC + 2*nComp, H_sparse, A_sparse);
+		
 		return MessageHandler::PrintMessage( runSolver( ) );
 
 	}
@@ -379,17 +392,17 @@ namespace lcqpOASES {
 	/*
 	 *	 s e t C o n s t r a i n t s
 	 */
-	returnValue LCQProblem::setConstraints( double* S1_data, int S1_nnx, int* S1_i, int* S1_p,
+	returnValue LCQProblem::setConstraints(	double* S1_data, int S1_nnx, int* S1_i, int* S1_p,
 											double* S2_data, int S2_nnx, int* S2_i, int* S2_p, 
 											double* A_data, int A_nnx, int* A_i, int* A_p,
-											double* lbA, double* ubA
+											double* lbA_new, double* ubA_new
 											)
 	{
 
 		int tmpA_nnx = A_nnx + S1_nnx + S2_nnx;
 		double* tmpA_data = new double[tmpA_nnx];
-		int* tmpA_i = new int[tmpA_nnx];
-		int* tmpA_p = new int[nV+1];
+		c_int* tmpA_i = new c_int[tmpA_nnx];
+		c_int* tmpA_p = new c_int[nV+1];
 
 		int index_data = 0;
 
@@ -422,6 +435,43 @@ namespace lcqpOASES {
 		// End index of column
 		tmpA_p[nV] = S2_p[nV] + nC + nComp;
 		
+		A_sparse = csc_matrix(nC + 2*nComp, nV, tmpA_nnx, tmpA_data, tmpA_i, tmpA_p);
+
+		// Set up new constraint bounds (lbA; 0; 0) & (ubA; INFINITY; INFINITY)
+		lbA = new double[nC + 2*nComp];
+		ubA = new double[nC + 2*nComp];
+
+		if ( lbA_new != 0 )
+		{
+			for (int i = 0; i < nC; i++)
+				lbA[i] = lbA_new[i];
+		}
+		else
+		{
+			for (int i = 0; i < nC; i++)
+				lbA[i] = -INFINITY;
+		}
+
+		if ( ubA_new != 0 )
+		{
+			for (int i = 0; i < nC; i++)
+				ubA[i] = ubA_new[i];
+		}
+		else
+		{
+			for (int i = 0; i < nC; i++)
+				ubA[i] = INFINITY;
+		}
+
+		for (int i = 0; i < 2*nComp; i++) {
+			lbA[i + nC] = 0;
+			ubA[i + nC] = INFINITY;
+		}
+
+		return returnValue::NOT_YET_IMPLEMENTED;
+
+
+		/* TODO: SET C
 		qpOASES::SparseMatrix tmpA(nC + 2*nComp, nV, tmpA_i, tmpA_p, tmpA_data);
 		A_sparse = tmpA;
 
@@ -432,13 +482,15 @@ namespace lcqpOASES {
 		S2_sparse = tmpS2;
 
 		qpOASES::SymSparseMat tmpC1;
-		// S1_sparse.transTimes(nV, 1, S2, nComp, 0,
+		// TODO: Create these products
+		// S1_sparse.transTimes(nV, 1, S2_sparse.full(), nComp, 0,
 
 		// qpOASES::SparseMatrix tmpS2(nComp, nV, S2_i, S2_p, S2_data);
 		S2_sparse = tmpS2;
 
 		qpOASES::SparseMatrix tmpS2(nComp, nV, S2_i, S2_p, S2_data);
 		S2_sparse = tmpS2;		
+		*/
 	}
 
 
@@ -450,22 +502,24 @@ namespace lcqpOASES {
 		if (nV <= 0)
 			return LCQPOBJECT_NOT_SETUP;
 
-		qpOASES::SymSparseMat tmp(nV, nV, H_i, H_p, H_data);
-		H_sparse = tmp;
+		H_sparse = csc_matrix(nV, nV, H_nnx, H_data, H_i, H_p);
+		
+		return returnValue::SUCCESSFUL_RETURN;
 	}
 
 
 	/*
 	 *	 r u n S o l v e r
 	 */
-	returnValue LCQProblem::runSolver( ) {
+	returnValue LCQProblem::runSolver( ) 
+	{
 
 		// Initialize variables
 		initializeSolver();
 
 		// Initialization strategy
 		if (options.solveZeroPenaltyFirst) {
-			memcpy(gk, g, (uint)nV*sizeof(double));
+			memcpy(gk, g, nV*sizeof(double));
 
 			if (solveQPSubproblem( true ) != SUCCESSFUL_RETURN) {
 				return INITIAL_SUBPROBLEM_FAILED;
@@ -536,10 +590,12 @@ namespace lcqpOASES {
 		}
 	}
 
+
 	/*
 	 *	 i n i t i a l i z e S o l v e r
 	 */
-	void LCQProblem::initializeSolver( ) {
+	void LCQProblem::initializeSolver( ) 
+	{
 		// Allocate vectors
 		Qk = new double[nV*nV];
 		gk = new double[nV];
@@ -553,43 +609,31 @@ namespace lcqpOASES {
 		outerIter = 0;
 		innerIter = 0;
 		algoStat = algorithmStatus::PROBLEM_NOT_SOLVED;
+		yk = new double[nV + nC + 2*nComp];
+		yk_A = new double[nC + 2*nComp];
 
-		// Silent the subproblem solver
-		qpOASES::Options qpOpts;
-		if (options.printLvl < printLevel::VERBOSE)
-			qpOpts.printLevel =  qpOASES::PrintLevel::PL_NONE;
-		qp.setOptions( qpOpts );
+		// Initialize subproblem solver
+		subsolver.setOptions( options.printLvl );
 	}
 
 
 	/*
 	 *	 s o l v e Q P S u b p r o b l e m
 	 */
-	returnValue LCQProblem::solveQPSubproblem(bool initialSolve) {
-		// For now, only implementing for qpOASES solver
-		qpOASES::returnValue ret;
-		qpOASES::int_t nwsr = 10000;
+	returnValue LCQProblem::solveQPSubproblem(bool initialSolve) 
+	{
+		returnValue ret = subsolver.solve( initialSolve, qpIterk, gk, lb, ub, lbA, ubA );
 
-		if (initialSolve) {
-			ret = qp.init(H, g, A, lb, ub, lbA, ubA, nwsr, (double*)0, xk, yk);
-
-			if (yk == 0)
-				yk = new double[nV + nC + 2*nComp];
-
-			hessianType = qp.getHessianType();
-		} else {
-			qp.setHessianType(hessianType);
-
-			ret = qp.hotstart(gk, lb, ub, lbA, ubA, nwsr);
-		}
-
-		if (ret != qpOASES::SUCCESSFUL_RETURN)
-			return SUBPROBLEM_SOLVER_ERROR;
+		if (ret != SUCCESSFUL_RETURN)
+			return ret;
 
 		// Update xnew, yk
-		qp.getPrimalSolution(xnew);
-		qp.getDualSolution(yk);
-		qpIterk = nwsr;
+		subsolver.getPrimalSolution(xnew);
+		subsolver.getDualSolution(yk);
+
+		// Update yk_A
+		for (int i = 0; i < nC + 2*nComp; i++)
+			yk_A[i] = yk[nV + i];
 
 		// Update pk
 		Utilities::WeightedVectorAdd(1, xnew, -1, xk, pk, nV);
@@ -684,7 +728,7 @@ namespace lcqpOASES {
 
 		// 2) Constraint contribution: A*yk
 		double* constr_stat = new double[nV];
-		Utilities::MatrixMultiplication(A, yk, constr_stat, nV, nC + 2*nComp, 1);
+		Utilities::MatrixMultiplication(A, yk_A, constr_stat, nV, nC + 2*nComp, 1);
 
 		// 1) - 2)
 		Utilities::WeightedVectorAdd(1, statk, -1, constr_stat, statk, nV);
@@ -777,7 +821,8 @@ namespace lcqpOASES {
 	/*
 	 *	 g e t W e a k C o m p l e m e n t a r i t i e s
 	 */
-	std::vector<int> LCQProblem::getWeakComplementarities( ) {
+	std::vector<int> LCQProblem::getWeakComplementarities( ) 
+	{
 		double* S1x = new double[nComp];
 		double* S2x = new double[nComp];
 
@@ -855,7 +900,7 @@ namespace lcqpOASES {
 
 		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES) {
 			printf("%s%10.3g", sep, alphak);
-			printf("%s%6ld", sep, qpIterk);
+			printf("%s%6d", sep, qpIterk);
 		}
 
 		printf(" \n");

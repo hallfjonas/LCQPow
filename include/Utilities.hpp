@@ -65,11 +65,7 @@ namespace lcqpOASES {
         NONE = 0,                                   /**< No Output. */
         OUTER_LOOP_ITERATES = 1,                    /**< Print stats for each outer loop iterate. */
         INNER_LOOP_ITERATES = 2,                    /**< Print stats for each inner loop iterate. */
-        VERBOSE = 3                                 /**< Print stats for each inner loop (and possibly output of subproblem solver). */
-    };
-
-    enum qpSubproblemSolver {
-        QPOASES = 0                                 /**< qpOASES. */
+        SUBPROBLEM_SOLVER_ITERATES = 3              /**< Print stats for each inner loop (and possibly output of subproblem solver). */
     };
 
     class Options {
@@ -102,7 +98,6 @@ namespace lcqpOASES {
             int maxOuterIterations;                 /**< Maximum number of outer iterations to be performed. */
             int maxInnerIterations;                 /**< Maximum number of inner iterations to be performed. */
 
-            qpSubproblemSolver qpSubSolver;         /**< Inidicating which qpSolver to use. */
             printLevel printLvl;                    /**< Print level. */
 
         protected:
