@@ -29,7 +29,7 @@ AUX_SOURCE_DIRECTORY(src SRC_FILES)
 
 add_compile_options(-Wall -pedantic -Wshadow -Wfloat-equal -O3 -Wconversion -Wsign-conversion -fPIC -DLINUX -D__USE_LONG_INTEGERS__ -D__USE_LONG_FINTS__)
 
-include_directories(/usr/local/include/osqp include /usr/local/qpOASES/include) # this is so we can #include <gtest/gtest.h>
+include_directories(SYSTEM /usr/local/include/osqp include /usr/local/qpOASES/include) # this is so we can #include <gtest/gtest.h>
 
 add_executable(TestUtils UnitTesting/TestUtils.cpp ${SRC_FILES}) # add this executable
 
