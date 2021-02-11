@@ -68,6 +68,7 @@ namespace lcqpOASES {
         SUBPROBLEM_SOLVER_ITERATES = 3              /**< Print stats for each inner loop (and possibly output of subproblem solver). */
     };
 
+
     class Options {
 
         public:
