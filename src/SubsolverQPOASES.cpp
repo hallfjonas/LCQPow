@@ -50,8 +50,8 @@ namespace lcqpOASES {
         H = new double[nV*nV];
         A = new double[nC*nV];
 
-        memcpy(H, _H, nV*nV*sizeof(double));
-        memcpy(A, _A, nC*nV*sizeof(double));        
+        memcpy(H, _H, (long unsigned int)(nV*nV)*sizeof(double));
+        memcpy(A, _A, (long unsigned int)(nC*nV)*sizeof(double));        
     }
 
     /*
@@ -103,13 +103,12 @@ namespace lcqpOASES {
             ret = qp.hotstart(g, lb, ub, lbA, ubA, nwsr);
         }
 
-        iterations = nwsr;
+        iterations = (int)(nwsr);
 
         if (ret != qpOASES::returnValue::SUCCESSFUL_RETURN)
             return returnValue::SUBPROBLEM_SOLVER_ERROR;
 
         return returnValue::SUCCESSFUL_RETURN;
-        
     }
 
 
