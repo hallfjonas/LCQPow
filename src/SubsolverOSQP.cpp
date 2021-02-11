@@ -56,7 +56,7 @@ namespace lcqpOASES {
         }
 
         // Setup workspace
-        work = osqp_setup(data, settings);
+        osqp_setup(&work, data, settings);
     }
 
     /*

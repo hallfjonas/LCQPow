@@ -401,22 +401,27 @@ namespace lcqpOASES {
 
 		int tmpA_nnx = A_nnx + S1_nnx + S2_nnx;
 		double* tmpA_data = new double[tmpA_nnx];
-		c_int* tmpA_i = new c_int[tmpA_nnx];
-		c_int* tmpA_p = new c_int[nV+1];
+		int* tmpA_i = new int[tmpA_nnx];
+		int* tmpA_p = new int[nV+1];
 
 		int index_data = 0;
 
 		// Iterate over columns
 		for (int i = 0; i < nV; i++) {
-			// Start index of column
-			tmpA_p[i] = A_p[i];
 
-			// First handle rows of A
-			for (int j = A_p[i]; j < A_p[i+1]; j++) {
-				tmpA_data[index_data] = A_data[A_p[i]+j];
-				tmpA_i[index_data] = A_i[A_p[i]+j];
-				index_data++;
-			}
+			if (A_p != 0) {
+				// Start index of column
+				tmpA_p[i] = A_p[i];
+
+				// First handle rows of A
+				for (int j = A_p[i]; j < A_p[i+1]; j++) {
+					tmpA_data[index_data] = A_data[A_p[i]+j];
+					tmpA_i[index_data] = A_i[A_p[i]+j];
+					index_data++;
+				}
+			} else {
+				tmpA_p[i] = S1_p[i];
+			}			
 
 			// Then rows of S1
 			for (int j = S1_p[i]; j < S1_p[i+1]; j++) {
@@ -434,7 +439,7 @@ namespace lcqpOASES {
 
 		// End index of column
 		tmpA_p[nV] = S2_p[nV] + nC + nComp;
-		
+
 		A_sparse = csc_matrix(nC + 2*nComp, nV, tmpA_nnx, tmpA_data, tmpA_i, tmpA_p);
 
 		// Set up new constraint bounds (lbA; 0; 0) & (ubA; INFINITY; INFINITY)
@@ -466,31 +471,29 @@ namespace lcqpOASES {
 		for (int i = 0; i < 2*nComp; i++) {
 			lbA[i + nC] = 0;
 			ubA[i + nC] = INFINITY;
+		}		
+
+		// For now store S1, S2, and C in dense format.
+		// If we can manage to adapt all operations required for C (specifically S1'*S2 + S2'*S1 = C) 
+		// we should instantly switch to sparse format!
+		S1 = new double[nComp*nV]();
+		for (int j = 0; j < nV; j++) {
+			for (int i = 0; i < S1_p[j+1] - S1_p[j]; i++) {
+				S1[(S1_p[j]+i)*nV + j] = S1_data[S1_p[j]+i];
+			}
 		}
 
-		return returnValue::NOT_YET_IMPLEMENTED;
+		S2 = new double[nComp*nV]();		
+		for (int j = 0; j < nV; j++) {
+			for (int i = 0; i < S2_p[j+1] - S2_p[j]; i++) {
+				S2[(S2_p[j]+i)*nV + j] = S2_data[S2_p[j]+i];
+			}
+		}		
 
+		C = new double[nV*nV];
+		Utilities::MatrixSymmetrizationProduct(S1, S2, C, nComp, nV);
 
-		/* TODO: SET C
-		qpOASES::SparseMatrix tmpA(nC + 2*nComp, nV, tmpA_i, tmpA_p, tmpA_data);
-		A_sparse = tmpA;
-
-		qpOASES::SparseMatrix tmpS1(nComp, nV, S1_i, S1_p, S1_data);
-		S1_sparse = tmpS1;
-
-		qpOASES::SparseMatrix tmpS2(nComp, nV, S2_i, S2_p, S2_data);
-		S2_sparse = tmpS2;
-
-		qpOASES::SymSparseMat tmpC1;
-		// TODO: Create these products
-		// S1_sparse.transTimes(nV, 1, S2_sparse.full(), nComp, 0,
-
-		// qpOASES::SparseMatrix tmpS2(nComp, nV, S2_i, S2_p, S2_data);
-		S2_sparse = tmpS2;
-
-		qpOASES::SparseMatrix tmpS2(nComp, nV, S2_i, S2_p, S2_data);
-		S2_sparse = tmpS2;		
-		*/
+		return SUCCESSFUL_RETURN;
 	}
 
 
@@ -502,7 +505,21 @@ namespace lcqpOASES {
 		if (nV <= 0)
 			return LCQPOBJECT_NOT_SETUP;
 
-		H_sparse = csc_matrix(nV, nV, H_nnx, H_data, H_i, H_p);
+		c_int _nV = nV;
+
+		csc* tmp1 = csc_spalloc(nV, nV, H_nnx, 1, 1);
+		csc* tmp2 = csc_spalloc(nV, nV, H_nnx, 0, 1);
+		csc* tmp3 = csc_spalloc(nV, nV, H_nnx, 1, 0);
+		csc* tmp4 = csc_spalloc(nV, nV, H_nnx, 0, 0);
+
+
+		H_sparse = csc_spalloc(nV, nV, H_nnx, 1, 1);
+		H_sparse = csc_matrix(_nV, _nV, H_nnx, H_data, H_i, H_p);
+
+		double* full = new double[nV*nV]();
+
+		// TODO: What about this?
+		// full = csc_to_dns(H_sparse);
 		
 		return returnValue::SUCCESSFUL_RETURN;
 	}
@@ -519,7 +536,7 @@ namespace lcqpOASES {
 
 		// Initialization strategy
 		if (options.solveZeroPenaltyFirst) {
-			memcpy(gk, g, nV*sizeof(double));
+			memcpy(gk, g, (long unsigned int)nV*sizeof(double));
 
 			if (solveQPSubproblem( true ) != SUCCESSFUL_RETURN) {
 				return INITIAL_SUBPROBLEM_FAILED;

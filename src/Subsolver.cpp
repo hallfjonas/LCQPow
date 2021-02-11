@@ -125,14 +125,14 @@ namespace lcqpOASES {
                                     double* lb, double* ub,
                                     double* lbA, double* ubA ) 
     {
-        returnValue ret;
+        returnValue ret = returnValue::SUCCESSFUL_RETURN;
         switch (qpSolver) {
             case QPSubproblemSolver::QPOASES:
                 ret = subQPOASES.solve( initialSolve, iterations, g, lb, ub, lbA, ubA );
                 break;
             
             case QPSubproblemSolver::OSQP:
-                ret = subQPOASES.solve( initialSolve, iterations, g, lb, ub, lbA, ubA );
+                ret = subOSQP.solve( initialSolve, iterations, g, lb, ub, lbA, ubA );
                 break;
         }
 
