@@ -23,7 +23,7 @@
 #include "osqp.h"
 
 namespace lcqpOASES {
-    
+
     /*
      *   S u b s o l v e r O S Q P
      */
@@ -62,7 +62,7 @@ namespace lcqpOASES {
     /*
      *   S u b s o l v e r O  S Q P
      */
-    SubsolverOSQP::SubsolverOSQP(const SubsolverOSQP& rhs) 
+    SubsolverOSQP::SubsolverOSQP(const SubsolverOSQP& rhs)
     {
         copy( rhs );
     }
@@ -71,7 +71,7 @@ namespace lcqpOASES {
     /*
      *   o p e r a t o r =
      */
-    SubsolverOSQP& SubsolverOSQP::operator=(const SubsolverOSQP& rhs) 
+    SubsolverOSQP& SubsolverOSQP::operator=(const SubsolverOSQP& rhs)
     {
         if (this != &rhs) {
             copy( rhs );
@@ -84,7 +84,7 @@ namespace lcqpOASES {
     /*
      *   s e t O p t i o n s
      */
-    void SubsolverOSQP::setOptions( OSQPSettings* _settings ) 
+    void SubsolverOSQP::setOptions( OSQPSettings* _settings )
     {
         settings = _settings;
     }
@@ -96,7 +96,8 @@ namespace lcqpOASES {
     returnValue SubsolverOSQP::solve(   bool initialSolve, int& iterations,
                                         double* _g,
                                         double* _lb, double* _ub,
-                                        double* _lbA, double* _ubA )
+                                        double* _lbA, double* _ubA,
+                                        double* x0, double* y0 )
     {
         // Update linear cost and bounds
         osqp_update_lin_cost(work, _g);
@@ -126,14 +127,14 @@ namespace lcqpOASES {
     /*
      *   g e t D u a l S o l u t i o n
      */
-    void SubsolverOSQP::getDualSolution( double* y ) 
+    void SubsolverOSQP::getDualSolution( double* y )
     {
         throw( MessageHandler::PrintMessage( returnValue::NOT_YET_IMPLEMENTED ));
     }
 
 
     /*
-     *   c o p y 
+     *   c o p y
      */
     void SubsolverOSQP::copy(const SubsolverOSQP& rhs)
     {

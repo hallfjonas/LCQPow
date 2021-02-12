@@ -30,30 +30,30 @@ namespace lcqpOASES {
      *   S u b s o l v e r (QPOASES)
      */
     Subsolver::Subsolver(   int nV, int nC,
-                            double* H, double* A ) 
+                            double* H, double* A )
     {
         qpSolver = QPSubproblemSolver::QPOASES;
-        subQPOASES = SubsolverQPOASES(nV, nC, H, A);
+        solverQPOASES = SubsolverQPOASES(nV, nC, H, A);
     }
 
     /*
      *   S u b s o l v e r (OSQP)
      */
     Subsolver::Subsolver(   int nV, int nC,
-                            csc* H, csc* A ) 
+                            csc* H, csc* A )
     {
         qpSolver = QPSubproblemSolver::OSQP;
-        subOSQP = SubsolverOSQP(nV, nC, H, A);
+        solverOSQP = SubsolverOSQP(nV, nC, H, A);
     }
 
     /** Copy constructor. */
-    Subsolver::Subsolver(const Subsolver& rhs) 
+    Subsolver::Subsolver(const Subsolver& rhs)
     {
         copy( rhs );
     }
 
     /** Assignment operator (deep copy). */
-    Subsolver& Subsolver::operator=(const Subsolver& rhs) 
+    Subsolver& Subsolver::operator=(const Subsolver& rhs)
     {
         if ( this != &rhs )
             {
@@ -65,48 +65,50 @@ namespace lcqpOASES {
 
 
     /** Write solution to x. */
-    void Subsolver::getPrimalSolution( double* x ) 
+    void Subsolver::getPrimalSolution( double* x )
     {
         switch (qpSolver) {
             case QPSubproblemSolver::QPOASES:
-                subQPOASES.getPrimalSolution( x );
+                solverQPOASES.getPrimalSolution( x );
                 return;
-            
+
             case QPSubproblemSolver::OSQP:
-                subQPOASES.getPrimalSolution( x );
+                solverQPOASES.getPrimalSolution( x );
                 return;
         }
     }
 
     /** Write solution to y. */
-    void Subsolver::getDualSolution( double* y ) 
+    void Subsolver::getDualSolution( double* y )
     {
         switch (qpSolver) {
             case QPSubproblemSolver::QPOASES:
-                subQPOASES.getDualSolution( y );
+                solverQPOASES.getDualSolution( y );
                 return;
-            
+
             case QPSubproblemSolver::OSQP:
-                subQPOASES.getDualSolution( y );
+                solverQPOASES.getDualSolution( y );
                 return;
         }
     }
 
 
     /*
-     *   s o l v e
+     *   s e t o p t i o n s
      */
-    void Subsolver::setOptions( printLevel printlvl ) 
+    void Subsolver::setPrintLevel( printLevel printlvl )
     {
         switch (qpSolver) {
             case QPSubproblemSolver::QPOASES:
             {
-                qpOASES::Options qpOpts;
                 if (printlvl < printLevel::SUBPROBLEM_SOLVER_ITERATES)
-                    qpOpts.printLevel =  qpOASES::PrintLevel::PL_NONE;
-                subQPOASES.setOptions( qpOpts );
+                    optionsQPOASES.printLevel =  qpOASES::PrintLevel::PL_NONE;
+                else
+                    optionsQPOASES.printLevel =  qpOASES::PrintLevel::PL_LOW;
+
+                solverQPOASES.setOptions( optionsQPOASES );
                 break;
-            }                
+            }
 
             case QPSubproblemSolver::OSQP:
             {
@@ -114,7 +116,55 @@ namespace lcqpOASES {
                 return;
             }
         }
-    }		
+    }
+
+
+    /*
+     *   s w i t c h T o R e l a x e d O p t i o n s
+     */
+    void Subsolver::switchToRelaxedOptions( )
+    {
+        switch (qpSolver) {
+            case QPSubproblemSolver::QPOASES:
+            {
+                qpOASES::PrintLevel pl = optionsQPOASES.printLevel;
+                optionsQPOASES.setToFast( );
+                optionsQPOASES.printLevel = pl;
+                solverQPOASES.setOptions( optionsQPOASES );
+                break;
+            }
+
+            case QPSubproblemSolver::OSQP:
+            {
+                MessageHandler::PrintMessage( NOT_YET_IMPLEMENTED );
+                break;
+            }
+        }
+    }
+
+
+    /*
+     *   s w i t c h T o S t r i c t O p t i o n s
+     */
+    void Subsolver::switchToStrictOptions( )
+    {
+        switch (qpSolver) {
+            case QPSubproblemSolver::QPOASES:
+            {
+                qpOASES::PrintLevel pl = optionsQPOASES.printLevel;
+                optionsQPOASES.setToDefault( );
+                optionsQPOASES.printLevel = pl;
+                solverQPOASES.setOptions( optionsQPOASES );
+                break;
+            }
+
+            case QPSubproblemSolver::OSQP:
+            {
+                MessageHandler::PrintMessage( NOT_YET_IMPLEMENTED );
+                break;
+            }
+        }
+    }
 
 
     /*
@@ -123,16 +173,17 @@ namespace lcqpOASES {
     returnValue Subsolver::solve(   bool initialSolve, int& iterations,
                                     double* g,
                                     double* lb, double* ub,
-                                    double* lbA, double* ubA ) 
+                                    double* lbA, double* ubA,
+                                    double* x0, double* y0 )
     {
         returnValue ret = returnValue::SUCCESSFUL_RETURN;
         switch (qpSolver) {
             case QPSubproblemSolver::QPOASES:
-                ret = subQPOASES.solve( initialSolve, iterations, g, lb, ub, lbA, ubA );
+                ret = solverQPOASES.solve( initialSolve, iterations, g, lb, ub, lbA, ubA, x0, y0 );
                 break;
-            
+
             case QPSubproblemSolver::OSQP:
-                ret = subOSQP.solve( initialSolve, iterations, g, lb, ub, lbA, ubA );
+                ret = solverOSQP.solve( initialSolve, iterations, g, lb, ub, lbA, ubA, x0, y0 );
                 break;
         }
 
@@ -140,18 +191,20 @@ namespace lcqpOASES {
     }
 
 
-    /** Copies all members from given rhs object. */
-    void Subsolver::copy(const Subsolver& rhs) 
+    /*
+     *   c o p y
+     */
+    void Subsolver::copy(const Subsolver& rhs)
     {
         qpSolver = rhs.qpSolver;
 
         switch (qpSolver) {
             case QPSubproblemSolver::QPOASES:
-                subQPOASES = SubsolverQPOASES( rhs.subQPOASES );
+                solverQPOASES = SubsolverQPOASES( rhs.solverQPOASES );
                 return;
 
             case QPSubproblemSolver::OSQP:
-                subOSQP = SubsolverOSQP( rhs.subOSQP );
+                solverOSQP = SubsolverOSQP( rhs.solverOSQP );
                 return;
         }
     }

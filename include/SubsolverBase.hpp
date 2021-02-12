@@ -34,10 +34,11 @@ namespace lcqpOASES {
             virtual void getDualSolution( double* y ) = 0;
 
             /** Abstract method for solving the QP. */
-            virtual returnValue solve(  bool initialSolve, int& iterations, 
-                                        double* _g, 
+            virtual returnValue solve(  bool initialSolve, int& iterations,
+                                        double* _g,
                                         double* _lb, double* _ub,
-                                        double* _lbA, double* _ubA  ) = 0;
+                                        double* _lbA, double* _ubA,
+                                        double* x0 = 0, double* y0 = 0) = 0;
 
     };
 }

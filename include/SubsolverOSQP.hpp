@@ -31,7 +31,7 @@ namespace lcqpOASES {
 			/** Default constructor. */
 			SubsolverOSQP( );
 
-            SubsolverOSQP(  int _nV, 
+            SubsolverOSQP(  int _nV,
                             int _nC,
                             csc* _H,
                             csc* _A
@@ -50,7 +50,8 @@ namespace lcqpOASES {
             returnValue solve(  bool initialSolve, int& iterations,
                                 double* _g,
                                 double* _lb, double* _ub,
-                                double* _lbA, double* _ubA );
+                                double* _lbA, double* _ubA,
+                                double* x0 = 0, double* y0 = 0);
 
             /** Write solution to x. */
             void getPrimalSolution( double* x );

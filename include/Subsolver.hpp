@@ -38,13 +38,13 @@ namespace lcqpOASES {
 			Subsolver( );
 
             /** Constructor for dense matrices. */
-            Subsolver(  int nV, 
+            Subsolver(  int nV,
                         int nC,
                         double* H,
                         double* A );
 
             /** Constructor for sparse matrices. */
-            Subsolver(  int nV, 
+            Subsolver(  int nV,
                         int nC,
                         csc* H,
                         csc* A );
@@ -62,23 +62,37 @@ namespace lcqpOASES {
             void getDualSolution( double* y );
 
             /** Options of subproblem solver. */
-            void setOptions( printLevel printlvl );
+            void setPrintLevel( printLevel printlvl );
+
+            /** Switch to relaxed options (far from a solution). */
+            void switchToRelaxedOptions( );
+
+            /** Switching to strict options (near a solution). */
+            void switchToStrictOptions( );
 
             /** Abstract method for solving the QP. */
             returnValue solve(  bool initialSolve, int& iterations,
                                 double* g,
                                 double* lb, double* ub,
-                                double* lbA, double* ubA );
+                                double* lbA, double* ubA,
+                                double* x0 = 0, double* y0 = 0 );
 
         protected:
             /** Copies all members from given rhs object. */
             void copy(const Subsolver& rhs);
 
         private:
+            // The solver type
             QPSubproblemSolver qpSolver;        	/**< Inidicating which qpSolver to use. */
-        	SubsolverQPOASES subQPOASES;			/**< When using qpOASES. */
-			SubsolverOSQP subOSQP;					/**< When using OSQP. */
-            
+
+            // The different solvers
+        	SubsolverQPOASES solverQPOASES;			/**< When using qpOASES. */
+			SubsolverOSQP solverOSQP;				/**< When using OSQP. */
+
+            // Options and settings
+            qpOASES::Options optionsQPOASES;        /**< Options for the qpOASES solver. */
+
+
     };
 }
 

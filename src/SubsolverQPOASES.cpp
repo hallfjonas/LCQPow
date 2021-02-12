@@ -26,7 +26,7 @@
 using qpOASES::QProblem;
 
 namespace lcqpOASES {
-    
+
     /*
      *   S u b s o l v e r O S Q P
      */
@@ -51,13 +51,13 @@ namespace lcqpOASES {
         A = new double[nC*nV];
 
         memcpy(H, _H, (long unsigned int)(nV*nV)*sizeof(double));
-        memcpy(A, _A, (long unsigned int)(nC*nV)*sizeof(double));        
+        memcpy(A, _A, (long unsigned int)(nC*nV)*sizeof(double));
     }
 
     /*
      *   S u b s o l v e r O  S Q P
      */
-    SubsolverQPOASES::SubsolverQPOASES(const SubsolverQPOASES& rhs) 
+    SubsolverQPOASES::SubsolverQPOASES(const SubsolverQPOASES& rhs)
     {
         copy( rhs );
     }
@@ -66,7 +66,7 @@ namespace lcqpOASES {
     /*
      *   o p e r a t o r =
      */
-    SubsolverQPOASES& SubsolverQPOASES::operator=(const SubsolverQPOASES& rhs) 
+    SubsolverQPOASES& SubsolverQPOASES::operator=(const SubsolverQPOASES& rhs)
     {
         if (this != &rhs) {
             copy( rhs );
@@ -79,7 +79,7 @@ namespace lcqpOASES {
     /*
      *   s e t O p t i o n s
      */
-    void SubsolverQPOASES::setOptions( qpOASES::Options options ) 
+    void SubsolverQPOASES::setOptions( qpOASES::Options options )
     {
         qp.setOptions( options );
     }
@@ -91,14 +91,15 @@ namespace lcqpOASES {
     returnValue SubsolverQPOASES::solve(    bool initialSolve, int& iterations,
                                             double* g,
                                             double* lb, double* ub,
-                                            double* lbA, double* ubA )
+                                            double* lbA, double* ubA,
+                                            double* x0, double* y0 )
     {
         qpOASES::returnValue ret;
 
-        qpOASES::int_t nwsr = 1000000; 
+        qpOASES::int_t nwsr = 1000000;
 
         if (initialSolve) {
-            ret = qp.init(H, g, A, lb, ub, lbA, ubA, nwsr);
+            ret = qp.init(H, g, A, lb, ub, lbA, ubA, nwsr, (double*)0, x0, y0);
         } else {
             ret = qp.hotstart(g, lb, ub, lbA, ubA, nwsr);
         }
@@ -124,14 +125,14 @@ namespace lcqpOASES {
     /*
      *   g e t D u a l S o l u t i o n
      */
-    void SubsolverQPOASES::getDualSolution( double* y ) 
+    void SubsolverQPOASES::getDualSolution( double* y )
     {
         qp.getDualSolution( y );
     }
 
 
     /*
-     *   c o p y 
+     *   c o p y
      */
     void SubsolverQPOASES::copy(const SubsolverQPOASES& rhs)
     {
