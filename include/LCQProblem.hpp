@@ -177,10 +177,10 @@ namespace lcqpOASES {
 			inline returnValue setH(	const double* const H_new	/**< New dense Hessian matrix (with correct dimension!), a shallow copy is made. */
 										);
 
-			inline returnValue setH(	double* H_data, 
+			inline returnValue setH(	double* H_data,
 										int H_nnx,
 										int* H_i,
-										int* H_p 
+										int* H_p
 										);
 
 			/** TODO: Write description. */
@@ -340,14 +340,16 @@ namespace lcqpOASES {
 			int outerIter;							/**< Outer iterate. */
 			int innerIter;							/**< Inner iterate- */
 
-			int qpIterk;						/**< Iterations taken by qpSolver to solve subproblem. */
+			int qpIterk;							/**< Iterations taken by qpSolver to solve subproblem. */
+
+			bool relaxedOptionsEnabled;				/**< Flag indicating whether the subsolver runs under relaxed options. */
 
 			algorithmStatus algoStat;				/**< Status of algorithm. */
 
 			// Sparse matrices
 			csc* H_sparse;
 			csc* A_sparse;
-			
+
 			// Subproblem solvers
             Subsolver subsolver;
 

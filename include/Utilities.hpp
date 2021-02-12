@@ -50,7 +50,8 @@ namespace lcqpOASES {
         INVALID_MAX_INNER_ITERATIONS_VALUE = 105,
         INVALID_NUMBER_OF_OPTIM_VARS = 106,
         INVALID_NUMBER_OF_COMP_VARS = 107,
-        INVALID_NUMBER_OF_CONSTRAINT_VARS = 108
+        INVALID_NUMBER_OF_CONSTRAINT_VARS = 108,
+        INVALID_RELAX_OPTIONS_TOLERANCE = 109
     };
 
     enum algorithmStatus {
@@ -98,6 +99,8 @@ namespace lcqpOASES {
 
             int maxOuterIterations;                 /**< Maximum number of outer iterations to be performed. */
             int maxInnerIterations;                 /**< Maximum number of inner iterations to be performed. */
+
+            int relaxOptionsTolerance;              /**< Number of active set changes until making subsolver options more percise. */
 
             printLevel printLvl;                    /**< Print level. */
 

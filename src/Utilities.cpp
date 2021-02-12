@@ -100,6 +100,9 @@ namespace lcqpOASES {
         if (maxInnerIterations <= 0)
             throw INVALID_MAX_INNER_ITERATIONS_VALUE;
 
+        if (relaxOptionsTolerance <= 0)
+            throw INVALID_RELAX_OPTIONS_TOLERANCE;
+
         return SUCCESSFUL_RETURN;
     }
 
@@ -118,6 +121,8 @@ namespace lcqpOASES {
         maxOuterIterations = 100;
         maxInnerIterations = 1000;
 
+        relaxOptionsTolerance = 5;
+
         printLvl = printLevel::INNER_LOOP_ITERATES;
 
     }
@@ -130,7 +135,7 @@ namespace lcqpOASES {
             for (int j = 0; j < p; j++) {
                 C[i*m + j] = 0;
                 for (int k = 0; k < n; k++) {
-                    C[i*m + j] += A[i*n + k]*B[k*p + j];
+                    C[i*p + j] += A[i*n + k]*B[k*p + j];
                 }
             }
         }
@@ -369,6 +374,10 @@ namespace lcqpOASES {
 
             case INVALID_MAX_INNER_ITERATIONS_VALUE:
                 printf("ERROR: Invalid argument passed (maximum inner iterations).");
+                break;
+
+            case INVALID_RELAX_OPTIONS_TOLERANCE:
+                printf("ERROR: Invalid argument passed (relax optiopns tolerance).");
                 break;
         }
 
