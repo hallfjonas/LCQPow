@@ -263,17 +263,17 @@ namespace lcqpOASES {
 		return MessageHandler::PrintMessage( runSolver( ) );
 	}
 
-	
+
 	/*
 	*	s o l v e
 	*/
-	returnValue LCQProblem::solve(	double* _H_data, int _H_nnx, int* _H_i, int* _H_p, 
+	returnValue LCQProblem::solve(	double* _H_data, int _H_nnx, int* _H_i, int* _H_p,
 									double* _g, double* _lb, double* _ub,
-									double* _S1_data, int _S1_nnx, int* _S1_i, int* _S1_p,			
-									double* _S2_data, int _S2_nnx, int* _S2_i, int* _S2_p,			
-									double* _A_data, int _A_nnx, int* _A_i, int* _A_p,		
+									double* _S1_data, int _S1_nnx, int* _S1_i, int* _S1_p,
+									double* _S2_data, int _S2_nnx, int* _S2_i, int* _S2_p,
+									double* _A_data, int _A_nnx, int* _A_i, int* _A_p,
 									double* _lbA, double* _ubA,	double* _x0, double* _y0
-									) 
+									)
 	{
 		returnValue ret;
 
@@ -298,7 +298,7 @@ namespace lcqpOASES {
 			return MessageHandler::PrintMessage( ret );
 
 		setConstraints( _S1_data, _S1_nnx, _S1_i, _S1_p, _S2_data, _S2_nnx, _S2_i, _S2_p, _A_data, _A_nnx, _A_i, _A_p, _lbA, _ubA );
-		
+
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
@@ -309,7 +309,7 @@ namespace lcqpOASES {
 
 		// USe OSQP in sparse formulations
 		subsolver = Subsolver(nV, nC + 2*nComp, H_sparse, A_sparse);
-		
+
 		return MessageHandler::PrintMessage( runSolver( ) );
 
 	}
@@ -393,7 +393,7 @@ namespace lcqpOASES {
 	 *	 s e t C o n s t r a i n t s
 	 */
 	returnValue LCQProblem::setConstraints(	double* S1_data, int S1_nnx, int* S1_i, int* S1_p,
-											double* S2_data, int S2_nnx, int* S2_i, int* S2_p, 
+											double* S2_data, int S2_nnx, int* S2_i, int* S2_p,
 											double* A_data, int A_nnx, int* A_i, int* A_p,
 											double* lbA_new, double* ubA_new
 											)
@@ -421,7 +421,7 @@ namespace lcqpOASES {
 				}
 			} else {
 				tmpA_p[i] = S1_p[i];
-			}			
+			}
 
 			// Then rows of S1
 			for (int j = S1_p[i]; j < S1_p[i+1]; j++) {
@@ -471,10 +471,10 @@ namespace lcqpOASES {
 		for (int i = 0; i < 2*nComp; i++) {
 			lbA[i + nC] = 0;
 			ubA[i + nC] = INFINITY;
-		}		
+		}
 
 		// For now store S1, S2, and C in dense format.
-		// If we can manage to adapt all operations required for C (specifically S1'*S2 + S2'*S1 = C) 
+		// If we can manage to adapt all operations required for C (specifically S1'*S2 + S2'*S1 = C)
 		// we should instantly switch to sparse format!
 		S1 = new double[nComp*nV]();
 		for (int j = 0; j < nV; j++) {
@@ -483,12 +483,12 @@ namespace lcqpOASES {
 			}
 		}
 
-		S2 = new double[nComp*nV]();		
+		S2 = new double[nComp*nV]();
 		for (int j = 0; j < nV; j++) {
 			for (int i = 0; i < S2_p[j+1] - S2_p[j]; i++) {
 				S2[(S2_p[j]+i)*nV + j] = S2_data[S2_p[j]+i];
 			}
-		}		
+		}
 
 		C = new double[nV*nV];
 		Utilities::MatrixSymmetrizationProduct(S1, S2, C, nComp, nV);
@@ -505,22 +505,21 @@ namespace lcqpOASES {
 		if (nV <= 0)
 			return LCQPOBJECT_NOT_SETUP;
 
-		c_int _nV = nV;
+		throw (MessageHandler::PrintMessage( NOT_YET_IMPLEMENTED ));
 
-		csc* tmp1 = csc_spalloc(nV, nV, H_nnx, 1, 1);
-		csc* tmp2 = csc_spalloc(nV, nV, H_nnx, 0, 1);
-		csc* tmp3 = csc_spalloc(nV, nV, H_nnx, 1, 0);
-		csc* tmp4 = csc_spalloc(nV, nV, H_nnx, 0, 0);
+		// csc* tmp1 = csc_spalloc(nV, nV, H_nnx, 1, 1);
+		// csc* tmp2 = csc_spalloc(nV, nV, H_nnx, 0, 1);
+		// csc* tmp3 = csc_spalloc(nV, nV, H_nnx, 1, 0);
+		// csc* tmp4 = csc_spalloc(nV, nV, H_nnx, 0, 0);
 
 
-		H_sparse = csc_spalloc(nV, nV, H_nnx, 1, 1);
-		H_sparse = csc_matrix(_nV, _nV, H_nnx, H_data, H_i, H_p);
-
-		double* full = new double[nV*nV]();
+		// H_sparse = csc_spalloc(nV, nV, H_nnx, 1, 1);
+		// H_sparse = csc_matrix(_nV, _nV, H_nnx, H_data, H_i, H_p);
+		// double* full = new double[nV*nV]();
 
 		// TODO: What about this?
 		// full = csc_to_dns(H_sparse);
-		
+
 		return returnValue::SUCCESSFUL_RETURN;
 	}
 
@@ -528,7 +527,7 @@ namespace lcqpOASES {
 	/*
 	 *	 r u n S o l v e r
 	 */
-	returnValue LCQProblem::runSolver( ) 
+	returnValue LCQProblem::runSolver( )
 	{
 
 		// Initialize variables
@@ -611,7 +610,7 @@ namespace lcqpOASES {
 	/*
 	 *	 i n i t i a l i z e S o l v e r
 	 */
-	void LCQProblem::initializeSolver( ) 
+	void LCQProblem::initializeSolver( )
 	{
 		// Allocate vectors
 		Qk = new double[nV*nV];
@@ -629,18 +628,23 @@ namespace lcqpOASES {
 		yk = new double[nV + nC + 2*nComp];
 		yk_A = new double[nC + 2*nComp];
 
-		// Initialize subproblem solver
-		subsolver.setOptions( options.printLvl );
+		// Initialize subproblem solver (with relaxed options)
+		subsolver.switchToRelaxedOptions( );
+		subsolver.setPrintLevel( options.printLvl );
+		relaxedOptionsEnabled = true;
 	}
 
 
 	/*
 	 *	 s o l v e Q P S u b p r o b l e m
 	 */
-	returnValue LCQProblem::solveQPSubproblem(bool initialSolve) 
+	returnValue LCQProblem::solveQPSubproblem(bool initialSolve)
 	{
-		returnValue ret = subsolver.solve( initialSolve, qpIterk, gk, lb, ub, lbA, ubA );
 
+		// First solve convex subproblem
+		returnValue ret = subsolver.solve( initialSolve, qpIterk, gk, lb, ub, lbA, ubA, xk, yk );
+
+		// Return on error
 		if (ret != SUCCESSFUL_RETURN)
 			return ret;
 
@@ -654,6 +658,19 @@ namespace lcqpOASES {
 
 		// Update pk
 		Utilities::WeightedVectorAdd(1, xnew, -1, xk, pk, nV);
+
+		// Update to strict options (near a solution)
+		if (relaxedOptionsEnabled && qpIterk <= options.relaxOptionsTolerance) {
+			relaxedOptionsEnabled = false;
+			subsolver.switchToStrictOptions( );
+		}
+
+		// or to relaxed options (far from a solution)
+		if (!relaxedOptionsEnabled && qpIterk > options.relaxOptionsTolerance) {
+			relaxedOptionsEnabled = true;
+			subsolver.switchToRelaxedOptions( );
+		}
+
 		return SUCCESSFUL_RETURN;
 	}
 
@@ -745,7 +762,7 @@ namespace lcqpOASES {
 
 		// 2) Constraint contribution: A*yk
 		double* constr_stat = new double[nV];
-		Utilities::MatrixMultiplication(A, yk_A, constr_stat, nV, nC + 2*nComp, 1);
+		Utilities::MatrixMultiplication(A, yk_A, constr_stat, nC + 2*nComp, nV, 1);
 
 		// 1) - 2)
 		Utilities::WeightedVectorAdd(1, statk, -1, constr_stat, statk, nV);
@@ -838,7 +855,7 @@ namespace lcqpOASES {
 	/*
 	 *	 g e t W e a k C o m p l e m e n t a r i t i e s
 	 */
-	std::vector<int> LCQProblem::getWeakComplementarities( ) 
+	std::vector<int> LCQProblem::getWeakComplementarities( )
 	{
 		double* S1x = new double[nComp];
 		double* S2x = new double[nComp];
