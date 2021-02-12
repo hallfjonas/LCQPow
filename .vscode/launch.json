@@ -64,6 +64,27 @@
             ]
         },
         {
+            "name": "(gdb) Launch IVOCP from file",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/debug/solve_lcqp_from_file",
+            "args": [
+                "examples/example_data/one_ivocp_example"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
             "name": "(gdb) Build and Launch Unit Tests",
             "type": "cppdbg",
             "request": "launch",
