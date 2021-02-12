@@ -153,13 +153,10 @@ namespace lcqpOASES {
 		if ( nV == 0 || nComp == 0)
 			return LCQPOBJECT_NOT_SETUP;
 
-		xk = new double[nV];
+		xk = new double[nV]();
 
 		if (_x0 != 0) {
 			memcpy(xk, _x0, nV*sizeof(double));
-		} else {
-			for (int i = 0; i < nV; i++)
-				xk[i] = 0;
 		}
 
 		if (_y0 != 0) {
