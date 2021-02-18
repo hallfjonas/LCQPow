@@ -94,6 +94,12 @@ int main(int argc, char **argv) {
 
     if (PathExists(A_file)) {
         Af = &A_file[0];
+
+        std::ifstream Afile(A_file);
+        while (std::getline(Afile, line))
+            nC++;
+
+        nC = nC/nV;
     }
 
     if (PathExists(lbA_file)) {
@@ -121,6 +127,11 @@ int main(int argc, char **argv) {
     }
 
     lcqpOASES::LCQProblem lcqp( nV, nC, nComp );
+
+    lcqpOASES::Options opts;
+    opts.printLvl = lcqpOASES::printLevel::SUBPROBLEM_SOLVER_ITERATES;
+
+    lcqp.setOptions( opts );
 
     // Record start time
     auto start = std::chrono::high_resolution_clock::now();
