@@ -104,7 +104,7 @@ namespace lcqpOASES {
                 if (printlvl < printLevel::SUBPROBLEM_SOLVER_ITERATES)
                     optionsQPOASES.printLevel =  qpOASES::PrintLevel::PL_NONE;
                 else
-                    optionsQPOASES.printLevel =  qpOASES::PrintLevel::PL_LOW;
+                    optionsQPOASES.printLevel =  qpOASES::PrintLevel::PL_MEDIUM;
 
                 solverQPOASES.setOptions( optionsQPOASES );
                 break;
