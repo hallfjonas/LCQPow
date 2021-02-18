@@ -23,6 +23,9 @@
 #include "Utilities.hpp"
 #include "LCQProblem.hpp"
 #include <gtest/gtest.h>
+#include <iostream>
+#include <fstream>
+#include <vector>
 
 // Testing standard and symmetrization matrix multiplications
 TEST(UtilitiesTest, MatrixMultiplicationTest) {
@@ -202,6 +205,51 @@ TEST(UtilitiesTest, ReadFromFile) {
     ASSERT_EQ(H[1], 0);
     ASSERT_EQ(H[2], 0);
     ASSERT_EQ(H[3], 2);
+}
+
+// Testing read from file and multiply functionality
+TEST(UtilitiesTest, ReadFromFileAndMultiply) {
+    const char* Apath = "examples/example_data/one_ivocp_example/A.txt";
+    const char* x0path = "examples/example_data/one_ivocp_example/x0.txt";
+
+    std::vector<double> Avals, x0vals;
+
+    std::string line;
+
+    std::ifstream x0file(x0path);
+    while (std::getline(x0file, line))
+        x0vals.push_back(std::stod(line));
+
+    std::ifstream Afile(Apath);
+    while (std::getline(Afile, line))
+        Avals.push_back(std::stod(line));
+
+    int nV = x0vals.size();
+    int nC = Avals.size()/nV;
+
+    double* x0 = new double[nV];
+    lcqpOASES::Utilities::readFromFile(x0, nV, x0path);
+
+    double* A = new double[nC*nV];
+    lcqpOASES::Utilities::readFromFile(A, nV*nC, Apath);
+
+    for (int i = 0; i < nV*nC; i++) {
+        if (i < nV)
+            ASSERT_EQ(x0[i], x0vals[i]);
+        ASSERT_EQ(A[i], Avals[i]);
+    }
+
+    double* Ax = new double[nC]();
+    lcqpOASES::Utilities::AffineLinearTransformation(1, A, x0, Ax, Ax, nC, nV);
+
+    for (int i = 0; i < nC; i++) {
+        double val = 0;
+        for (int j = 0; j < nV; j++)
+            val += A[i*nV + j]*x0[j];
+
+        ASSERT_EQ(val, Ax[i]);
+    }
+
 }
 
 // Testing Options constructors, default settings, consistency
