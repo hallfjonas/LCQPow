@@ -300,6 +300,85 @@ namespace lcqpOASES {
 
 
     /*
+     *	r e a d F r o m F i l e
+     */
+    returnValue Utilities::writeToFile( double* data, int n, const char* datafilename )
+    {
+        int i;
+        FILE* datafile;
+
+        /* 1) Open file. */
+        if ( ( datafile = fopen( datafilename, "w" ) ) == 0 )
+        {
+            fclose( datafile );
+            return UNABLE_TO_READ_FILE;
+        }
+
+        /* 2) Read data from file. */
+        for( i=0; i<n; ++i )
+        {
+            if ( fprintf( datafile, "%f\n", data[i] ) == 0 )
+            {
+                fclose( datafile );
+                return UNABLE_TO_READ_FILE;
+            }
+        }
+
+        /* 3) Close file. */
+        fclose( datafile );
+
+        return SUCCESSFUL_RETURN;
+    }
+
+
+    /*
+     *   p r i n t M a t r i x
+     */
+    void Utilities::printMatrix(double* A, int m, int n, const char* const name)
+    {
+        printf("Printing matrix %s:\n", name);
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++)
+                printf("%.1f ", A[i*n + j]);
+
+
+            printf("\n");
+        }
+
+        printf("\n");
+    }
+
+
+    /*
+     *   p r i n t S t e p
+     */
+    void Utilities::printStep(double* xk, double* pk, double* xk_new, double alpha, int nV)
+    {
+        printf("Printing Step:\n");
+
+        for (int i = 0; i < nV; i++)
+            printf("%.2f + %.2f * %.2f = %.2f \n", xk[i], alpha, pk[i], xk_new[i]);
+
+        printf("\n");
+    }
+
+
+    /*
+     *   p r i n t M a t r i x
+     */
+    void Utilities::printBounds(double* lb, double* xk, double* ub, int m)
+    {
+        printf("Printing box constraints:\n");
+
+        for (int i = 0; i < m; i++)
+            printf("%.2f <= %.2f <= %.2f \n", lb[i], xk[i], ub[i]);
+
+        printf("\n");
+    }
+
+
+    /*
      *   P r i n t M e s s a g e
      */
     returnValue MessageHandler::PrintMessage( returnValue ret) {

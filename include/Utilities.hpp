@@ -140,6 +140,18 @@ namespace lcqpOASES {
             // Read float data from file
             static returnValue readFromFile(double* data, int n, const char* datafilename );
 
+            // Read float data from file
+            static returnValue writeToFile(double* data, int n, const char* datafilename );
+
+            // Print a matrix
+            static void printMatrix(double* A, int m, int n, const char* const name);
+
+            // Printing bounds
+            static void printStep(double* xk, double* pk, double* xk_new, double alpha, int nV);
+
+            // Printing bounds
+            static void printBounds(double* lb, double* xk, double* ub, int m);
+
             constexpr static const double EPS = 1.11e-16;
     };
 
