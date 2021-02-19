@@ -24,6 +24,7 @@
 #include <Utilities.hpp>
 #include <SubsolverQPOASES.hpp>
 #include <SubsolverOSQP.hpp>
+#include <PlotManager.hpp>
 
 #include <iostream>
 #include <string>
@@ -529,6 +530,8 @@ namespace lcqpOASES {
 	 */
 	returnValue LCQProblem::runSolver( )
 	{
+		// Create a plot manager instance
+		PlotManager plotter(nV, nC, nComp, LCQPNAME::IVOCP);
 
 		// Initialize variables
 		initializeSolver();
@@ -560,6 +563,9 @@ namespace lcqpOASES {
 
 			// Update xk, gk, Qk, stationarity
 			updateStep( );
+
+			// Create debugging plots
+			plotter.CreateIVOCPPlots(xk);
 
 			// Print iteration
 			printIteration( );

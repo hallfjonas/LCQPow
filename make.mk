@@ -38,6 +38,10 @@ CASADI_IDIR   = /usr/local/casadi
 CASADI_LIB_DIR = /usr/local/casadi/build/lib
 CASADI_LINK = -lcasadi
 
+# 4) Python3 (for plotting)
+PYTHON2_IDIR = /usr/include/python2.7
+PYTHON2_LINK = -lpython2.7
+
 ## Do not touch this
 # include directories, relative
 TOP = $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
