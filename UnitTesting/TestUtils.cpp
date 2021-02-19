@@ -27,23 +27,49 @@
 #include <fstream>
 #include <vector>
 
-// Testing standard and symmetrization matrix multiplications
+// Testing standard matrix multiplications
 TEST(UtilitiesTest, MatrixMultiplicationTest) {
     // A = [1 0 2; 3 1 1]
-    // B = [2 0; 1 0; 0 -1]
-    // C = A*B = [2 -2; 7 -1]
+    // B = [2 0 0 2; 1 0 0 1; 0 -1 -1 0]
+    // C = A*B = [2 -2 -2 2; 7 -1 -1 7]
     int m = 2;
     int n = 3;
+    int p = 4;
 
     double* A = new double[m*n] { 1, 0, 2, 3, 1, 1 };
-    double* B = new double[n*m] { 2, 0, 1, 0, 0, -1 };
-    double* C = new double[m*m];
+    double* B = new double[n*p] { 2, 0, 0, 2, 1, 0, 0, 1, 0, -1, -1, 0 };
+    double* C = new double[m*p];
 
-    lcqpOASES::Utilities::MatrixMultiplication(A, B, C, m, n, m);
+    lcqpOASES::Utilities::MatrixMultiplication(A, B, C, m, n, p);
+
     ASSERT_EQ(C[0], 2);
     ASSERT_EQ(C[1], -2);
-    ASSERT_EQ(C[2], 7);
-    ASSERT_EQ(C[3], -1);
+    ASSERT_EQ(C[2], -2);
+    ASSERT_EQ(C[3], 2);
+    ASSERT_EQ(C[4], 7);
+    ASSERT_EQ(C[5], -1);
+    ASSERT_EQ(C[6], -1);
+    ASSERT_EQ(C[7], 7);
+}
+
+
+// Testing transposed matrix multiplications
+TEST(UtilitiesTest, TransposedMatrixMultiplicationTest) {
+    // A = [1 0 2; 3 1 1]
+    // B = [98 -10]
+    // C = A*B = [68 -10 186]
+    int m = 2;
+    int n = 3;
+    int p = 1;
+
+    double* A = new double[m*n] { 1, 0, 2, 3, 1, 1 };
+    double* B = new double[n*m] { 98, -10 };
+    double* C = new double[n*p];
+
+    lcqpOASES::Utilities::TransponsedMatrixMultiplication(A, B, C, m, n, p);
+    ASSERT_EQ(C[0], 68);
+    ASSERT_EQ(C[1], -10);
+    ASSERT_EQ(C[2], 186);
 }
 
 // Testing the matrix symmetrization product
@@ -211,8 +237,9 @@ TEST(UtilitiesTest, ReadFromFile) {
 TEST(UtilitiesTest, ReadFromFileAndMultiply) {
     const char* Apath = "examples/example_data/one_ivocp_example/A.txt";
     const char* x0path = "examples/example_data/one_ivocp_example/x0.txt";
+    const char* lbApath = "examples/example_data/one_ivocp_example/lbA.txt";
 
-    std::vector<double> Avals, x0vals;
+    std::vector<double> Avals, x0vals, lbAvals;
 
     std::string line;
 
@@ -224,6 +251,14 @@ TEST(UtilitiesTest, ReadFromFileAndMultiply) {
     while (std::getline(Afile, line))
         Avals.push_back(std::stod(line));
 
+    std::ifstream lbAfile(lbApath);
+    while (std::getline(lbAfile, line))
+        lbAvals.push_back(std::stod(line));
+
+    x0file.close();
+    Afile.close();
+    lbAfile.close();
+
     int nV = x0vals.size();
     int nC = Avals.size()/nV;
 
@@ -233,21 +268,28 @@ TEST(UtilitiesTest, ReadFromFileAndMultiply) {
     double* A = new double[nC*nV];
     lcqpOASES::Utilities::readFromFile(A, nV*nC, Apath);
 
+    double* lbA = new double[nC];
+    lcqpOASES::Utilities::readFromFile(lbA, nC, lbApath);
+
     for (int i = 0; i < nV*nC; i++) {
+        if (i < nC)
+            ASSERT_EQ(lbA[i], lbAvals[i]);
+
         if (i < nV)
             ASSERT_EQ(x0[i], x0vals[i]);
+
         ASSERT_EQ(A[i], Avals[i]);
     }
 
     double* Ax = new double[nC]();
-    lcqpOASES::Utilities::AffineLinearTransformation(1, A, x0, Ax, Ax, nC, nV);
+    lcqpOASES::Utilities::AffineLinearTransformation(1, A, x0, lbA, Ax, nC, nV);
 
     for (int i = 0; i < nC; i++) {
-        double val = 0;
+        double val = lbA[i];
         for (int j = 0; j < nV; j++)
             val += A[i*nV + j]*x0[j];
 
-        ASSERT_EQ(val, Ax[i]);
+        ASSERT_FLOAT_EQ(val, Ax[i]);
     }
 
 }

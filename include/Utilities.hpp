@@ -113,6 +113,9 @@ namespace lcqpOASES {
             // C = A*B.
             static void MatrixMultiplication(const double* const A, const double* const B, double* C, int m, int n, int p);
 
+            // C = A'*B
+            static void TransponsedMatrixMultiplication(const double* const A, const double* const B, double* C, int m, int n, int p);
+
             // C = A'*B + B'*A
             static void MatrixSymmetrizationProduct(const double* const A, const double* const B, double* C, int m, int n);
 
@@ -144,7 +147,7 @@ namespace lcqpOASES {
             static returnValue writeToFile(double* data, int n, const char* datafilename );
 
             // Print a matrix
-            static void printMatrix(double* A, int m, int n, const char* const name);
+            static void printMatrix(const double* const A, int m, int n, const char* const name);
 
             // Printing bounds
             static void printStep(double* xk, double* pk, double* xk_new, double alpha, int nV);

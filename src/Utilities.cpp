@@ -133,7 +133,7 @@ namespace lcqpOASES {
     void Utilities::MatrixMultiplication(const double* const A, const double* const B, double* C, int m, int n, int p) {
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < p; j++) {
-                C[i*m + j] = 0;
+                C[i*p + j] = 0;
                 for (int k = 0; k < n; k++) {
                     C[i*p + j] += A[i*n + k]*B[k*p + j];
                 }
@@ -141,6 +141,21 @@ namespace lcqpOASES {
         }
     }
 
+    /*
+     *   M a t r i x M u l t i p l i c a t i o n
+     */
+    void Utilities::TransponsedMatrixMultiplication(const double* const A, const double* const B, double* C, int m, int n, int p) {
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < p; j++) {
+                C[i*p + j] = 0;
+
+                for (int k = 0; k < m; k++) {
+                    C[i*p+j] += A[k*n + i]*B[k*p + j];
+                }
+            }
+        }
+    }
 
     /*
      *  M a t r i x S y m m e t r i z a t i o n P r o d u c t
@@ -334,7 +349,7 @@ namespace lcqpOASES {
     /*
      *   p r i n t M a t r i x
      */
-    void Utilities::printMatrix(double* A, int m, int n, const char* const name)
+    void Utilities::printMatrix(const double* const A, int m, int n, const char* const name)
     {
         printf("Printing matrix %s:\n", name);
 
