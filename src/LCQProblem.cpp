@@ -640,7 +640,6 @@ namespace lcqpOASES {
 	 */
 	returnValue LCQProblem::solveQPSubproblem(bool initialSolve)
 	{
-
 		// First solve convex subproblem
 		returnValue ret = subsolver.solve( initialSolve, qpIterk, gk, lb, ub, lbA, ubA, xk, yk );
 
@@ -762,9 +761,9 @@ namespace lcqpOASES {
 
 		// 2) Constraint contribution: A*yk
 		double* constr_stat = new double[nV];
-		Utilities::MatrixMultiplication(A, yk_A, constr_stat, nC + 2*nComp, nV, 1);
+		Utilities::TransponsedMatrixMultiplication(A, yk_A, constr_stat, nC + 2*nComp, nV, 1);
 
-		// 1) - 2)
+		// 3) => 1) - 2)
 		Utilities::WeightedVectorAdd(1, statk, -1, constr_stat, statk, nV);
 	}
 
