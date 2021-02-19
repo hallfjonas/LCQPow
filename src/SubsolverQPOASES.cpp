@@ -89,10 +89,10 @@ namespace lcqpOASES {
      *   s o l v e
      */
     returnValue SubsolverQPOASES::solve(    bool initialSolve, int& iterations,
-                                            double* g,
-                                            double* lb, double* ub,
-                                            double* lbA, double* ubA,
-                                            double* x0, double* y0 )
+                                            const double* const g,
+                                            const double* const lb, const double* const ub,
+                                            const double* const lbA, const double* const ubA,
+                                            const double* const x0, const double* const y0 )
     {
         qpOASES::returnValue ret;
 

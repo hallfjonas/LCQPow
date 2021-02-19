@@ -35,10 +35,10 @@ namespace lcqpOASES {
 
             /** Abstract method for solving the QP. */
             virtual returnValue solve(  bool initialSolve, int& iterations,
-                                        double* _g,
-                                        double* _lb, double* _ub,
-                                        double* _lbA, double* _ubA,
-                                        double* x0 = 0, double* y0 = 0) = 0;
+                                        const double* const _g,
+                                        const double* const _lb, const double* const _ub,
+                                        const double* const _lbA, const double* const _ubA,
+                                        const double* const x0 = 0, const double* const y0 = 0) = 0;
 
     };
 }

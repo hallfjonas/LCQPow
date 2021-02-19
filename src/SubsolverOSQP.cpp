@@ -94,10 +94,10 @@ namespace lcqpOASES {
      *   s o l v e
      */
     returnValue SubsolverOSQP::solve(   bool initialSolve, int& iterations,
-                                        double* _g,
-                                        double* _lb, double* _ub,
-                                        double* _lbA, double* _ubA,
-                                        double* x0, double* y0 )
+                                        const double* const _g,
+                                        const double* const _lb, const double* const _ub,
+                                        const double* const _lbA, const double* const _ubA,
+                                        const double* const x0, const double* const y0 )
     {
         // Update linear cost and bounds
         osqp_update_lin_cost(work, _g);
