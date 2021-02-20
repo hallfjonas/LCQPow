@@ -23,8 +23,8 @@
 #ifndef PLOTMANAGER_LCQPROBLEM_HPP
 #define PLOTMANAGER_LCQPROBLEM_HPP
 
-#include "matplotlibcpp.h"
-#include<vector>
+#include <matplotlibcpp.h>
+#include <vector>
 
 namespace lcqpOASES {
 
