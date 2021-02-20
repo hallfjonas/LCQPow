@@ -4,7 +4,7 @@
 #include <vector>
 
 int main(int argc, char *argv[]) {
-    std::cout << "HELLP\n";
+    std::cout << "Entering Main...\n";
     std::vector<double> x;
     std::vector<double> f;
 
@@ -13,7 +13,14 @@ int main(int argc, char *argv[]) {
         f.push_back(std::sin(x[i]));
     }
 
+    std::cout << "Plot vectors created...\n";
+
     matplotlibcpp::plot(x, f);
 
+    std::cout << "Plot created ...\n";
+
     matplotlibcpp::show();
+    std::cout << "leaving main ...\n";
+
+    return 0;
 }
