@@ -3,8 +3,10 @@
 #include <matplotlibcpp.h>
 #include <vector>
 
-int main() {
-    std::vector<double> x, f;
+int main(int argc, char *argv[]) {
+    std::cout << "HELLP\n";
+    std::vector<double> x;
+    std::vector<double> f;
 
     for (int i = 0; i < 100; i++) {
         x.push_back(3.2*i/100.0);

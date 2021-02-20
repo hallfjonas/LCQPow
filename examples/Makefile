@@ -29,10 +29,11 @@ IFLAGS      =  -I. \
                -I${IDIR} \
 			   -isystem${QPOASES_IDIR}\
 			   -isystem${OSQP_IDIR}\
-			   -isystem${PYTHON2_IDIR}
+			   -isystem${PLOTLIB_IDIR}\
+			   -isystem${PYTHON3_IDIR}
 
 
-LFLAGS 		= ${QPOASES_LINK} ${OSQP_LINK} ${PYTHON2_LINK}
+LFLAGS 		= ${QPOASES_LINK} ${OSQP_LINK} ${PYTHON3_LINK}
 
 DEBUGFLAGS = -g -D__USE_LONG_INTEGERS__ -Wall -pedantic -Wshadow -Wfloat-equal
 
@@ -52,8 +53,9 @@ LCQPOASES_DEBUG = \
 	${DEBUGDIR}/warm_up${EXE} \
 	${DEBUGDIR}/warm_up_sparse${EXE} \
 	${DEBUGDIR}/solve_lcqp_from_file${EXE} \
+	${DEBUGDIR}/matplotlibtest${EXE} \
 	# ${DEBUGDIR}/test_csc${EXE}
-	
+
 
 LCQPOASES_SRC = $(wildcard ${SRCDIR}/*.cpp)
 OSQP_SRC = $(wildcard /usr/local/osqp/src/*.c)
@@ -83,8 +85,8 @@ ${BINDIR}/%${EXE}: %.${OBJEXT} ${LCQPOASES_LIB}
 ${DEBUGDIR}/%${EXE}:
 	@mkdir -p ${DEBUGDIR}
 	@${ECHO} "Building debug..." $@
-	${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${LCQPOASES_SRC} ${DEF_TARGET} ${IFLAGS} ${LFLAGS}
-	@${CPP} ${DEBUGFLAGS} $(notdir $@).cpp ${LCQPOASES_SRC} ${DEF_TARGET} ${IFLAGS} ${LFLAGS}
+	${CPP} ${DEBUGFLAGS} ${PLOTLIBFLAGS} $(notdir $@).cpp ${LCQPOASES_SRC} ${DEF_TARGET} ${IFLAGS} ${LFLAGS}
+	@${CPP} ${DEBUGFLAGS} ${PLOTLIBFLAGS} $(notdir $@).cpp ${LCQPOASES_SRC} ${DEF_TARGET} ${IFLAGS} ${LFLAGS}
 
 clean:
 	@${ECHO} "Cleaning up (examples)"
