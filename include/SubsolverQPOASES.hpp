@@ -19,13 +19,11 @@
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef LCQPOASES_SubsolverQPOASES_HPP
-#define LCQPOASES_SubsolverQPOASES_HPP
+#ifndef LCQPOASES_SUBSOLVERQPOASES_HPP
+#define LCQPOASES_SUBSOLVERQPOASES_HPP
 
 #include <SubsolverBase.hpp>
 #include <qpOASES.hpp>
-
-using qpOASES::QProblem;
 
 namespace lcqpOASES {
     class SubsolverQPOASES : public SubsolverBase {
@@ -41,6 +39,9 @@ namespace lcqpOASES {
 
             /** Copy constructor. */
             SubsolverQPOASES(const SubsolverQPOASES& rhs);
+
+            /** Destructor. */
+            ~SubsolverQPOASES();
 
             /** Assignment operator (deep copy). */
             virtual SubsolverQPOASES& operator=(const SubsolverQPOASES& rhs);
@@ -75,8 +76,8 @@ namespace lcqpOASES {
             double* H;
             double* A;
 
-            QProblem qp;
+            qpOASES::QProblem qp;
     };
 }
 
-#endif  // LCQPOASES_SubsolverQPOASES_HPP
+#endif  // LCQPOASES_SUBSOLVERQPOASES_HPP

@@ -19,8 +19,8 @@
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef LCQPOASES_SubsolverOSQP_HPP
-#define LCQPOASES_SubsolverOSQP_HPP
+#ifndef LCQPOASES_SUBSOLVEROSQP_HPP
+#define LCQPOASES_SUBSOLVEROSQP_HPP
 
 #include <SubsolverBase.hpp>
 #include "osqp.h"
@@ -39,6 +39,9 @@ namespace lcqpOASES {
 
             /** Copy constructor. */
             SubsolverOSQP(const SubsolverOSQP& rhs);
+
+            /** Destructor. */
+            ~SubsolverOSQP( );
 
             /** Assignment operator (deep copy). */
             virtual SubsolverOSQP& operator=(const SubsolverOSQP& rhs);
@@ -73,4 +76,4 @@ namespace lcqpOASES {
     };
 }
 
-#endif  // LCQPOASES_SubsolverOSQP_HPP
+#endif  // LCQPOASES_SUBSOLVEROSQP_HPP

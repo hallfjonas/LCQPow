@@ -21,9 +21,6 @@
 
 #include <SubsolverQPOASES.hpp>
 #include <qpOASES.hpp>
-#include "osqp.h"
-
-using qpOASES::QProblem;
 
 namespace lcqpOASES {
 
@@ -34,7 +31,7 @@ namespace lcqpOASES {
 
 
     /*
-     *   S u b s o l v e r O  S Q P
+     *   S u b s o l v e r Q P O A S E S
      */
     SubsolverQPOASES::SubsolverQPOASES( int _nV, int _nC,
                                         double* _H, double* _A)
@@ -45,7 +42,7 @@ namespace lcqpOASES {
         nV = _nV;
         nC = _nC;
 
-        qp = QProblem(nV, nC);
+        qp = qpOASES::QProblem(nV, nC);
 
         H = new double[nV*nV];
         A = new double[nC*nV];
@@ -62,6 +59,17 @@ namespace lcqpOASES {
         copy( rhs );
     }
 
+    /*
+     *   ~ S u b s o l v e r Q P O A S E S
+     */
+    SubsolverQPOASES::~SubsolverQPOASES()
+    {
+        if (H != 0)
+            delete[] H;
+
+        if (A != 0)
+            delete[] A;
+    }
 
     /*
      *   o p e r a t o r =

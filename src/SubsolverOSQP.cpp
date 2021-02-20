@@ -69,6 +69,19 @@ namespace lcqpOASES {
 
 
     /*
+     *   ~ S u b s o l v e r O S Q P
+     */
+    SubsolverOSQP::~SubsolverOSQP()
+    {
+        if (H != 0)
+            delete[] H;
+
+        if (A != 0)
+            delete[] A;
+    }
+
+
+    /*
      *   o p e r a t o r =
      */
     SubsolverOSQP& SubsolverOSQP::operator=(const SubsolverOSQP& rhs)
