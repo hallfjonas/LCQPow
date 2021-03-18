@@ -566,7 +566,7 @@ namespace lcqpOASES {
 			updateStep( );
 
 			// Create debugging plots
-			plotter.CreateIVOCPPlots(xk);
+			plotter.CreateIVOCPPlots(xk, lb, ub);
 
 			// Print iteration
 			printIteration( );
@@ -717,22 +717,11 @@ namespace lcqpOASES {
 
 		double lk = Utilities::DotProduct(pk, lk_tmp, nV);
 
-		alphak = 0;
+		alphak = 1;
 
 		// Non convex case
-		if (qk <= Utilities::EPS) {
-			if (qk + lk < 0)
-				alphak = 1;
-		} else {
-			// Descent + Convex
-			if (lk < 0) {
-				alphak = std::min(-lk/qk, 1.0);
-			}
-		}
-
-		// 0-Step Length:
-		if (Utilities::MaxAbs(pk, nV) < options.stationarityTolerance || complementarityCheck()) {
-			alphak = 1;
+		if (qk > 0 && lk < 0) {
+			alphak = std::min(-lk/qk, 1.0);
 		}
 	}
 
