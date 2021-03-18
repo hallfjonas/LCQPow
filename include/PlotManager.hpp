@@ -38,7 +38,7 @@ namespace lcqpOASES {
         public:
             PlotManager(int _nV, int _nC, int _nComp, LCQPNAME lcqpname);
 
-            void CreateIVOCPPlots(const double* const _xk);
+            void CreateIVOCPPlots(const double* const _xk, const double* const _lb, const double* const _ub);
 
             void CreateIVOCPTrajectoryPlot();
 
@@ -50,6 +50,9 @@ namespace lcqpOASES {
 
             // Debugging variables for IVOCP example
             double* xk;
+            double* lb;
+            double* ub;
+
             std::vector<int> indicesX;
             std::vector<int> indicesY;
             std::vector<int> indiceslam0;

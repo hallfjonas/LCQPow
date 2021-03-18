@@ -20,6 +20,7 @@
  */
 
 #include "PlotManager.hpp"
+#include "Utilities.hpp"
 
 #include "matplotlibcpp.h"
 namespace plt = matplotlibcpp;
@@ -34,28 +35,32 @@ namespace lcqpOASES {
         nComp = _nComp;
 
         xk = new double[nV]();
+        lb = new double[nV]();
+        ub = new double[nV]();
 
         switch (lcqpname) {
         case LCQPNAME::IVOCP:
-            
-            for (int i = 1; i < nV; i++) {
-                if (i % 3 == 1)
+
+            for (int i = 2; i < nV; i++) {
+                if (i % 3 == 2)
                     indicesX.push_back(i);
-                else if (i % 3 == 1)
+                else if (i % 3 == 0)
                     indicesY.push_back(i);
                 else
                     indiceslam0.push_back(i);
             }
             break;
-        
+
         default:
             break;
         }
     }
 
-    void PlotManager::CreateIVOCPPlots(const double* const _xk) 
+    void PlotManager::CreateIVOCPPlots(const double* const _xk, const double* const _lb, const double* const _ub)
     {
         memcpy(xk, _xk, (unsigned int)nV*sizeof(double));
+        memcpy(lb, _lb, (unsigned int)nV*sizeof(double));
+        memcpy(ub, _ub, (unsigned int)nV*sizeof(double));
 
         CreateIVOCPTrajectoryPlot();
         CreateIVOCPComplementarityPlot();
@@ -63,13 +68,15 @@ namespace lcqpOASES {
 
     void PlotManager::CreateIVOCPTrajectoryPlot()
     {
-        std::vector<double> xVals;
+        std::vector<double> xVals, lbVals, ubVals;
         for (unsigned int i = 0; i < indicesX.size(); i++) {
             xVals.push_back(xk[indicesX[i]]);
         }
-        
+
+        plt::figure();
+
         plt::plot(xVals);
-        
+
         // Add graph title
         plt::title("Trajectory");
 
@@ -81,8 +88,12 @@ namespace lcqpOASES {
     {
         std::vector<double> xVals;
         std::vector<double> yVals;
+        std::vector<double> ylbVals;
+        std::vector<double> yubVals;
         std::vector<double> lam0Vals;
-        std::vector<double> lam1Vals;        
+        std::vector<double> lam0lbVals;
+        std::vector<double> lam0ubVals;
+        std::vector<double> lam1Vals;
 
         for (unsigned int i = 0; i < indicesX.size(); i++) {
             xVals.push_back(xk[indicesX[i]]);
@@ -90,27 +101,45 @@ namespace lcqpOASES {
 
         for (unsigned int i = 0; i < indicesY.size(); i++) {
             yVals.push_back(xk[indicesY[i]]);
+            ylbVals.push_back(lb[indicesY[i]]);
+            yubVals.push_back(ub[indicesY[i]]);
         }
 
         for (unsigned int i = 0; i < indiceslam0.size(); i++) {
             lam0Vals.push_back(xk[indiceslam0[i]]);
+            lam0lbVals.push_back(lb[indiceslam0[i]]);
+            lam0ubVals.push_back(ub[indiceslam0[i]]);
             lam1Vals.push_back(xk[indicesX[i]] + xk[indiceslam0[i]]);
         }
+
+        plt::figure();
 
         plt::named_plot("y", yVals);
         plt::named_plot("lam-", lam0Vals);
         plt::named_plot("lam+", lam1Vals);
-        
+
         // Add graph title
         plt::title("Complementarity variables");
 
         // Enable legend.
         plt::legend();
 
-        // Show image.
-        plt::show();
-
         // Export
         plt::save("plots/complementarity_variables.png");
+
+        // bounds plot
+        plt::figure();
+        plt::named_plot("lb(y)", ylbVals);
+        plt::named_plot("ub(y)", yubVals);
+        plt::named_plot("lb(lam-)", lam0lbVals);
+        // plt::named_plot("ub(lam-)", lam0ubVals);
+        // Add graph title
+        plt::title("Bounds");
+
+        // Enable legend.
+        plt::legend();
+
+        // Export
+        plt::save("plots/bound_plot.png");
     }
 }
