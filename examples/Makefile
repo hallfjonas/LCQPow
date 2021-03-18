@@ -53,7 +53,6 @@ LCQPOASES_DEBUG = \
 	${DEBUGDIR}/warm_up${EXE} \
 	${DEBUGDIR}/warm_up_sparse${EXE} \
 	${DEBUGDIR}/solve_lcqp_from_file${EXE} \
-	${DEBUGDIR}/matplotlibtest${EXE} \
 	# ${DEBUGDIR}/test_csc${EXE}
 
 
