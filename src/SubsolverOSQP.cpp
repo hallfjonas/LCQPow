@@ -151,9 +151,7 @@ namespace lcqpOASES {
      */
     void SubsolverOSQP::copy(const SubsolverOSQP& rhs)
     {
-        H = rhs.H;
-        A = rhs.A;
-
+        // Todo: Verify copy
         data = rhs.data;
         settings = rhs.settings;
         work = rhs.work;

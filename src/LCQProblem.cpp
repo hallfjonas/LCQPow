@@ -258,7 +258,8 @@ namespace lcqpOASES {
 			return MessageHandler::PrintMessage( ret );
 
 		// USe qpOASES in dense formulations
-		subsolver = Subsolver( nV, nC + 2*nComp, H, A );
+		Subsolver tmp( nV, nC + 2*nComp, H, A );
+		subsolver = tmp;
 
 		// Call solver
 		return MessageHandler::PrintMessage( runSolver( ) );

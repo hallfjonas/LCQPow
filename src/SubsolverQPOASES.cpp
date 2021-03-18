@@ -149,8 +149,9 @@ namespace lcqpOASES {
 
         H = new double[nV*nV];
         A = new double[nC*nV];
-        H = rhs.H;
-        A = rhs.A;
+
+        memcpy(H, rhs.H, (long unsigned int)(nV*nV)*sizeof(double));
+        memcpy(A, rhs.A, (long unsigned int)(nC*nV)*sizeof(double));
 
         qp = rhs.qp;
     }

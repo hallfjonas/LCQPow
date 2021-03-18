@@ -33,7 +33,8 @@ namespace lcqpOASES {
                             double* H, double* A )
     {
         qpSolver = QPSubproblemSolver::QPOASES;
-        solverQPOASES = SubsolverQPOASES(nV, nC, H, A);
+        SubsolverQPOASES tmp(nV, nC, H, A);
+        solverQPOASES = tmp;
     }
 
     /*
