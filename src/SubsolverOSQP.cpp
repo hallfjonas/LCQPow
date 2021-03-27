@@ -73,11 +73,7 @@ namespace lcqpOASES {
      */
     SubsolverOSQP::~SubsolverOSQP()
     {
-        if (H != 0)
-            delete[] H;
-
-        if (A != 0)
-            delete[] A;
+        // TODO: Destruct csc matrices
     }
 
 
