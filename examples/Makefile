@@ -45,12 +45,14 @@ QPOASES_SRC = $(wildcard ${QPOASESDIR}/src/*.cpp)
 
 LCQPOASES_EXAMPLES = \
 	${BINDIR}/warm_up${EXE} \
+	${BINDIR}/warm_up_w_A${EXE} \
 	${BINDIR}/warm_up_sparse${EXE} \
 	${BINDIR}/solve_lcqp_from_file${EXE} \
 	# ${BINDIR}/test_csc${EXE}
 
 LCQPOASES_DEBUG = \
 	${DEBUGDIR}/warm_up${EXE} \
+	${DEBUGDIR}/warm_up_w_A${EXE} \
 	${DEBUGDIR}/warm_up_sparse${EXE} \
 	${DEBUGDIR}/solve_lcqp_from_file${EXE} \
 	# ${DEBUGDIR}/test_csc${EXE}
