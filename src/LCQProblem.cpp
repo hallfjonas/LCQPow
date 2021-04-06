@@ -719,7 +719,7 @@ namespace lcqpOASES {
 
 		alphak = 1;
 
-		// Non convex case
+		// Convex Descent Case
 		if (qk > 0 && lk < 0) {
 			alphak = std::min(-lk/qk, 1.0);
 		}
@@ -731,6 +731,7 @@ namespace lcqpOASES {
 	 */
 	void LCQProblem::updateStep( ) {
 		// Update penalty on rejected step
+		// Currently doesn't exist
 		if (alphak <= 0) {
 			updatePenalty( );
 
@@ -746,10 +747,12 @@ namespace lcqpOASES {
 
 			// Add some +/- EPS to each coordinate
 			perturbGradient();
+			// perturbStep();
 		}
 
-		// Update Qk
-		Utilities::WeightedMatrixAdd(1, H, rho, C, Qk, nV, nV);
+		// Update Qk = H + rho*C (only required on first inner iteration)
+		if (innerIter == 0)
+			Utilities::WeightedMatrixAdd(1, H, rho, C, Qk, nV, nV);
 
 		// stat = Qk*xk + g - A*yk
 		// 1) Objective contribution: Qk*xk + g
@@ -778,6 +781,20 @@ namespace lcqpOASES {
 		}
 	}
 
+
+	/*
+	 *	 p e r t u r b S t e p
+	 */
+	void LCQProblem::perturbStep( ) {
+
+		int randNum;
+		for (int i = 0; i < nV; i++) {
+			// Random number -1, 0, 1
+			randNum = (rand() % 3) - 1;
+
+			xk[i] += randNum*Utilities::EPS;
+		}
+	}
 
 	/*
 	 *	 t r a n s f o r m D u a l s
