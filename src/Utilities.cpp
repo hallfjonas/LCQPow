@@ -112,7 +112,7 @@ namespace lcqpOASES {
      */
     void Options::setToDefault( ) {
         complementarityTolerance = 1.0e3 * Utilities::EPS;
-        stationarityTolerance  = 1.0e3 * Utilities::EPS;
+        stationarityTolerance  = 1.0e3 * Utilities::EPS*1000;
         initialComplementarityPenalty = 0.01;
     	complementarityPenaltyUpdate  = 2.0;
 
@@ -234,7 +234,7 @@ namespace lcqpOASES {
     }
 
     /*
-     *	Q u a d r a t i c F o r m P r o d u c t
+     *	M a x A b s
      */
     double Utilities::MaxAbs(const double* const a, int m) {
         double max = 0;
