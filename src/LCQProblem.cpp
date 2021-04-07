@@ -754,16 +754,22 @@ namespace lcqpOASES {
 		if (innerIter == 0)
 			Utilities::WeightedMatrixAdd(1, H, rho, C, Qk, nV, nV);
 
-		// stat = Qk*xk + g - A*yk
+		// stat = Qk*xk + g - A'*yk_A - yk_x
 		// 1) Objective contribution: Qk*xk + g
 		Utilities::AffineLinearTransformation(1, Qk, xk, g, statk, nV, nV);
 
-		// 2) Constraint contribution: A*yk
+		// 2) Constraint contribution: A'*yk
 		double* constr_stat = new double[nV];
 		Utilities::TransponsedMatrixMultiplication(A, yk_A, constr_stat, nC + 2*nComp, nV, 1);
 
-		// 3) => 1) - 2)
+		// 3) Box constraint contribution
+		double* box_stat = new double[nV];
+		for (int i = 0; i < nV; i++)
+			box_stat[i] = yk[i];
+
+		// 4) => stat = 1) - 2) - 3)
 		Utilities::WeightedVectorAdd(1, statk, -1, constr_stat, statk, nV);
+		Utilities::WeightedVectorAdd(1, statk, -1, box_stat, statk, nV);
 	}
 
 
