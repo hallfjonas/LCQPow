@@ -55,6 +55,10 @@ namespace lcqpOASES {
 						);
 
 
+			/** Destructor. */
+			~LCQProblem( );
+
+
 			/** Run solver passing the desired LCQP in dense format (qpOASES is used on subsolver level).
 			 *
 			 * @param _H The objective's hessian matrix.
@@ -247,7 +251,7 @@ namespace lcqpOASES {
 		*/
 		protected:
 			/** Clears all memory. */
-			returnValue clear( );
+			void clear( );
 
 
 			/** Copies all properties from rhs to this.

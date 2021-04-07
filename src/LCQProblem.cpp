@@ -72,6 +72,13 @@ namespace lcqpOASES {
 	}
 
 
+	/// Destructor
+	LCQProblem::~LCQProblem( ) {
+		clear();
+	}
+
+
+
 	/*
 	*	s o l v e
 	*/
@@ -566,7 +573,7 @@ namespace lcqpOASES {
 			updateStep( );
 
 			// Create debugging plots
-			plotter.CreateIVOCPPlots(xk, lb, ub);
+			// plotter.CreateIVOCPPlots(xk, lb, ub);
 
 			// Print iteration
 			printIteration( );
@@ -1019,6 +1026,73 @@ namespace lcqpOASES {
 		}
 
 		printf("-\n");
+	}
+
+
+	/// Clear allocated memory
+	void LCQProblem::clear( )
+	{
+		if (H != 0)
+			delete[] H;
+
+		if (g != 0)
+			delete[] g;
+
+		if (lb != 0)
+			delete[] lb;
+
+		if (ub != 0)
+			delete[] ub;
+
+		if (A != 0)
+			delete[] A;
+
+		if (lbA != 0)
+			delete[] lbA;
+
+		if (ubA != 0)
+			delete[] ubA;
+
+		if (H != 0)
+			delete[] H;
+
+		if (S1 != 0)
+			delete[] S1;
+
+		if (S2 != 0)
+			delete[] S2;
+
+		if (C != 0)
+			delete[] C;
+
+
+		if (gk != 0)
+			delete[] gk;
+
+		if (xk != 0)
+			delete[] xk;
+
+		if (yk != 0)
+			delete[] yk;
+
+		if (yk_A != 0)
+			delete[] yk_A;
+
+		if (xnew != 0)
+			delete[] xnew;
+
+		if (pk != 0)
+			delete[] pk;
+
+		if (Qk != 0)
+			delete[] Qk;
+
+		if (statk != 0)
+			delete[] statk;
+
+		// TODO: Delete csc types
+		// csc* H_sparse;
+		// csc* A_sparse;
 	}
 }
 
