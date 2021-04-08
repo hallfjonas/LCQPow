@@ -259,8 +259,8 @@ TEST(UtilitiesTest, ReadFromFileAndMultiply) {
     Afile.close();
     lbAfile.close();
 
-    int nV = x0vals.size();
-    int nC = Avals.size()/nV;
+    int nV = (int) x0vals.size();
+    int nC = ((int)Avals.size())/nV;
 
     double* x0 = new double[nV];
     lcqpOASES::Utilities::readFromFile(x0, nV, x0path);
@@ -272,12 +272,17 @@ TEST(UtilitiesTest, ReadFromFileAndMultiply) {
     lcqpOASES::Utilities::readFromFile(lbA, nC, lbApath);
 
     for (int i = 0; i < nV*nC; i++) {
-        if (i < nC)
+        // Check lower bounds
+        if (i < nC) {
             ASSERT_EQ(lbA[i], lbAvals[i]);
+        }
 
-        if (i < nV)
+        // Check x vals
+        if (i < nV) {
             ASSERT_EQ(x0[i], x0vals[i]);
+        }
 
+        // Check contraint
         ASSERT_EQ(A[i], Avals[i]);
     }
 
@@ -310,6 +315,76 @@ TEST(UtilitiesTest, Options) {
     ASSERT_EQ(opts2.initialComplementarityPenalty, 100);
     ASSERT_EQ(opts2.complementarityPenaltyUpdate, 100);
 }
+
+
+// Testing csc to dns
+TEST(UtilitiesTest, CSCtoDNS) {
+    // First test matrix
+    // | 2 1 0 |
+    // | 0 2 0 |
+
+    int m = 2;
+    int n = 3;
+
+    int H_nnx = 3;
+    double H_data[3] = { 2.0, 1.0, 2.0 };
+    int H_i[3] = {0, 0, 1};
+    int H_p[4] = {0, 1, 3, 4};
+
+    csc* H = csc_matrix(m, n, H_nnx, H_data, H_i, H_p);
+
+    double* H_full = new double[m*n]();
+    lcqpOASES::Utilities::csc_to_dns(H, H_full, m, n);
+
+    ASSERT_FLOAT_EQ(H_full[0], 2);
+    ASSERT_FLOAT_EQ(H_full[1], 1);
+    ASSERT_FLOAT_EQ(H_full[2], 0);
+    ASSERT_FLOAT_EQ(H_full[3], 0);
+    ASSERT_FLOAT_EQ(H_full[4], 2);
+    ASSERT_FLOAT_EQ(H_full[5], 0);
+
+    // Modify some values: Second test matrix
+    // | 2 0 0  |
+    // | 1 0 10 |
+    H_data[2] = 10;
+    H_p[1] = 2;
+    H_p[2] = 2;
+    H_i[1] = 1;
+    H = csc_matrix(m, n, H_nnx, H_data, H_i, H_p);
+
+    H_full = new double[m*n]();
+    lcqpOASES::Utilities::csc_to_dns(H, H_full, m, n);
+
+    ASSERT_FLOAT_EQ(H_full[0], 2);
+    ASSERT_FLOAT_EQ(H_full[1], 0);
+    ASSERT_FLOAT_EQ(H_full[2], 0);
+    ASSERT_FLOAT_EQ(H_full[3], 1);
+    ASSERT_FLOAT_EQ(H_full[4], 0);
+    ASSERT_FLOAT_EQ(H_full[5], 10);
+
+    // Transpose: Third test matrix
+    // | 2  1 |
+    // | 0  0 |
+    // | 10 0 |
+    m = 3;
+    n = 2;
+    double T_data[3] = { 2.0, 10.0, 1.0 };
+    int T_i[3] = {0, 2, 0};
+    int T_p[3] = {0, 2, 3};
+    int T_nnx = 3;
+    csc* T = csc_matrix(m, n, T_nnx, T_data, T_i, T_p);
+
+    double* T_full = new double[m*n]();
+    lcqpOASES::Utilities::csc_to_dns(T, T_full, m, n);
+
+    ASSERT_FLOAT_EQ(T_full[0], 2);
+    ASSERT_FLOAT_EQ(T_full[1], 1);
+    ASSERT_FLOAT_EQ(T_full[2], 0);
+    ASSERT_FLOAT_EQ(T_full[3], 0);
+    ASSERT_FLOAT_EQ(T_full[4], 10);
+    ASSERT_FLOAT_EQ(T_full[5], 0);
+}
+
 
 // Testing lcqpOASES solver set up
 TEST(SolverTest, RunWarmUp) {
@@ -344,7 +419,7 @@ TEST(SolverTest, RunWarmUp) {
     bool sStat1Found = (std::abs(xOpt[0] - 1) <= options.stationarityTolerance) && (std::abs(xOpt[1]) <= options.stationarityTolerance);
     bool sStat2Found = (std::abs(xOpt[1] - 1) <= options.stationarityTolerance) && (std::abs(xOpt[0]) <= options.stationarityTolerance);
 
-    ASSERT_TRUE(  sStat1Found || sStat2Found );
+    ASSERT_TRUE( sStat1Found || sStat2Found );
 
     bool stat1 = std::abs(2*xOpt[0] - 2 - yOpt[0] - yOpt[2]) <= options.stationarityTolerance;
     bool stat2 = std::abs(2*xOpt[1] - 2 - yOpt[1] - yOpt[3]) <= options.stationarityTolerance;
