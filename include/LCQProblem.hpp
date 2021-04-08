@@ -23,8 +23,8 @@
 #ifndef LCQPOASES_LCQPROBLEM_HPP
 #define LCQPOASES_LCQPROBLEM_HPP
 
-#include <Utilities.hpp>
-#include <Subsolver.hpp>
+#include "Utilities.hpp"
+#include "Subsolver.hpp"
 
 #include <qpOASES.hpp>
 #include <vector>
@@ -517,12 +517,10 @@ namespace lcqpOASES {
 
 			algorithmStatus algoStat;				/**< Status of algorithm. */
 
-			// Sparse matrices
-			csc* H_sparse;
-			csc* A_sparse;
+			csc* H_sparse;							/**< Sparse objective Hessian matrix. */
+			csc* A_sparse;							/**< Sparse constraint matrix. */
 
-			// Subproblem solvers
-            Subsolver subsolver;
+			Subsolver subsolver;					/**< Subsolver class for solving the QP subproblems. */
 
 	};
 }

@@ -41,9 +41,7 @@ namespace lcqpOASES {
 
 	LCQProblem::LCQProblem( ) { }
 
-	/*
-	*	Q P r o b l e m
-	*/
+
 	LCQProblem::LCQProblem( int _nV, int _nC, int _nComp )
 	{
 		/* consistency checks */
@@ -72,16 +70,11 @@ namespace lcqpOASES {
 	}
 
 
-	/// Destructor
 	LCQProblem::~LCQProblem( ) {
 		clear();
 	}
 
 
-
-	/*
-	*	s o l v e
-	*/
 	returnValue LCQProblem::solve(	const double* const _H, const double* const _g,
 									const double* const _lb, const double* const _ub,
 									const double* const _S1, const double* const _S2,
@@ -129,9 +122,6 @@ namespace lcqpOASES {
 	}
 
 
-	/*
-	*	s o l v e
-	*/
 	returnValue LCQProblem::solve(	const char* const H_file, const char* const g_file,
 									const char* const lb_file, const char* const ub_file,
 									const char* const S1_file, const char* const S2_file,
@@ -273,9 +263,6 @@ namespace lcqpOASES {
 	}
 
 
-	/*
-	*	s o l v e
-	*/
 	returnValue LCQProblem::solve(	double* _H_data, int _H_nnx, int* _H_i, int* _H_p,
 									double* _g, double* _lb, double* _ub,
 									double* _S1_data, int _S1_nnx, int* _S1_i, int* _S1_p,
@@ -306,7 +293,7 @@ namespace lcqpOASES {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
-		setConstraints( _S1_data, _S1_nnx, _S1_i, _S1_p, _S2_data, _S2_nnx, _S2_i, _S2_p, _A_data, _A_nnx, _A_i, _A_p, _lbA, _ubA );
+		ret = setConstraints( _S1_data, _S1_nnx, _S1_i, _S1_p, _S2_data, _S2_nnx, _S2_i, _S2_p, _A_data, _A_nnx, _A_i, _A_p, _lbA, _ubA );
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
@@ -324,9 +311,6 @@ namespace lcqpOASES {
 	}
 
 
-	/*
-	*	s e t C o n s t r a i n t s
-	*/
 	returnValue LCQProblem::setConstraints( 	const double* const S1_new, const double* const S2_new,
 												const double* const A_new, const double* const lbA_new, const double* const ubA_new )
 	{
@@ -398,9 +382,6 @@ namespace lcqpOASES {
 	}
 
 
-	/*
-	 *	 s e t C o n s t r a i n t s
-	 */
 	returnValue LCQProblem::setConstraints(	double* S1_data, int S1_nnx, int* S1_i, int* S1_p,
 											double* S2_data, int S2_nnx, int* S2_i, int* S2_p,
 											double* A_data, int A_nnx, int* A_i, int* A_p,
@@ -424,8 +405,8 @@ namespace lcqpOASES {
 
 				// First handle rows of A
 				for (int j = A_p[i]; j < A_p[i+1]; j++) {
-					tmpA_data[index_data] = A_data[A_p[i]+j];
-					tmpA_i[index_data] = A_i[A_p[i]+j];
+					tmpA_data[index_data] = A_data[j];
+					tmpA_i[index_data] = A_i[j];
 					index_data++;
 				}
 			} else {
@@ -434,21 +415,22 @@ namespace lcqpOASES {
 
 			// Then rows of S1
 			for (int j = S1_p[i]; j < S1_p[i+1]; j++) {
-				tmpA_data[index_data] = S1_data[S2_p[i]+j];
-				tmpA_i[index_data] = S1_i[S2_p[i]+j];
+				tmpA_data[index_data] = S1_data[j];
+				tmpA_i[index_data] = S1_i[j];
 				index_data++;
 			}
 			// Then rows of S2
 			for (int j = S2_p[i]; j < S2_p[i+1]; j++) {
-				tmpA_data[index_data] = S2_data[S2_p[i]+j];
-				tmpA_i[index_data] = S2_i[S2_p[i]+j];
+				tmpA_data[index_data] = S2_data[j];
+				tmpA_i[index_data] = S2_i[j];
 				index_data++;
 			}
 		}
 
 		// End index of column
-		tmpA_p[nV] = S2_p[nV] + nC + nComp;
+		tmpA_p[nV] = tmpA_nnx;
 
+		// Create sparse matrix
 		A_sparse = csc_matrix(nC + 2*nComp, nV, tmpA_nnx, tmpA_data, tmpA_i, tmpA_p);
 
 		// Set up new constraint bounds (lbA; 0; 0) & (ubA; INFINITY; INFINITY)
@@ -482,15 +464,20 @@ namespace lcqpOASES {
 			ubA[i + nC] = INFINITY;
 		}
 
+
+		// Create dense matrices
+		A = new double[(nC + 2*nComp)*nV]();
+		lcqpOASES::returnValue ret = Utilities::csc_to_dns(A_sparse, A, nC + 2*nComp, nV);
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage(ret);
+
+		Utilities::printMatrix(A, nC + 2*nComp, nV, "Full A");
+
 		// For now store S1, S2, and C in dense format.
 		// If we can manage to adapt all operations required for C (specifically S1'*S2 + S2'*S1 = C)
 		// we should instantly switch to sparse format!
 		S1 = new double[nComp*nV]();
-		for (int j = 0; j < nV; j++) {
-			for (int i = 0; i < S1_p[j+1] - S1_p[j]; i++) {
-				S1[(S1_p[j]+i)*nV + j] = S1_data[S1_p[j]+i];
-			}
-		}
+
 
 		S2 = new double[nComp*nV]();
 		for (int j = 0; j < nV; j++) {
@@ -501,41 +488,28 @@ namespace lcqpOASES {
 
 		C = new double[nV*nV];
 		Utilities::MatrixSymmetrizationProduct(S1, S2, C, nComp, nV);
+		Utilities::printMatrix(C, nV, nV, "Full C");
 
 		return SUCCESSFUL_RETURN;
 	}
 
 
-	/*
-	 *	 s e t S p a r s e M a t r i x
-	 */
 	returnValue LCQProblem::setH( double* H_data, int H_nnx, int* H_i, int* H_p )
 	{
 		if (nV <= 0)
 			return LCQPOBJECT_NOT_SETUP;
 
-		throw (MessageHandler::PrintMessage( NOT_YET_IMPLEMENTED ));
+		H_sparse = csc_spalloc(nV, nV, H_nnx, 1, 1);
+		H_sparse = csc_matrix(nV, nV, H_nnx, H_data, H_i, H_p);
 
-		// csc* tmp1 = csc_spalloc(nV, nV, H_nnx, 1, 1);
-		// csc* tmp2 = csc_spalloc(nV, nV, H_nnx, 0, 1);
-		// csc* tmp3 = csc_spalloc(nV, nV, H_nnx, 1, 0);
-		// csc* tmp4 = csc_spalloc(nV, nV, H_nnx, 0, 0);
-
-
-		// H_sparse = csc_spalloc(nV, nV, H_nnx, 1, 1);
-		// H_sparse = csc_matrix(_nV, _nV, H_nnx, H_data, H_i, H_p);
-		// double* full = new double[nV*nV]();
-
-		// TODO: What about this?
-		// full = csc_to_dns(H_sparse);
+		H = new double[nV*nV]();
+		Utilities::csc_to_dns(H_sparse, H, nV, nV);
+		Utilities::printMatrix(H, nV, nV, "Full H");
 
 		return returnValue::SUCCESSFUL_RETURN;
 	}
 
 
-	/*
-	 *	 r u n S o l v e r
-	 */
 	returnValue LCQProblem::runSolver( )
 	{
 		// Create a plot manager instance
@@ -621,9 +595,6 @@ namespace lcqpOASES {
 	}
 
 
-	/*
-	 *	 i n i t i a l i z e S o l v e r
-	 */
 	void LCQProblem::initializeSolver( )
 	{
 		// Allocate vectors
@@ -649,9 +620,6 @@ namespace lcqpOASES {
 	}
 
 
-	/*
-	 *	 s o l v e Q P S u b p r o b l e m
-	 */
 	returnValue LCQProblem::solveQPSubproblem(bool initialSolve)
 	{
 		// First solve convex subproblem
@@ -688,33 +656,21 @@ namespace lcqpOASES {
 	}
 
 
-	/*
-	 *	 s t a t i o n a r i t y C h e c k
-	 */
 	bool LCQProblem::stationarityCheck( ) {
 		return Utilities::MaxAbs(statk, nV) < options.stationarityTolerance;
 	}
 
 
-	/*
-	 *	 c o m p l e m e n t a r i t y C h e c k
-	 */
 	bool LCQProblem::complementarityCheck( ) {
 		return Utilities::QuadraticFormProduct(C, xk, nV) < 2*options.complementarityTolerance;
 	}
 
 
-	/*
-	 *	 u p d a t e P e n a l t y
-	 */
 	void LCQProblem::updatePenalty( ) {
 		rho *= options.complementarityPenaltyUpdate;
 	}
 
 
-	/*
-	 *	 g e t O p t i m a l S t e p L e n g t h
-	 */
 	void LCQProblem::getOptimalStepLength( ) {
 
 		double qk = Utilities::QuadraticFormProduct(Qk, pk, nV);
@@ -733,9 +689,6 @@ namespace lcqpOASES {
 	}
 
 
-	/*
-	 *	 u p d a t e S t e p
-	 */
 	void LCQProblem::updateStep( ) {
 		// Update penalty on rejected step
 		// Currently doesn't exist
@@ -780,9 +733,6 @@ namespace lcqpOASES {
 	}
 
 
-	/*
-	 *	 p e r t u r b G r a d i e n t
-	 */
 	void LCQProblem::perturbGradient( ) {
 
 		int randNum;
@@ -795,9 +745,6 @@ namespace lcqpOASES {
 	}
 
 
-	/*
-	 *	 p e r t u r b S t e p
-	 */
 	void LCQProblem::perturbStep( ) {
 
 		int randNum;
@@ -809,9 +756,7 @@ namespace lcqpOASES {
 		}
 	}
 
-	/*
-	 *	 t r a n s f o r m D u a l s
-	 */
+
 	void LCQProblem::transformDuals( ) {
 
 		double* tmp = new double[nComp];
@@ -830,9 +775,6 @@ namespace lcqpOASES {
 	}
 
 
-	/*
-	 *	 d e t e r m i n e S t a t i o n a r i t y T y p e
-	 */
 	void LCQProblem::determineStationarityType( ) {
 
 		std::vector<int> weakComp = getWeakComplementarities( );
@@ -877,9 +819,6 @@ namespace lcqpOASES {
 	}
 
 
-	/*
-	 *	 g e t W e a k C o m p l e m e n t a r i t i e s
-	 */
 	std::vector<int> LCQProblem::getWeakComplementarities( )
 	{
 		double* S1x = new double[nComp];
@@ -900,9 +839,6 @@ namespace lcqpOASES {
 	}
 
 
-	/*
-	*	g e t P r i m a l S o l u t i o n
-	*/
 	algorithmStatus LCQProblem::getPrimalSolution( double* const xOpt ) const
 	{
 		if (algoStat != algorithmStatus::PROBLEM_NOT_SOLVED) {
@@ -914,9 +850,6 @@ namespace lcqpOASES {
 	}
 
 
-	/*
-	*	g e t D u a l S o l u t i o n
-	*/
 	algorithmStatus LCQProblem::getDualSolution( double* const yOpt ) const
 	{
 		if (algoStat != algorithmStatus::PROBLEM_NOT_SOLVED) {
@@ -965,9 +898,7 @@ namespace lcqpOASES {
 		printf(" \n");
 	}
 
-	/*
-	 * 	 p r i n t H e a d e r
-	 */
+
 	void LCQProblem::printHeader()
 	{
 		printLine();

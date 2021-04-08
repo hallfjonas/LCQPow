@@ -22,36 +22,28 @@
 
 #include "Utilities.hpp"
 #include <iostream>
+#include <vector>
+#include <osqp.h>
 
 namespace lcqpOASES {
-    /*
-    *	O p t i o n s
-    */
+
+
     Options::Options( )
     {
         setToDefault( );
     }
 
 
-    /*
-    *	O p t i o n s
-    */
     Options::Options( const Options& rhs)
     {
         copy( rhs );
     }
 
 
-    /*
-    *	~ O p t i o n s
-    */
     Options::~Options( )
     { }
 
 
-    /*
-    *	o p e r a t o r =
-    */
     Options& Options::operator=( const Options& rhs )
     {
         if ( this != &rhs )
@@ -63,9 +55,6 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *   c o p y
-     */
     void Options::copy( const Options& rhs ) {
         stationarityTolerance = rhs.stationarityTolerance;
         complementarityTolerance = rhs.complementarityTolerance;
@@ -80,9 +69,6 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *  e n s u r e C o n s i s t e n c y
-     */
     returnValue Options::ensureConsistency( ) {
 
         if (complementarityPenaltyUpdate <= 1)
@@ -107,9 +93,6 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *   s e t T o D e f a u l t
-     */
     void Options::setToDefault( ) {
         complementarityTolerance = 1.0e3 * Utilities::EPS;
         stationarityTolerance  = 1.0e3 * Utilities::EPS*1000;
@@ -127,9 +110,7 @@ namespace lcqpOASES {
 
     }
 
-    /*
-     *   M a t r i x M u l t i p l i c a t i o n
-     */
+
     void Utilities::MatrixMultiplication(const double* const A, const double* const B, double* C, int m, int n, int p) {
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < p; j++) {
@@ -141,9 +122,7 @@ namespace lcqpOASES {
         }
     }
 
-    /*
-     *   M a t r i x M u l t i p l i c a t i o n
-     */
+
     void Utilities::TransponsedMatrixMultiplication(const double* const A, const double* const B, double* C, int m, int n, int p) {
 
         for (int i = 0; i < n; i++) {
@@ -157,9 +136,7 @@ namespace lcqpOASES {
         }
     }
 
-    /*
-     *  M a t r i x S y m m e t r i z a t i o n P r o d u c t
-     */
+
     void Utilities::MatrixSymmetrizationProduct(const double* const A, const double* const B, double* C, int m, int n) {
         for (int i = 0; i < n; i++) {
             for (int j = 0; j <= i; j++) {
@@ -174,9 +151,7 @@ namespace lcqpOASES {
         }
     }
 
-    /*
-     *   A f f i n e L i n e a r T r a n s f o r m a t i o n
-     */
+
     void Utilities::AffineLinearTransformation(const double alpha, const double* const A, const double* const b, const double* const c, double* d, int m, int n) {
         for (int i = 0; i < m; i++) {
 
@@ -189,26 +164,19 @@ namespace lcqpOASES {
         }
     }
 
-    /*
-     *	r e a d F r o m F i l e
-     */
+
     void Utilities::WeightedMatrixAdd(const double alpha, const double* const A, const double beta, const double* const B, double* C, int m, int n) {
         for (int i = 0; i < m; i++)
             for (int j = 0; j < n; j++)
                 C[i*n + j] = alpha*A[i*n+j] + beta*B[i*n+j];
     }
 
-    /*
-     *	r e a d F r o m F i l e
-     */
+
     void Utilities::WeightedVectorAdd(const double alpha, const double* const a, const double beta, const double* const b, double* c, int m) {
         WeightedMatrixAdd(alpha, a, beta, b, c, m, 1);
     }
 
 
-    /*
-     *	Q u a d r a t i c F o r m P r o d u c t
-     */
     double Utilities::QuadraticFormProduct(const double* const Q, const double* const p, int m) {
         double ret = 0;
         for (int i = 0; i < m; i++) {
@@ -222,9 +190,7 @@ namespace lcqpOASES {
         return ret;
     }
 
-    /*
-     *	Q u a d r a t i c F o r m P r o d u c t
-     */
+
     double Utilities::DotProduct(const double* const a, const double* const b, int m) {
         double ret = 0;
         for (int i = 0; i < m; i++)
@@ -233,9 +199,7 @@ namespace lcqpOASES {
         return ret;
     }
 
-    /*
-     *	M a x A b s
-     */
+
     double Utilities::MaxAbs(const double* const a, int m) {
         double max = 0;
         double min = 0;
@@ -250,9 +214,7 @@ namespace lcqpOASES {
         return std::max(max, -min);
     }
 
-    /*
-     *	r e a d F r o m F i l e
-     */
+
     returnValue Utilities::readFromFile( int* data, int n, const char* datafilename )
     {
         int i;
@@ -282,9 +244,6 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *	r e a d F r o m F i l e
-     */
     returnValue Utilities::readFromFile( double* data, int n, const char* datafilename )
     {
         int i;
@@ -314,9 +273,6 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *	r e a d F r o m F i l e
-     */
     returnValue Utilities::writeToFile( double* data, int n, const char* datafilename )
     {
         int i;
@@ -346,9 +302,6 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *   p r i n t M a t r i x
-     */
     void Utilities::printMatrix(const double* const A, int m, int n, const char* const name)
     {
         printf("Printing matrix %s:\n", name);
@@ -365,9 +318,6 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *   p r i n t S t e p
-     */
     void Utilities::printStep(double* xk, double* pk, double* xk_new, double alpha, int nV)
     {
         printf("Printing Step:\n");
@@ -379,9 +329,6 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *   p r i n t M a t r i x
-     */
     void Utilities::printBounds(double* lb, double* xk, double* ub, int m)
     {
         printf("Printing box constraints:\n");
@@ -393,9 +340,6 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *   P r i n t M e s s a g e
-     */
     returnValue MessageHandler::PrintMessage( returnValue ret) {
 
         switch (ret) {
@@ -403,80 +347,91 @@ namespace lcqpOASES {
                 break;
 
             case NOT_YET_IMPLEMENTED:
-                printf("This method has not yet been implemented.");
+                printf("This method has not yet been implemented.\n");
                 break;
 
             case LCQPOBJECT_NOT_SETUP:
-                printf("ERROR: The LCQP object has not been set up correctly.");
+                printf("ERROR: The LCQP object has not been set up correctly.\n");
                 break;
 
             case INDEX_OUT_OF_BOUNDS:
-                printf("ERROR: Index out of bounds.");
+                printf("ERROR: Index out of bounds.\n");
                 break;
 
             case SUBPROBLEM_SOLVER_ERROR:
-                printf("ERROR: The subproblem solver produced an error.");
+                printf("ERROR: The subproblem solver produced an error.\n");
                 break;
 
             case UNABLE_TO_READ_FILE:
-                printf("ERROR: Unable to read file.");
+                printf("ERROR: Unable to read file.\n");
                 break;
 
             case MAX_OUTER_ITERATIONS_REACHED:
-                printf("ERROR: Maximum number of outer iterations reached.");
+                printf("ERROR: Maximum number of outer iterations reached.\n");
                 break;
 
             case MAX_INNER_ITERATIONS_REACHED:
-                printf("ERROR: Maximum number of inner iterations reached.");
+                printf("ERROR: Maximum number of inner iterations reached.\n");
                 break;
 
             case INITIAL_SUBPROBLEM_FAILED:
-                printf("ERROR: Failed to solve initial QP.");
+                printf("ERROR: Failed to solve initial QP.\n");
                 break;
 
             case INVALID_ARGUMENT:
-                printf("ERROR: Invalid argument passed.");
+                printf("ERROR: Invalid argument passed.\n");
                 break;
 
             case INVALID_NUMBER_OF_OPTIM_VARS:
-                printf("ERROR: Invalid optimization variable dimension passed (required to be > 0).");
+                printf("ERROR: Invalid optimization variable dimension passed (required to be > 0).\n");
                 break;
 
             case INVALID_NUMBER_OF_COMP_VARS:
-                printf("ERROR: Invalid complementarity dimension passed (required to be > 0).");
+                printf("ERROR: Invalid complementarity dimension passed (required to be > 0).\n");
                 break;
 
             case INVALID_NUMBER_OF_CONSTRAINT_VARS:
-                printf("ERROR: Invalid number of optimization variables passed (required to be >= 0).");
+                printf("ERROR: Invalid number of optimization variables passed (required to be >= 0).\n");
                 break;
 
             case INVALID_COMPLEMENTARITY_TOLERANCE:
-                printf("ERROR: Invalid argument passed (complementarity tolerance).");
+                printf("ERROR: Invalid argument passed (complementarity tolerance).\n");
                 break;
 
             case INVALID_INITIAL_PENALTY_VALUE:
-                printf("ERROR: Invalid argument passed (initial penalty value).");
+                printf("ERROR: Invalid argument passed (initial penalty value).\n");
                 break;
 
             case INVALID_PENALTY_UPDATE_VALUE:
-                printf("ERROR: Invalid argument passed (penalty update value).");
+                printf("ERROR: Invalid argument passed (penalty update value).\n");
                 break;
 
             case INVALID_MAX_OUTER_ITERATIONS_VALUE:
-                printf("ERROR: Invalid argument passed (maximum outer iterations).");
+                printf("ERROR: Invalid argument passed (maximum outer iterations).\n");
                 break;
 
             case INVALID_MAX_INNER_ITERATIONS_VALUE:
-                printf("ERROR: Invalid argument passed (maximum inner iterations).");
+                printf("ERROR: Invalid argument passed (maximum inner iterations).\n");
                 break;
 
             case INVALID_RELAX_OPTIONS_TOLERANCE:
-                printf("ERROR: Invalid argument passed (relax optiopns tolerance).");
+                printf("ERROR: Invalid argument passed (relax optiopns tolerance).\n");
+                break;
+
+            case INVALID_INDEX_POINTER:
+                printf("ERROR: Invalid index pointer passed in csc format.\n");
+                break;
+
+            case INVALID_INDEX_ARRAY:
+                printf("ERROR: Invalid index array passed in csc format.\n");
                 break;
         }
 
+        fflush(stdout);
+
         return ret;
     }
+
 
     algorithmStatus MessageHandler::PrintSolution( algorithmStatus algoStat ) {
 
@@ -485,7 +440,7 @@ namespace lcqpOASES {
 
         switch (algoStat) {
             case PROBLEM_NOT_SOLVED:
-                printf("The LCQP has not been solved.");
+                printf("The LCQP has not been solved.\n");
                 break;
 
             case W_STATIONARY_SOLUTION:
@@ -510,6 +465,5 @@ namespace lcqpOASES {
 
         return algoStat;
     }
-
 }
 

@@ -22,12 +22,13 @@
 #include "PlotManager.hpp"
 #include "Utilities.hpp"
 
-#include "matplotlibcpp.h"
+#include <matplotlibcpp.h>
 namespace plt = matplotlibcpp;
 
-#include<vector>
+#include <vector>
 
 namespace lcqpOASES {
+
     PlotManager::PlotManager(int _nV, int _nC, int _nComp, LCQPNAME lcqpname)
     {
         nV = _nV;
@@ -56,6 +57,7 @@ namespace lcqpOASES {
         }
     }
 
+
     void PlotManager::CreateIVOCPPlots(const double* const _xk, const double* const _lb, const double* const _ub)
     {
         memcpy(xk, _xk, (unsigned int)nV*sizeof(double));
@@ -65,6 +67,7 @@ namespace lcqpOASES {
         CreateIVOCPTrajectoryPlot();
         CreateIVOCPComplementarityPlot();
     }
+
 
     void PlotManager::CreateIVOCPTrajectoryPlot()
     {
@@ -83,6 +86,7 @@ namespace lcqpOASES {
         plt::save("plots/trajectory.png");
 
     }
+
 
     void PlotManager::CreateIVOCPComplementarityPlot()
     {

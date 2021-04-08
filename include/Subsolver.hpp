@@ -22,8 +22,8 @@
 #ifndef LCQPOASES_SUBSOLVER_HPP
 #define LCQPOASES_SUBSOLVER_HPP
 
-#include <SubsolverQPOASES.hpp>
-#include <SubsolverOSQP.hpp>
+#include "SubsolverQPOASES.hpp"
+#include "SubsolverOSQP.hpp"
 
 namespace lcqpOASES {
 

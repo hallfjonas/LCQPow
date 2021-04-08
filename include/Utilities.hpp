@@ -23,86 +23,105 @@
 #ifndef LCQPOASES_UTILITIES_HPP
 #define LCQPOASES_UTILITIES_HPP
 
+#include <osqp.h>
+
 namespace lcqpOASES {
 
     enum returnValue {
-        // Not implemented
-        NOT_YET_IMPLEMENTED = -1,                   /**< Not yet implemented (internal use only). */
-
-        // Success
-        SUCCESSFUL_RETURN = 0,						/**< Successful return. */
-
-        // Generic Errors
-        LCQPOBJECT_NOT_SETUP = 300,                   /**< Constructor has not been called. */
-        INDEX_OUT_OF_BOUNDS = 301,                    /**< Index out of bounds. */
-        SUBPROBLEM_SOLVER_ERROR = 302,
-        UNABLE_TO_READ_FILE = 303,
-        MAX_OUTER_ITERATIONS_REACHED = 304,
-        MAX_INNER_ITERATIONS_REACHED = 305,
-        INITIAL_SUBPROBLEM_FAILED = 306,
+        // Special values
+        NOT_YET_IMPLEMENTED = -1,                       /**< Not yet implemented (internal use only). */
+        SUCCESSFUL_RETURN = 0,						    /**< Successful return. */
 
         // Invalid arguments
-        INVALID_ARGUMENT = 100,
-        INVALID_PENALTY_UPDATE_VALUE = 101,
-        INVALID_COMPLEMENTARITY_TOLERANCE = 102,
-        INVALID_INITIAL_PENALTY_VALUE = 103,
-        INVALID_MAX_OUTER_ITERATIONS_VALUE = 104,
-        INVALID_MAX_INNER_ITERATIONS_VALUE = 105,
-        INVALID_NUMBER_OF_OPTIM_VARS = 106,
-        INVALID_NUMBER_OF_COMP_VARS = 107,
-        INVALID_NUMBER_OF_CONSTRAINT_VARS = 108,
-        INVALID_RELAX_OPTIONS_TOLERANCE = 109
+        INVALID_ARGUMENT = 100,                         /**< Invalid argument. */
+        INVALID_PENALTY_UPDATE_VALUE = 101,             /**< Invalid penalty update value. Needs to be > 1. */
+        INVALID_COMPLEMENTARITY_TOLERANCE = 102,        /**< Invalid complementarity tolerance. Must be no smaller than machine precision. */
+        INVALID_INITIAL_PENALTY_VALUE = 103,            /**< Invalid initial penalty parameter. Must be positive. */
+        INVALID_MAX_OUTER_ITERATIONS_VALUE = 104,       /**< Invalid number of maximal outer iterations. Must be a positive integer */
+        INVALID_MAX_INNER_ITERATIONS_VALUE = 105,       /**< Invalid number of maximal inner iterations. Must be a positive integer. */
+        INVALID_NUMBER_OF_OPTIM_VARS = 106,             /**< Invalid number of optimization variables. Must be a positive integer. */
+        INVALID_NUMBER_OF_COMP_VARS = 107,              /**< Invalid number of complementarity constraints. Must be a positive integer. */
+        INVALID_NUMBER_OF_CONSTRAINT_VARS = 108,        /**< Invalid number of linear constraints. Must be a non-negative integer. */
+        INVALID_RELAX_OPTIONS_TOLERANCE = 109,          /**< Invalid number of active set changes to switch to precision mode. Must be a positive integer. */
+
+        // Algorithmic errors
+        MAX_OUTER_ITERATIONS_REACHED = 200,             /**< Maximum number of outer iterations reached. */
+        MAX_INNER_ITERATIONS_REACHED = 201,             /**< Maximum number of inner iterations reached. */
+        INITIAL_SUBPROBLEM_FAILED = 202,                /**< Failed to solve the initial QP. */
+        SUBPROBLEM_SOLVER_ERROR = 203,                  /**< An error occured in the subproblem solver. */
+
+        // Generic errors
+        LCQPOBJECT_NOT_SETUP = 300,                     /**< Constructor has not been called. */
+        INDEX_OUT_OF_BOUNDS = 301,                      /**< Index out of bounds. */
+        UNABLE_TO_READ_FILE = 302,                      /**< Unable to read a file. */
+
+        // Sparse matrices
+        INVALID_INDEX_POINTER = 400,                    /**< Invalid index pointer for a csc matrix. */
+        INVALID_INDEX_ARRAY = 401                       /**< Invalid index array for a csc matrix. */
     };
 
     enum algorithmStatus {
-        PROBLEM_NOT_SOLVED = 0,
-        W_STATIONARY_SOLUTION = 1,
-        C_STATIONARY_SOLUTION = 2,
-        M_STATIONARY_SOLUTION = 3,
-        S_STATIONARY_SOLUTION = 4
+        PROBLEM_NOT_SOLVED = 0,                         /**< The problem was not solved. */
+        W_STATIONARY_SOLUTION = 1,                      /**< The solution corresponds to a weakly stationary point. */
+        C_STATIONARY_SOLUTION = 2,                      /**< The solution corresponds to a Clarke stationary point. */
+        M_STATIONARY_SOLUTION = 3,                      /**< The solution corresponds to a Mordukhovich stationary point. */
+        S_STATIONARY_SOLUTION = 4                       /**< The solution corresponds to a strongly stationary point. */
     };
 
     enum printLevel {
-        NONE = 0,                                   /**< No Output. */
-        OUTER_LOOP_ITERATES = 1,                    /**< Print stats for each outer loop iterate. */
-        INNER_LOOP_ITERATES = 2,                    /**< Print stats for each inner loop iterate. */
-        SUBPROBLEM_SOLVER_ITERATES = 3              /**< Print stats for each inner loop (and possibly output of subproblem solver). */
+        NONE = 0,                                       /**< No Output. */
+        OUTER_LOOP_ITERATES = 1,                        /**< Print stats for each outer loop iterate. */
+        INNER_LOOP_ITERATES = 2,                        /**< Print stats for each inner loop iterate. */
+        SUBPROBLEM_SOLVER_ITERATES = 3                  /**< Print stats for each inner loop (and possibly output of subproblem solver). */
     };
 
 
     class Options {
 
         public:
+
             /** Default constructor. */
             Options( );
 
-            /** Copy constructor (deep copy). */
-            Options(	const Options& rhs			/**< Rhs object. */
-                        );
+
+            /** Copy constructor (deep copy).
+             *
+             * @param rhs The object to be copied.
+            */
+            Options( const Options& rhs );
+
 
             /** Destructor. */
             ~Options( );
 
-            /** Assignment operator. */
+
+            /** Assignment operator.
+             *
+             * @param rhs The obejct from which to assign.
+            */
             Options& operator=( const Options& rhs );
 
-            void setToDefault( );                   /**< Sets all options to default values. */
 
-            returnValue ensureConsistency( );       /**< Ensures the consistency of given options. */
+            /** Sets all options to default values. */
+            void setToDefault( );
 
-            double stationarityTolerance;           /**< Tolerance for 1-Norm of stationarity violation. */
-            double complementarityTolerance;		/**< Complementarity tolerance. */
-            double initialComplementarityPenalty;	/**< Start value for complementarity penalty term. */
-            double complementarityPenaltyUpdate;	/**< Factor for updating penaltised complementarity term. */
 
-            bool solveZeroPenaltyFirst;             /**< Flag indicating whether first QP should ignore penalization. */
+            /** Ensures the consistency of given options. */
+            returnValue ensureConsistency( );
 
-            int maxOuterIterations;                 /**< Maximum number of outer iterations to be performed. */
-            int maxInnerIterations;                 /**< Maximum number of inner iterations to be performed. */
+            double stationarityTolerance;               /**< Tolerance for 1-Norm of stationarity violation. */
+            double complementarityTolerance;		    /**< Complementarity tolerance. */
+            double initialComplementarityPenalty;	    /**< Start value for complementarity penalty term. */
+            double complementarityPenaltyUpdate;	    /**< Factor for updating penaltised complementarity term. */
 
-            int relaxOptionsTolerance;              /**< Number of active set changes until making subsolver options more percise. */
+            bool solveZeroPenaltyFirst;                 /**< Flag indicating whether first QP should ignore penalization. */
 
-            printLevel printLvl;                    /**< Print level. */
+            int maxOuterIterations;                     /**< Maximum number of outer iterations to be performed. */
+            int maxInnerIterations;                     /**< Maximum number of inner iterations to be performed. */
+
+            int relaxOptionsTolerance;                  /**< Number of active set changes until making subsolver options more percise. */
+
+            printLevel printLvl;                        /**< Print level. */
 
         protected:
             void copy( const Options& rhs );        /**< Copy each property. */
@@ -154,6 +173,12 @@ namespace lcqpOASES {
 
             // Printing bounds
             static void printBounds(double* lb, double* xk, double* ub, int m);
+
+            // csc matrix to dense
+            static returnValue csc_to_dns(csc* H_sparse, double* full, int m, int n);
+
+            // dense to csc matrix
+            static returnValue dns_to_csc(double* full, csc* H_sparse, int m, int n);
 
             constexpr static const double EPS = 1.11e-16;
     };

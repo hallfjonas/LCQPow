@@ -22,7 +22,7 @@
 #ifndef LCQPOASES_SUBSOLVERBASE_HPP
 #define LCQPOASES_SUBSOLVERBASE_HPP
 
-#include <Utilities.hpp>
+#include "Utilities.hpp"
 
 namespace lcqpOASES {
     class SubsolverBase {

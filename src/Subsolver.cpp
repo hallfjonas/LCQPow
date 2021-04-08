@@ -19,16 +19,15 @@
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <Subsolver.hpp>
+#include "Subsolver.hpp"
 #include <cstring>
 
 namespace lcqpOASES {
 
+
     Subsolver::Subsolver( ) { }
 
-    /*
-     *   S u b s o l v e r (QPOASES)
-     */
+
     Subsolver::Subsolver(   int nV, int nC,
                             double* H, double* A )
     {
@@ -37,9 +36,7 @@ namespace lcqpOASES {
         solverQPOASES = tmp;
     }
 
-    /*
-     *   S u b s o l v e r (OSQP)
-     */
+
     Subsolver::Subsolver(   int nV, int nC,
                             csc* H, csc* A )
     {
@@ -47,13 +44,13 @@ namespace lcqpOASES {
         solverOSQP = SubsolverOSQP(nV, nC, H, A);
     }
 
-    /** Copy constructor. */
+
     Subsolver::Subsolver(const Subsolver& rhs)
     {
         copy( rhs );
     }
 
-    /** Assignment operator (deep copy). */
+
     Subsolver& Subsolver::operator=(const Subsolver& rhs)
     {
         if ( this != &rhs )
@@ -65,7 +62,6 @@ namespace lcqpOASES {
     }
 
 
-    /** Write solution to x. */
     void Subsolver::getPrimalSolution( double* x )
     {
         switch (qpSolver) {
@@ -79,7 +75,7 @@ namespace lcqpOASES {
         }
     }
 
-    /** Write solution to y. */
+
     void Subsolver::getDualSolution( double* y )
     {
         switch (qpSolver) {
@@ -94,9 +90,6 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *   s e t o p t i o n s
-     */
     void Subsolver::setPrintLevel( printLevel printlvl )
     {
         switch (qpSolver) {
@@ -120,9 +113,6 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *   s w i t c h T o R e l a x e d O p t i o n s
-     */
     void Subsolver::switchToRelaxedOptions( )
     {
         switch (qpSolver) {
@@ -144,9 +134,6 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *   s w i t c h T o S t r i c t O p t i o n s
-     */
     void Subsolver::switchToStrictOptions( )
     {
         switch (qpSolver) {
@@ -168,9 +155,6 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *   s o l v e
-     */
     returnValue Subsolver::solve(   bool initialSolve, int& iterations,
                                     double* g,
                                     double* lb, double* ub,
@@ -192,9 +176,6 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *   c o p y
-     */
     void Subsolver::copy(const Subsolver& rhs)
     {
         qpSolver = rhs.qpSolver;
