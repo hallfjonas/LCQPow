@@ -20,8 +20,8 @@
  */
 
 
-#include <iostream>
 #include "LCQProblem.hpp"
+#include <iostream>
 
 using namespace lcqpOASES;
 
