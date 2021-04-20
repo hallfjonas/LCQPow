@@ -325,7 +325,6 @@ TEST(UtilitiesTest, CSCtoDNS) {
 
     int m = 2;
     int n = 3;
-
     int H_nnx = 3;
     double H_data[3] = { 2.0, 1.0, 2.0 };
     int H_i[3] = {0, 0, 1};
@@ -334,14 +333,15 @@ TEST(UtilitiesTest, CSCtoDNS) {
     csc* H = csc_matrix(m, n, H_nnx, H_data, H_i, H_p);
 
     double* H_full = new double[m*n]();
-    lcqpOASES::Utilities::csc_to_dns(H, H_full, m, n);
+    lcqpOASES::returnValue ret = lcqpOASES::Utilities::csc_to_dns(H, H_full, m, n);
+    ASSERT_TRUE(ret == lcqpOASES::returnValue::SUCCESSFUL_RETURN);
 
-    ASSERT_FLOAT_EQ(H_full[0], 2);
-    ASSERT_FLOAT_EQ(H_full[1], 1);
-    ASSERT_FLOAT_EQ(H_full[2], 0);
-    ASSERT_FLOAT_EQ(H_full[3], 0);
-    ASSERT_FLOAT_EQ(H_full[4], 2);
-    ASSERT_FLOAT_EQ(H_full[5], 0);
+    ASSERT_DOUBLE_EQ(H_full[0], 2);
+    ASSERT_DOUBLE_EQ(H_full[1], 1);
+    ASSERT_DOUBLE_EQ(H_full[2], 0);
+    ASSERT_DOUBLE_EQ(H_full[3], 0);
+    ASSERT_DOUBLE_EQ(H_full[4], 2);
+    ASSERT_DOUBLE_EQ(H_full[5], 0);
 
     // Modify some values: Second test matrix
     // | 2 0 0  |
@@ -353,14 +353,15 @@ TEST(UtilitiesTest, CSCtoDNS) {
     H = csc_matrix(m, n, H_nnx, H_data, H_i, H_p);
 
     H_full = new double[m*n]();
-    lcqpOASES::Utilities::csc_to_dns(H, H_full, m, n);
+    ret = lcqpOASES::Utilities::csc_to_dns(H, H_full, m, n);
+    ASSERT_TRUE(ret == lcqpOASES::returnValue::SUCCESSFUL_RETURN);
 
-    ASSERT_FLOAT_EQ(H_full[0], 2);
-    ASSERT_FLOAT_EQ(H_full[1], 0);
-    ASSERT_FLOAT_EQ(H_full[2], 0);
-    ASSERT_FLOAT_EQ(H_full[3], 1);
-    ASSERT_FLOAT_EQ(H_full[4], 0);
-    ASSERT_FLOAT_EQ(H_full[5], 10);
+    ASSERT_EQ(H_full[0], 2);
+    ASSERT_EQ(H_full[1], 0);
+    ASSERT_EQ(H_full[2], 0);
+    ASSERT_EQ(H_full[3], 1);
+    ASSERT_EQ(H_full[4], 0);
+    ASSERT_EQ(H_full[5], 10);
 
     // Transpose: Third test matrix
     // | 2  1 |
@@ -374,17 +375,57 @@ TEST(UtilitiesTest, CSCtoDNS) {
     int T_nnx = 3;
     csc* T = csc_matrix(m, n, T_nnx, T_data, T_i, T_p);
 
-    double* T_full = new double[m*n]();
-    lcqpOASES::Utilities::csc_to_dns(T, T_full, m, n);
+    double* T_full = new double[m*n];
+    ret = lcqpOASES::Utilities::csc_to_dns(T, T_full, m, n);
+    ASSERT_TRUE(ret == lcqpOASES::returnValue::SUCCESSFUL_RETURN);
 
-    ASSERT_FLOAT_EQ(T_full[0], 2);
-    ASSERT_FLOAT_EQ(T_full[1], 1);
-    ASSERT_FLOAT_EQ(T_full[2], 0);
-    ASSERT_FLOAT_EQ(T_full[3], 0);
-    ASSERT_FLOAT_EQ(T_full[4], 10);
-    ASSERT_FLOAT_EQ(T_full[5], 0);
+    ASSERT_EQ(T_full[0], 2.0);
+    ASSERT_EQ(T_full[1], 1.0);
+    ASSERT_EQ(T_full[2], 0.0);
+    ASSERT_EQ(T_full[3], 0.0);
+    ASSERT_EQ(T_full[4], 10.0);
+    ASSERT_EQ(T_full[5], 0.0);
 }
 
+// Testing csc to dns and vice versa
+TEST(UtilitiesTest, SparseDenseBackAndForth) {
+
+    int numExp = 100;
+    int m = 2;
+    int n = 5;
+
+    srand (time(NULL));
+
+    for (int i = 0; i < numExp; i++) {
+        double* H = new double[m*n]();
+
+        // Monitor number of nonzeros
+        int nnx = 0;
+
+        // Randomly fill values
+        for (int j=0; j < m*n; j++)
+        {
+            // Get random integers
+            int rd = std::rand();
+
+            // Only fill even integers (i.e should be rougly 25% filled).
+            if (rd % 4 == 0) {
+                H[j] = rd % 9;
+                nnx++;
+            }
+        }
+
+        // Convert to sparse
+        csc* H_sparse = lcqpOASES::Utilities::dns_to_csc(H, m, n);
+
+        double* H_control = new double[m*n]();
+        lcqpOASES::Utilities::csc_to_dns(H_sparse, H_control, m, n);
+
+        for (int j = 0; j < m*n; j++)
+            ASSERT_FLOAT_EQ(H_control[j], H[j]);
+
+    }
+}
 
 // Testing lcqpOASES solver set up
 TEST(SolverTest, RunWarmUp) {
@@ -402,8 +443,10 @@ TEST(SolverTest, RunWarmUp) {
     lcqpOASES::LCQProblem lcqp( nV, nC, nComp );
 
 	lcqpOASES::Options options;
-    options.printLvl = lcqpOASES::printLevel::NONE;
+    options.printLvl = lcqpOASES::printLevel::OUTER_LOOP_ITERATES;
     lcqp.setOptions( options );
+
+    // TODO: RUN THIS OFTEN! Like 100 times
 
 	lcqpOASES::returnValue retVal = lcqp.solve( H, g, lb, ub, S1, S2, (double*)0, (double*)0, x0);
 
@@ -424,8 +467,13 @@ TEST(SolverTest, RunWarmUp) {
     bool stat1 = std::abs(2*xOpt[0] - 2 - yOpt[0] - yOpt[2]) <= options.stationarityTolerance;
     bool stat2 = std::abs(2*xOpt[1] - 2 - yOpt[1] - yOpt[3]) <= options.stationarityTolerance;
 
+    printf("stat1 = %f\n", std::abs(2*xOpt[0] - 2 - yOpt[0] - yOpt[2]));
+    printf("stat2 = %f\n", std::abs(2*xOpt[1] - 2 - yOpt[1] - yOpt[3]));
+
     ASSERT_TRUE( stat1 );
     ASSERT_TRUE( stat2 );
+
+    // TODO: LOOP END
 }
 
 int main(int argc, char* argv[])

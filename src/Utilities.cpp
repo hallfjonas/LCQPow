@@ -318,6 +318,22 @@ namespace lcqpOASES {
     }
 
 
+    void Utilities::printMatrix(const int* const A, int m, int n, const char* const name)
+    {
+        printf("Printing matrix %s:\n", name);
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++)
+                printf("%d ", A[i*n + j]);
+
+
+            printf("\n");
+        }
+
+        printf("\n");
+    }
+
+
     void Utilities::printStep(double* xk, double* pk, double* xk_new, double alpha, int nV)
     {
         printf("Printing Step:\n");
@@ -337,6 +353,69 @@ namespace lcqpOASES {
             printf("%.2f <= %.2f <= %.2f \n", lb[i], xk[i], ub[i]);
 
         printf("\n");
+    }
+
+
+    returnValue Utilities::csc_to_dns(const csc* const sparse, double* full, int m, int n)
+    {
+        for (int j = 0; j < n; j++) {
+			for (int i = sparse->p[j]; i < sparse->p[j+1]; i++) {
+                // Reached final element
+                if (i == sparse->nzmax) {
+                    return returnValue::SUCCESSFUL_RETURN;
+                }
+
+                // Ensure validity of index
+                if (sparse->i[i]*n + j >= m*n || sparse->i[i]*n + j < 0) {
+                    return MessageHandler::PrintMessage( returnValue::INDEX_OUT_OF_BOUNDS );
+                }
+
+				full[sparse->i[i]*n + j] = sparse->x[i];
+			}
+		}
+
+        return returnValue::SUCCESSFUL_RETURN;
+    }
+
+
+    csc* Utilities::dns_to_csc(const double* const full, int m, int n)
+    {
+        csc* sparse = (csc*) c_malloc(sizeof(csc));
+
+        std::vector<double> H_data;
+        std::vector<int> H_i;
+        sparse->m = m;
+        sparse->n = n;
+        sparse->nz = -1;
+        sparse->p = new int[n+1]();
+
+        for (int i = 0; i < n; i++) {
+            // Begin column pointer with previous value
+            sparse->p[i+1] = sparse->p[i];
+
+            for (int j = 0; j < m; j++) {
+                if (full[j*n + i] > 0 || full[j*n + i] < 0) {
+                    H_data.push_back(full[j*n + i]);
+                    H_i.push_back(j);
+                    sparse->p[i+1]++;
+                }
+            }
+        }
+
+        // Final pointer should point to equal of elemtns
+        int nnx = (int) H_i.size();
+        sparse->p[n] = nnx;
+
+        sparse->nzmax = nnx;
+        sparse->i = new int[nnx];
+        sparse->x = new double[nnx];
+
+        for (int i = 0; i < nnx; i++) {
+            sparse->i[i] = H_i[i];
+            sparse->x[i] = H_data[i];
+        }
+
+        return sparse;
     }
 
 
