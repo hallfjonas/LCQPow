@@ -41,12 +41,12 @@ int main() {
     int S1_nnx = 1;
     double S1_data[1] = { 1.0 };
     int S1_i[1] = {0};
-    int S1_p[2] = {0, 3};
+    int S1_p[3] = {0, 1, 3};
 
     int S2_nnx = 1;
     double S2_data[1] = { 1.0 };
     int S2_i[1] = {0};
-    int S2_p[2] = {1, 3};
+    int S2_p[3] = {0, 0, 3};
 
     int nV = 2;
     int nC = 0;
