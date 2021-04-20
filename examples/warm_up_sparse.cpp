@@ -30,24 +30,24 @@ int main() {
 
     /* Setup data of first QP. */
     int H_nnx = 3;
-    double H_data[3] = { 2.0, 1.0, 2.0 };
-    int H_i[3] = {0, 0, 1};
+    double H_data[3] = { 2.0, 2.0 };
+    int H_i[3] = {0, 1};
     int H_p[3] = {0, 1, 3};
 
     double g[2] = { -2.0, -2.0 };
     double lb[2] = { 0, 0 };
     double ub[2] = { INFINITY, INFINITY };
-    
+
     int S1_nnx = 1;
     double S1_data[1] = { 1.0 };
     int S1_i[1] = {0};
     int S1_p[2] = {0, 3};
-    
+
     int S2_nnx = 1;
     double S2_data[1] = { 1.0 };
     int S2_i[1] = {0};
     int S2_p[2] = {1, 3};
-    
+
     int nV = 2;
     int nC = 0;
     int nComp = 1;
