@@ -34,7 +34,10 @@ namespace lcqpOASES {
      *   S u b s o l v e r O  S Q P
      */
     SubsolverOSQP::SubsolverOSQP(   int nV, int nC,
-                                    csc* _H, csc* _A )
+                                    csc* _H, csc* _A,
+                                    const double* _g,
+                                    const double* _l,
+                                    const double* _u)
     {
         settings = (OSQPSettings *)c_malloc(sizeof(OSQPSettings));
         data = (OSQPData *)c_malloc(sizeof(OSQPData));
@@ -42,12 +45,29 @@ namespace lcqpOASES {
         H = _H;
         A = _A;
 
+        // Conversion to OSQP data type c_float
+        c_float* g = new c_float[nV];
+        c_float* l = new c_float[nC];
+        c_float* u = new c_float[nC];
+
+        for (int i = 0; i < nV; i++) {
+            g[i] = (c_float) _g[i];
+        }
+
+        for (int i = 0; i < nC; i++) {
+            l[i] = (c_float) _l[i];
+            u[i] = (c_float) _u[i];
+        }
+
         // Populate data
         if (data) {
             data->n = nV;
             data->m = nC;
             data->P = H;
             data->A = A;
+            data->q = g;
+            data->l = l;
+            data->u = u;
         }
 
         // Define solver settings as default
@@ -56,8 +76,9 @@ namespace lcqpOASES {
         }
 
         // Setup workspace
-        osqp_setup(&work, data, settings);
+        c_int exitflag = osqp_setup(&work, data, settings);
     }
+
 
     /*
      *   S u b s o l v e r O  S Q P

@@ -47,7 +47,10 @@ namespace lcqpOASES {
             Subsolver(  int nV,
                         int nC,
                         csc* H,
-                        csc* A );
+                        csc* A,
+                        const double* g,
+                        const double* l,
+                        const double* u);
 
             /** Copy constructor. */
             Subsolver(const Subsolver& rhs);

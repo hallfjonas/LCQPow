@@ -38,10 +38,13 @@ namespace lcqpOASES {
 
 
     Subsolver::Subsolver(   int nV, int nC,
-                            csc* H, csc* A )
+                            csc* H, csc* A,
+                            const double* g,
+                            const double* l,
+                            const double* u )
     {
         qpSolver = QPSubproblemSolver::OSQP;
-        solverOSQP = SubsolverOSQP(nV, nC, H, A);
+        solverOSQP = SubsolverOSQP(nV, nC, H, A, g, l, u);
     }
 
 

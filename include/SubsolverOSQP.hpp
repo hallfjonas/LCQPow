@@ -34,7 +34,10 @@ namespace lcqpOASES {
             SubsolverOSQP(  int _nV,
                             int _nC,
                             csc* _H,
-                            csc* _A
+                            csc* _A,
+                            const double* g,
+                            const double* lbA,
+                            const double* ubA
                             );
 
             /** Copy constructor. */
