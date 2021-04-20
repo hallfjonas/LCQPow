@@ -443,37 +443,49 @@ TEST(SolverTest, RunWarmUp) {
     lcqpOASES::LCQProblem lcqp( nV, nC, nComp );
 
 	lcqpOASES::Options options;
-    options.printLvl = lcqpOASES::printLevel::OUTER_LOOP_ITERATES;
+    options.printLvl = lcqpOASES::printLevel::NONE;
     lcqp.setOptions( options );
 
-    // TODO: RUN THIS OFTEN! Like 100 times
+    int numExp = 100;
 
-	lcqpOASES::returnValue retVal = lcqp.solve( H, g, lb, ub, S1, S2, (double*)0, (double*)0, x0);
+    srand (time(NULL));
 
-    ASSERT_EQ(retVal, lcqpOASES::SUCCESSFUL_RETURN);
+    for (int i = 0; i < numExp; i++) {
 
-    // Get solutions
-    double* xOpt = new double[2];
-	double* yOpt = new double[nV + nC + 2*nComp];
+        lcqpOASES::returnValue retVal = lcqp.solve( H, g, lb, ub, S1, S2, (double*)0, (double*)0, x0);
 
-	lcqp.getPrimalSolution( xOpt );
-	lcqp.getDualSolution( yOpt );
+        ASSERT_EQ(retVal, lcqpOASES::SUCCESSFUL_RETURN);
 
-    bool sStat1Found = (std::abs(xOpt[0] - 1) <= options.stationarityTolerance) && (std::abs(xOpt[1]) <= options.stationarityTolerance);
-    bool sStat2Found = (std::abs(xOpt[1] - 1) <= options.stationarityTolerance) && (std::abs(xOpt[0]) <= options.stationarityTolerance);
+        // Get solutions
+        double* xOpt = new double[2];
+        double* yOpt = new double[nV + nC + 2*nComp];
 
-    ASSERT_TRUE( sStat1Found || sStat2Found );
+        lcqp.getPrimalSolution( xOpt );
+        lcqp.getDualSolution( yOpt );
 
-    bool stat1 = std::abs(2*xOpt[0] - 2 - yOpt[0] - yOpt[2]) <= options.stationarityTolerance;
-    bool stat2 = std::abs(2*xOpt[1] - 2 - yOpt[1] - yOpt[3]) <= options.stationarityTolerance;
+        bool sStat1Found = (std::abs(xOpt[0] - 1) <= options.stationarityTolerance) && (std::abs(xOpt[1]) <= options.stationarityTolerance);
+        bool sStat2Found = (std::abs(xOpt[1] - 1) <= options.stationarityTolerance) && (std::abs(xOpt[0]) <= options.stationarityTolerance);
 
-    printf("stat1 = %f\n", std::abs(2*xOpt[0] - 2 - yOpt[0] - yOpt[2]));
-    printf("stat2 = %f\n", std::abs(2*xOpt[1] - 2 - yOpt[1] - yOpt[3]));
+        ASSERT_TRUE( sStat1Found || sStat2Found );
 
-    ASSERT_TRUE( stat1 );
-    ASSERT_TRUE( stat2 );
+        bool stat1 = std::abs(2*xOpt[0] - 2 - yOpt[0] - yOpt[2]) <= options.stationarityTolerance;
+        bool stat2 = std::abs(2*xOpt[1] - 2 - yOpt[1] - yOpt[3]) <= options.stationarityTolerance;
 
-    // TODO: LOOP END
+        // Printing for debugging
+        // printf("Init = (%g, %g)          %d/%d\n", x0[0], x0[1], i, numExp);
+        // printf("Solution = (%g, %g, %g, %g, %g, %g)\n", xOpt[0], xOpt[1], yOpt[0], yOpt[1], yOpt[2], yOpt[3]);
+        // printf("stat1 = %f\n", std::abs(2*xOpt[0] - 2 - yOpt[0] - yOpt[2]));
+        // printf("stat2 = %f\n", std::abs(2*xOpt[1] - 2 - yOpt[1] - yOpt[3]));
+
+        ASSERT_TRUE( stat1 );
+        ASSERT_TRUE( stat2 );
+
+        // After first initialization use random feasible values
+        int rd_idx = std::rand() % 2;
+        int rd_value = std::rand() % 10000;
+
+        x0[rd_idx] = rd_value;
+    }
 }
 
 int main(int argc, char* argv[])
