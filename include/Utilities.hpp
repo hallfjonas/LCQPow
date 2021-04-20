@@ -23,8 +23,6 @@
 #ifndef LCQPOASES_UTILITIES_HPP
 #define LCQPOASES_UTILITIES_HPP
 
-#include "Types.hpp"
-
 #include <osqp.h>
 
 namespace lcqpOASES {

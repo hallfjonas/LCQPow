@@ -23,7 +23,6 @@
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "Types.hpp"
 #include "Utilities.hpp"
 
 #include <math.h>
@@ -32,7 +31,7 @@ namespace lcqpOASES {
     /*
     *   i s E q u a l
     */
-    inline bool isEqual(real_t x, real_t y, real_t TOL)
+    inline bool isEqual(double x, double y, double TOL)
     {
         if ( getAbs(x-y) <= TOL )
             return true;
@@ -44,7 +43,7 @@ namespace lcqpOASES {
     /*
     *   i s E q u a l
     */
-    inline bool isEqual(real_t x, real_t y)
+    inline bool isEqual(double x, double y)
     {
         return isEqual(x, y, Utilities::ZERO);
     }
@@ -53,7 +52,7 @@ namespace lcqpOASES {
     /*
     *   i s Z e r o
     */
-    inline bool isZero(real_t x, real_t TOL)
+    inline bool isZero(double x, double TOL)
     {
         if ( getAbs(x) <= TOL )
             return true;
@@ -65,7 +64,7 @@ namespace lcqpOASES {
     /*
     *   i s Z e r o
     */
-    inline bool isZero(real_t x)
+    inline bool isZero(double x)
     {
         return isZero(x, Utilities::ZERO);
     }
@@ -73,7 +72,7 @@ namespace lcqpOASES {
     /*
     *   g e t S i g n
     */
-    inline real_t getSign(real_t arg)
+    inline double getSign(double arg)
     {
         if ( arg >= 0.0 )
             return 1.0;
@@ -85,7 +84,7 @@ namespace lcqpOASES {
     /*
     *   g e t M a x
     */
-    inline int_t getMax(int_t x, int_t y)
+    inline double getMax(double x, double y)
     {
         return (y<x) ? x : y;
     }
@@ -94,7 +93,7 @@ namespace lcqpOASES {
     /*
     *   g e t M i n
     */
-    inline int_t getMin(int_t x, int_t y)
+    inline double getMin(double x, double y)
     {
         return (y>x) ? x : y;
     }
@@ -104,7 +103,7 @@ namespace lcqpOASES {
     /*
     *   g e t M a x
     */
-    inline real_t getMax(real_t x, real_t y)
+    inline double getMax(double x, double y)
     {
         return (y<x) ? x : y;
     }
@@ -113,7 +112,7 @@ namespace lcqpOASES {
     /*
     *   g e t M i n
     */
-    inline real_t getMin(real_t x, real_t y)
+    inline double getMin(double x, double y)
     {
         return (y>x) ? x : y;
     }
@@ -122,25 +121,12 @@ namespace lcqpOASES {
     /*
     *   g e t A b s
     */
-    inline real_t getAbs(real_t x)
+    inline double getAbs(double x)
     {
         #ifdef __NO_FMATH__
         return (x>=0.0) ? x : -x;
         #else
         return fabs(x);
-        #endif
-    }
-
-
-    /*
-    *   g e t S q r t
-    */
-    inline real_t getSqrt(real_t x)
-    {
-        #ifdef __NO_FMATH__
-        return sqrt(x); /* put your custom sqrt-replacement here */
-        #else
-        return sqrt(x);
         #endif
     }
 }
