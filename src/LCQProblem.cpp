@@ -766,7 +766,7 @@ namespace lcqpOASES {
 		// y_S2 = y - rho*S1*xk
 		Utilities::MatrixMultiplication(S1, xk, tmp, nComp, nV, 1);
 		for (int i = 0; i < nComp; i++) {
-			yk[nV + 2*nC + i] = yk[nV + 2*nC + i] - rho*tmp[i];
+			yk[nV + nC + nComp + i] = yk[nV + nC + nComp + i] - rho*tmp[i];
 		}
 	}
 
