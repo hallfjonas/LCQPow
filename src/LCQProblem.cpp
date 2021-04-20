@@ -300,7 +300,7 @@ namespace lcqpOASES {
 			return MessageHandler::PrintMessage( ret );
 
 		// USe OSQP in sparse formulations
-		subsolver = Subsolver(nV, nC + 2*nComp, H_sparse, A_sparse);
+		subsolver = Subsolver(nV, nC + 2*nComp, H_sparse, A_sparse, g, lbA, ubA);
 
 		return MessageHandler::PrintMessage( runSolver( ) );
 
@@ -473,7 +473,11 @@ namespace lcqpOASES {
 		// If we can manage to adapt all operations required for C (specifically S1'*S2 + S2'*S1 = C)
 		// we should instantly switch to sparse format!
 		S1 = new double[nComp*nV]();
-
+		for (int j = 0; j < nV; j++) {
+			for (int i = 0; i < S1_p[j+1] - S1_p[j]; i++) {
+				S1[(S1_p[j]+i)*nV + j] = S1_data[S1_p[j]+i];
+			}
+		}
 
 		S2 = new double[nComp*nV]();
 		for (int j = 0; j < nV; j++) {
