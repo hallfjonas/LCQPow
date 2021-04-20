@@ -23,6 +23,8 @@
 #ifndef LCQPOASES_UTILITIES_HPP
 #define LCQPOASES_UTILITIES_HPP
 
+#include "Types.hpp"
+
 #include <osqp.h>
 
 namespace lcqpOASES {
@@ -165,8 +167,11 @@ namespace lcqpOASES {
             // Read float data from file
             static returnValue writeToFile(double* data, int n, const char* datafilename );
 
-            // Print a matrix
+            // Print a double valued matrix
             static void printMatrix(const double* const A, int m, int n, const char* const name);
+
+            // Print an integer valued matrix
+            static void printMatrix(const int* const A, int m, int n, const char* const name);
 
             // Printing bounds
             static void printStep(double* xk, double* pk, double* xk_new, double alpha, int nV);
@@ -174,13 +179,84 @@ namespace lcqpOASES {
             // Printing bounds
             static void printBounds(double* lb, double* xk, double* ub, int m);
 
-            // csc matrix to dense
-            static returnValue csc_to_dns(csc* H_sparse, double* full, int m, int n);
+            /** Transform a csc matrix to dense.
+             *
+             * @param sparse A sparse matrix.
+             * @param full A target pointer for the full matrix (expected to have size m*n).
+             * @param m Number of rows of `H_sparse` (in its dense representation).
+             * @param n Number of columns of `H_sparse` (in its dense representation).
+             *
+             * @returns returnValue::SUCCESSFUL_RETURN, or returnValue::INDEX_OUT_OF_BOUNDSA if an index leads to invalid memory access of the dense array.
+             */
+            static returnValue csc_to_dns(const csc* const sparse, double* full, int m, int n);
 
-            // dense to csc matrix
-            static returnValue dns_to_csc(double* full, csc* H_sparse, int m, int n);
 
-            constexpr static const double EPS = 1.11e-16;
+            /** Transform a dense matrix to csc.
+             *
+             * @param full A dense double array.
+             * @param m Number of rows of `full`.
+             * @param n Number of columns of `full`.
+             *
+             * @returns A csc pointer to the sparse matrix.
+             */
+            static csc* dns_to_csc(const double* const full, int m, int n);
+
+
+            // Methods below this line where taken from qpOASES implementation
+            /** Returns the absolute value of a real number.
+             * \return	Absolute value of a real number */
+            inline double getAbs(double x);
+
+            /** Checks if the absolute difference between x and y is less than TOL. */
+            inline bool isEqual(double x, double y, double TOL);
+
+            /** Checks if the absolute difference between x and y is less than the constant Utilities::ZERO. */
+            inline bool isEqual(double x, double y);
+
+            /** Checks if the absolute value of x is less than TOL. */
+            inline bool isZero(double x, double TOL);
+
+            /** Checks if the absolute value of x is less than the constant Utilities::ZERO. */
+            inline bool isZero(double x);
+
+            /** Returns the sign of a double x. */
+            inline double getSign(double x);
+
+            /** Returns the maximum of two integer values x and y. */
+            inline int getMax(int x, int y);
+
+            /** Returns the minimum of two integer values x and y. */
+            inline int getMin(int x, int y);
+
+            /** Returns the maximum of two real values x and y. */
+            inline double getMax(double x, double y);
+
+            /** Returns the minimum of two real values x and y. */
+            inline double getMin(double x, double y);
+
+            /** Returns the absolute value of x. */
+            inline double getAbs(double x);
+
+            /** Numerical value of machine precision (min eps, s.t. 1+eps > 1).
+             *	Note: this value has to be positive! */
+            #ifdef __USE_SINGLE_PRECISION__
+            const double EPS = 1.193e-07f;
+            #else
+            const static double EPS = 2.221e-16;
+            #endif /* __USE_SINGLE_PRECISION__ */
+
+            /** Numerical value of zero (for situations in which it would be
+             *	unreasonable to compare with 0.0).
+            *	Note: this value has to be positive! */
+            const static double ZERO = 1.0e-25;
+
+            /** Numerical value of infinity (e.g. for non-existing bounds).
+                Note: this value has to be positive! */
+            const static double INFTY = 1.0e20;
+
+            /** Maximum number of characters within a string.
+             *	Note: this value should be at least 41! */
+            const static uint MAX_STRING_LENGTH = 160;
     };
 
     class MessageHandler {
@@ -193,5 +269,6 @@ namespace lcqpOASES {
     };
 }
 
+#include "Utilities.ipp"
 
 #endif  // LCQPOASES_UTILITIES_HPP
