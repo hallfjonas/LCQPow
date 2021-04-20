@@ -35,10 +35,6 @@ using qpOASES::QProblem;
 
 namespace lcqpOASES {
 
-	/*****************************************************************************
-	 *  P U B L I C                                                              *
-	 *****************************************************************************/
-
 	LCQProblem::LCQProblem( ) { }
 
 
@@ -984,9 +980,6 @@ namespace lcqpOASES {
 		if (ubA != 0)
 			delete[] ubA;
 
-		if (H != 0)
-			delete[] H;
-
 		if (S1 != 0)
 			delete[] S1;
 
@@ -995,7 +988,6 @@ namespace lcqpOASES {
 
 		if (C != 0)
 			delete[] C;
-
 
 		if (gk != 0)
 			delete[] gk;
@@ -1020,10 +1012,6 @@ namespace lcqpOASES {
 
 		if (statk != 0)
 			delete[] statk;
-
-		// TODO: Delete csc types
-		// csc* H_sparse;
-		// csc* A_sparse;
 	}
 }
 
