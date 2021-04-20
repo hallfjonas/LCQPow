@@ -28,6 +28,20 @@
 #include <math.h>
 
 namespace lcqpOASES {
+
+    /*
+    *   g e t A b s
+    */
+    inline double getAbs(double x)
+    {
+        #ifdef __NO_FMATH__
+        return (x>=0.0) ? x : -x;
+        #else
+        return fabs(x);
+        #endif
+    }
+
+
     /*
     *   i s E q u a l
     */
@@ -84,7 +98,7 @@ namespace lcqpOASES {
     /*
     *   g e t M a x
     */
-    inline double getMax(double x, double y)
+    inline double getMax(int x, int y)
     {
         return (y<x) ? x : y;
     }
@@ -93,7 +107,7 @@ namespace lcqpOASES {
     /*
     *   g e t M i n
     */
-    inline double getMin(double x, double y)
+    inline double getMin(int x, int y)
     {
         return (y>x) ? x : y;
     }
@@ -115,19 +129,6 @@ namespace lcqpOASES {
     inline double getMin(double x, double y)
     {
         return (y>x) ? x : y;
-    }
-
-
-    /*
-    *   g e t A b s
-    */
-    inline double getAbs(double x)
-    {
-        #ifdef __NO_FMATH__
-        return (x>=0.0) ? x : -x;
-        #else
-        return fabs(x);
-        #endif
     }
 }
 

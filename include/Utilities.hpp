@@ -201,8 +201,7 @@ namespace lcqpOASES {
 
 
             // Methods below this line where taken from qpOASES implementation
-            /** Returns the absolute value of a real number.
-             * \return	Absolute value of a real number */
+            /** Returns the absolute value of x. */
             inline double getAbs(double x);
 
             /** Checks if the absolute difference between x and y is less than TOL. */
@@ -232,29 +231,26 @@ namespace lcqpOASES {
             /** Returns the minimum of two real values x and y. */
             inline double getMin(double x, double y);
 
-            /** Returns the absolute value of x. */
-            inline double getAbs(double x);
-
             /** Numerical value of machine precision (min eps, s.t. 1+eps > 1).
              *	Note: this value has to be positive! */
             #ifdef __USE_SINGLE_PRECISION__
             const double EPS = 1.193e-07f;
             #else
-            const static double EPS = 2.221e-16;
+            constexpr static double EPS = 2.221e-16;
             #endif /* __USE_SINGLE_PRECISION__ */
 
             /** Numerical value of zero (for situations in which it would be
              *	unreasonable to compare with 0.0).
             *	Note: this value has to be positive! */
-            const static double ZERO = 1.0e-25;
+            constexpr static double ZERO = 1.0e-25;
 
             /** Numerical value of infinity (e.g. for non-existing bounds).
                 Note: this value has to be positive! */
-            const static double INFTY = 1.0e20;
+            constexpr static double INFTY = 1.0e20;
 
             /** Maximum number of characters within a string.
              *	Note: this value should be at least 41! */
-            const static uint MAX_STRING_LENGTH = 160;
+            constexpr static uint MAX_STRING_LENGTH = 160;
     };
 
     class MessageHandler {
