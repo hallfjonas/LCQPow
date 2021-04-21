@@ -63,5 +63,8 @@ int main() {
 	printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g, %g, %g ]; \n\n",
 			xOpt[0],xOpt[1],yOpt[0],yOpt[1],yOpt[2],yOpt[3] );
 
+    // Clean Up
+    delete[] xOpt; delete[] yOpt;
+
     return 0;
 }

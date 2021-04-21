@@ -38,6 +38,8 @@ namespace lcqpOASES {
         public:
             PlotManager(int _nV, int _nC, int _nComp, LCQPNAME lcqpname);
 
+            ~PlotManager();
+
             void CreateIVOCPPlots(const double* const _xk, const double* const _lb, const double* const _ub);
 
             void CreateIVOCPTrajectoryPlot();

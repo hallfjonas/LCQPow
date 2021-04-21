@@ -598,11 +598,16 @@ namespace lcqpOASES {
 	void LCQProblem::initializeSolver( )
 	{
 		// Allocate vectors
-		Qk = new double[nV*nV];
-		gk = new double[nV];
-		xnew = new double[nV];
-		pk = new double[nV];
-		statk = new double[nV];
+		Qk = new double[nV*nV]();
+		gk = new double[nV]();
+		xnew = new double[nV]();
+		yk = new double[nV + nC + 2*nComp]();
+		yk_A = new double[nC + 2*nComp]();
+		pk = new double[nV]();
+		statk = new double[nV]();
+		constr_statk = new double[nV]();
+		box_statk = new double[nV]();
+		lk_tmp = new double[nV]();
 
 		// Initialize variables and counters
 		alphak = 1;
@@ -610,8 +615,6 @@ namespace lcqpOASES {
 		outerIter = 0;
 		innerIter = 0;
 		algoStat = algorithmStatus::PROBLEM_NOT_SOLVED;
-		yk = new double[nV + nC + 2*nComp];
-		yk_A = new double[nC + 2*nComp];
 
 		// Initialize subproblem solver (with relaxed options)
 		subsolver.switchToRelaxedOptions( );
@@ -675,7 +678,6 @@ namespace lcqpOASES {
 
 		double qk = Utilities::QuadraticFormProduct(Qk, pk, nV);
 
-		double* lk_tmp = new double[nV];
 		Utilities::AffineLinearTransformation(1, Qk, xk, g, lk_tmp, nV, nV);
 
 		double lk = Utilities::DotProduct(pk, lk_tmp, nV);
@@ -719,17 +721,15 @@ namespace lcqpOASES {
 		Utilities::AffineLinearTransformation(1, Qk, xk, g, statk, nV, nV);
 
 		// 2) Constraint contribution: A'*yk
-		double* constr_stat = new double[nV];
-		Utilities::TransponsedMatrixMultiplication(A, yk_A, constr_stat, nC + 2*nComp, nV, 1);
+		Utilities::TransponsedMatrixMultiplication(A, yk_A, constr_statk, nC + 2*nComp, nV, 1);
 
 		// 3) Box constraint contribution
-		double* box_stat = new double[nV];
 		for (int i = 0; i < nV; i++)
-			box_stat[i] = yk[i];
+			box_statk[i] = yk[i];
 
 		// 4) => stat = 1) - 2) - 3)
-		Utilities::WeightedVectorAdd(1, statk, -1, constr_stat, statk, nV);
-		Utilities::WeightedVectorAdd(1, statk, -1, box_stat, statk, nV);
+		Utilities::WeightedVectorAdd(1, statk, -1, constr_statk, statk, nV);
+		Utilities::WeightedVectorAdd(1, statk, -1, box_statk, statk, nV);
 	}
 
 
@@ -772,6 +772,9 @@ namespace lcqpOASES {
 		for (int i = 0; i < nComp; i++) {
 			yk[nV + nC + nComp + i] = yk[nV + nC + nComp + i] - rho*tmp[i];
 		}
+
+		// clear memory
+		delete[] tmp;
 	}
 
 
@@ -835,6 +838,10 @@ namespace lcqpOASES {
 					indices.push_back(i);
 		}
 
+		// Free memory
+		delete[] S1x;
+		delete[] S2x;
+
 		return indices;
 	}
 
@@ -885,16 +892,30 @@ namespace lcqpOASES {
 		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES)
 			printf("%s%*d", sep, 6, innerIter);
 
-		printf("%s%10.3g", sep, Utilities::MaxAbs(statk, nV));
-		printf("%s%10.3g", sep, Utilities::QuadraticFormProduct(C, xk, nV)/2.0);
+		// Print stationarity violation
+		double tmpdbl = Utilities::MaxAbs(statk, nV);
+		printf("%s%10.3g", sep, tmpdbl);
+
+		// Print complementarity violation
+		tmpdbl = Utilities::QuadraticFormProduct(C, xk, nV)/2.0;
+		printf("%s%10.3g", sep, tmpdbl);
+
+		// Print current penalty parameter
 		printf("%s%10.3g", sep, rho);
-		printf("%s%10.3g", sep, Utilities::MaxAbs(pk, nV));
+
+		// Print infinity norm of computed full step
+		tmpdbl = Utilities::MaxAbs(pk, nV);
+		printf("%s%10.3g", sep, tmpdbl);
 
 		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES) {
+			// Print optimal step length
 			printf("%s%10.3g", sep, alphak);
+
+			// Print number of qpOASES iterations
 			printf("%s%6d", sep, qpIterk);
 		}
 
+		// Print new line
 		printf(" \n");
 	}
 
@@ -1016,6 +1037,15 @@ namespace lcqpOASES {
 
 		if (statk != 0)
 			delete[] statk;
+
+		if (constr_statk != 0)
+			delete[] constr_statk;
+
+		if (box_statk != 0)
+			delete[] box_statk;
+
+		if (lk_tmp != 0)
+			delete[] lk_tmp;
 	}
 }
 

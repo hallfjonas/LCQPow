@@ -504,9 +504,12 @@ namespace lcqpOASES {
 			double* pk;								/**< xnew - xk. */
 
 			double alphak; 							/**< Optimal step length. */
+			double* lk_tmp;							/**< An auxiliar vector to help compute lkj. */
 
 			double* Qk;								/**< H + rho*C, required for stationarity and optimal step length. */
 			double* statk;							/**< Stationarity of current iterate. */
+			double* constr_statk;					/**< Constraint contribution to stationarity equation. */
+			double* box_statk;						/**< Box Constraint contribution to stationarity equation. */
 
 			int outerIter;							/**< Outer iterate. */
 			int innerIter;							/**< Inner iterate- */

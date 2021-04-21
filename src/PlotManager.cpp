@@ -57,6 +57,18 @@ namespace lcqpOASES {
         }
     }
 
+    PlotManager::~PlotManager()
+    {
+        if (xk != 0)
+            delete[] xk;
+
+        if (lb != 0)
+            delete[] lb;
+
+        if (ub != 0)
+            delete[] ub;
+    }
+
 
     void PlotManager::CreateIVOCPPlots(const double* const _xk, const double* const _lb, const double* const _ub)
     {
