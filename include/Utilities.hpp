@@ -171,6 +171,9 @@ namespace lcqpOASES {
             // Print an integer valued matrix
             static void printMatrix(const int* const A, int m, int n, const char* const name);
 
+            // Print dense representation of csc matrix
+            static void printMatrix(const csc* A, const char* const name);
+
             // Printing bounds
             static void printStep(double* xk, double* pk, double* xk_new, double alpha, int nV);
 
@@ -202,34 +205,34 @@ namespace lcqpOASES {
 
             // Methods below this line where taken from qpOASES implementation
             /** Returns the absolute value of x. */
-            inline double getAbs(double x);
+            static double getAbs(double x);
 
             /** Checks if the absolute difference between x and y is less than TOL. */
-            inline bool isEqual(double x, double y, double TOL);
+            static bool isEqual(double x, double y, double TOL);
 
             /** Checks if the absolute difference between x and y is less than the constant Utilities::ZERO. */
-            inline bool isEqual(double x, double y);
+            static bool isEqual(double x, double y);
 
             /** Checks if the absolute value of x is less than TOL. */
-            inline bool isZero(double x, double TOL);
+            static bool isZero(double x, double TOL);
 
             /** Checks if the absolute value of x is less than the constant Utilities::ZERO. */
-            inline bool isZero(double x);
+            static bool isZero(double x);
 
             /** Returns the sign of a double x. */
-            inline double getSign(double x);
+            static double getSign(double x);
 
             /** Returns the maximum of two integer values x and y. */
-            inline int getMax(int x, int y);
+            static int getMax(int x, int y);
 
             /** Returns the minimum of two integer values x and y. */
-            inline int getMin(int x, int y);
+            static int getMin(int x, int y);
 
             /** Returns the maximum of two real values x and y. */
-            inline double getMax(double x, double y);
+            static double getMax(double x, double y);
 
             /** Returns the minimum of two real values x and y. */
-            inline double getMin(double x, double y);
+            static double getMin(double x, double y);
 
             /** Numerical value of machine precision (min eps, s.t. 1+eps > 1).
              *	Note: this value has to be positive! */
@@ -262,7 +265,5 @@ namespace lcqpOASES {
             static void PrintSolutionLine( );
     };
 }
-
-#include "Utilities.ipp"
 
 #endif  // LCQPOASES_UTILITIES_HPP

@@ -201,17 +201,17 @@ namespace lcqpOASES {
 
 
     double Utilities::MaxAbs(const double* const a, int m) {
-        double max = 0;
-        double min = 0;
+        double mx = 0;
+        double mn = 0;
 
         for (int i = 0; i < m; i++) {
-            if (a[i] > max)
-                max = a[i];
-            else if (a[i] < min)
-                min = a[i];
+            if (a[i] > mx)
+                mx = a[i];
+            else if (a[i] < mn)
+                mn = a[i];
         }
 
-        return std::max(max, -min);
+        return Utilities::getMax(mx, -mn);
     }
 
 
@@ -334,6 +334,20 @@ namespace lcqpOASES {
     }
 
 
+    void Utilities::printMatrix(const csc* A, const char* const name)
+    {
+        if (A->m*A->n <= 0)
+            return;
+
+        // Get dense representation
+        double* dense = new double[A->m*A->n];
+        Utilities::csc_to_dns(A, dense, A->m, A->n);
+
+        // Print the dense matrix
+        Utilities::printMatrix(dense, A->m, A->n, name);
+    }
+
+
     void Utilities::printStep(double* xk, double* pk, double* xk_new, double alpha, int nV)
     {
         printf("Printing Step:\n");
@@ -416,6 +430,79 @@ namespace lcqpOASES {
         }
 
         return sparse;
+    }
+
+
+    double Utilities::getAbs(double x)
+    {
+        #ifdef __NO_FMATH__
+        return (x>=0.0) ? x : -x;
+        #else
+        return fabs(x);
+        #endif
+    }
+
+
+    bool Utilities::isEqual(double x, double y, double TOL)
+    {
+        if ( getAbs(x-y) <= TOL )
+            return true;
+        else
+            return false;
+    }
+
+
+    bool Utilities::isEqual(double x, double y)
+    {
+        return isEqual(x, y, Utilities::ZERO);
+    }
+
+
+    bool Utilities::isZero(double x, double TOL)
+    {
+        if ( getAbs(x) <= TOL )
+            return true;
+        else
+            return false;
+    }
+
+
+    bool Utilities::isZero(double x)
+    {
+        return isZero(x, Utilities::ZERO);
+    }
+
+
+    double Utilities::getSign(double arg)
+    {
+        if ( arg >= 0.0 )
+            return 1.0;
+        else
+            return -1.0;
+    }
+
+
+    int Utilities::getMax(int x, int y)
+    {
+        return (y<x) ? x : y;
+    }
+
+
+    int Utilities::getMin(int x, int y)
+    {
+        return (y>x) ? x : y;
+    }
+
+
+    double Utilities::getMax(double x, double y)
+    {
+        return (y<x) ? x : y;
+    }
+
+
+    double Utilities::getMin(double x, double y)
+    {
+        return (y>x) ? x : y;
     }
 
 
