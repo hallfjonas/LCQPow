@@ -340,7 +340,7 @@ namespace lcqpOASES {
             return;
 
         // Get dense representation
-        double* dense = new double[A->m*A->n];
+        double* dense = new double[A->m*A->n]();
         Utilities::csc_to_dns(A, dense, A->m, A->n);
 
         // Print the dense matrix

@@ -63,6 +63,17 @@ namespace lcqpOASES {
 		nV = _nV;
 		nC = _nC;
 		nComp = _nComp;
+
+		// Allocate auxiliar vectors
+		Qk = new double[nV*nV]();
+		gk = new double[nV]();
+		xnew = new double[nV]();
+		yk_A = new double[nC + 2*nComp]();
+		pk = new double[nV]();
+		statk = new double[nV]();
+		constr_statk = new double[nV]();
+		box_statk = new double[nV]();
+		lk_tmp = new double[nV]();
 	}
 
 
@@ -300,7 +311,8 @@ namespace lcqpOASES {
 			return MessageHandler::PrintMessage( ret );
 
 		// USe OSQP in sparse formulations
-		subsolver = Subsolver(nV, nC + 2*nComp, H_sparse, A_sparse, g, lbA, ubA);
+		Subsolver tmp(nV, nC + 2*nComp, H_sparse, A_sparse, g, lbA, ubA);
+		subsolver = tmp;
 
 		return MessageHandler::PrintMessage( runSolver( ) );
 
@@ -391,40 +403,38 @@ namespace lcqpOASES {
 		int* tmpA_p = new int[nV+1];
 
 		int index_data = 0;
+		tmpA_p[0] = 0;
 
 		// Iterate over columns
 		for (int i = 0; i < nV; i++) {
+			tmpA_p[i+1] = tmpA_p[i];
 
+			// First handle rows of A
 			if (A_p != 0) {
-				// Start index of column
-				tmpA_p[i] = A_p[i];
-
-				// First handle rows of A
 				for (int j = A_p[i]; j < A_p[i+1]; j++) {
 					tmpA_data[index_data] = A_data[j];
 					tmpA_i[index_data] = A_i[j];
 					index_data++;
+					tmpA_p[i+1]++;
 				}
-			} else {
-				tmpA_p[i] = S1_p[i];
 			}
 
 			// Then rows of S1
 			for (int j = S1_p[i]; j < S1_p[i+1]; j++) {
 				tmpA_data[index_data] = S1_data[j];
-				tmpA_i[index_data] = S1_i[j];
+				tmpA_i[index_data] = nC + S1_i[j];
 				index_data++;
+				tmpA_p[i+1]++;
 			}
+
 			// Then rows of S2
 			for (int j = S2_p[i]; j < S2_p[i+1]; j++) {
 				tmpA_data[index_data] = S2_data[j];
-				tmpA_i[index_data] = S2_i[j];
+				tmpA_i[index_data] = nC + nComp + S2_i[j];
 				index_data++;
+				tmpA_p[i+1]++;
 			}
 		}
-
-		// End index of column
-		tmpA_p[nV] = tmpA_nnx;
 
 		// Create sparse matrix
 		A_sparse = csc_matrix(nC + 2*nComp, nV, tmpA_nnx, tmpA_data, tmpA_i, tmpA_p);
@@ -597,18 +607,6 @@ namespace lcqpOASES {
 
 	void LCQProblem::initializeSolver( )
 	{
-		// Allocate vectors
-		Qk = new double[nV*nV]();
-		gk = new double[nV]();
-		xnew = new double[nV]();
-		yk = new double[nV + nC + 2*nComp]();
-		yk_A = new double[nC + 2*nComp]();
-		pk = new double[nV]();
-		statk = new double[nV]();
-		constr_statk = new double[nV]();
-		box_statk = new double[nV]();
-		lk_tmp = new double[nV]();
-
 		// Initialize variables and counters
 		alphak = 1;
 		rho = options.initialComplementarityPenalty;
@@ -627,6 +625,15 @@ namespace lcqpOASES {
 	{
 		// First solve convex subproblem
 		returnValue ret = subsolver.solve( initialSolve, qpIterk, gk, lb, ub, lbA, ubA, xk, yk );
+
+		// If no initial guess was passed, then need to allocate memory
+		if (xk == 0) {
+			xk = new double[nV];
+		}
+
+		if (yk == 0) {
+			yk = new double[nV + nC + 2*nComp];
+		}
 
 		// Return on error
 		if (ret != SUCCESSFUL_RETURN)

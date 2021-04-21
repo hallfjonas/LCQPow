@@ -75,10 +75,10 @@ namespace lcqpOASES {
 
             /** Abstract method for solving the QP. */
             returnValue solve(  bool initialSolve, int& iterations,
-                                double* g,
-                                double* lb, double* ub,
-                                double* lbA, double* ubA,
-                                double* x0 = 0, double* y0 = 0 );
+                                const double* g,
+                                const double* lb, const double* ub,
+                                const double* lbA, const double* ubA,
+                                const double* x0 = 0, const double* y0 = 0 );
 
         protected:
             /** Copies all members from given rhs object. */

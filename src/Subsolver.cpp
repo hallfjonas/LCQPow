@@ -32,6 +32,7 @@ namespace lcqpOASES {
                             double* H, double* A )
     {
         qpSolver = QPSubproblemSolver::QPOASES;
+
         SubsolverQPOASES tmp(nV, nC, H, A);
         solverQPOASES = tmp;
     }
@@ -44,7 +45,9 @@ namespace lcqpOASES {
                             const double* u )
     {
         qpSolver = QPSubproblemSolver::OSQP;
-        solverOSQP = SubsolverOSQP(nV, nC, H, A, g, l, u);
+
+        SubsolverOSQP tmp(nV, nC, H, A, g, l, u);
+        solverOSQP = tmp;
     }
 
 
@@ -159,10 +162,10 @@ namespace lcqpOASES {
 
 
     returnValue Subsolver::solve(   bool initialSolve, int& iterations,
-                                    double* g,
-                                    double* lb, double* ub,
-                                    double* lbA, double* ubA,
-                                    double* x0, double* y0 )
+                                    const double* g,
+                                    const double* lb, const double* ub,
+                                    const double* lbA, const double* ubA,
+                                    const double* x0, const double* y0 )
     {
         returnValue ret = returnValue::SUCCESSFUL_RETURN;
         switch (qpSolver) {
@@ -183,14 +186,16 @@ namespace lcqpOASES {
     {
         qpSolver = rhs.qpSolver;
 
-        switch (qpSolver) {
-            case QPSubproblemSolver::QPOASES:
-                solverQPOASES = SubsolverQPOASES( rhs.solverQPOASES );
-                return;
+        if (qpSolver == QPSubproblemSolver::QPOASES) {
+            SubsolverQPOASES tmp( rhs.solverQPOASES );
+            solverQPOASES = tmp;
+            return;
+        }
 
-            case QPSubproblemSolver::OSQP:
-                solverOSQP = SubsolverOSQP( rhs.solverOSQP );
-                return;
+        if (qpSolver == QPSubproblemSolver::OSQP) {
+            SubsolverOSQP tmp( rhs.solverOSQP );
+            solverOSQP = tmp;
+            return;
         }
     }
 

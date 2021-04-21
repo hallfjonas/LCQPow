@@ -42,8 +42,8 @@ namespace lcqpOASES {
         settings = (OSQPSettings *)c_malloc(sizeof(OSQPSettings));
         data = (OSQPData *)c_malloc(sizeof(OSQPData));
 
-        H = _H;
-        A = _A;
+        H = csc_matrix(_H->m, _H->n, _H->nzmax, _H->x, _H->i, _H->p);
+        A = csc_matrix(_A->m, _A->n, _A->nzmax, _A->x, _A->i, _A->p);
 
         // Conversion to OSQP data type c_float
         c_float* g = new c_float[nV];
@@ -76,7 +76,7 @@ namespace lcqpOASES {
         }
 
         // Setup workspace
-        c_int exitflag = osqp_setup(&work, data, settings);
+        osqp_setup(&work, data, settings);
     }
 
 
@@ -94,7 +94,8 @@ namespace lcqpOASES {
      */
     SubsolverOSQP::~SubsolverOSQP()
     {
-        // TODO: Destruct csc matrices
+        // TODO: DO Cleanup
+        printf("TODO: CLEAN UP OSQP.\n");
     }
 
 
@@ -168,9 +169,25 @@ namespace lcqpOASES {
      */
     void SubsolverOSQP::copy(const SubsolverOSQP& rhs)
     {
-        // Todo: Verify copy
-        data = rhs.data;
-        settings = rhs.settings;
-        work = rhs.work;
+        if (rhs.H != 0)
+            H = csc_matrix(rhs.H->m, rhs.H->n, rhs.H->nzmax, rhs.H->x, rhs.H->i, rhs.H->p);
+
+        if (rhs.A != 0)
+            A = csc_matrix(rhs.A->m, rhs.A->n, rhs.A->nzmax, rhs.A->x, rhs.A->i, rhs.A->p);
+
+        if (rhs.data) {
+            data = (OSQPData *)c_malloc(sizeof(OSQPData));
+            memcpy(data, rhs.data, sizeof(OSQPData));
+        }
+
+        if (rhs.settings) {
+            settings = (OSQPSettings *)c_malloc(sizeof(OSQPSettings));
+            memcpy(settings, rhs.settings, sizeof(OSQPSettings));
+        }
+
+        if (rhs.work) {
+            work = (OSQPWorkspace *)c_malloc(sizeof(OSQPWorkspace));
+            memcpy(work, rhs.work, sizeof(OSQPWorkspace));
+        }
     }
 }

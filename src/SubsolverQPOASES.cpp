@@ -49,6 +49,7 @@ namespace lcqpOASES {
 
         memcpy(H, _H, (long unsigned int)(nV*nV)*sizeof(double));
         memcpy(A, _A, (long unsigned int)(nC*nV)*sizeof(double));
+
     }
 
     /*
@@ -64,11 +65,15 @@ namespace lcqpOASES {
      */
     SubsolverQPOASES::~SubsolverQPOASES()
     {
-        if (H != 0)
+        if (H != 0) {
             delete[] H;
+            H = NULL;
+        }
 
-        if (A != 0)
+        if (A != 0) {
             delete[] A;
+            A = NULL;
+        }
     }
 
     /*
