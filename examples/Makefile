@@ -55,6 +55,7 @@ LCQPOASES_DEBUG = \
 	${DEBUGDIR}/warm_up_w_A${EXE} \
 	${DEBUGDIR}/warm_up_sparse${EXE} \
 	${DEBUGDIR}/solve_lcqp_from_file${EXE} \
+	${DEBUGDIR}/test_osqp${EXE} \
 	# ${DEBUGDIR}/test_csc${EXE}
 
 
