@@ -76,7 +76,7 @@ namespace lcqpOASES {
                 return;
 
             case QPSubproblemSolver::OSQP:
-                solverQPOASES.getPrimalSolution( x );
+                solverOSQP.getPrimalSolution( x );
                 return;
         }
     }
@@ -90,7 +90,7 @@ namespace lcqpOASES {
                 return;
 
             case QPSubproblemSolver::OSQP:
-                solverQPOASES.getDualSolution( y );
+                solverOSQP.getDualSolution( y );
                 return;
         }
     }
@@ -112,50 +112,8 @@ namespace lcqpOASES {
 
             case QPSubproblemSolver::OSQP:
             {
-                MessageHandler::PrintMessage( NOT_YET_IMPLEMENTED );
+                solverOSQP.setPrintlevl(printlvl >= printLevel::SUBPROBLEM_SOLVER_ITERATES);
                 return;
-            }
-        }
-    }
-
-
-    void Subsolver::switchToRelaxedOptions( )
-    {
-        switch (qpSolver) {
-            case QPSubproblemSolver::QPOASES:
-            {
-                qpOASES::PrintLevel pl = optionsQPOASES.printLevel;
-                optionsQPOASES.setToFast( );
-                optionsQPOASES.printLevel = pl;
-                solverQPOASES.setOptions( optionsQPOASES );
-                break;
-            }
-
-            case QPSubproblemSolver::OSQP:
-            {
-                MessageHandler::PrintMessage( NOT_YET_IMPLEMENTED );
-                break;
-            }
-        }
-    }
-
-
-    void Subsolver::switchToStrictOptions( )
-    {
-        switch (qpSolver) {
-            case QPSubproblemSolver::QPOASES:
-            {
-                qpOASES::PrintLevel pl = optionsQPOASES.printLevel;
-                optionsQPOASES.setToDefault( );
-                optionsQPOASES.printLevel = pl;
-                solverQPOASES.setOptions( optionsQPOASES );
-                break;
-            }
-
-            case QPSubproblemSolver::OSQP:
-            {
-                MessageHandler::PrintMessage( NOT_YET_IMPLEMENTED );
-                break;
             }
         }
     }
@@ -163,18 +121,18 @@ namespace lcqpOASES {
 
     returnValue Subsolver::solve(   bool initialSolve, int& iterations,
                                     const double* g,
-                                    const double* lb, const double* ub,
                                     const double* lbA, const double* ubA,
-                                    const double* x0, const double* y0 )
+                                    const double* x0, const double* y0,
+                                    const double* lb, const double* ub)
     {
         returnValue ret = returnValue::SUCCESSFUL_RETURN;
         switch (qpSolver) {
             case QPSubproblemSolver::QPOASES:
-                ret = solverQPOASES.solve( initialSolve, iterations, g, lb, ub, lbA, ubA, x0, y0 );
+                ret = solverQPOASES.solve( initialSolve, iterations, g, lbA, ubA, x0, y0, lb, ub );
                 break;
 
             case QPSubproblemSolver::OSQP:
-                ret = solverOSQP.solve( initialSolve, iterations, g, lb, ub, lbA, ubA, x0, y0 );
+                ret = solverOSQP.solve( initialSolve, iterations, g, lbA, ubA, x0, y0, lb, ub );
                 break;
         }
 

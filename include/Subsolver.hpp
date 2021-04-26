@@ -67,22 +67,17 @@ namespace lcqpOASES {
             /** Options of subproblem solver. */
             void setPrintLevel( printLevel printlvl );
 
-            /** Switch to relaxed options (far from a solution). */
-            void switchToRelaxedOptions( );
-
-            /** Switching to strict options (near a solution). */
-            void switchToStrictOptions( );
-
             /** Abstract method for solving the QP. */
             returnValue solve(  bool initialSolve, int& iterations,
                                 const double* g,
-                                const double* lb, const double* ub,
                                 const double* lbA, const double* ubA,
-                                const double* x0 = 0, const double* y0 = 0 );
+                                const double* x0 = 0, const double* y0 = 0,
+                                const double* lb = 0, const double* ub = 0);
 
         protected:
             /** Copies all members from given rhs object. */
             void copy(const Subsolver& rhs);
+
 
         private:
             // The solver type
@@ -94,8 +89,6 @@ namespace lcqpOASES {
 
             // Options and settings
             qpOASES::Options optionsQPOASES;        /**< Options for the qpOASES solver. */
-
-
     };
 }
 

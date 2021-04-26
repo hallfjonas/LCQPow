@@ -27,7 +27,11 @@ namespace lcqpOASES {
     /*
      *   S u b s o l v e r O S Q P
      */
-    SubsolverOSQP::SubsolverOSQP( ) { }
+    SubsolverOSQP::SubsolverOSQP( ) {
+        data = 0;
+        settings = 0;
+        work = 0;
+     }
 
 
     /*
@@ -42,13 +46,16 @@ namespace lcqpOASES {
         settings = (OSQPSettings *)c_malloc(sizeof(OSQPSettings));
         data = (OSQPData *)c_malloc(sizeof(OSQPData));
 
+        nVars = nV;
+        nDuals = nC;
+
         H = csc_matrix(_H->m, _H->n, _H->nzmax, _H->x, _H->i, _H->p);
         A = csc_matrix(_A->m, _A->n, _A->nzmax, _A->x, _A->i, _A->p);
 
         // Conversion to OSQP data type c_float
-        c_float* g = new c_float[nV];
-        c_float* l = new c_float[nC];
-        c_float* u = new c_float[nC];
+        g = new c_float[nV];
+        l = new c_float[nC];
+        u = new c_float[nC];
 
         for (int i = 0; i < nV; i++) {
             g[i] = (c_float) _g[i];
@@ -58,6 +65,9 @@ namespace lcqpOASES {
             l[i] = (c_float) _l[i];
             u[i] = (c_float) _u[i];
         }
+
+		Utilities::printMatrix(H, "Full H");
+		Utilities::printMatrix(A, "Full A");
 
         // Populate data
         if (data) {
@@ -73,6 +83,8 @@ namespace lcqpOASES {
         // Define solver settings as default
         if (settings) {
             osqp_set_default_settings(settings);
+            settings->eps_prim_inf = Utilities::ZERO;
+            settings->verbose = false;
         }
 
         // Setup workspace
@@ -94,8 +106,43 @@ namespace lcqpOASES {
      */
     SubsolverOSQP::~SubsolverOSQP()
     {
-        // TODO: DO Cleanup
-        printf("TODO: CLEAN UP OSQP.\n");
+        if (settings != 0) {
+            c_free(settings);
+            settings = 0;
+        }
+
+        if (data != 0) {
+            c_free(data);
+            data = 0;
+        }
+
+        // TODO: FIGURE OUT WHEN AND HOW TO CALL OSQP_CLEANUP
+        printf("NOT CLEANING UP osqp work!!!\n");
+
+        if (H != 0) {
+            c_free(H);
+            H = 0;
+        }
+
+        if (A != 0) {
+            c_free(A);
+            A = 0;
+        }
+
+        if (g != 0) {
+            delete[] g;
+            g = 0;
+        }
+
+        if (l != 0) {
+            delete[] l;
+            l = 0;
+        }
+
+        if (u != 0) {
+            delete[] u;
+            u = 0;
+        }
     }
 
 
@@ -122,20 +169,37 @@ namespace lcqpOASES {
 
 
     /*
+     *   s e t O p t i o n s
+     */
+    void SubsolverOSQP::setPrintlevl( bool verbose )
+    {
+        if (settings != 0)
+            settings->verbose = verbose;
+    }
+
+
+    /*
      *   s o l v e
      */
     returnValue SubsolverOSQP::solve(   bool initialSolve, int& iterations,
                                         const double* const _g,
-                                        const double* const _lb, const double* const _ub,
                                         const double* const _lbA, const double* const _ubA,
-                                        const double* const x0, const double* const y0 )
+                                        const double* const x0, const double* const y0,
+                                        const double* const _lb, const double* const _ub )
     {
+        // Make sure that lb and ub are null pointers, as OSQP does not handle box constraints
+        if (_lb != 0 || _ub != 0) {
+            return MessageHandler::PrintMessage( returnValue::INVALID_OSQP_BOX_CONSTRAINTS );
+        }
+
         // Update linear cost and bounds
         osqp_update_lin_cost(work, _g);
         osqp_update_bounds(work, _lbA, _ubA);
 
+        int exitflag;
+
         // Solve Problem
-        int exitflag = osqp_solve(work);
+        exitflag = osqp_solve(work);
 
         // Either pass error
         if (exitflag != 0)
@@ -151,7 +215,11 @@ namespace lcqpOASES {
      */
     void SubsolverOSQP::getPrimalSolution( double* x )
     {
-        throw( MessageHandler::PrintMessage( returnValue::NOT_YET_IMPLEMENTED ));
+        OSQPSolution *sol(work->solution);
+
+        if (sol->x != 0) {
+            memcpy(x, sol->x, nVars*(sizeof(double)));
+        }
     }
 
 
@@ -160,7 +228,11 @@ namespace lcqpOASES {
      */
     void SubsolverOSQP::getDualSolution( double* y )
     {
-        throw( MessageHandler::PrintMessage( returnValue::NOT_YET_IMPLEMENTED ));
+        OSQPSolution *sol(work->solution);
+
+        if (sol->y != 0) {
+            memcpy(y, sol->y, nDuals*(sizeof(double)));
+        }
     }
 
 
@@ -169,6 +241,9 @@ namespace lcqpOASES {
      */
     void SubsolverOSQP::copy(const SubsolverOSQP& rhs)
     {
+        nVars = rhs.nVars;
+        nDuals = rhs.nDuals;
+
         if (rhs.H != 0)
             H = csc_matrix(rhs.H->m, rhs.H->n, rhs.H->nzmax, rhs.H->x, rhs.H->i, rhs.H->p);
 

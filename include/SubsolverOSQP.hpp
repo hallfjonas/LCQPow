@@ -52,12 +52,15 @@ namespace lcqpOASES {
             /** Set OSQP settings. */
             void setOptions( OSQPSettings* settings );
 
+            /** Set print level. */
+            void setPrintlevl( bool verbose );
+
             /** Run OSQP solver. */
             returnValue solve(  bool initialSolve, int& iterations,
                                 const double* const _g,
-                                const double* const _lb, const double* const _ub,
                                 const double* const _lbA, const double* const _ubA,
-                                const double* const x0 = 0, const double* const y0 = 0);
+                                const double* const x0 = 0, const double* const y0 = 0,
+                                const double* const _lb = 0, const double* const _ub = 0);
 
             /** Write solution to x. */
             void getPrimalSolution( double* x );
@@ -73,9 +76,16 @@ namespace lcqpOASES {
             csc* H;
             csc* A;
 
-            OSQPWorkspace *work;
-            OSQPSettings *settings;
-            OSQPData *data;
+            int nVars;                              /**< Number of optimization variables. */
+            int nDuals;                             /**< Total number of dual variables. */
+
+            OSQPWorkspace *work = 0;
+            OSQPSettings *settings = 0;
+            OSQPData *data = 0;
+
+            c_float* g = 0;
+            c_float* l = 0;
+            c_float* u = 0;
     };
 }
 

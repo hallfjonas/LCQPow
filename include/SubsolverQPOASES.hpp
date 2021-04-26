@@ -52,12 +52,12 @@ namespace lcqpOASES {
             /** Run qpOASES solver. */
             returnValue solve(  bool initialSolve, int& iterations,
                                 const double* const _g,
-                                const double* const _lb,
-                                const double* const _ub,
                                 const double* const _lbA,
                                 const double* const _ubA,
                                 const double* const x0 = 0,
-                                const double* const y0 = 0 );
+                                const double* const y0 = 0,
+                                const double* const _lb = 0,
+                                const double* const _ub = 0 );
 
             /** Write solution to x. */
             void getPrimalSolution( double* x );

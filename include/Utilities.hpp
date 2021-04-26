@@ -43,6 +43,7 @@ namespace lcqpOASES {
         INVALID_NUMBER_OF_COMP_VARS = 107,              /**< Invalid number of complementarity constraints. Must be a positive integer. */
         INVALID_NUMBER_OF_CONSTRAINT_VARS = 108,        /**< Invalid number of linear constraints. Must be a non-negative integer. */
         INVALID_RELAX_OPTIONS_TOLERANCE = 109,          /**< Invalid number of active set changes to switch to precision mode. Must be a positive integer. */
+        INVALID_OSQP_BOX_CONSTRAINTS = 110,             /**< Invalid constraints passed to OSQP solver: This solver does not handle box constraints, please pass them through linear constraints. */
 
         // Algorithmic errors
         MAX_OUTER_ITERATIONS_REACHED = 200,             /**< Maximum number of outer iterations reached. */

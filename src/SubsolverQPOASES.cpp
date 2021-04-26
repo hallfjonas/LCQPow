@@ -27,7 +27,10 @@ namespace lcqpOASES {
     /*
      *   S u b s o l v e r O S Q P
      */
-    SubsolverQPOASES::SubsolverQPOASES( ) { }
+    SubsolverQPOASES::SubsolverQPOASES( ) {
+        H = 0;
+        A = 0;
+    }
 
 
     /*
@@ -103,9 +106,9 @@ namespace lcqpOASES {
      */
     returnValue SubsolverQPOASES::solve(    bool initialSolve, int& iterations,
                                             const double* const g,
-                                            const double* const lb, const double* const ub,
                                             const double* const lbA, const double* const ubA,
-                                            const double* const x0, const double* const y0 )
+                                            const double* const x0, const double* const y0,
+                                            const double* const lb, const double* const ub )
     {
         qpOASES::returnValue ret;
 

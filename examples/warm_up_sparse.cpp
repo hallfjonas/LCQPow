@@ -32,11 +32,9 @@ int main() {
     int H_nnx = 3;
     double H_data[3] = { 2.0, 2.0 };
     int H_i[3] = {0, 1};
-    int H_p[3] = {0, 1, 3};
+    int H_p[3] = {0, 1, 2};
 
     double g[2] = { -2.0, -2.0 };
-    double lb[2] = { 0, 0 };
-    double ub[2] = { INFINITY, INFINITY };
 
     int S1_nnx = 1;
     double S1_data[1] = { 1.0 };
@@ -59,7 +57,7 @@ int main() {
 	lcqp.setOptions( options );
 
     // Solve first LCQP
-	returnValue retVal = lcqp.solve( H_data, H_nnx, H_i, H_p, g, lb, ub, S1_data, S1_nnx, S1_i, S1_p, S2_data, S2_nnx, S2_i, S2_p );
+	returnValue retVal = lcqp.solve( H_data, H_nnx, H_i, H_p, g, S1_data, S1_nnx, S1_i, S1_p, S2_data, S2_nnx, S2_i, S2_p );
 
     if (retVal != SUCCESSFUL_RETURN)
     {

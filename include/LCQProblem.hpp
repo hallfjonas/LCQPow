@@ -127,8 +127,6 @@ namespace lcqpOASES {
 			 * @param _H_i Row indicies of non-zero values.
 			 * @param _H_p Pointer to column starts.
 			 * @param _g The objective's linear term.
-			 * @param _lb The box constraint's lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
-			 * @param _ub The box constraint's upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
 			 * @param _S1_data Non-zero values of LHS of complementarity product.
 			 * @param _S1_nnx Number of non-zero values of S1.
 			 * @param _S1_i Row indicies of non-zero values of S1.
@@ -153,8 +151,6 @@ namespace lcqpOASES {
 								int* _H_i,
 								int* _H_p,
 								double* _g,
-								double* _lb,
-								double* _ub,
 								double* _S1_data,
 								int _S1_nnx,
 								int* _S1_i,
@@ -478,6 +474,7 @@ namespace lcqpOASES {
 			int nV;									/**< Number of variables. */
 			int nC;									/**< Number of constraints. */
 			int nComp;								/**< Number of complementarity constraints. */
+			int nDuals; 							/**< Number of duals variables. */
 
 			double* H;								/**< Objective Hessian term. */
 
@@ -516,12 +513,13 @@ namespace lcqpOASES {
 
 			int qpIterk;							/**< Iterations taken by qpSolver to solve subproblem. */
 
-			bool relaxedOptionsEnabled;				/**< Flag indicating whether the subsolver runs under relaxed options. */
-
 			algorithmStatus algoStat;				/**< Status of algorithm. */
 
 			csc* H_sparse;							/**< Sparse objective Hessian matrix. */
 			csc* A_sparse;							/**< Sparse constraint matrix. */
+			double* tmpA_data = 0;
+			int* tmpA_i = 0;
+			int* tmpA_p = 0;
 
 			Subsolver subsolver;					/**< Subsolver class for solving the QP subproblems. */
 

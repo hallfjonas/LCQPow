@@ -20,11 +20,11 @@
  */
 
 
-#include <LCQProblem.hpp>
-#include <Utilities.hpp>
-#include <SubsolverQPOASES.hpp>
-#include <SubsolverOSQP.hpp>
-#include <PlotManager.hpp>
+#include "LCQProblem.hpp"
+#include "Utilities.hpp"
+#include "SubsolverQPOASES.hpp"
+#include "SubsolverOSQP.hpp"
+#include "PlotManager.hpp"
 
 #include <iostream>
 #include <string>
@@ -85,7 +85,7 @@ namespace lcqpOASES {
 	returnValue LCQProblem::solve(	const double* const _H, const double* const _g,
 									const double* const _lb, const double* const _ub,
 									const double* const _S1, const double* const _S2,
-									 const double* const _A, const double* const _lbA, const double* const _ubA,
+									const double* const _A, const double* const _lbA, const double* const _ubA,
 									const double* const _x0, const double* const _y0
 									)
 	{
@@ -120,6 +120,9 @@ namespace lcqpOASES {
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
+
+		// Number of duals in qpOASES case (box constraints + linear constraints + complementarity bounds):
+		nDuals = nV + nC + 2*nComp;
 
 		// USe qpOASES in dense formulations
 		Subsolver tmp( nV, nC + 2*nComp, H, A );
@@ -261,6 +264,9 @@ namespace lcqpOASES {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
+		// Number of duals in qpOASES case (box constraints + linear constraints + complementarity bounds):
+		nDuals = nV + nC + 2*nComp;
+
 		// USe qpOASES in dense formulations
 		Subsolver tmp( nV, nC + 2*nComp, H, A );
 		subsolver = tmp;
@@ -270,8 +276,7 @@ namespace lcqpOASES {
 	}
 
 
-	returnValue LCQProblem::solve(	double* _H_data, int _H_nnx, int* _H_i, int* _H_p,
-									double* _g, double* _lb, double* _ub,
+	returnValue LCQProblem::solve(	double* _H_data, int _H_nnx, int* _H_i, int* _H_p, double* _g,
 									double* _S1_data, int _S1_nnx, int* _S1_i, int* _S1_p,
 									double* _S2_data, int _S2_nnx, int* _S2_i, int* _S2_p,
 									double* _A_data, int _A_nnx, int* _A_i, int* _A_p,
@@ -290,16 +295,6 @@ namespace lcqpOASES {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
-		ret = setLB( _lb );
-
-		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
-
-		ret = setUB( _ub );
-
-		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
-
 		ret = setConstraints( _S1_data, _S1_nnx, _S1_i, _S1_p, _S2_data, _S2_nnx, _S2_i, _S2_p, _A_data, _A_nnx, _A_i, _A_p, _lbA, _ubA );
 
 		if (ret != SUCCESSFUL_RETURN)
@@ -310,7 +305,14 @@ namespace lcqpOASES {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
-		// USe OSQP in sparse formulations
+		// Make sure that box constraints are null pointers in OSQP case
+		lb = 0;
+		ub = 0;
+
+		// Number of duals in qpOASES case (box constraints + linear constraints + complementarity bounds):
+		nDuals = nC + 2*nComp;
+
+		// Use OSQP in sparse formulations
 		Subsolver tmp(nV, nC + 2*nComp, H_sparse, A_sparse, g, lbA, ubA);
 		subsolver = tmp;
 
@@ -398,9 +400,9 @@ namespace lcqpOASES {
 	{
 
 		int tmpA_nnx = A_nnx + S1_nnx + S2_nnx;
-		double* tmpA_data = new double[tmpA_nnx];
-		int* tmpA_i = new int[tmpA_nnx];
-		int* tmpA_p = new int[nV+1];
+		tmpA_data = new double[tmpA_nnx];
+		tmpA_i = new int[tmpA_nnx];
+		tmpA_p = new int[nV+1];
 
 		int index_data = 0;
 		tmpA_p[0] = 0;
@@ -477,8 +479,6 @@ namespace lcqpOASES {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage(ret);
 
-		Utilities::printMatrix(A, nC + 2*nComp, nV, "Full A");
-
 		// For now store S1, S2, and C in dense format.
 		// If we can manage to adapt all operations required for C (specifically S1'*S2 + S2'*S1 = C)
 		// we should instantly switch to sparse format!
@@ -498,7 +498,6 @@ namespace lcqpOASES {
 
 		C = new double[nV*nV];
 		Utilities::MatrixSymmetrizationProduct(S1, S2, C, nComp, nV);
-		Utilities::printMatrix(C, nV, nV, "Full C");
 
 		return SUCCESSFUL_RETURN;
 	}
@@ -509,12 +508,10 @@ namespace lcqpOASES {
 		if (nV <= 0)
 			return LCQPOBJECT_NOT_SETUP;
 
-		H_sparse = csc_spalloc(nV, nV, H_nnx, 1, 1);
 		H_sparse = csc_matrix(nV, nV, H_nnx, H_data, H_i, H_p);
 
 		H = new double[nV*nV]();
 		Utilities::csc_to_dns(H_sparse, H, nV, nV);
-		Utilities::printMatrix(H, nV, nV, "Full H");
 
 		return returnValue::SUCCESSFUL_RETURN;
 	}
@@ -614,17 +611,15 @@ namespace lcqpOASES {
 		innerIter = 0;
 		algoStat = algorithmStatus::PROBLEM_NOT_SOLVED;
 
-		// Initialize subproblem solver (with relaxed options)
-		subsolver.switchToRelaxedOptions( );
+		// Initialize subproblem solver
 		subsolver.setPrintLevel( options.printLvl );
-		relaxedOptionsEnabled = true;
 	}
 
 
 	returnValue LCQProblem::solveQPSubproblem(bool initialSolve)
 	{
 		// First solve convex subproblem
-		returnValue ret = subsolver.solve( initialSolve, qpIterk, gk, lb, ub, lbA, ubA, xk, yk );
+		returnValue ret = subsolver.solve( initialSolve, qpIterk, gk, lbA, ubA, xk, yk, lb, ub );
 
 		// If no initial guess was passed, then need to allocate memory
 		if (xk == 0) {
@@ -632,7 +627,7 @@ namespace lcqpOASES {
 		}
 
 		if (yk == 0) {
-			yk = new double[nV + nC + 2*nComp];
+			yk = new double[nDuals];
 		}
 
 		// Return on error
@@ -649,18 +644,6 @@ namespace lcqpOASES {
 
 		// Update pk
 		Utilities::WeightedVectorAdd(1, xnew, -1, xk, pk, nV);
-
-		// Update to strict options (near a solution)
-		if (relaxedOptionsEnabled && qpIterk <= options.relaxOptionsTolerance) {
-			relaxedOptionsEnabled = false;
-			subsolver.switchToStrictOptions( );
-		}
-
-		// or to relaxed options (far from a solution)
-		if (!relaxedOptionsEnabled && qpIterk > options.relaxOptionsTolerance) {
-			relaxedOptionsEnabled = true;
-			subsolver.switchToRelaxedOptions( );
-		}
 
 		return SUCCESSFUL_RETURN;
 	}
@@ -729,14 +712,15 @@ namespace lcqpOASES {
 
 		// 2) Constraint contribution: A'*yk
 		Utilities::TransponsedMatrixMultiplication(A, yk_A, constr_statk, nC + 2*nComp, nV, 1);
+		Utilities::WeightedVectorAdd(1, statk, -1, constr_statk, statk, nV);
 
 		// 3) Box constraint contribution
-		for (int i = 0; i < nV; i++)
-			box_statk[i] = yk[i];
+		if (lb != 0 || ub != 0) {
+			for (int i = 0; i < nV; i++)
+				box_statk[i] = yk[i];
 
-		// 4) => stat = 1) - 2) - 3)
-		Utilities::WeightedVectorAdd(1, statk, -1, constr_statk, statk, nV);
-		Utilities::WeightedVectorAdd(1, statk, -1, box_statk, statk, nV);
+			Utilities::WeightedVectorAdd(1, statk, -1, box_statk, statk, nV);
+		}
 	}
 
 
@@ -991,68 +975,135 @@ namespace lcqpOASES {
 	/// Clear allocated memory
 	void LCQProblem::clear( )
 	{
-		if (H != 0)
+		if (H != 0) {
 			delete[] H;
+			H = 0;
+		}
 
-		if (g != 0)
+		if (g != 0) {
 			delete[] g;
+			g = 0;
+		}
 
-		if (lb != 0)
+		if (lb != 0) {
 			delete[] lb;
+			lb = 0;
+		}
 
-		if (ub != 0)
+		if (ub != 0) {
 			delete[] ub;
+			ub = 0;
+		}
 
-		if (A != 0)
+		if (A != 0) {
 			delete[] A;
+			A = 0;
+		}
 
-		if (lbA != 0)
+		if (lbA != 0) {
 			delete[] lbA;
+			lbA = 0;
+		}
 
-		if (ubA != 0)
+		if (ubA != 0) {
 			delete[] ubA;
+			ubA = 0;
+		}
 
-		if (S1 != 0)
+		if (S1 != 0) {
 			delete[] S1;
+			S1 = 0;
+		}
 
-		if (S2 != 0)
+		if (S2 != 0) {
 			delete[] S2;
+			S2 = 0;
+		}
 
-		if (C != 0)
+		if (C != 0) {
 			delete[] C;
+			C = 0;
+		}
 
-		if (gk != 0)
+		if (gk != 0) {
 			delete[] gk;
+			gk = 0;
+		}
 
-		if (xk != 0)
+		if (xk != 0) {
 			delete[] xk;
+			xk = 0;
+		}
 
-		if (yk != 0)
+		if (yk != 0) {
 			delete[] yk;
+			yk = 0;
+		}
 
-		if (yk_A != 0)
+		if (yk_A != 0) {
 			delete[] yk_A;
+			yk_A = 0;
+		}
 
-		if (xnew != 0)
+		if (xnew != 0) {
 			delete[] xnew;
+			xnew = 0;
+		}
 
-		if (pk != 0)
+		if (pk != 0) {
 			delete[] pk;
+			pk = 0;
+		}
 
-		if (Qk != 0)
+		if (Qk != 0) {
 			delete[] Qk;
+			Qk = 0;
+		}
 
-		if (statk != 0)
+		if (statk != 0) {
 			delete[] statk;
+			statk = 0;
+		}
 
-		if (constr_statk != 0)
+		if (constr_statk != 0) {
 			delete[] constr_statk;
+			constr_statk = 0;
+		}
 
-		if (box_statk != 0)
+		if (box_statk != 0) {
 			delete[] box_statk;
+			box_statk = 0;
+		}
 
-		if (lk_tmp != 0)
+		if (lk_tmp != 0) {
 			delete[] lk_tmp;
+			lk_tmp = 0;
+		}
+
+		if (tmpA_data != 0) {
+			delete[] tmpA_data;
+			tmpA_data = 0;
+		}
+
+		if (tmpA_p != 0) {
+			delete[] tmpA_p;
+			tmpA_p = 0;
+		}
+
+		if (tmpA_i != 0) {
+			delete[] tmpA_i;
+			tmpA_i = 0;
+		}
+
+		if (H_sparse != 0) {
+			c_free(H_sparse);
+			H_sparse = 0;
+		}
+
+		if (A_sparse != 0) {
+			c_free(A_sparse);
+			A_sparse = 0;
+		}
 	}
 }
 
