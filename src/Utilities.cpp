@@ -308,7 +308,7 @@ namespace lcqpOASES {
 
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++)
-                printf("%.1f ", A[i*n + j]);
+                printf("%.5f ", A[i*n + j]);
 
 
             printf("\n");
@@ -331,6 +331,7 @@ namespace lcqpOASES {
         }
 
         printf("\n");
+        fflush(stdout);
     }
 
 
@@ -345,6 +346,9 @@ namespace lcqpOASES {
 
         // Print the dense matrix
         Utilities::printMatrix(dense, A->m, A->n, name);
+
+        // Clear memory
+        delete[] dense;
     }
 
 
@@ -590,6 +594,10 @@ namespace lcqpOASES {
 
             case INVALID_INDEX_ARRAY:
                 printf("ERROR: Invalid index array passed in csc format.\n");
+                break;
+
+            case INVALID_OSQP_BOX_CONSTRAINTS:
+                printf("ERROR: Invalid constraints passed to OSQP solver: This solver does not handle box constraints, please pass them through linear constraints.\n");
                 break;
         }
 
