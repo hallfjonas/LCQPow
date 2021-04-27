@@ -46,7 +46,7 @@ namespace lcqpOASES {
     {
         qpSolver = QPSubproblemSolver::OSQP;
 
-        SubsolverOSQP tmp(nV, nC, H, A, g, l, u);
+        SubsolverOSQP tmp(H, A, g, l, u);
         solverOSQP = tmp;
     }
 
@@ -68,29 +68,15 @@ namespace lcqpOASES {
     }
 
 
-    void Subsolver::getPrimalSolution( double* x )
+    void Subsolver::getSolution( double* x, double* y )
     {
         switch (qpSolver) {
             case QPSubproblemSolver::QPOASES:
-                solverQPOASES.getPrimalSolution( x );
+                solverQPOASES.getSolution( x, y );
                 return;
 
             case QPSubproblemSolver::OSQP:
-                solverOSQP.getPrimalSolution( x );
-                return;
-        }
-    }
-
-
-    void Subsolver::getDualSolution( double* y )
-    {
-        switch (qpSolver) {
-            case QPSubproblemSolver::QPOASES:
-                solverQPOASES.getDualSolution( y );
-                return;
-
-            case QPSubproblemSolver::OSQP:
-                solverOSQP.getDualSolution( y );
+                solverOSQP.getSolution( x, y );
                 return;
         }
     }
