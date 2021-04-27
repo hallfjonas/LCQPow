@@ -477,37 +477,37 @@ namespace lcqpOASES {
 			int nDuals; 							/**< Number of duals variables. */
 			int boxDualOffset;						/**< Offset for linear constraint duals (i.e. 0 if no BC (Box Constraints) exist nV if BC exist). */
 
-			double* H = 0;							/**< Objective Hessian term. */
+			double* H = NULL;							/**< Objective Hessian term. */
 
-			double* g = 0;							/**< Objective linear term. */
-			double* lb = 0;							/**< Lower bound vector (on variables). */
-			double* ub = 0;							/**< Upper bound vector (on variables). */
+			double* g = NULL;							/**< Objective linear term. */
+			double* lb = NULL;							/**< Lower bound vector (on variables). */
+			double* ub = NULL;							/**< Upper bound vector (on variables). */
 
-			double* A = 0;							/**< Constraint matrix. */
-			double* lbA = 0;						/**< Lower bound vector (on constraints). */
-			double* ubA = 0;						/**< Upper bound vector (on constraints). */
+			double* A = NULL;							/**< Constraint matrix. */
+			double* lbA = NULL;						/**< Lower bound vector (on constraints). */
+			double* ubA = NULL;						/**< Upper bound vector (on constraints). */
 
-			double* S1 = 0;							/**< LHS of complementarity product. */
-			double* S2 = 0;							/**< RHS of complementarity product. */
-			double* C = 0;							/**< Complementarity matrix (S1'*S2 + S2'*S1). */
+			double* S1 = NULL;							/**< LHS of complementarity product. */
+			double* S2 = NULL;							/**< RHS of complementarity product. */
+			double* C = NULL;							/**< Complementarity matrix (S1'*S2 + S2'*S1). */
 
 			double rho; 							/**< Current penalty value. */
 
 			double* gk;								/**< Current objective linear term. */
 
-			double* xk = 0;							/**< Current primal iterate. */
-			double* yk = 0;							/**< Current dual vector. */
-			double* yk_A = 0;						/**< Current dual vector w.r.t A. */
-			double* xnew = 0;						/**< Current qpSubproblem solution. */
-			double* pk = 0;							/**< xnew - xk. */
+			double* xk = NULL;							/**< Current primal iterate. */
+			double* yk = NULL;							/**< Current dual vector. */
+			double* yk_A = NULL;						/**< Current dual vector w.r.t A. */
+			double* xnew = NULL;						/**< Current qpSubproblem solution. */
+			double* pk = NULL;							/**< xnew - xk. */
 
 			double alphak; 							/**< Optimal step length. */
-			double* lk_tmp = 0;						/**< An auxiliar vector to help compute lkj. */
+			double* lk_tmp = NULL;						/**< An auxiliar vector to help compute lkj. */
 
-			double* Qk = 0;							/**< H + rho*C, required for stationarity and optimal step length. */
-			double* statk = 0;						/**< Stationarity of current iterate. */
-			double* constr_statk = 0;				/**< Constraint contribution to stationarity equation. */
-			double* box_statk = 0;					/**< Box Constraint contribution to stationarity equation. */
+			double* Qk = NULL;							/**< H + rho*C, required for stationarity and optimal step length. */
+			double* statk = NULL;						/**< Stationarity of current iterate. */
+			double* constr_statk = NULL;				/**< Constraint contribution to stationarity equation. */
+			double* box_statk = NULL;					/**< Box Constraint contribution to stationarity equation. */
 
 			int outerIter;							/**< Outer iterate. */
 			int innerIter;							/**< Inner iterate- */
@@ -516,11 +516,11 @@ namespace lcqpOASES {
 
 			algorithmStatus algoStat;				/**< Status of algorithm. */
 
-			csc* H_sparse = 0;						/**< Sparse objective Hessian matrix. */
-			csc* A_sparse = 0;						/**< Sparse constraint matrix. */
-			double* tmpA_data = 0;					/**< Temporary data vector for building CSC matrix. */
-			int* tmpA_i = 0;						/**< Temporary row pointer for building CSC matrix. */
-			int* tmpA_p = 0;						/**< Temporary column pointer for building CSC matrix. */
+			csc* H_sparse = NULL;						/**< Sparse objective Hessian matrix. */
+			csc* A_sparse = NULL;						/**< Sparse constraint matrix. */
+			double* tmpA_data = NULL;					/**< Temporary data vector for building CSC matrix. */
+			int* tmpA_i = NULL;						/**< Temporary row pointer for building CSC matrix. */
+			int* tmpA_p = NULL;						/**< Temporary column pointer for building CSC matrix. */
 
 			Subsolver subsolver;					/**< Subsolver class for solving the QP subproblems. */
 
