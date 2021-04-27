@@ -74,15 +74,15 @@ namespace lcqpOASES {
             int nVars;                              /**< Number of optimization variables. */
             int nDuals;                             /**< Total number of dual variables. */
 
-            OSQPWorkspace *work = 0;
-            OSQPSettings *settings = 0;
-            OSQPData *data = 0;
+            OSQPWorkspace *work = NULL;
+            OSQPSettings *settings = NULL;
+            OSQPData *data = NULL;
 
-            csc* H = 0;
-            csc* A = 0;
-            c_float* g = 0;
-            c_float* l = 0;
-            c_float* u = 0;
+            csc* H = NULL;
+            csc* A = NULL;
+            c_float* g = NULL;
+            c_float* l = NULL;
+            c_float* u = NULL;
     };
 }
 

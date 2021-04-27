@@ -27,10 +27,7 @@ namespace lcqpOASES {
     /*
      *   S u b s o l v e r O S Q P
      */
-    SubsolverQPOASES::SubsolverQPOASES( ) {
-        H = 0;
-        A = 0;
-    }
+    SubsolverQPOASES::SubsolverQPOASES( ) { }
 
 
     /*

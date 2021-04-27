@@ -184,7 +184,7 @@ namespace lcqpOASES {
 			return MessageHandler::PrintMessage( ret );
 		}
 
-		double* _A = 0;
+		double* _A = NULL;
 		if (A_file != 0) {
 			_A = new double[nC*nV];
 			ret = Utilities::readFromFile( _A, nC*nV, A_file );
@@ -194,7 +194,7 @@ namespace lcqpOASES {
 			}
 		}
 
-		double* _lbA = 0;
+		double* _lbA = NULL;
 		if (lbA_file != 0) {
 			_lbA = new double[nC];
 			ret = Utilities::readFromFile( _lbA, nC, lbA_file );
@@ -204,7 +204,7 @@ namespace lcqpOASES {
 			}
 		}
 
-		double* _ubA = 0;
+		double* _ubA = NULL;
 		if (ubA_file != 0) {
 			_ubA = new double[nC];
 			ret = Utilities::readFromFile( _ubA, nC, ubA_file );
@@ -214,7 +214,7 @@ namespace lcqpOASES {
 			}
 		}
 
-		double* _x0 = 0;
+		double* _x0 = NULL;
 		if (x0_file != 0) {
 			_x0 = new double[nC + 2*nComp];
 			ret = Utilities::readFromFile( _x0, nC + 2*nComp, x0_file );
@@ -224,7 +224,7 @@ namespace lcqpOASES {
 			}
 		}
 
-		double* _y0 = 0;
+		double* _y0 = NULL;
 		if (y0_file != 0) {
 			_y0 = new double[nC + 2*nComp];
 			ret = Utilities::readFromFile( _y0, nC + 2*nComp, y0_file );
@@ -308,8 +308,8 @@ namespace lcqpOASES {
 			return MessageHandler::PrintMessage( ret );
 
 		// Make sure that box constraints are null pointers in OSQP case
-		lb = 0;
-		ub = 0;
+		lb = NULL;
+		ub = NULL;
 
 		// Number of duals in OSQP case:
 		nDuals = nC + 2*nComp;
@@ -979,132 +979,132 @@ namespace lcqpOASES {
 	{
 		if (H != 0) {
 			delete[] H;
-			H = 0;
+			H = NULL;
 		}
 
 		if (g != 0) {
 			delete[] g;
-			g = 0;
+			g = NULL;
 		}
 
 		if (lb != 0) {
 			delete[] lb;
-			lb = 0;
+			lb = NULL;
 		}
 
 		if (ub != 0) {
 			delete[] ub;
-			ub = 0;
+			ub = NULL;
 		}
 
 		if (A != 0) {
 			delete[] A;
-			A = 0;
+			A = NULL;
 		}
 
 		if (lbA != 0) {
 			delete[] lbA;
-			lbA = 0;
+			lbA = NULL;
 		}
 
 		if (ubA != 0) {
 			delete[] ubA;
-			ubA = 0;
+			ubA = NULL;
 		}
 
 		if (S1 != 0) {
 			delete[] S1;
-			S1 = 0;
+			S1 = NULL;
 		}
 
 		if (S2 != 0) {
 			delete[] S2;
-			S2 = 0;
+			S2 = NULL;
 		}
 
 		if (C != 0) {
 			delete[] C;
-			C = 0;
+			C = NULL;
 		}
 
 		if (gk != 0) {
 			delete[] gk;
-			gk = 0;
+			gk = NULL;
 		}
 
 		if (xk != 0) {
 			delete[] xk;
-			xk = 0;
+			xk = NULL;
 		}
 
 		if (yk != 0) {
 			delete[] yk;
-			yk = 0;
+			yk = NULL;
 		}
 
 		if (yk_A != 0) {
 			delete[] yk_A;
-			yk_A = 0;
+			yk_A = NULL;
 		}
 
 		if (xnew != 0) {
 			delete[] xnew;
-			xnew = 0;
+			xnew = NULL;
 		}
 
 		if (pk != 0) {
 			delete[] pk;
-			pk = 0;
+			pk = NULL;
 		}
 
 		if (Qk != 0) {
 			delete[] Qk;
-			Qk = 0;
+			Qk = NULL;
 		}
 
 		if (statk != 0) {
 			delete[] statk;
-			statk = 0;
+			statk = NULL;
 		}
 
 		if (constr_statk != 0) {
 			delete[] constr_statk;
-			constr_statk = 0;
+			constr_statk = NULL;
 		}
 
 		if (box_statk != 0) {
 			delete[] box_statk;
-			box_statk = 0;
+			box_statk = NULL;
 		}
 
 		if (lk_tmp != 0) {
 			delete[] lk_tmp;
-			lk_tmp = 0;
+			lk_tmp = NULL;
 		}
 
 		if (tmpA_data != 0) {
 			delete[] tmpA_data;
-			tmpA_data = 0;
+			tmpA_data = NULL;
 		}
 
 		if (tmpA_p != 0) {
 			delete[] tmpA_p;
-			tmpA_p = 0;
+			tmpA_p = NULL;
 		}
 
 		if (tmpA_i != 0) {
 			delete[] tmpA_i;
-			tmpA_i = 0;
+			tmpA_i = NULL;
 		}
 
 		if (H_sparse != 0) {
 			c_free(H_sparse);
-			H_sparse = 0;
+			H_sparse = NULL;
 		}
 
 		if (A_sparse != 0) {
 			c_free(A_sparse);
-			A_sparse = 0;
+			A_sparse = NULL;
 		}
 	}
 }

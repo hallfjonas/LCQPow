@@ -26,9 +26,9 @@ namespace lcqpOASES {
 
 
     SubsolverOSQP::SubsolverOSQP( ) {
-        data = 0;
-        settings = 0;
-        work = 0;
+        data = NULL;
+        settings = NULL;
+        work = NULL;
      }
 
 
@@ -92,37 +92,37 @@ namespace lcqpOASES {
 
         if (data != 0) {
             c_free(data);
-            data = 0;
+            data = NULL;
         }
 
         if (settings != 0) {
             c_free(settings);
-            settings = 0;
+            settings = NULL;
         }
 
         if (H != 0) {
             csc_spfree(H);
-            H = 0;
+            H = NULL;
         }
 
         if (A != 0) {
             csc_spfree(A);
-            A = 0;
+            A = NULL;
         }
 
         if (g != 0) {
             delete[] g;
-            g = 0;
+            g = NULL;
         }
 
         if (l != 0) {
             delete[] l;
-            l = 0;
+            l = NULL;
         }
 
         if (u != 0) {
             delete[] u;
-            u = 0;
+            u = NULL;
         }
     }
 
