@@ -49,10 +49,11 @@ namespace lcqpOASES {
 			 * @param _nC Number of linear constraints.
 			 * @param _nComp Number of complementarity pairs.
 			 */
-			LCQProblem(	int _nV,	  		// Number of variables.
-						int _nC,		  	// Number of constraints.
-						int _nComp 			// Number of complementarity constraints.
-						);
+			LCQProblem(
+				int _nV,
+				int _nC,
+				int _nComp
+			);
 
 
 			/** Destructor. */
@@ -75,18 +76,19 @@ namespace lcqpOASES {
 			 *
 			 * @returns SUCCESSFUL_RETURN if a solution is found. Otherwise the return value will indicate an occured error.
 			*/
-			returnValue solve(	const double* const _H,
-								const double* const _g,
-								const double* const _lb,
-								const double* const _ub,
-								const double* const _S1,
-								const double* const _S2,
-								const double* const _A = 0,
-								const double* const _lbA = 0,
-								const double* const _ubA = 0,
-								const double* const _x0 = 0,
-								const double* const _y0 = 0
-								);
+			returnValue loadLCQP(
+				const double* const _H,
+				const double* const _g,
+				const double* const _lb,
+				const double* const _ub,
+				const double* const _S1,
+				const double* const _S2,
+				const double* const _A = 0,
+				const double* const _lbA = 0,
+				const double* const _ubA = 0,
+				const double* const _x0 = 0,
+				const double* const _y0 = 0
+			 );
 
 
 			/** Run solver passing the desired LCQP in (file) dense format (qpOASES is used on subsolver level).
@@ -106,18 +108,19 @@ namespace lcqpOASES {
 			 *
 			 * @returns SUCCESSFUL_RETURN if a solution is found. Otherwise the return value will indicate an occured error.
 			*/
-			returnValue solve(	const char* const H_file,
-								const char* const g_file,
-								const char* const lb_file,
-								const char* const ub_file,
-								const char* const S1_file,
-								const char* const S2_file,
-								const char* const A_file = 0,
-								const char* const lbA_file = 0,
-								const char* const ubA_file = 0,
-								const char* const x0_file = 0,
-								const char* const y0_file = 0
-								);
+			returnValue loadLCQP(
+				const char* const H_file,
+				const char* const g_file,
+				const char* const lb_file,
+				const char* const ub_file,
+				const char* const S1_file,
+				const char* const S2_file,
+				const char* const A_file = 0,
+				const char* const lbA_file = 0,
+				const char* const ubA_file = 0,
+				const char* const x0_file = 0,
+				const char* const y0_file = 0
+			);
 
 
 			/** Run solver passing the desired LCQP in sparse format (OSQP is used on subsolver level).
@@ -146,28 +149,29 @@ namespace lcqpOASES {
 			 *
 			 * @returns SUCCESSFUL_RETURN if a solution is found. Otherwise the return value will indicate an occured error.
 			*/
-			returnValue solve(	double* _H_data,
-								int _H_nnx,
-								int* _H_i,
-								int* _H_p,
-								double* _g,
-								double* _S1_data,
-								int _S1_nnx,
-								int* _S1_i,
-								int* _S1_p,
-								double* _S2_data,
-								int _S2_nnx,
-								int* _S2_i,
-								int* _S2_p,
-								double* _A_data = 0,
-								int _A_nnx = 0,
-								int* _A_i = 0,
-								int* _A_p = 0,
-								double* _lbA = 0,
-								double* _ubA = 0,
-								double* _x0 = 0,
-								double* _y0 = 0
-								);
+			returnValue loadLCQP(
+				double* _H_data,
+				int _H_nnx,
+				int* _H_i,
+				int* _H_p,
+				double* _g,
+				double* _S1_data,
+				int _S1_nnx,
+				int* _S1_i,
+				int* _S1_p,
+				double* _S2_data,
+				int _S2_nnx,
+				int* _S2_i,
+				int* _S2_p,
+				double* _A_data = 0,
+				int _A_nnx = 0,
+				int* _A_i = 0,
+				int* _A_p = 0,
+				double* _lbA = 0,
+				double* _ubA = 0,
+				double* _x0 = 0,
+				double* _y0 = 0
+			);
 
 
 			/** Run solver passing the desired LCQP in (file) sparse format (OSQP is used on subsolver level).
@@ -195,27 +199,30 @@ namespace lcqpOASES {
 			 *
 			 * @returns SUCCESSFUL_RETURN if a solution is found. Otherwise the return value will indicate an occured error.
 			*/
-			returnValue solve(	const char* const H_data_file,
-								const char* const H_i_file,
-								const char* const H_p_file,
-								const char* const g_file,
-								const char* const lb_file,
-								const char* const ub_file,
-								const char* const S1_data_file,
-								const char* const S1_i_file,
-								const char* const S1_p_file,
-								const char* const S2_data_file,
-								const char* const S2_i_file,
-								const char* const S2_p_file,
-								const char* const A_data_file = 0,
-								const char* const A_i_file = 0,
-								const char* const A_p_file = 0,
-								const char* const lbA_file = 0,
-								const char* const ubA_file = 0,
-								const char* const x0_file = 0,
-								const char* const y0_file = 0
-								);
+			returnValue loadLCQP(
+				const char* const H_data_file,
+				const char* const H_i_file,
+				const char* const H_p_file,
+				const char* const g_file,
+				const char* const lb_file,
+				const char* const ub_file,
+				const char* const S1_data_file,
+				const char* const S1_i_file,
+				const char* const S1_p_file,
+				const char* const S2_data_file,
+				const char* const S2_i_file,
+				const char* const S2_p_file,
+				const char* const A_data_file = 0,
+				const char* const A_i_file = 0,
+				const char* const A_p_file = 0,
+				const char* const lbA_file = 0,
+				const char* const ubA_file = 0,
+				const char* const x0_file = 0,
+				const char* const y0_file = 0
+			);
 
+			/** After problem is set up, call this function and solve LCQP. */
+			returnValue runSolver( );
 
 			/** Writes the primal solution vector.
 			 *
@@ -283,11 +290,12 @@ namespace lcqpOASES {
 			 * @param _H_i Row indicies of non-zero values.
 			 * @param _H_p Pointer to column starts.
 			 */
-			inline returnValue setH(	double* H_data,
-										int H_nnx,
-										int* H_i,
-										int* H_p
-										);
+			inline returnValue setH(
+				double* H_data,
+				int H_nnx,
+				int* H_i,
+				int* H_p
+			);
 
 
 
@@ -305,9 +313,10 @@ namespace lcqpOASES {
 			 * @param number Number of entry to be changed.
 			 * @param value New value for entry of lower bound vector.
 			 */
-			inline returnValue setLB( 	int number,
-										double value
-									);
+			inline returnValue setLB(
+				int number,
+				double value
+			);
 
 
 			/** Store the upper (box) bounds internally.
@@ -322,9 +331,10 @@ namespace lcqpOASES {
 			 * @param number Number of entry to be changed.
 			 * @param value New value for entry of lower bound vector.
 			 */
-			inline returnValue setUB(	int number,
-										double value
-									);
+			inline returnValue setUB(
+				int number,
+				double value
+			);
 
 
 			/** Set the new linear constraint consisting of (dense) complementarity pairs and regular linear constraints.
@@ -335,12 +345,13 @@ namespace lcqpOASES {
 			 * @param lbA New lower bounds for A.
 			 * @param ubA New upper bounds for A.
 			 */
-			returnValue setConstraints( const double* const S1_new,
-										const double* const S2_new,
-										const double* const A_new,
-										const double* const lbA,
-										const double* const ubA
-										);
+			returnValue setConstraints(
+				const double* const S1_new,
+				const double* const S2_new,
+				const double* const A_new,
+				const double* const lbA,
+				const double* const ubA
+			);
 
 
 			/** Set the new linear constraint consisting of (dense) complementarity pairs and regular linear constraints.
@@ -360,21 +371,22 @@ namespace lcqpOASES {
 			 * @param lbA The constraint's lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
 			 * @param ubA The constraint's upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
 			 */
-			returnValue setConstraints(	double* S1_data,
-										int S1_nnx,
-										int* S1_i,
-										int* S1_p,
-										double* S2_data,
-										int S2_nnx,
-										int* S2_i,
-										int* S2_p,
-										double* A_data,
-										int A_nnx,
-										int* A_i,
-										int* A_p,
-										double* lbA,
-										double* ubA
-										);
+			returnValue setConstraints(
+				double* S1_data,
+				int S1_nnx,
+				int* S1_i,
+				int* S1_p,
+				double* S2_data,
+				int S2_nnx,
+				int* S2_i,
+				int* S2_p,
+				double* A_data,
+				int A_nnx,
+				int* A_i,
+				int* A_p,
+				double* lbA,
+				double* ubA
+			);
 
 
 			/** Set the complementarity matrix (requires the constraints to be set) as the symmetrization product of S1 and S2.
@@ -387,24 +399,29 @@ namespace lcqpOASES {
 			 * @param _x0 The primal initial guess.
 			 * @param _y0 The dual initial guess.
 			 */
-			inline returnValue setInitialGuess( const double* const _x0, const double* const _y0 );
+			inline returnValue setInitialGuess(
+				const double* const _x0,
+				const double* const _y0
+			);
 
 
 			/** TODO: Write description. */
-			inline returnValue setSparseMatrix(	const double* const _M_data,
-												const int _M_nnx,
-												const int* const _M_i,
-												const int* const _M_p,
-												qpOASES::SparseMatrix Mat
-												);
+			inline returnValue setSparseMatrix(
+				const double* const _M_data,
+				const int _M_nnx,
+				const int* const _M_i,
+				const int* const _M_p,
+				qpOASES::SparseMatrix Mat
+			);
 
 			/** TODO: Write description. */
-			inline returnValue setSparseMatrix(	const double* const _M_data,
-												const int _M_nnx,
-												const int* const _M_i,
-												const int* const _M_p,
-												qpOASES::SymSparseMat Mat
-												);
+			inline returnValue setSparseMatrix(
+				const double* const _M_data,
+				const int _M_nnx,
+				const int* const _M_i,
+				const int* const _M_p,
+				qpOASES::SymSparseMat Mat
+			);
 
 
 			/** Returns the NLP stationarity vector.
@@ -415,10 +432,11 @@ namespace lcqpOASES {
 			 *
 			 * @returns The stationarity vector.
 			 */
-			double* getPenaltyStationarity(	const double* const x_eval,
-											const double penVal,
-											const double* const g_original
-											);
+			double* getPenaltyStationarity(
+				const double* const x_eval,
+				const double penVal,
+				const double* const g_original
+			);
 
 
 		/*
@@ -428,9 +446,6 @@ namespace lcqpOASES {
 			Options options;						/**< Class for algorithmic options. */
 
 		private:
-
-			/** After problem is set up, call this function and solve LCQP. */
-			returnValue runSolver( );
 
 			/** Called in runSolver to initialize variables. */
 			void initializeSolver( );
@@ -477,37 +492,37 @@ namespace lcqpOASES {
 			int nDuals; 							/**< Number of duals variables. */
 			int boxDualOffset;						/**< Offset for linear constraint duals (i.e. 0 if no BC (Box Constraints) exist nV if BC exist). */
 
-			double* H = NULL;							/**< Objective Hessian term. */
+			double* H = NULL;						/**< Objective Hessian term. */
 
-			double* g = NULL;							/**< Objective linear term. */
-			double* lb = NULL;							/**< Lower bound vector (on variables). */
-			double* ub = NULL;							/**< Upper bound vector (on variables). */
+			double* g = NULL;						/**< Objective linear term. */
+			double* lb = NULL;						/**< Lower bound vector (on variables). */
+			double* ub = NULL;						/**< Upper bound vector (on variables). */
 
-			double* A = NULL;							/**< Constraint matrix. */
+			double* A = NULL;						/**< Constraint matrix. */
 			double* lbA = NULL;						/**< Lower bound vector (on constraints). */
 			double* ubA = NULL;						/**< Upper bound vector (on constraints). */
 
-			double* S1 = NULL;							/**< LHS of complementarity product. */
-			double* S2 = NULL;							/**< RHS of complementarity product. */
-			double* C = NULL;							/**< Complementarity matrix (S1'*S2 + S2'*S1). */
+			double* S1 = NULL;						/**< LHS of complementarity product. */
+			double* S2 = NULL;						/**< RHS of complementarity product. */
+			double* C = NULL;						/**< Complementarity matrix (S1'*S2 + S2'*S1). */
 
 			double rho; 							/**< Current penalty value. */
 
 			double* gk;								/**< Current objective linear term. */
 
-			double* xk = NULL;							/**< Current primal iterate. */
-			double* yk = NULL;							/**< Current dual vector. */
-			double* yk_A = NULL;						/**< Current dual vector w.r.t A. */
-			double* xnew = NULL;						/**< Current qpSubproblem solution. */
-			double* pk = NULL;							/**< xnew - xk. */
+			double* xk = NULL;						/**< Current primal iterate. */
+			double* yk = NULL;						/**< Current dual vector. */
+			double* yk_A = NULL;					/**< Current dual vector w.r.t A. */
+			double* xnew = NULL;					/**< Current qpSubproblem solution. */
+			double* pk = NULL;						/**< xnew - xk. */
 
 			double alphak; 							/**< Optimal step length. */
-			double* lk_tmp = NULL;						/**< An auxiliar vector to help compute lkj. */
+			double* lk_tmp = NULL;					/**< An auxiliar vector to help compute lkj. */
 
-			double* Qk = NULL;							/**< H + rho*C, required for stationarity and optimal step length. */
-			double* statk = NULL;						/**< Stationarity of current iterate. */
-			double* constr_statk = NULL;				/**< Constraint contribution to stationarity equation. */
-			double* box_statk = NULL;					/**< Box Constraint contribution to stationarity equation. */
+			double* Qk = NULL;						/**< H + rho*C, required for stationarity and optimal step length. */
+			double* statk = NULL;					/**< Stationarity of current iterate. */
+			double* constr_statk = NULL;			/**< Constraint contribution to stationarity equation. */
+			double* box_statk = NULL;				/**< Box Constraint contribution to stationarity equation. */
 
 			int outerIter;							/**< Outer iterate. */
 			int innerIter;							/**< Inner iterate- */
@@ -516,9 +531,9 @@ namespace lcqpOASES {
 
 			algorithmStatus algoStat;				/**< Status of algorithm. */
 
-			csc* H_sparse = NULL;						/**< Sparse objective Hessian matrix. */
-			csc* A_sparse = NULL;						/**< Sparse constraint matrix. */
-			double* tmpA_data = NULL;					/**< Temporary data vector for building CSC matrix. */
+			csc* H_sparse = NULL;					/**< Sparse objective Hessian matrix. */
+			csc* A_sparse = NULL;					/**< Sparse constraint matrix. */
+			double* tmpA_data = NULL;				/**< Temporary data vector for building CSC matrix. */
 			int* tmpA_i = NULL;						/**< Temporary row pointer for building CSC matrix. */
 			int* tmpA_p = NULL;						/**< Temporary column pointer for building CSC matrix. */
 

@@ -47,11 +47,19 @@ int main() {
 	lcqp.setOptions( options );
 
     // Solve first LCQP
-	returnValue retVal = lcqp.solve( H, g, lb, ub, S1, S2 );
+	returnValue retVal = lcqp.loadLCQP( H, g, lb, ub, S1, S2 );
 
     if (retVal != SUCCESSFUL_RETURN)
     {
-        printf("Termination ended without success.\n");
+        printf("Failed to load LCQP.\n");
+        return 1;
+    }
+
+    retVal = lcqp.runSolver();
+
+    if (retVal != SUCCESSFUL_RETURN)
+    {
+        printf("Failed to solve LCQP.\n");
         return 1;
     }
 

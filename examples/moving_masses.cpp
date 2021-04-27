@@ -451,7 +451,8 @@ int main() {
     double* cputime = 0;
 
     // Solve LCQP
-    lcqp.solve(Q, d, lb, ub, S1, S2, A, lbA, ubA, &w0[0]);
+    lcqp.loadLCQP(Q, d, lb, ub, S1, S2, A, lbA, ubA, &w0[0]);
+    lcqp.runSolver();
 
     double* wk_opt = new double[NV];
     lcqp.getPrimalSolution( wk_opt );
