@@ -70,8 +70,11 @@ int main() {
 	double* yOpt = new double[nV + nC + 2*nComp];
 	lcqp.getPrimalSolution( xOpt );
 	lcqp.getDualSolution( yOpt );
-	printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g, %g, %g ]; \n\n",
-			xOpt[0],xOpt[1],yOpt[0],yOpt[1],yOpt[2],yOpt[3] );
+	printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g ]; \n\n",
+			xOpt[0],xOpt[1],yOpt[0],yOpt[1]);
+
+    delete[] xOpt; delete[] yOpt;
+
 
     return 0;
 }
