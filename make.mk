@@ -11,7 +11,7 @@
 ##
 ##	lcqpOASES is distributed in the hope that it will be useful,
 ##	but WITHOUT ANY WARRANTY; without even the implied warranty of
-##	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+##	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ##	See the GNU Lesser General Public License for more details.
 ##
 ##	You should have received a copy of the GNU Lesser General Public
@@ -27,12 +27,23 @@
 
 # 1) qpOASES
 QPOASES_IDIR   = /usr/local/qpOASES/include
-QPOASES_LINK   = -lqpOASES 
+QPOASES_LINK   = -lqpOASES
 
-# 2) CasADi
+# 2) OSQP
+OSQP_IDIR   = /usr/local/include/osqp
+OSQP_LINK   = -losqp
+
+# 3) CasADi
 CASADI_IDIR   = /usr/local/casadi
 CASADI_LIB_DIR = /usr/local/casadi/build/lib
 CASADI_LINK = -lcasadi
+
+# 4) Matplotlib
+PLOTLIB_IDIR = /usr/local/matplotlib-cpp
+
+# 5) Python3 (dependency of matplotlib)
+PYTHON3_IDIR = /usr/include/python3.6m
+PYTHON3_LINK = -lpython3.6m
 
 ## Do not touch this
 # include directories, relative

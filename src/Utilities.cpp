@@ -22,36 +22,28 @@
 
 #include "Utilities.hpp"
 #include <iostream>
+#include <vector>
+#include <osqp.h>
 
 namespace lcqpOASES {
-    /*
-    *	O p t i o n s
-    */
+
+
     Options::Options( )
     {
         setToDefault( );
     }
 
 
-    /*
-    *	O p t i o n s
-    */
     Options::Options( const Options& rhs)
     {
         copy( rhs );
     }
 
 
-    /*
-    *	~ O p t i o n s
-    */
     Options::~Options( )
     { }
 
 
-    /*
-    *	o p e r a t o r =
-    */
     Options& Options::operator=( const Options& rhs )
     {
         if ( this != &rhs )
@@ -63,9 +55,6 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *   c o p y
-     */
     void Options::copy( const Options& rhs ) {
         stationarityTolerance = rhs.stationarityTolerance;
         complementarityTolerance = rhs.complementarityTolerance;
@@ -77,13 +66,9 @@ namespace lcqpOASES {
         maxInnerIterations = rhs.maxInnerIterations;
 
         printLvl = rhs.printLvl;
-        qpSubSolver = rhs.qpSubSolver;
     }
 
 
-    /*
-     *  e n s u r e C o n s i s t e n c y
-     */
     returnValue Options::ensureConsistency( ) {
 
         if (complementarityPenaltyUpdate <= 1)
@@ -101,16 +86,16 @@ namespace lcqpOASES {
         if (maxInnerIterations <= 0)
             throw INVALID_MAX_INNER_ITERATIONS_VALUE;
 
+        if (relaxOptionsTolerance <= 0)
+            throw INVALID_RELAX_OPTIONS_TOLERANCE;
+
         return SUCCESSFUL_RETURN;
     }
 
 
-    /*
-     *   s e t T o D e f a u l t
-     */
     void Options::setToDefault( ) {
         complementarityTolerance = 1.0e3 * Utilities::EPS;
-        stationarityTolerance  = 1.0e3 * Utilities::EPS;
+        stationarityTolerance  = 1.0e3 * Utilities::EPS*1000;
         initialComplementarityPenalty = 0.01;
     	complementarityPenaltyUpdate  = 2.0;
 
@@ -119,30 +104,39 @@ namespace lcqpOASES {
         maxOuterIterations = 100;
         maxInnerIterations = 1000;
 
-        qpSubSolver = qpSubproblemSolver::QPOASES;
+        relaxOptionsTolerance = 5;
 
         printLvl = printLevel::INNER_LOOP_ITERATES;
 
     }
 
-    /*
-     *   M a t r i x M u l t i p l i c a t i o n
-     */
+
     void Utilities::MatrixMultiplication(const double* const A, const double* const B, double* C, int m, int n, int p) {
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < p; j++) {
-                C[i*m + j] = 0;
+                C[i*p + j] = 0;
                 for (int k = 0; k < n; k++) {
-                    C[i*m + j] += A[i*n + k]*B[k*p + j];
+                    C[i*p + j] += A[i*n + k]*B[k*p + j];
                 }
             }
         }
     }
 
 
-    /*
-     *  M a t r i x S y m m e t r i z a t i o n P r o d u c t
-     */
+    void Utilities::TransponsedMatrixMultiplication(const double* const A, const double* const B, double* C, int m, int n, int p) {
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < p; j++) {
+                C[i*p + j] = 0;
+
+                for (int k = 0; k < m; k++) {
+                    C[i*p+j] += A[k*n + i]*B[k*p + j];
+                }
+            }
+        }
+    }
+
+
     void Utilities::MatrixSymmetrizationProduct(const double* const A, const double* const B, double* C, int m, int n) {
         for (int i = 0; i < n; i++) {
             for (int j = 0; j <= i; j++) {
@@ -157,9 +151,7 @@ namespace lcqpOASES {
         }
     }
 
-    /*
-     *   A f f i n e L i n e a r T r a n s f o r m a t i o n
-     */
+
     void Utilities::AffineLinearTransformation(const double alpha, const double* const A, const double* const b, const double* const c, double* d, int m, int n) {
         for (int i = 0; i < m; i++) {
 
@@ -172,26 +164,19 @@ namespace lcqpOASES {
         }
     }
 
-    /*
-     *	r e a d F r o m F i l e
-     */
+
     void Utilities::WeightedMatrixAdd(const double alpha, const double* const A, const double beta, const double* const B, double* C, int m, int n) {
         for (int i = 0; i < m; i++)
             for (int j = 0; j < n; j++)
                 C[i*n + j] = alpha*A[i*n+j] + beta*B[i*n+j];
     }
 
-    /*
-     *	r e a d F r o m F i l e
-     */
+
     void Utilities::WeightedVectorAdd(const double alpha, const double* const a, const double beta, const double* const b, double* c, int m) {
         WeightedMatrixAdd(alpha, a, beta, b, c, m, 1);
     }
 
 
-    /*
-     *	Q u a d r a t i c F o r m P r o d u c t
-     */
     double Utilities::QuadraticFormProduct(const double* const Q, const double* const p, int m) {
         double ret = 0;
         for (int i = 0; i < m; i++) {
@@ -205,9 +190,7 @@ namespace lcqpOASES {
         return ret;
     }
 
-    /*
-     *	Q u a d r a t i c F o r m P r o d u c t
-     */
+
     double Utilities::DotProduct(const double* const a, const double* const b, int m) {
         double ret = 0;
         for (int i = 0; i < m; i++)
@@ -216,26 +199,22 @@ namespace lcqpOASES {
         return ret;
     }
 
-    /*
-     *	Q u a d r a t i c F o r m P r o d u c t
-     */
+
     double Utilities::MaxAbs(const double* const a, int m) {
-        double max = 0;
-        double min = 0;
+        double mx = 0;
+        double mn = 0;
 
         for (int i = 0; i < m; i++) {
-            if (a[i] > max)
-                max = a[i];
-            else if (a[i] < min)
-                min = a[i];
+            if (a[i] > mx)
+                mx = a[i];
+            else if (a[i] < mn)
+                mn = a[i];
         }
 
-        return std::max(max, -min);
+        return Utilities::getMax(mx, -mn);
     }
 
-    /*
-     *	r e a d F r o m F i l e
-     */
+
     returnValue Utilities::readFromFile( int* data, int n, const char* datafilename )
     {
         int i;
@@ -265,9 +244,6 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *	r e a d F r o m F i l e
-     */
     returnValue Utilities::readFromFile( double* data, int n, const char* datafilename )
     {
         int i;
@@ -297,9 +273,243 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *   P r i n t M e s s a g e
-     */
+    returnValue Utilities::writeToFile( double* data, int n, const char* datafilename )
+    {
+        int i;
+        FILE* datafile;
+
+        /* 1) Open file. */
+        if ( ( datafile = fopen( datafilename, "w" ) ) == 0 )
+        {
+            fclose( datafile );
+            return UNABLE_TO_READ_FILE;
+        }
+
+        /* 2) Read data from file. */
+        for( i=0; i<n; ++i )
+        {
+            if ( fprintf( datafile, "%f\n", data[i] ) == 0 )
+            {
+                fclose( datafile );
+                return UNABLE_TO_READ_FILE;
+            }
+        }
+
+        /* 3) Close file. */
+        fclose( datafile );
+
+        return SUCCESSFUL_RETURN;
+    }
+
+
+    void Utilities::printMatrix(const double* const A, int m, int n, const char* const name)
+    {
+        printf("Printing matrix %s:\n", name);
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++)
+                printf("%.5f ", A[i*n + j]);
+
+
+            printf("\n");
+        }
+
+        printf("\n");
+    }
+
+
+    void Utilities::printMatrix(const int* const A, int m, int n, const char* const name)
+    {
+        printf("Printing matrix %s:\n", name);
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++)
+                printf("%d ", A[i*n + j]);
+
+
+            printf("\n");
+        }
+
+        printf("\n");
+        fflush(stdout);
+    }
+
+
+    void Utilities::printMatrix(const csc* A, const char* const name)
+    {
+        if (A->m*A->n <= 0)
+            return;
+
+        // Get dense representation
+        double* dense = new double[A->m*A->n]();
+        Utilities::csc_to_dns(A, dense, A->m, A->n);
+
+        // Print the dense matrix
+        Utilities::printMatrix(dense, A->m, A->n, name);
+
+        // Clear memory
+        delete[] dense;
+    }
+
+
+    void Utilities::printStep(double* xk, double* pk, double* xk_new, double alpha, int nV)
+    {
+        printf("Printing Step:\n");
+
+        for (int i = 0; i < nV; i++)
+            printf("%.2f + %.2f * %.2f = %.2f \n", xk[i], alpha, pk[i], xk_new[i]);
+
+        printf("\n");
+    }
+
+
+    void Utilities::printBounds(double* lb, double* xk, double* ub, int m)
+    {
+        printf("Printing box constraints:\n");
+
+        for (int i = 0; i < m; i++)
+            printf("%.2f <= %.2f <= %.2f \n", lb[i], xk[i], ub[i]);
+
+        printf("\n");
+    }
+
+
+    returnValue Utilities::csc_to_dns(const csc* const sparse, double* full, int m, int n)
+    {
+        for (int j = 0; j < n; j++) {
+			for (int i = sparse->p[j]; i < sparse->p[j+1]; i++) {
+                // Reached final element
+                if (i == sparse->nzmax) {
+                    return returnValue::SUCCESSFUL_RETURN;
+                }
+
+                // Ensure validity of index
+                if (sparse->i[i]*n + j >= m*n || sparse->i[i]*n + j < 0) {
+                    return MessageHandler::PrintMessage( returnValue::INDEX_OUT_OF_BOUNDS );
+                }
+
+				full[sparse->i[i]*n + j] = sparse->x[i];
+			}
+		}
+
+        return returnValue::SUCCESSFUL_RETURN;
+    }
+
+
+    csc* Utilities::dns_to_csc(const double* const full, int m, int n)
+    {
+        csc* sparse = (csc*) c_malloc(sizeof(csc));
+
+        std::vector<double> H_data;
+        std::vector<int> H_i;
+        sparse->m = m;
+        sparse->n = n;
+        sparse->nz = -1;
+        sparse->p = new int[n+1]();
+
+        for (int i = 0; i < n; i++) {
+            // Begin column pointer with previous value
+            sparse->p[i+1] = sparse->p[i];
+
+            for (int j = 0; j < m; j++) {
+                if (full[j*n + i] > 0 || full[j*n + i] < 0) {
+                    H_data.push_back(full[j*n + i]);
+                    H_i.push_back(j);
+                    sparse->p[i+1]++;
+                }
+            }
+        }
+
+        // Final pointer should point to equal of elemtns
+        int nnx = (int) H_i.size();
+        sparse->p[n] = nnx;
+
+        sparse->nzmax = nnx;
+        sparse->i = new int[nnx];
+        sparse->x = new double[nnx];
+
+        for (int i = 0; i < nnx; i++) {
+            sparse->i[i] = H_i[i];
+            sparse->x[i] = H_data[i];
+        }
+
+        return sparse;
+    }
+
+
+    double Utilities::getAbs(double x)
+    {
+        #ifdef __NO_FMATH__
+        return (x>=0.0) ? x : -x;
+        #else
+        return fabs(x);
+        #endif
+    }
+
+
+    bool Utilities::isEqual(double x, double y, double TOL)
+    {
+        if ( getAbs(x-y) <= TOL )
+            return true;
+        else
+            return false;
+    }
+
+
+    bool Utilities::isEqual(double x, double y)
+    {
+        return isEqual(x, y, Utilities::ZERO);
+    }
+
+
+    bool Utilities::isZero(double x, double TOL)
+    {
+        if ( getAbs(x) <= TOL )
+            return true;
+        else
+            return false;
+    }
+
+
+    bool Utilities::isZero(double x)
+    {
+        return isZero(x, Utilities::ZERO);
+    }
+
+
+    double Utilities::getSign(double arg)
+    {
+        if ( arg >= 0.0 )
+            return 1.0;
+        else
+            return -1.0;
+    }
+
+
+    int Utilities::getMax(int x, int y)
+    {
+        return (y<x) ? x : y;
+    }
+
+
+    int Utilities::getMin(int x, int y)
+    {
+        return (y>x) ? x : y;
+    }
+
+
+    double Utilities::getMax(double x, double y)
+    {
+        return (y<x) ? x : y;
+    }
+
+
+    double Utilities::getMin(double x, double y)
+    {
+        return (y>x) ? x : y;
+    }
+
+
     returnValue MessageHandler::PrintMessage( returnValue ret) {
 
         switch (ret) {
@@ -315,7 +525,7 @@ namespace lcqpOASES {
                 break;
 
             case INDEX_OUT_OF_BOUNDS:
-                printf("ERROR: Index out of bounds.");
+                printf("ERROR: Index out of bounds.\n");
                 break;
 
             case SUBPROBLEM_SOLVER_ERROR:
@@ -373,10 +583,29 @@ namespace lcqpOASES {
             case INVALID_MAX_INNER_ITERATIONS_VALUE:
                 printf("ERROR: Invalid argument passed (maximum inner iterations).\n");
                 break;
+
+            case INVALID_RELAX_OPTIONS_TOLERANCE:
+                printf("ERROR: Invalid argument passed (relax optiopns tolerance).\n");
+                break;
+
+            case INVALID_INDEX_POINTER:
+                printf("ERROR: Invalid index pointer passed in csc format.\n");
+                break;
+
+            case INVALID_INDEX_ARRAY:
+                printf("ERROR: Invalid index array passed in csc format.\n");
+                break;
+
+            case INVALID_OSQP_BOX_CONSTRAINTS:
+                printf("ERROR: Invalid constraints passed to OSQP solver: This solver does not handle box constraints, please pass them through linear constraints.\n");
+                break;
         }
+
+        fflush(stdout);
 
         return ret;
     }
+
 
     algorithmStatus MessageHandler::PrintSolution( algorithmStatus algoStat ) {
 
@@ -410,6 +639,5 @@ namespace lcqpOASES {
 
         return algoStat;
     }
-
 }
 

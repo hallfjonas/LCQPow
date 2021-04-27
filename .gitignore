@@ -24,6 +24,8 @@ build
 src/qpOASES
 debug
 examples/example_data/ivocp
+plots
+doxygen
 
 ### C ###
 # Prerequisites

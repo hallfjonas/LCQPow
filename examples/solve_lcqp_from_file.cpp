@@ -29,15 +29,17 @@
 
 bool PathExists(const std::string &s)
 {
-  struct stat buffer;
-  return (stat (s.c_str(), &buffer) == 0);
+    struct stat buffer;
+    return (stat (s.c_str(), &buffer) == 0);
 }
 
-void WriteToFile(const double* const vec, int n, std::string path) {
-  std::ofstream myfile;
-  myfile.open(path);
-  for (int i = 0; i < n; i++)
-    myfile << vec[i] << std::endl;
+void WriteToFile(const double* const vec, int n, std::string path)
+{
+    // TODO; Delete file before open
+    // std::ofstream myfile;
+    // myfile.open(path);
+    // for (int i = 0; i < n; i++)
+    //     myfile << vec[i] << std::endl;
 }
 
 int main(int argc, char **argv) {
@@ -98,8 +100,8 @@ int main(int argc, char **argv) {
         std::ifstream Afile(A_file);
         while (std::getline(Afile, line))
             nC++;
-        
-        nC = nC / nV;
+
+        nC = nC/nV;
     }
 
     if (PathExists(lbA_file)) {
@@ -127,8 +129,9 @@ int main(int argc, char **argv) {
     }
 
     lcqpOASES::LCQProblem lcqp( nV, nC, nComp );
+
     lcqpOASES::Options opts;
-    opts.printLvl = lcqpOASES::printLevel::VERBOSE;
+    opts.printLvl = lcqpOASES::printLevel::NONE;
 
     lcqp.setOptions( opts );
 

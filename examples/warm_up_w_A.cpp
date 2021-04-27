@@ -20,8 +20,8 @@
  */
 
 
-#include <iostream>
 #include "LCQProblem.hpp"
+#include <iostream>
 
 using namespace lcqpOASES;
 
@@ -35,9 +35,12 @@ int main() {
     double ub[2] = { INFINITY, INFINITY };
     double S1[1*2] = {1.0, 0.0};
     double S2[1*2] = {0.0, 1.0};
+    double A[1*2] = {1.0, -1.0};
+    double lbA[1] = { -0.5 };
+    double ubA[1] = {  INFINITY };
 
     int nV = 2;
-    int nC = 0;
+    int nC = 1;
     int nComp = 1;
 
     LCQProblem lcqp( nV, nC, nComp );
@@ -47,7 +50,7 @@ int main() {
 	lcqp.setOptions( options );
 
     // Solve first LCQP
-	returnValue retVal = lcqp.solve( H, g, lb, ub, S1, S2 );
+	returnValue retVal = lcqp.solve( H, g, lb, ub, S1, S2, A, lbA, ubA );
 
     if (retVal != SUCCESSFUL_RETURN)
     {
@@ -62,9 +65,6 @@ int main() {
 	lcqp.getDualSolution( yOpt );
 	printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g, %g, %g ]; \n\n",
 			xOpt[0],xOpt[1],yOpt[0],yOpt[1],yOpt[2],yOpt[3] );
-
-    // Clean Up
-    delete[] xOpt; delete[] yOpt;
 
     return 0;
 }

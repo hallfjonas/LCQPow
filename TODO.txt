@@ -1,0 +1,48 @@
+
+ TOP 6)
+========
+
+1) qpOASES:
+1.1) Schur Complement (Requested MA57 solver)
+1.2) Sparsity 
+
+2) OSQP
+2.1) Solve warm up
+2.2) Solve IVOCP
+
+3) Interfaces
+3.1) MATLAB
+3.2) Python
+3.3) C++ API for standard QP formats? 
+
+4) Benchmark
+4.1) MIQP
+4.2) Smooth/Relaxed/NLP
+
+5) Global Convergence Proof
+5.1) Outer Loop Convergence
+     -> Assume complementarity variables are not involved in other linear constraints
+     => 0 in convex relaxed feasible set
+     => increasing penalty param will lead to penalty satisfaction
+5.2) Inner Loop Convergence
+     -> psi'(xj)(xj*-xj) < 0
+     -> xj+1 is chosen such that psi(xj+1) <= psi(xj), since it minimizes psi along xj + alpha pj
+     -> psi coercive on relaxed feasible set
+     -> (xj)j bounded sequence in R^n
+     -> xj has convergent subsequence ...
+
+6) Non-Monotonous Penalty Updates
+
+ OTHER TODOS 
+=============
+
+1) Document code correctly. Current Solution:
+	=> Doxygen comments of member functions and properties in header files
+	=> Leave comments above member functions away in source files
+	=> Comment code functionality in source files
+
+2) valgrind
+
+3) Make Member Attributes in Options private? This would allow to better ensure consistency.
+
+4) Loop Warm Up Problem run. Why does it not work always?

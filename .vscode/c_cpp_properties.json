@@ -5,8 +5,11 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/include/**",
-                "/usr/local/qpOASES/include/**",
-                "/usr/local/casadi/**"
+                "/usr/local/qpOASES/**",
+                "/usr/local/casadi/**",
+                "/usr/local/matplotlib-cpp/**",
+                "/usr/include/**",
+                "/usr/local/include/**"
             ],
             "defines": [],
             "cStandard": "gnu11",
