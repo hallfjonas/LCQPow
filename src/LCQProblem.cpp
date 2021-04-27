@@ -123,6 +123,7 @@ namespace lcqpOASES {
 
 		// Number of duals in qpOASES case (box constraints + linear constraints + complementarity bounds):
 		nDuals = nV + nC + 2*nComp;
+		boxDualOffset = nV;
 
 		// USe qpOASES in dense formulations
 		Subsolver tmp( nV, nC + 2*nComp, H, A );
@@ -266,6 +267,7 @@ namespace lcqpOASES {
 
 		// Number of duals in qpOASES case (box constraints + linear constraints + complementarity bounds):
 		nDuals = nV + nC + 2*nComp;
+		boxDualOffset = nV;
 
 		// USe qpOASES in dense formulations
 		Subsolver tmp( nV, nC + 2*nComp, H, A );
@@ -309,8 +311,9 @@ namespace lcqpOASES {
 		lb = 0;
 		ub = 0;
 
-		// Number of duals in qpOASES case (box constraints + linear constraints + complementarity bounds):
+		// Number of duals in OSQP case:
 		nDuals = nC + 2*nComp;
+		boxDualOffset = 0;
 
 		// Use OSQP in sparse formulations
 		Subsolver tmp(nV, nC + 2*nComp, H_sparse, A_sparse, g, lbA, ubA);
@@ -635,12 +638,11 @@ namespace lcqpOASES {
 			return ret;
 
 		// Update xnew, yk
-		subsolver.getPrimalSolution(xnew);
-		subsolver.getDualSolution(yk);
+		subsolver.getSolution(xnew, yk);
 
 		// Update yk_A
 		for (int i = 0; i < nC + 2*nComp; i++)
-			yk_A[i] = yk[nV + i];
+			yk_A[i] = yk[boxDualOffset + i];
 
 		// Update pk
 		Utilities::WeightedVectorAdd(1, xnew, -1, xk, pk, nV);
@@ -755,13 +757,13 @@ namespace lcqpOASES {
 		// y_S1 = y - rho*S2*xk
 		Utilities::MatrixMultiplication(S2, xk, tmp, nComp, nV, 1);
 		for (int i = 0; i < nComp; i++) {
-			yk[nV + nC + i] = yk[nV + nC + i] - rho*tmp[i];
+			yk[boxDualOffset + nC + i] = yk[boxDualOffset + nC + i] - rho*tmp[i];
 		}
 
 		// y_S2 = y - rho*S1*xk
 		Utilities::MatrixMultiplication(S1, xk, tmp, nComp, nV, 1);
 		for (int i = 0; i < nComp; i++) {
-			yk[nV + nC + nComp + i] = yk[nV + nC + nComp + i] - rho*tmp[i];
+			yk[boxDualOffset + nC + nComp + i] = yk[boxDualOffset + nC + nComp + i] - rho*tmp[i];
 		}
 
 		// clear memory
@@ -777,8 +779,8 @@ namespace lcqpOASES {
 		bool m_stationary = true;
 
 		for (int i : weakComp) {
-			double dualProd = yk[nV + nC + i]*yk[nV + 2*nC + i];
-			double dualMin = std::min(yk[nV + nC + i], yk[nV + 2*nC + i]);
+			double dualProd = yk_A[nC + i]*yk_A[nC + nComp + i];
+			double dualMin = std::min(yk_A[nC + i], yk_A[nC + nComp + i]);
 
 			// Check failure of s-stationarity
 			if (dualMin < 0)
@@ -851,7 +853,7 @@ namespace lcqpOASES {
 	algorithmStatus LCQProblem::getDualSolution( double* const yOpt ) const
 	{
 		if (algoStat != algorithmStatus::PROBLEM_NOT_SOLVED) {
-			for (int i = 0; i < nV + nC + 2*nComp; i++)
+			for (int i = 0; i < nDuals; i++)
 				yOpt[i] = yk[i];
 		}
 

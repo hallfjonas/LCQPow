@@ -475,6 +475,7 @@ namespace lcqpOASES {
 			int nC;									/**< Number of constraints. */
 			int nComp;								/**< Number of complementarity constraints. */
 			int nDuals; 							/**< Number of duals variables. */
+			int boxDualOffset;						/**< Offset for linear constraint duals (i.e. 0 if no BC (Box Constraints) exist nV if BC exist). */
 
 			double* H;								/**< Objective Hessian term. */
 
