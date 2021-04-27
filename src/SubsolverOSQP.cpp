@@ -24,9 +24,7 @@
 
 namespace lcqpOASES {
 
-    /*
-     *   S u b s o l v e r O S Q P
-     */
+
     SubsolverOSQP::SubsolverOSQP( ) {
         data = 0;
         settings = 0;
@@ -34,98 +32,81 @@ namespace lcqpOASES {
      }
 
 
-    /*
-     *   S u b s o l v e r O  S Q P
-     */
-    SubsolverOSQP::SubsolverOSQP(   int nV, int nC,
-                                    csc* _H, csc* _A,
-                                    const double* _g,
-                                    const double* _l,
-                                    const double* _u)
+    SubsolverOSQP::SubsolverOSQP(   const csc* const _H, const csc* const _A,
+                                    const double* const _g,
+                                    const double* const _l,
+                                    const double* const _u)
     {
+        // Store dimensions
+        nVars = _H->n;
+        nDuals = _A->m;
+
+        // Allocate memory
         settings = (OSQPSettings *)c_malloc(sizeof(OSQPSettings));
         data = (OSQPData *)c_malloc(sizeof(OSQPData));
 
-        nVars = nV;
-        nDuals = nC;
+        // Copy matrices
+        H = copy_csc_mat(_H);
+        A = copy_csc_mat(_A);
+        g = new c_float[nVars];
+        l = new c_float[nDuals];
+        u = new c_float[nDuals];
+        memcpy(g, _g, nVars*sizeof(c_float));
+        memcpy(l, _l, nDuals*sizeof(c_float));
+        memcpy(u, _u, nDuals*sizeof(c_float));
 
-        H = csc_matrix(_H->m, _H->n, _H->nzmax, _H->x, _H->i, _H->p);
-        A = csc_matrix(_A->m, _A->n, _A->nzmax, _A->x, _A->i, _A->p);
+        // Fill data
+        data->n = nVars;
+        data->m = nDuals;
+        data->P = H;
+        data->A = A;
+        data->q = g;
+        data->l = l;
+        data->u = u;
 
-        // Conversion to OSQP data type c_float
-        g = new c_float[nV];
-        l = new c_float[nC];
-        u = new c_float[nC];
-
-        for (int i = 0; i < nV; i++) {
-            g[i] = (c_float) _g[i];
-        }
-
-        for (int i = 0; i < nC; i++) {
-            l[i] = (c_float) _l[i];
-            u[i] = (c_float) _u[i];
-        }
-
-		Utilities::printMatrix(H, "Full H");
-		Utilities::printMatrix(A, "Full A");
-
-        // Populate data
-        if (data) {
-            data->n = nV;
-            data->m = nC;
-            data->P = H;
-            data->A = A;
-            data->q = g;
-            data->l = l;
-            data->u = u;
-        }
-
-        // Define solver settings as default
-        if (settings) {
-            osqp_set_default_settings(settings);
-            settings->eps_prim_inf = Utilities::ZERO;
-            settings->verbose = false;
-        }
+        // Define solver settings
+        osqp_set_default_settings(settings);
+        settings->eps_prim_inf = Utilities::ZERO;
+        settings->verbose = false;
 
         // Setup workspace
         osqp_setup(&work, data, settings);
     }
 
 
-    /*
-     *   S u b s o l v e r O  S Q P
-     */
     SubsolverOSQP::SubsolverOSQP(const SubsolverOSQP& rhs)
     {
         copy( rhs );
     }
 
 
-    /*
-     *   ~ S u b s o l v e r O S Q P
-     */
     SubsolverOSQP::~SubsolverOSQP()
     {
-        if (settings != 0) {
-            c_free(settings);
-            settings = 0;
-        }
+        clear();
+    }
+
+
+    void SubsolverOSQP::clear()
+    {
+        osqp_cleanup(work);
 
         if (data != 0) {
             c_free(data);
             data = 0;
         }
 
-        // TODO: FIGURE OUT WHEN AND HOW TO CALL OSQP_CLEANUP
-        printf("NOT CLEANING UP osqp work!!!\n");
+        if (settings != 0) {
+            c_free(settings);
+            settings = 0;
+        }
 
         if (H != 0) {
-            c_free(H);
+            csc_spfree(H);
             H = 0;
         }
 
         if (A != 0) {
-            c_free(A);
+            csc_spfree(A);
             A = 0;
         }
 
@@ -146,9 +127,6 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *   o p e r a t o r =
-     */
     SubsolverOSQP& SubsolverOSQP::operator=(const SubsolverOSQP& rhs)
     {
         if (this != &rhs) {
@@ -159,18 +137,12 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *   s e t O p t i o n s
-     */
     void SubsolverOSQP::setOptions( OSQPSettings* _settings )
     {
-        settings = _settings;
+        settings = copy_settings(_settings);
     }
 
 
-    /*
-     *   s e t O p t i o n s
-     */
     void SubsolverOSQP::setPrintlevl( bool verbose )
     {
         if (settings != 0)
@@ -178,9 +150,6 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *   s o l v e
-     */
     returnValue SubsolverOSQP::solve(   bool initialSolve, int& iterations,
                                         const double* const _g,
                                         const double* const _lbA, const double* const _ubA,
@@ -201,6 +170,8 @@ namespace lcqpOASES {
         // Solve Problem
         exitflag = osqp_solve(work);
 
+        iterations = work->info->iter;
+
         // Either pass error
         if (exitflag != 0)
             return returnValue::SUBPROBLEM_SOLVER_ERROR;
@@ -210,59 +181,51 @@ namespace lcqpOASES {
     }
 
 
-    /*
-     *   g e t P r i m a l S o l u t i o n
-     */
-    void SubsolverOSQP::getPrimalSolution( double* x )
+    void SubsolverOSQP::getSolution( double* x, double* y )
     {
         OSQPSolution *sol(work->solution);
 
         if (sol->x != 0) {
             memcpy(x, sol->x, nVars*(sizeof(double)));
         }
-    }
 
-
-    /*
-     *   g e t D u a l S o l u t i o n
-     */
-    void SubsolverOSQP::getDualSolution( double* y )
-    {
-        OSQPSolution *sol(work->solution);
-
-        if (sol->y != 0) {
-            memcpy(y, sol->y, nDuals*(sizeof(double)));
+        // Copy duals with negative sign
+        for (int i = 0; i < nDuals; i++) {
+            y[i] = -sol->y[i];
         }
     }
 
 
-    /*
-     *   c o p y
-     */
     void SubsolverOSQP::copy(const SubsolverOSQP& rhs)
     {
+        clear();
+
         nVars = rhs.nVars;
         nDuals = rhs.nDuals;
 
-        if (rhs.H != 0)
-            H = csc_matrix(rhs.H->m, rhs.H->n, rhs.H->nzmax, rhs.H->x, rhs.H->i, rhs.H->p);
+        H = copy_csc_mat(rhs.H);
+        A = copy_csc_mat(rhs.A);
+        g = new c_float[nVars];
+        l = new c_float[nDuals];
+        u = new c_float[nDuals];
+        memcpy(g, rhs.g, nVars*sizeof(c_float));
+        memcpy(l, rhs.l, nDuals*sizeof(c_float));
+        memcpy(u, rhs.u, nDuals*sizeof(c_float));
 
-        if (rhs.A != 0)
-            A = csc_matrix(rhs.A->m, rhs.A->n, rhs.A->nzmax, rhs.A->x, rhs.A->i, rhs.A->p);
+        // Copy data
+        data = (OSQPData *)c_malloc(sizeof(OSQPData));
+        data->n = rhs.data->n;
+        data->m = rhs.data->m;
+        data->P = H;
+        data->A = A;
+        data->q = g;
+        data->l = l;
+        data->u = u;
 
-        if (rhs.data) {
-            data = (OSQPData *)c_malloc(sizeof(OSQPData));
-            memcpy(data, rhs.data, sizeof(OSQPData));
-        }
+        // Copy settings
+        settings = copy_settings(rhs.settings);
 
-        if (rhs.settings) {
-            settings = (OSQPSettings *)c_malloc(sizeof(OSQPSettings));
-            memcpy(settings, rhs.settings, sizeof(OSQPSettings));
-        }
-
-        if (rhs.work) {
-            work = (OSQPWorkspace *)c_malloc(sizeof(OSQPWorkspace));
-            memcpy(work, rhs.work, sizeof(OSQPWorkspace));
-        }
+        // Setup workspace
+        osqp_setup(&work, data, settings);
     }
 }
