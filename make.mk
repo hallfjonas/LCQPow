@@ -45,6 +45,10 @@ PLOTLIB_IDIR = /usr/local/matplotlib-cpp
 PYTHON3_IDIR = /usr/include/python3.6m
 PYTHON3_LINK = -lpython3.6m
 
+# 6) MATLAB
+MATLAB_IDIR   = /usr/local/MATLAB/R2021a/extern/include
+MATLAB_LIBDIR = /usr/local/MATLAB/R2021a/bin/glnxa64
+
 ## Do not touch this
 # include directories, relative
 TOP = $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
@@ -80,6 +84,7 @@ SHARED = -shared
 LCQPOASES_LIB = ${LIBDIR}/liblcqpOASES.${LIBEXT} ${LIBDIR}/liblcqpOASES.${DLLEXT}
 LCQPOASES_LINK = -L${LIBDIR} -llcqpOASES
 
+LINK_LIBRARIES = ${QPOASES_LINK} ${OSQP_LINK}
 
 ##
 ##	end of file

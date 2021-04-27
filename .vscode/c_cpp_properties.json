@@ -9,7 +9,8 @@
                 "/usr/local/casadi/**",
                 "/usr/local/matplotlib-cpp/**",
                 "/usr/include/**",
-                "/usr/local/include/**"
+                "/usr/local/include/**",
+                "/usr/local/MATLAB/R2021a/extern/include"
             ],
             "defines": [],
             "cStandard": "gnu11",
