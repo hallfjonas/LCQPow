@@ -31,13 +31,11 @@ namespace lcqpOASES {
 			/** Default constructor. */
 			SubsolverOSQP( );
 
-            SubsolverOSQP(  int _nV,
-                            int _nC,
-                            csc* _H,
-                            csc* _A,
-                            const double* g,
-                            const double* lbA,
-                            const double* ubA
+            SubsolverOSQP(  const csc* const _H,
+                            const csc* const _A,
+                            const double* const g,
+                            const double* const lbA,
+                            const double* const ubA
                             );
 
             /** Copy constructor. */
@@ -45,6 +43,9 @@ namespace lcqpOASES {
 
             /** Destructor. */
             ~SubsolverOSQP( );
+
+            /** Clear memory. */
+            void clear();
 
             /** Assignment operator (deep copy). */
             virtual SubsolverOSQP& operator=(const SubsolverOSQP& rhs);
@@ -63,19 +64,13 @@ namespace lcqpOASES {
                                 const double* const _lb = 0, const double* const _ub = 0);
 
             /** Write solution to x. */
-            void getPrimalSolution( double* x );
-
-            /** Write solution to y. */
-            void getDualSolution( double* y );
+            void getSolution( double* x, double* y );
 
         protected:
             /** Copies all members from given rhs object. */
             void copy(const SubsolverOSQP& rhs);
 
         private:
-            csc* H;
-            csc* A;
-
             int nVars;                              /**< Number of optimization variables. */
             int nDuals;                             /**< Total number of dual variables. */
 
@@ -83,6 +78,8 @@ namespace lcqpOASES {
             OSQPSettings *settings = 0;
             OSQPData *data = 0;
 
+            csc* H = 0;
+            csc* A = 0;
             c_float* g = 0;
             c_float* l = 0;
             c_float* u = 0;

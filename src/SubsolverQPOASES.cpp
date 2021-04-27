@@ -132,17 +132,9 @@ namespace lcqpOASES {
     /*
      *   g e t P r i m a l S o l u t i o n
      */
-    void SubsolverQPOASES::getPrimalSolution( double* x )
+    void SubsolverQPOASES::getSolution( double* x, double* y )
     {
         qp.getPrimalSolution( x );
-    }
-
-
-    /*
-     *   g e t D u a l S o l u t i o n
-     */
-    void SubsolverQPOASES::getDualSolution( double* y )
-    {
         qp.getDualSolution( y );
     }
 

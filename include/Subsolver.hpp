@@ -58,11 +58,8 @@ namespace lcqpOASES {
             /** Assignment operator (deep copy). */
             virtual Subsolver& operator=(const Subsolver& rhs);
 
-            /** Write solution to x. */
-            void getPrimalSolution( double* x );
-
-            /** Write solution to y. */
-            void getDualSolution( double* y );
+            /** Write solution to x and y. */
+            void getSolution( double* x, double* y );
 
             /** Options of subproblem solver. */
             void setPrintLevel( printLevel printlvl );

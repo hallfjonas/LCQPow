@@ -60,10 +60,7 @@ namespace lcqpOASES {
                                 const double* const _ub = 0 );
 
             /** Write solution to x. */
-            void getPrimalSolution( double* x );
-
-            /** Write solution to y. */
-            void getDualSolution( double* y );
+            void getSolution( double* x, double* y );
 
         protected:
             /** Copies all members from given rhs object. */

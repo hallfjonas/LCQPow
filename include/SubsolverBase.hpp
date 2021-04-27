@@ -28,10 +28,7 @@ namespace lcqpOASES {
     class SubsolverBase {
         public:
 			/** Write solution to x. */
-            virtual void getPrimalSolution( double* x ) = 0;
-
-            /** Write solution to y. */
-            virtual void getDualSolution( double* y ) = 0;
+            virtual void getSolution( double* x, double* y ) = 0;
 
             /** Abstract method for solving the QP. */
             virtual returnValue solve(  bool initialSolve, int& iterations,
