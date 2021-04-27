@@ -82,12 +82,12 @@ namespace lcqpOASES {
 	}
 
 
-	returnValue LCQProblem::solve(	const double* const _H, const double* const _g,
-									const double* const _lb, const double* const _ub,
-									const double* const _S1, const double* const _S2,
-									const double* const _A, const double* const _lbA, const double* const _ubA,
-									const double* const _x0, const double* const _y0
-									)
+	returnValue LCQProblem::loadLCQP(	const double* const _H, const double* const _g,
+										const double* const _lb, const double* const _ub,
+										const double* const _S1, const double* const _S2,
+										const double* const _A, const double* const _lbA, const double* const _ubA,
+										const double* const _x0, const double* const _y0
+										)
 	{
 		returnValue ret;
 
@@ -129,16 +129,16 @@ namespace lcqpOASES {
 		Subsolver tmp( nV, nC + 2*nComp, H, A );
 		subsolver = tmp;
 
-		return MessageHandler::PrintMessage( runSolver( ) );
+		return returnValue::SUCCESSFUL_RETURN;
 	}
 
 
-	returnValue LCQProblem::solve(	const char* const H_file, const char* const g_file,
-									const char* const lb_file, const char* const ub_file,
-									const char* const S1_file, const char* const S2_file,
-									const char* const A_file, const char* const lbA_file, const char* const ubA_file,
-									const char* const x0_file, const char* const y0_file
-									)
+	returnValue LCQProblem::loadLCQP(	const char* const H_file, const char* const g_file,
+										const char* const lb_file, const char* const ub_file,
+										const char* const S1_file, const char* const S2_file,
+										const char* const A_file, const char* const lbA_file, const char* const ubA_file,
+										const char* const x0_file, const char* const y0_file
+										)
 	{
 		returnValue ret;
 
@@ -273,17 +273,16 @@ namespace lcqpOASES {
 		Subsolver tmp( nV, nC + 2*nComp, H, A );
 		subsolver = tmp;
 
-		// Call solver
-		return MessageHandler::PrintMessage( runSolver( ) );
+		return returnValue::SUCCESSFUL_RETURN;
 	}
 
 
-	returnValue LCQProblem::solve(	double* _H_data, int _H_nnx, int* _H_i, int* _H_p, double* _g,
-									double* _S1_data, int _S1_nnx, int* _S1_i, int* _S1_p,
-									double* _S2_data, int _S2_nnx, int* _S2_i, int* _S2_p,
-									double* _A_data, int _A_nnx, int* _A_i, int* _A_p,
-									double* _lbA, double* _ubA,	double* _x0, double* _y0
-									)
+	returnValue LCQProblem::loadLCQP(	double* _H_data, int _H_nnx, int* _H_i, int* _H_p, double* _g,
+										double* _S1_data, int _S1_nnx, int* _S1_i, int* _S1_p,
+										double* _S2_data, int _S2_nnx, int* _S2_i, int* _S2_p,
+										double* _A_data, int _A_nnx, int* _A_i, int* _A_p,
+										double* _lbA, double* _ubA,	double* _x0, double* _y0
+										)
 	{
 		returnValue ret;
 
@@ -319,8 +318,92 @@ namespace lcqpOASES {
 		Subsolver tmp(nV, nC + 2*nComp, H_sparse, A_sparse, g, lbA, ubA);
 		subsolver = tmp;
 
-		return MessageHandler::PrintMessage( runSolver( ) );
+		return returnValue::SUCCESSFUL_RETURN;
+	}
 
+
+	returnValue LCQProblem::runSolver( )
+	{
+		// Create a plot manager instance
+		PlotManager plotter(nV, nC, nComp, LCQPNAME::IVOCP);
+
+		// Initialize variables
+		initializeSolver();
+
+		// Initialization strategy
+		if (options.solveZeroPenaltyFirst) {
+			memcpy(gk, g, (long unsigned int)nV*sizeof(double));
+
+			if (solveQPSubproblem( true ) != SUCCESSFUL_RETURN) {
+				return INITIAL_SUBPROBLEM_FAILED;
+			}
+
+			Utilities::AffineLinearTransformation(rho, C, xk, g, gk, nV, nV);
+
+			if (solveQPSubproblem( false ) != SUCCESSFUL_RETURN) {
+				return SUBPROBLEM_SOLVER_ERROR;
+			}
+
+		} else {
+			Utilities::AffineLinearTransformation(rho, C, xk, g, gk, nV, nV);
+
+			if (solveQPSubproblem( true ) != SUCCESSFUL_RETURN) {
+				return INITIAL_SUBPROBLEM_FAILED;
+			}
+		}
+
+		// Outer and inner loop in one
+		while ( true ) {
+
+			// Update xk, gk, Qk, stationarity
+			updateStep( );
+
+			// Create debugging plots
+			// plotter.CreateIVOCPPlots(xk, lb, ub);
+
+			// Print iteration
+			printIteration( );
+
+			// Terminate, update pen, or continue inner loop
+			if (stationarityCheck()) {
+				if (complementarityCheck()) {
+					// Switch from penalized to LCQP duals
+					transformDuals();
+
+					// Determine C-,M-,S-Stationarity
+					determineStationarityType();
+
+					// Print solution type
+					if (options.printLvl > printLevel::NONE)
+						MessageHandler::PrintSolution( algoStat );
+
+					return SUCCESSFUL_RETURN;
+				} else {
+					updatePenalty();
+
+					// Update iterate counters
+					outerIter++;
+					innerIter = -1;
+				}
+			}
+
+			// Step computation
+			if (solveQPSubproblem( false ) != SUCCESSFUL_RETURN) {
+				return SUBPROBLEM_SOLVER_ERROR;
+			}
+
+			// Step length computation
+			getOptimalStepLength( );
+
+			if ( outerIter > options.maxOuterIterations )
+				return MAX_OUTER_ITERATIONS_REACHED;
+
+			if ( innerIter > options.maxInnerIterations )
+				return MAX_INNER_ITERATIONS_REACHED;
+
+			// Update inner iterate counter
+			innerIter++;
+		}
 	}
 
 
@@ -517,91 +600,6 @@ namespace lcqpOASES {
 		Utilities::csc_to_dns(H_sparse, H, nV, nV);
 
 		return returnValue::SUCCESSFUL_RETURN;
-	}
-
-
-	returnValue LCQProblem::runSolver( )
-	{
-		// Create a plot manager instance
-		PlotManager plotter(nV, nC, nComp, LCQPNAME::IVOCP);
-
-		// Initialize variables
-		initializeSolver();
-
-		// Initialization strategy
-		if (options.solveZeroPenaltyFirst) {
-			memcpy(gk, g, (long unsigned int)nV*sizeof(double));
-
-			if (solveQPSubproblem( true ) != SUCCESSFUL_RETURN) {
-				return INITIAL_SUBPROBLEM_FAILED;
-			}
-
-			Utilities::AffineLinearTransformation(rho, C, xk, g, gk, nV, nV);
-
-			if (solveQPSubproblem( false ) != SUCCESSFUL_RETURN) {
-				return SUBPROBLEM_SOLVER_ERROR;
-			}
-
-		} else {
-			Utilities::AffineLinearTransformation(rho, C, xk, g, gk, nV, nV);
-
-			if (solveQPSubproblem( true ) != SUCCESSFUL_RETURN) {
-				return INITIAL_SUBPROBLEM_FAILED;
-			}
-		}
-
-		// Outer and inner loop in one
-		while ( true ) {
-
-			// Update xk, gk, Qk, stationarity
-			updateStep( );
-
-			// Create debugging plots
-			// plotter.CreateIVOCPPlots(xk, lb, ub);
-
-			// Print iteration
-			printIteration( );
-
-			// Terminate, update pen, or continue inner loop
-			if (stationarityCheck()) {
-				if (complementarityCheck()) {
-					// Switch from penalized to LCQP duals
-					transformDuals();
-
-					// Determine C-,M-,S-Stationarity
-					determineStationarityType();
-
-					// Print solution type
-					if (options.printLvl > printLevel::NONE)
-						MessageHandler::PrintSolution( algoStat );
-
-					return SUCCESSFUL_RETURN;
-				} else {
-					updatePenalty();
-
-					// Update iterate counters
-					outerIter++;
-					innerIter = -1;
-				}
-			}
-
-			// Step computation
-			if (solveQPSubproblem( false ) != SUCCESSFUL_RETURN) {
-				return SUBPROBLEM_SOLVER_ERROR;
-			}
-
-			// Step length computation
-			getOptimalStepLength( );
-
-			if ( outerIter > options.maxOuterIterations )
-				return MAX_OUTER_ITERATIONS_REACHED;
-
-			if ( innerIter > options.maxInnerIterations )
-				return MAX_INNER_ITERATIONS_REACHED;
-
-			// Update inner iterate counter
-			innerIter++;
-		}
 	}
 
 

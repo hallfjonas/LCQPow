@@ -135,18 +135,31 @@ int main(int argc, char **argv) {
 
     lcqp.setOptions( opts );
 
+    // Run solver
+	lcqpOASES::returnValue ret = lcqp.loadLCQP( &H_file[0], &g_file[0], &lb_file[0], &ub_file[0], &S1_file[0], &S2_file[0], Af, lbAf, ubAf, x0f, y0f );
+
+    if (ret != lcqpOASES::SUCCESSFUL_RETURN)
+    {
+        printf("Failed to load LCQP.\n");
+        return 1;
+    }
+
     // Record start time
     auto start = std::chrono::high_resolution_clock::now();
 
-    // Run solver
-	lcqpOASES::returnValue ret = lcqp.solve( &H_file[0], &g_file[0], &lb_file[0], &ub_file[0], &S1_file[0], &S2_file[0], Af, lbAf, ubAf, x0f, y0f );
+    ret = lcqp.runSolver();
 
     // Record end time
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = finish - start;
 
-    if (ret == lcqpOASES::SUCCESSFUL_RETURN)
+    if (ret != lcqpOASES::SUCCESSFUL_RETURN)
+    {
+        printf("Failed to solve LCQP.\n");
+        return 1;
+    } else {
         printf("Solved lcqp in %g[s]\n\n", elapsed.count());
+    }
 
     double* xOpt = new double[nV];
     double* yOpt = new double[nV];
@@ -158,6 +171,8 @@ int main(int argc, char **argv) {
     WriteToFile(xOpt, nV, inputdir + "/x_opt.txt");
     WriteToFile(yOpt, nV, inputdir + "/y_opt.txt");
     WriteToFile(time, 1, inputdir + "/time.txt");
+
+    delete[] xOpt; delete[] yOpt; delete[] time;
 
     return ret;
 }

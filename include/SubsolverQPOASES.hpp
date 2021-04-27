@@ -70,8 +70,8 @@ namespace lcqpOASES {
             int nV;
             int nC;
 
-            double* H;
-            double* A;
+            double* H = NULL;
+            double* A = NULL;
 
             qpOASES::QProblem qp;
     };
