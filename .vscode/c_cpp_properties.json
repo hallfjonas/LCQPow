@@ -5,12 +5,10 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/include/**",
-                "/usr/local/qpOASES/**",
-                "/usr/local/casadi/**",
-                "/usr/local/matplotlib-cpp/**",
+                "external/qpOASES/include/**",
+                "external/osqp/include/**",
                 "/usr/include/**",
-                "/usr/local/include/**",
-                "/usr/local/MATLAB/R2021a/extern/include"
+                "/usr/local/include/**"
             ],
             "defines": [],
             "cStandard": "gnu11",

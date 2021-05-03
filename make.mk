@@ -25,30 +25,6 @@
 ## 		please do so by adding the path via -L/path-to-external-lib-dir -lexternal
 ## 		In this case, make sure that your system can find this library (e.g. by setting the LD_LIBRARY_PATH)
 
-# 1) qpOASES
-QPOASES_IDIR   = /usr/local/qpOASES/include
-QPOASES_LINK   = -lqpOASES
-
-# 2) OSQP
-OSQP_IDIR   = /usr/local/include/osqp
-OSQP_LINK   = -losqp
-
-# 3) CasADi
-CASADI_IDIR   = /usr/local/casadi
-CASADI_LIB_DIR = /usr/local/casadi/build/lib
-CASADI_LINK = -lcasadi
-
-# 4) Matplotlib
-PLOTLIB_IDIR = /usr/local/matplotlib-cpp
-
-# 5) Python3 (dependency of matplotlib)
-PYTHON3_IDIR = /usr/include/python3.6m
-PYTHON3_LINK = -lpython3.6m
-
-# 6) MATLAB
-MATLAB_IDIR   = /usr/local/MATLAB/R2021a/extern/include
-MATLAB_LIBDIR = /usr/local/MATLAB/R2021a/bin/glnxa64
-
 ## Do not touch this
 # include directories, relative
 TOP = $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
@@ -58,6 +34,14 @@ BINDIR = ${TOP}/bin
 LIBDIR = ${TOP}/lib
 DEBUGDIR = ${TOP}/debug
 BUILDDIR = ${TOP}/build
+
+# qpOASES
+QPOASES_IDIR   = ${TOP}/external/qpOASES/include
+QPOASES_LINK   = -lqpOASES
+
+# OSQP
+OSQP_IDIR   = ${TOP}/external/osqp/include
+OSQP_LINK   = -losqp
 
 # Compiler flags
 CPP = g++
@@ -69,6 +53,7 @@ ECHO = echo
 CD = cd
 CP = cp
 CMAKE = cmake
+MKDIR = mkdir
 CPPFLAGS = -Wall -pedantic -Wshadow -Wfloat-equal -O3 -Wconversion -Wsign-conversion -fPIC -DLINUX -D__USE_LONG_INTEGERS__ -D__USE_LONG_FINTS__ -D__NO_COPYRIGHT__
 
 # file extensions
