@@ -30,22 +30,28 @@ include ../make.mk
 IFLAGS      =  -I. \
                -I${IDIR} \
 			   -I${QPOASES_IDIR} \
-			   -I${CASADI_IDIR} \
 			   -I${OSQP_IDIR}
+
+LCQPOASES_DEPENDS = \
+	${IDIR}/LCQProblem.hpp \
+	${IDIR}/Utilities.hpp \
+	${IDIR}/Subsolver.hpp \
+	${IDIR}/SubsolverOSQP.hpp \
+	${IDIR}/SubsolverQPOASES.hpp \
+	${IDIR}/SubsolverBase.hpp
 
 LCQPOASES_OBJECTS = \
 	LCQProblem.${OBJEXT} \
 	Utilities.${OBJEXT} \
 	Subsolver.${OBJEXT} \
 	SubsolverOSQP.${OBJEXT} \
-	SubsolverQPOASES.${OBJEXT} \
-	SubsolverBase.${OBJEXT}
+	SubsolverQPOASES.${OBJEXT}
 
 ##
 ##	targets
 ##
 
-all: ${LINK_DEPENDS}
+all: ${LCQPOASES_LIBS}
 
 
 ${LIBDIR}/liblcqpOASES.${LIBEXT}: ${LCQPOASES_OBJECTS}
@@ -64,8 +70,9 @@ clean:
 
 clobber: clean
 
-%.${OBJEXT}: %.cpp
+%.${OBJEXT}: %.cpp ${LCQPOASES_DEPENDS}
 	@${ECHO} "Creating" $@
+	@${ECHO} ${CPP} ${DEF_TARGET} -c ${IFLAGS} ${CPPFLAGS} $<
 	@${CPP} ${DEF_TARGET} -c ${IFLAGS} ${CPPFLAGS} $<
 
 ##
