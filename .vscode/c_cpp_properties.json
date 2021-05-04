@@ -8,7 +8,8 @@
                 "external/qpOASES/include/**",
                 "external/osqp/include/**",
                 "/usr/include/**",
-                "/usr/local/include/**"
+                "/usr/local/include/**",
+                "/usr/local/MATLAB/R2021a/extern/include/**"
             ],
             "defines": [],
             "cStandard": "gnu11",
