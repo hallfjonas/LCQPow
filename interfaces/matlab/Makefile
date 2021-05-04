@@ -29,9 +29,11 @@ IDIR   = ../../include
 
 IFLAGS      =  -I. \
                -I${IDIR} \
-               -I${MATLAB_IDIR}
+               -I${MATLAB_IDIR} \
+               -I${QPOASES_IDIR} \
+               -I${OSQP_IDIR}
 			   
-LINK_MATLAB_LIBS = -L${MATLAB_LIBDIR} -lmex -lmat -lmx
+LINK_MATLAB_LIBS = -L${MATLAB_LIBDIR} ${QPOASES_LINK} ${OSQP_LINK} -lmex -lmat -lmx
 
 EXTRAFLAGS = -largeArrayDims -O -D__cpluplus -D__MATLAB__ -fexceptions
 
@@ -43,9 +45,9 @@ LCQPOASES_OBJECT = LCQPanther.${OBJEXT}
 
 all: ${BINDIR}/LCQPanther.${MEXEXT} copyMs
 
-${BINDIR}/qpOASES.${MEXEXT}: ${LCQPOASES_OBJECT} 
+${BINDIR}/LCQPanther.${MEXEXT}: ${LCQPOASES_OBJECT} 
 	@${ECHO} "Creating" $@
-	@${CPP} -shared -o $@ $? ${QPOASES_LINK} ${LINK_LIBRARIES} ${LINK_MATLAB_LIBS}
+	@${CPP} -shared -o $@ $? ${LCQPOASES_LINK} ${LINK_LIBRARIES} ${LINK_MATLAB_LIBS}
 
 copyMs:
 	@${ECHO} "Copying M files ..."

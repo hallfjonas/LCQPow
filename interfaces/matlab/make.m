@@ -59,16 +59,18 @@ function [] = make( varargin )
 
     
     %% define compiler settings
-    LCQPOASESPATH = '../../';
+    LCQPOASES_IFLAG = '-I../../include ';
+    QPOASES_IFLAG = '-I../../external/qpOASES/include ';
+    OSQP_IFLAG = '-I../../external/osqp/include ';
     
     DEBUGFLAGS = ' ';
     %DEBUGFLAGS = ' -v -g CXXDEBUGFLAGS=''$CXXDEBUGFLAGS -Wall -pedantic -Wshadow'' ';
 
-    IFLAGS = [ '-I. -I',LCQPOASESPATH,'include',' -I',LCQPOASESPATH,'src',' ' ];
-    CPPFLAGS = [ IFLAGS, DEBUGFLAGS, '-largeArrayDims -D__cpluplus -D__MATLAB__ -D__AVOID_LA_NAMING_CONFLICTS__ -D__SINGLE_OBJECT__',' ' ];
+    IFLAGS = [ '-I. ', LCQPOASES_IFLAG, QPOASES_IFLAG, OSQP_IFLAG];
+    CPPFLAGS = [ IFLAGS, DEBUGFLAGS, '-largeArrayDims -D__cpluplus -D__MATLAB__',' ' ];
     defaultFlags = '-O -D__NO_COPYRIGHT__ '; %% -D__SUPPRESSANYOUTPUT__
 
-    CPPFLAGS = [ CPPFLAGS, '-DLINUX -lmwblas',' ' ];
+    CPPFLAGS = [ CPPFLAGS, '-DLINUX -L/usr/local/lib -llcqpOASES -lmwblas -lqpOASES -losqp',' ' ];
 
     if ( isempty(userFlags) > 0 )
         CPPFLAGS = [ CPPFLAGS, defaultFlags,' ' ];
@@ -80,7 +82,6 @@ function [] = make( varargin )
     
     %% clean if desired
     if ( doClean > 0 )
-        
         eval( 'delete *.o;' );
         eval( ['delete *.',mexExt,'*;'] );
         disp( [ 'INFO (',mfilename '.m): Cleaned all compiled files.'] );
@@ -99,7 +100,7 @@ function [] = make( varargin )
         cmd = [ 'mex -output ', fcnNames{ii}, ' ', CPPFLAGS, [fcnNames{ii},'.cpp'] ];
         
         if ( exist( [fcnNames{ii},'.',mexExt],'file' ) == 0 )
-            
+            disp( ['Evaluating ', cmd] );
             eval( cmd );
             disp( [ 'INFO (',mfilename '.m): ', fcnNames{ii},'.',mexExt, ' successfully created.'] );
             
@@ -121,6 +122,7 @@ function [] = make( varargin )
             
             if ( ( cppFileTimestamp   >= mexFileTimestamp ) || ...
                  ( makeFileTimestamp  >= mexFileTimestamp ) )
+                disp( ['Evaluating ', cmd] );
                 eval( cmd );
                 disp( [ 'INFO (',mfilename '.m): ', fcnNames{ii},'.',mexExt, ' successfully created.'] );
             else            
