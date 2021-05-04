@@ -82,9 +82,9 @@ namespace lcqpOASES {
 
 
 	returnValue LCQProblem::loadLCQP(	const double* const _H, const double* const _g,
-										const double* const _lb, const double* const _ub,
 										const double* const _S1, const double* const _S2,
 										const double* const _A, const double* const _lbA, const double* const _ubA,
+										const double* const _lb, const double* const _ub,
 										const double* const _x0, const double* const _y0
 										)
 	{
@@ -133,9 +133,9 @@ namespace lcqpOASES {
 
 
 	returnValue LCQProblem::loadLCQP(	const char* const H_file, const char* const g_file,
-										const char* const lb_file, const char* const ub_file,
 										const char* const S1_file, const char* const S2_file,
 										const char* const A_file, const char* const lbA_file, const char* const ubA_file,
+										const char* const lb_file, const char* const ub_file,
 										const char* const x0_file, const char* const y0_file
 										)
 	{
