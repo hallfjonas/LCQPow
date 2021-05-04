@@ -64,13 +64,13 @@ namespace lcqpOASES {
 			 *
 			 * @param _H The objective's hessian matrix.
 			 * @param _g The obective's linear term.
-			 * @param _lb The box constraint's lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
-			 * @param _ub The box constraint's upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
 			 * @param _S1 The matrix selecting the left hand side of the complementarity pairs.
 			 * @param _S2 The matrix selecting the right hand side of the complementarity pairs.
 			 * @param _A The constraint matrix. A `NULL` pointer can be passed if no linear constraints exist.
 			 * @param _lbA The lower bounds associated to the constraint matrix `_A`. A `NULL` pointer can be passed if no lower bounds exist.
 			 * @param _ubA The upper bounds associated to the constraint matrix `_A`. A `NULL` pointer can be passed if no upper bounds exist.
+			 * @param _lb The box constraint's lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
+			 * @param _ub The box constraint's upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
 			 * @param _x0 The initial guess for the optimal primal solution vector. If a `NULL` pointer is passed the zero vector is used.
 			 * @param _y0 The initial guess for the optimal dual solution vector. If a `NULL` pointer is passed, then the initialization depends on the subsolver and its options.
 			 *
@@ -79,13 +79,13 @@ namespace lcqpOASES {
 			returnValue loadLCQP(
 				const double* const _H,
 				const double* const _g,
-				const double* const _lb,
-				const double* const _ub,
 				const double* const _S1,
 				const double* const _S2,
 				const double* const _A = 0,
 				const double* const _lbA = 0,
 				const double* const _ubA = 0,
+				const double* const _lb = 0,
+				const double* const _ub = 0,
 				const double* const _x0 = 0,
 				const double* const _y0 = 0
 			 );
@@ -96,13 +96,13 @@ namespace lcqpOASES {
 			 *
 			 * @param H_file The objective's hessian matrix.
 			 * @param g_file The obective's linear term.
-			 * @param lb_file The box constraint's lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
-			 * @param ub_file The box constraint's upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
 			 * @param S1_file The matrix selecting the left hand side of the complementarity pairs.
 			 * @param S2_file The matrix selecting the right hand side of the complementarity pairs.
 			 * @param A_file The constraint matrix. A `NULL` pointer can be passed if no linear constraints exist.
 			 * @param lbA_file The lower bounds associated to the constraint matrix `_A`. A `NULL` pointer can be passed if no lower bounds exist.
 			 * @param ubA_file The upper bounds associated to the constraint matrix `_A`. A `NULL` pointer can be passed if no upper bounds exist.
+			 * @param lb_file The box constraint's lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
+			 * @param ub_file The box constraint's upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
 			 * @param x0_file The initial guess for the optimal primal solution vector. If a `NULL` pointer is passed the zero vector is used.
 			 * @param y0_file The initial guess for the optimal dual solution vector. If a `NULL` pointer is passed, then the initialization depends on the subsolver and its options.
 			 *
@@ -111,13 +111,13 @@ namespace lcqpOASES {
 			returnValue loadLCQP(
 				const char* const H_file,
 				const char* const g_file,
-				const char* const lb_file,
-				const char* const ub_file,
 				const char* const S1_file,
 				const char* const S2_file,
 				const char* const A_file = 0,
 				const char* const lbA_file = 0,
 				const char* const ubA_file = 0,
+				const char* const lb_file = 0,
+				const char* const ub_file = 0,
 				const char* const x0_file = 0,
 				const char* const y0_file = 0
 			);

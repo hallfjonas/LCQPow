@@ -75,7 +75,7 @@ moving_masses: clean ${MOVING_MASSES}
 warm_up: clean ${WARM_UP}
 lcqp_from_file: clean ${LCQP_FROM_FILE}
 
-${BINDIR}/%${EXE}: %.${OBJEXT} ${LCQPOASES_LIB}
+${BINDIR}/%${EXE}: %.${OBJEXT} ${LCQPOASES_LIBS}
 	@mkdir -p ${BINDIR}
 	@${ECHO} "Creating" $@
 	@${CPP} ${DEF_TARGET} ${CPPFLAGS} $< ${LCQPOASES_LINK} ${LFLAGS}
@@ -93,7 +93,7 @@ clean:
 
 clobber: clean
 
-${LCQPOASES_LIB}:
+${LCQPOASES_LIBS}:
 	@cd ..; ${MAKE} -s src
 
 %.${OBJEXT}: %.cpp

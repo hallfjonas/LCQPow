@@ -31,8 +31,6 @@ int main() {
     /* Setup data of first QP. */
     double H[2*2] = { 2.0, 0.0, 0.0, 2.0 };
     double g[2] = { -2.0, -2.0 };
-    double lb[2] = { 0, 0 };
-    double ub[2] = { INFINITY, INFINITY };
     double S1[1*2] = {1.0, 0.0};
     double S2[1*2] = {0.0, 1.0};
 
@@ -47,7 +45,7 @@ int main() {
 	lcqp.setOptions( options );
 
     // Solve first LCQP
-	returnValue retVal = lcqp.loadLCQP( H, g, lb, ub, S1, S2 );
+	returnValue retVal = lcqp.loadLCQP( H, g, S1, S2 );
 
     if (retVal != SUCCESSFUL_RETURN)
     {
