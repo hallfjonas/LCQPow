@@ -36,12 +36,16 @@ DEBUGDIR = ${TOP}/debug
 BUILDDIR = ${TOP}/build
 
 # qpOASES
-QPOASES_IDIR   = ${TOP}/external/qpOASES/include
-QPOASES_LINK   = -lqpOASES
+QPOASES_IDIR = ${TOP}/external/qpOASES/include
+QPOASES_LINK = -lqpOASES
 
 # OSQP
-OSQP_IDIR   = ${TOP}/external/osqp/include
-OSQP_LINK   = -losqp
+OSQP_IDIR = ${TOP}/external/osqp/include
+OSQP_LINK = -losqp
+
+# MATLAB (required for the matlab interface)
+MATLAB_IDIR   = /usr/local/MATLAB/R2021a/extern/include
+MATLAB_LIBDIR = /usr/local/MATLAB/R2021a/bin/glnxa64
 
 # Compiler flags
 CPP = g++

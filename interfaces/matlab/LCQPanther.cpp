@@ -26,7 +26,7 @@ bool checkDimensionAndType(const mxArray* arr, int m, int n, const char* name)
 {
     if (!mxIsDouble(arr)) {
         char* errorMsg = (char*)malloc(100*sizeof(char));
-        sprintf(errorMsg, "Invalid type: %s must be of type double", name);
+        sprintf(errorMsg, "Invalid type: %s must be of type double.\n", name);
         mexErrMsgTxt(errorMsg);
         free(errorMsg);
         return false;
@@ -34,7 +34,7 @@ bool checkDimensionAndType(const mxArray* arr, int m, int n, const char* name)
 
     if (mxGetM(arr) != m || mxGetN(arr) != n) {
         char* errorMsg = (char*)malloc(100*sizeof(char));
-        sprintf(errorMsg, "Invalid dimension: %s (got %d x %d but expected %d x %d)", name, mxGetM(arr), mxGetN(arr), m, n);
+        sprintf(errorMsg, "Invalid dimension: %s (got %d x %d but expected %d x %d).\n", name, (int)mxGetM(arr), (int)mxGetN(arr), m, n);
         mexErrMsgTxt(errorMsg);
         free(errorMsg);
         return false;
@@ -48,7 +48,7 @@ bool checkStructType(const mxArray* arr, const char* name)
 {
     if (!mxIsStruct(arr)) {
         char* errorMsg = (char*)malloc(100*sizeof(char));
-        sprintf(errorMsg, "Invalid type: %s must be of type struct", name);
+        sprintf(errorMsg, "Invalid type: %s must be of type struct.\n", name);
         mexErrMsgTxt(errorMsg);
         free(errorMsg);
         return false;
@@ -65,7 +65,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
     // Validate number of output arguments
     if (nlhs != 1) {
-        sprintf(errorMsg, "Invalid number of output arguments (got %d but expected 1)", nlhs);
+        sprintf(errorMsg, "Invalid number of output arguments (got %d but expected 1).\n", nlhs);
         mexErrMsgTxt(errorMsg);
         free(errorMsg);
         return;
@@ -73,7 +73,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
     // Validate number of input arguments
     if (nrhs < 4 || nrhs > 10) {
-        sprintf(errorMsg, "Invalid number of input arguments (got %d but expected between 4 and 10).", nrhs);
+        sprintf(errorMsg, "Invalid number of input arguments (got %d but expected between 4 and 10).\n", nrhs);
         mexErrMsgTxt(errorMsg);
         free(errorMsg);
         return;
@@ -85,7 +85,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
     // Get number of optimization variables
     if (mxIsEmpty(prhs[0]) || !mxIsDouble(prhs[0])) {
-        sprintf(errorMsg, "Invalid input argument: Hessian must be a non-empty double matrix.", nrhs);
+        sprintf(errorMsg, "Invalid input argument: Hessian must be a non-empty double matrix.\n");
         mexErrMsgTxt(errorMsg);
         free(errorMsg);
         return;
@@ -95,7 +95,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
     // Get number of complementarity constraints
     if (mxIsEmpty(prhs[2]) || !mxIsDouble(prhs[2])) {
-        sprintf(errorMsg, "Invalid input argument: S1 must be a non-empty double matrix.", nrhs);
+        sprintf(errorMsg, "Invalid input argument: S1 must be a non-empty double matrix.\n");
         mexErrMsgTxt(errorMsg);
         free(errorMsg);
         return;
@@ -106,12 +106,13 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     // Get number of linear constraints
     if (nrhs > 7 || ( nrhs == 7 && !mxIsStruct(prhs[6]))) {
         if (mxIsEmpty(prhs[4]) || !mxIsDouble(prhs[4])) {
-            sprintf(errorMsg, "Invalid input argument: A must be a non-empty double matrix.", nrhs);
+            sprintf(errorMsg, "Invalid input argument: A must be a non-empty double matrix.\n");
             mexErrMsgTxt(errorMsg);
             free(errorMsg);
             return;
-    } else {
-        nC = (int) mxGetM(prhs[2]);
+        } else {
+            nC = (int) mxGetM(prhs[2]);
+        }
     }
 
     // Check all dimensions (except for params)
@@ -144,6 +145,6 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     if (nrhs == 10 && !checkStructType(prhs[9], "params")) return;
 
     // To know we ran successfully.
-    mexPrintf("Leaving mex function.");
+    mexPrintf("Leaving mex function.\n");
     return;
 }
