@@ -65,7 +65,7 @@ bool checkStructType(const mxArray* arr, const char* name)
 void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 {
     // Validate number of output arguments
-    if (nlhs != 0) {
+    if (nlhs != 1) {
         char *errorMsg = (char*)malloc(100*sizeof(char));
         sprintf(errorMsg, "Invalid number of output arguments (got %d but expected 1).\n", nlhs);
         mexErrMsgTxt(errorMsg);
@@ -121,7 +121,8 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         }
     }
 
-    mexPrintf("Got LCQP of dimension (nV x nComp x nC) = (%d x %d x %d).\n", nV, nComp, nC);
+    // Debug statement
+    // mexPrintf("Got LCQP of dimension (nV x nComp x nC) = (%d x %d x %d).\n", nV, nComp, nC);
 
     // Check all dimensions (except for params)
     if (!checkDimensionAndType(prhs[0], nV, nV, "H")) return;
@@ -217,28 +218,25 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     // Run solver
     lcqpOASES::returnValue ret = lcqp.runSolver();
     if (ret != lcqpOASES::SUCCESSFUL_RETURN) {
-        mexPrintf("Failed to solve LCQP (%d).\n", ret);
+        mexPrintf("Failed to solve LCQP (error code: %d).\n", ret);
     } else {
-        mexPrintf("Succeeded to solve LCQP. Obtaining solution vector.\n");
+        // Succeeded to solve LCQP. Obtaining solution vector
+        double* xOpt_tmp = new double[nV];
+        lcqp.getPrimalSolution(xOpt_tmp);
 
-        // double* xOpt_tmp = new double[nV];
-        // lcqp.getPrimalSolution(xOpt_tmp);
+        // Allocate output vector
+        plhs[0] = mxCreateDoubleMatrix(nV, 1, mxREAL);
+        if (plhs[0] == NULL) {
+            mexPrintf("Failed to allocate output.\n");
+            return;
+        }
 
+        // Point to the output object
+        double* xOpt = (double*) mxGetPr(plhs[0]);
 
-        // Utilities::printMatrix(xOpt_tmp, 1, nV, "xOpt");
-
-        // delete[] xOpt_tmp;
-
-        // plhs[0] = mxCreateDoubleMatrix(nV, 1, mxREAL);
-        // if (plhs[0] == NULL) {
-        //     mexPrintf("Failed to allocate output.\n");
-        //     return;
-        // }
-
-        // xOpt = (double*) mxGetPr(plhs[0]);
-
-        // for (int i = 0; i < nV; i++)
-        //     xOpt[i] = xOpt_tmp[i];
+        // Write output
+        for (int i = 0; i < nV; i++)
+            xOpt[i] = xOpt_tmp[i];
     }
 
     // Destroy LCQProblem object

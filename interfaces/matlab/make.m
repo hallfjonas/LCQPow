@@ -179,7 +179,7 @@ function [ doClean,fcnNames,userIFlags ] = analyseMakeArguments( nArgs,args )
             end
             
         otherwise
-            fcnNames = { 'LCQPanther', 'LCQParrot' };
+            fcnNames = { 'LCQPanther' };
             
     end
     

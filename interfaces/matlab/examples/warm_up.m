@@ -11,7 +11,7 @@ L = [1 0];
 R = [0 1];
 
 % Run solver
-LCQPanther(Q, g, L, R);
+xopt = LCQPanther(Q, g, L, R);
 
 % Algorithm parameters
 params.x0 = [1; 1];
