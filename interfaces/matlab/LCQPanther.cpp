@@ -160,84 +160,84 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     LCQProblem lcqp_tmp((int)nV, (int)nC, (int)nComp);
     lcqp = lcqp_tmp;
 
-    // // Load data
-    // double* H = NULL;
-    // double* g = NULL;
-    // double* S1 = NULL;
-    // double* S2 = NULL;
-    // double* lb = NULL;
-    // double* ub = NULL;
-    // double* A = NULL;
-    // double* lbA = NULL;
-    // double* ubA = NULL;
-    // // Options opts();
-    //     
-    // H = (double*) mxGetPr( prhs[0] );
-    // g = (double*) mxGetPr( prhs[1] );
-    // S1 = (double*) mxGetPr( prhs[2] );
-    // S2 = (double*) mxGetPr( prhs[3] );
-// 
-    // if (nrhs == 6 || (nrhs == 7 && nC == 0)) {
-    //     lb = (double*) mxGetPr( prhs[4] );
-    //     ub = (double*) mxGetPr( prhs[5] );
-    // } else if (nrhs >= 7) {
-    //     A = (double*) mxGetPr( prhs[4] );
-    //     lbA = (double*) mxGetPr( prhs[5] );
-    //     ubA = (double*) mxGetPr( prhs[6] );
-// 
-    //     if (nrhs >= 9) {
-    //         lb = (double*) mxGetPr( prhs[7] );
-    //         ub = (double*) mxGetPr( prhs[8] );
-    //     }
-    // }
-// 
-    // // Load settings
-    // int structIdx = -1;
-    // if (nrhs == 5 && checkStructType(prhs[4], "params")) { structIdx = 4; }
-    // if (nrhs == 7 && !mxIsDouble(prhs[6]) && checkStructType(prhs[6], "params"))  { structIdx = 6; }
-    // if (nrhs == 8 && checkStructType(prhs[7], "params")) { structIdx = 7; }
-    // if (nrhs == 10 && checkStructType(prhs[9], "params")) { structIdx = 9; }
-// 
-    // if (structIdx != -1) {
-    //     mexErrMsgTxt("Passing the parameter field is not yet supported.\n");
-    //     return;
-    // }
-// 
-    // Utilities::printMatrix(H, nV, nV, "H");
-    // Utilities::printMatrix(g, 1, nV, "H");
-    // Utilities::printMatrix(S1, nComp, nV, "H");
-    // Utilities::printMatrix(S2, nComp, nV, "H");
-// 
-    // double* xOpt;
-// 
-    // // Load data into LCQP object
-    // lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub);
-// 
-    // // Run solver
-    // lcqpOASES::returnValue ret = lcqp.runSolver();
-    // if (ret != lcqpOASES::SUCCESSFUL_RETURN) {
-    //     mexPrintf("Failed to solve LCQP (%d).\n", ret);
-    // } else {
-    //     double* xOpt_tmp = new double[nV];
-    //     lcqp.getPrimalSolution(xOpt_tmp);
-// 
-    //     mexPrintf("Succeeded to solve LCQP. Obtaining solution vector.\n");
-// 
-    //     Utilities::printMatrix(xOpt_tmp, 1, nV, "xOpt");
-// 
-    //     delete[] xOpt_tmp;
-// 
-    //     // plhs[0] = mxCreateDoubleMatrix(nV, 1, mxREAL);
-    //     // if (plhs[0] == NULL) {
-    //     //     mexPrintf("Failed to allocate output.\n");
-    //     //     return;
-    //     // }
-// 
-    //     // xOpt = (double*) mxGetPr(plhs[0]);
-    //     
-    //     // for (int i = 0; i < nV; i++)
-    //         // xOpt[i] = xOpt_tmp[i];
-    // }
+    // Load data
+    double* H = NULL;
+    double* g = NULL;
+    double* S1 = NULL;
+    double* S2 = NULL;
+    double* lb = NULL;
+    double* ub = NULL;
+    double* A = NULL;
+    double* lbA = NULL;
+    double* ubA = NULL;
+    // Options opts();
+        
+    H = (double*) mxGetPr( prhs[0] );
+    g = (double*) mxGetPr( prhs[1] );
+    S1 = (double*) mxGetPr( prhs[2] );
+    S2 = (double*) mxGetPr( prhs[3] );
+
+    if (nrhs == 6 || (nrhs == 7 && nC == 0)) {
+        lb = (double*) mxGetPr( prhs[4] );
+        ub = (double*) mxGetPr( prhs[5] );
+    } else if (nrhs >= 7) {
+        A = (double*) mxGetPr( prhs[4] );
+        lbA = (double*) mxGetPr( prhs[5] );
+        ubA = (double*) mxGetPr( prhs[6] );
+
+        if (nrhs >= 9) {
+            lb = (double*) mxGetPr( prhs[7] );
+            ub = (double*) mxGetPr( prhs[8] );
+        }
+    }
+
+    // Load settings
+    int structIdx = -1;
+    if (nrhs == 5 && checkStructType(prhs[4], "params")) { structIdx = 4; }
+    if (nrhs == 7 && !mxIsDouble(prhs[6]) && checkStructType(prhs[6], "params"))  { structIdx = 6; }
+    if (nrhs == 8 && checkStructType(prhs[7], "params")) { structIdx = 7; }
+    if (nrhs == 10 && checkStructType(prhs[9], "params")) { structIdx = 9; }
+
+    if (structIdx != -1) {
+        mexErrMsgTxt("Passing the parameter field is not yet supported.\n");
+        return;
+    }
+
+    Utilities::printMatrix(H, nV, nV, "H");
+    Utilities::printMatrix(g, 1, nV, "H");
+    Utilities::printMatrix(S1, nComp, nV, "H");
+    Utilities::printMatrix(S2, nComp, nV, "H");
+
+    double* xOpt;
+
+    // Load data into LCQP object
+    lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub);
+
+    // Run solver
+    lcqpOASES::returnValue ret = lcqp.runSolver();
+    if (ret != lcqpOASES::SUCCESSFUL_RETURN) {
+        mexPrintf("Failed to solve LCQP (%d).\n", ret);
+    } else {
+        double* xOpt_tmp = new double[nV];
+        lcqp.getPrimalSolution(xOpt_tmp);
+
+        mexPrintf("Succeeded to solve LCQP. Obtaining solution vector.\n");
+
+        Utilities::printMatrix(xOpt_tmp, 1, nV, "xOpt");
+
+        delete[] xOpt_tmp;
+
+        // plhs[0] = mxCreateDoubleMatrix(nV, 1, mxREAL);
+        // if (plhs[0] == NULL) {
+        //     mexPrintf("Failed to allocate output.\n");
+        //     return;
+        // }
+
+        // xOpt = (double*) mxGetPr(plhs[0]);
+        
+        // for (int i = 0; i < nV; i++)
+            // xOpt[i] = xOpt_tmp[i];
+    }
 
     mexPrintf("Leaving mex function.\n");
     return;
