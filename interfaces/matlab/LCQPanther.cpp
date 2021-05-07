@@ -27,7 +27,7 @@ using lcqpOASES::Utilities;
 
 LCQProblem lcqp;
 
-bool checkDimensionAndType(const mxArray* arr, size_t m, size_t n, const char* name) 
+bool checkDimensionAndType(const mxArray* arr, size_t m, size_t n, const char* name)
 {
     if (!mxIsDouble(arr)) {
         char* errorMsg = (char*)malloc(100*sizeof(char));
@@ -64,11 +64,9 @@ bool checkStructType(const mxArray* arr, const char* name)
 
 void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 {
-    // Create a char for message handling
-    char *errorMsg = (char*)malloc(100*sizeof(char));
-
     // Validate number of output arguments
     if (nlhs != 0) {
+        char *errorMsg = (char*)malloc(100*sizeof(char));
         sprintf(errorMsg, "Invalid number of output arguments (got %d but expected 1).\n", nlhs);
         mexErrMsgTxt(errorMsg);
         free(errorMsg);
@@ -77,6 +75,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
     // Validate number of input arguments
     if (nrhs < 4 || nrhs > 10) {
+        char *errorMsg = (char*)malloc(100*sizeof(char));
         sprintf(errorMsg, "Invalid number of input arguments (got %d but expected between 4 and 10).\n", nrhs);
         mexErrMsgTxt(errorMsg);
         free(errorMsg);
@@ -89,6 +88,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
     // Get number of optimization variables
     if (mxIsEmpty(prhs[0]) || !mxIsDouble(prhs[0])) {
+        char *errorMsg = (char*)malloc(100*sizeof(char));
         sprintf(errorMsg, "Invalid input argument: Hessian must be a non-empty double matrix.\n");
         mexErrMsgTxt(errorMsg);
         free(errorMsg);
@@ -99,6 +99,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
     // Get number of complementarity constraints
     if (mxIsEmpty(prhs[2]) || !mxIsDouble(prhs[2])) {
+        char *errorMsg = (char*)malloc(100*sizeof(char));
         sprintf(errorMsg, "Invalid input argument: S1 must be a non-empty double matrix.\n");
         mexErrMsgTxt(errorMsg);
         free(errorMsg);
@@ -110,6 +111,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     // Get number of linear constraints
     if (nrhs > 7 || ( nrhs == 7 && !mxIsStruct(prhs[6]))) {
         if (mxIsEmpty(prhs[4]) || !mxIsDouble(prhs[4])) {
+            char *errorMsg = (char*)malloc(100*sizeof(char));
             sprintf(errorMsg, "Invalid input argument: A must be a non-empty double matrix.\n");
             mexErrMsgTxt(errorMsg);
             free(errorMsg);
@@ -157,8 +159,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     }
 
     // Create LCQP object
-    LCQProblem lcqp_tmp((int)nV, (int)nC, (int)nComp);
-    lcqp = lcqp_tmp;
+    LCQProblem lcqp((int)nV, (int)nC, (int)nComp);
 
     // Load data
     double* H = NULL;
@@ -171,7 +172,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     double* lbA = NULL;
     double* ubA = NULL;
     // Options opts();
-        
+
     H = (double*) mxGetPr( prhs[0] );
     g = (double*) mxGetPr( prhs[1] );
     S1 = (double*) mxGetPr( prhs[2] );
@@ -208,7 +209,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     Utilities::printMatrix(S1, nComp, nV, "H");
     Utilities::printMatrix(S2, nComp, nV, "H");
 
-    double* xOpt;
+    // double* xOpt;
 
     // Load data into LCQP object
     lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub);
@@ -218,14 +219,15 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     if (ret != lcqpOASES::SUCCESSFUL_RETURN) {
         mexPrintf("Failed to solve LCQP (%d).\n", ret);
     } else {
-        double* xOpt_tmp = new double[nV];
-        lcqp.getPrimalSolution(xOpt_tmp);
-
         mexPrintf("Succeeded to solve LCQP. Obtaining solution vector.\n");
 
-        Utilities::printMatrix(xOpt_tmp, 1, nV, "xOpt");
+        // double* xOpt_tmp = new double[nV];
+        // lcqp.getPrimalSolution(xOpt_tmp);
 
-        delete[] xOpt_tmp;
+
+        // Utilities::printMatrix(xOpt_tmp, 1, nV, "xOpt");
+
+        // delete[] xOpt_tmp;
 
         // plhs[0] = mxCreateDoubleMatrix(nV, 1, mxREAL);
         // if (plhs[0] == NULL) {
@@ -234,10 +236,13 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         // }
 
         // xOpt = (double*) mxGetPr(plhs[0]);
-        
+
         // for (int i = 0; i < nV; i++)
-            // xOpt[i] = xOpt_tmp[i];
+        //     xOpt[i] = xOpt_tmp[i];
     }
+
+    mexPrintf("Destroying LCQP instance.\n");
+    lcqp.~LCQProblem();
 
     mexPrintf("Leaving mex function.\n");
     return;
