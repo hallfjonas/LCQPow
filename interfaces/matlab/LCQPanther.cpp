@@ -241,9 +241,8 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         //     xOpt[i] = xOpt_tmp[i];
     }
 
-    mexPrintf("Destroying LCQP instance.\n");
+    // Destroy LCQProblem object
     lcqp.~LCQProblem();
 
-    mexPrintf("Leaving mex function.\n");
     return;
 }
