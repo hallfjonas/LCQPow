@@ -1,4 +1,10 @@
 build-job:
   stage: build
   script:
-    - echo "Helloo, $GITLAB_USER_LOGIN!"
+    - echo "Helloo, $GITLAB_USER_LOGIN!
+
+test-job1:
+  stage: test
+  script:
+    - echo "HELLO WLRD test-job1"
+
