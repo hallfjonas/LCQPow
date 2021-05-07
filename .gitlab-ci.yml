@@ -1,3 +1,5 @@
+image: lcqpbuild
+
 build-job:
   stage: build
   script:
