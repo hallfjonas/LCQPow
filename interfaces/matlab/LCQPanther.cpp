@@ -21,10 +21,13 @@
 
 #include "LCQProblem.hpp"
 using lcqpOASES::LCQProblem;
+using lcqpOASES::Utilities;
 
 #include <mex.h>
 
-bool checkDimensionAndType(const mxArray* arr, int m, int n, const char* name) 
+LCQProblem lcqp;
+
+bool checkDimensionAndType(const mxArray* arr, size_t m, size_t n, const char* name) 
 {
     if (!mxIsDouble(arr)) {
         char* errorMsg = (char*)malloc(100*sizeof(char));
@@ -36,7 +39,7 @@ bool checkDimensionAndType(const mxArray* arr, int m, int n, const char* name)
 
     if (mxGetM(arr) != m || mxGetN(arr) != n) {
         char* errorMsg = (char*)malloc(100*sizeof(char));
-        sprintf(errorMsg, "Invalid dimension: %s (got %d x %d but expected %d x %d).\n", name, (int)mxGetM(arr), (int)mxGetN(arr), m, n);
+        sprintf(errorMsg, "Invalid dimension: %s (got %d x %d but expected %d x %d).\n", name, (int)mxGetM(arr), (int)mxGetN(arr), (int)m, (int)n);
         mexErrMsgTxt(errorMsg);
         free(errorMsg);
         return false;
@@ -59,66 +62,13 @@ bool checkStructType(const mxArray* arr, const char* name)
     return true;
 }
 
-void loadDenseArray(const mxArray* src, double* dest) 
-{
-    dest = (double*) mxGetPr( src );
-}
-
-void clearMemory(double* H, double* g, double* S1, double* S2, double* A, double* lbA, double* ubA, double* lb, double* ub)
-{
-    if (H != NULL) {
-        delete[] H;
-        H = NULL;
-    }
-
-    if (g != NULL) {
-        delete[] g;
-        g = NULL;
-    } 
-
-    if (S1 != NULL) {
-        delete[] S1;
-        S1 = NULL;
-    }
-
-    if (S2 != NULL) {
-        delete[] S2;
-        S2 = NULL;
-    }
-
-    if (lb != NULL) {
-        delete[] lb;
-        lb = NULL;
-    }
-
-    if (ub != NULL) {
-        delete[] ub;
-        ub = NULL;
-    }
-
-    if (A != NULL) {
-        delete[] A;
-        A = NULL;
-    }
-
-    if (lbA != NULL) {
-        delete[] lbA;
-        lbA = NULL;
-    }
-
-    if (ubA != NULL) {
-        delete[] ubA;
-        ubA = NULL;
-    }
-}
-
 void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 {
     // Create a char for message handling
     char *errorMsg = (char*)malloc(100*sizeof(char));
 
     // Validate number of output arguments
-    if (nlhs != 1) {
+    if (nlhs != 0) {
         sprintf(errorMsg, "Invalid number of output arguments (got %d but expected 1).\n", nlhs);
         mexErrMsgTxt(errorMsg);
         free(errorMsg);
@@ -133,9 +83,9 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         return;
     }
 
-    int nV = 0;
-    int nComp = 0;
-    int nC = 0;
+    size_t nV = 0;
+    size_t nComp = 0;
+    size_t nC = 0;
 
     // Get number of optimization variables
     if (mxIsEmpty(prhs[0]) || !mxIsDouble(prhs[0])) {
@@ -144,7 +94,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         free(errorMsg);
         return;
     } else {
-        nV = (int) mxGetM(prhs[0]);
+        nV = mxGetM(prhs[0]);
     }
 
     // Get number of complementarity constraints
@@ -154,7 +104,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         free(errorMsg);
         return;
     } else {
-        nComp = (int) mxGetM(prhs[2]);
+        nComp = mxGetM(prhs[2]);
     }
 
     // Get number of linear constraints
@@ -165,7 +115,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             free(errorMsg);
             return;
         } else {
-            nC = (int) mxGetM(prhs[2]);
+            nC = mxGetM(prhs[2]);
         }
     }
 
@@ -179,7 +129,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
     if (nrhs == 6 && !checkDimensionAndType(prhs[4], nV, 1, "lb")) return;
     if (nrhs == 6 && !checkDimensionAndType(prhs[5], nV, 1, "ub")) return;
-    
+
     if (nrhs == 7 && mxIsStruct(prhs[6]) && !checkDimensionAndType(prhs[4], nV, 1, "lb")) return;
     if (nrhs == 7 && mxIsStruct(prhs[6]) && !checkDimensionAndType(prhs[5], nV, 1, "ub")) return;
 
@@ -207,84 +157,88 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     }
 
     // Create LCQP object
-    LCQProblem lcqp(nV, nC, nComp);
+    LCQProblem lcqp_tmp((int)nV, (int)nC, (int)nComp);
+    lcqp = lcqp_tmp;
 
-    // Load data
-    double* H = new double[nV*nV];
-    double* g = new double[nV];
-    double* S1 = new double[nComp*nV];
-    double* S2 = new double[nComp*nV];
-    double* lb = NULL;
-    double* ub = NULL;
-    double* A = NULL;
-    double* lbA = NULL;
-    double* ubA = NULL;
-    // Options opts();
-        
-    loadDenseArray(prhs[0], H);
-    loadDenseArray(prhs[1], g);
-    loadDenseArray(prhs[2], S1);
-    loadDenseArray(prhs[3], S2);
-
-    if (nrhs == 6 || (nrhs == 7 && nC == 0)) {
-        double* lb = new double[nV];
-        double* ub = new double[nV];
-        
-        loadDenseArray(prhs[4], lb);
-        loadDenseArray(prhs[5], ub);
-    } else if (nrhs >= 7) {
-        A = new double[nC*nV];
-        lbA = new double[nC];
-        ubA = new double[nC];
-
-        loadDenseArray(prhs[4], A);
-        loadDenseArray(prhs[5], lbA);
-        loadDenseArray(prhs[6], ubA);
-
-        if (nrhs >= 9) {
-            double* lb = new double[nV];
-            double* ub = new double[nV];
-            
-            loadDenseArray(prhs[7], lb);
-            loadDenseArray(prhs[8], ub);
-        }
-    }
-
-    // Load settings
-    int structIdx = -1;
-    if (nrhs == 5 && checkStructType(prhs[4], "params")) { structIdx = 4; }
-    if (nrhs == 7 && !mxIsDouble(prhs[6]) && checkStructType(prhs[6], "params"))  { structIdx = 6; }
-    if (nrhs == 8 && checkStructType(prhs[7], "params")) { structIdx = 7; }
-    if (nrhs == 10 && checkStructType(prhs[9], "params")) { structIdx = 9; }
-
-    if (structIdx != -1) {
-        mexErrMsgTxt("Passing the parameter field is not yet supported.\n");
-        return;
-    }
-
-    // Load data into LCQP object
-    lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub);
-
-    // Run solver
-    lcqpOASES::returnValue ret = lcqp.runSolver();
-    if (ret != lcqpOASES::SUCCESSFUL_RETURN) {
-        mexPrintf("Failed to solve LCQP (%d).\n", ret);
-    } else {
-        double* xOpt = new double[nV];
-        lcqp.getPrimalSolution(xOpt);
-
-        mexPrintf("Succeeded to solve LCQP. Obtaining solution vector.\n");
- 
-        plhs[0] = mxCreateDoubleMatrix(nV, 1, mxREAL);
-        xOpt = mxGetPr(plhs[0]);
-    }
-
-    mexPrintf("Clearing memory.\n");
-
-    // Clear all allocated memory
-    clearMemory( H, g, S1, S2, A, lbA, ubA, lb, ub);    
+    // // Load data
+    // double* H = NULL;
+    // double* g = NULL;
+    // double* S1 = NULL;
+    // double* S2 = NULL;
+    // double* lb = NULL;
+    // double* ub = NULL;
+    // double* A = NULL;
+    // double* lbA = NULL;
+    // double* ubA = NULL;
+    // // Options opts();
+    //     
+    // H = (double*) mxGetPr( prhs[0] );
+    // g = (double*) mxGetPr( prhs[1] );
+    // S1 = (double*) mxGetPr( prhs[2] );
+    // S2 = (double*) mxGetPr( prhs[3] );
+// 
+    // if (nrhs == 6 || (nrhs == 7 && nC == 0)) {
+    //     lb = (double*) mxGetPr( prhs[4] );
+    //     ub = (double*) mxGetPr( prhs[5] );
+    // } else if (nrhs >= 7) {
+    //     A = (double*) mxGetPr( prhs[4] );
+    //     lbA = (double*) mxGetPr( prhs[5] );
+    //     ubA = (double*) mxGetPr( prhs[6] );
+// 
+    //     if (nrhs >= 9) {
+    //         lb = (double*) mxGetPr( prhs[7] );
+    //         ub = (double*) mxGetPr( prhs[8] );
+    //     }
+    // }
+// 
+    // // Load settings
+    // int structIdx = -1;
+    // if (nrhs == 5 && checkStructType(prhs[4], "params")) { structIdx = 4; }
+    // if (nrhs == 7 && !mxIsDouble(prhs[6]) && checkStructType(prhs[6], "params"))  { structIdx = 6; }
+    // if (nrhs == 8 && checkStructType(prhs[7], "params")) { structIdx = 7; }
+    // if (nrhs == 10 && checkStructType(prhs[9], "params")) { structIdx = 9; }
+// 
+    // if (structIdx != -1) {
+    //     mexErrMsgTxt("Passing the parameter field is not yet supported.\n");
+    //     return;
+    // }
+// 
+    // Utilities::printMatrix(H, nV, nV, "H");
+    // Utilities::printMatrix(g, 1, nV, "H");
+    // Utilities::printMatrix(S1, nComp, nV, "H");
+    // Utilities::printMatrix(S2, nComp, nV, "H");
+// 
+    // double* xOpt;
+// 
+    // // Load data into LCQP object
+    // lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub);
+// 
+    // // Run solver
+    // lcqpOASES::returnValue ret = lcqp.runSolver();
+    // if (ret != lcqpOASES::SUCCESSFUL_RETURN) {
+    //     mexPrintf("Failed to solve LCQP (%d).\n", ret);
+    // } else {
+    //     double* xOpt_tmp = new double[nV];
+    //     lcqp.getPrimalSolution(xOpt_tmp);
+// 
+    //     mexPrintf("Succeeded to solve LCQP. Obtaining solution vector.\n");
+// 
+    //     Utilities::printMatrix(xOpt_tmp, 1, nV, "xOpt");
+// 
+    //     delete[] xOpt_tmp;
+// 
+    //     // plhs[0] = mxCreateDoubleMatrix(nV, 1, mxREAL);
+    //     // if (plhs[0] == NULL) {
+    //     //     mexPrintf("Failed to allocate output.\n");
+    //     //     return;
+    //     // }
+// 
+    //     // xOpt = (double*) mxGetPr(plhs[0]);
+    //     
+    //     // for (int i = 0; i < nV; i++)
+    //         // xOpt[i] = xOpt_tmp[i];
+    // }
 
     mexPrintf("Leaving mex function.\n");
-
     return;
 }

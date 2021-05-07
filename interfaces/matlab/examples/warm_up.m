@@ -9,7 +9,7 @@ L = [1 0];
 R = [0 1];
 
 % Run solver
-xOpt = LCQPanther(Q, g, L, R);
+LCQPanther(Q, g, L, R);
 
 % Algorithm parameters
 params.x0 = [1; 1];
@@ -19,3 +19,6 @@ params.useInitializationStruct = false;
 params.solveZeroPenaltyFirst = false;
 params.printStats = true;
 params.penaltyUpdater = @(R) R*2;
+
+% Direct call (for valgrind debug)
+% LCQPanther([2 0; 0 2], [-2; -2], [1 0], [0 1]);

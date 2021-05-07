@@ -70,7 +70,7 @@ function [] = make( varargin )
     CPPFLAGS = [ IFLAGS, DEBUGFLAGS, '-largeArrayDims -D__cpluplus -D__MATLAB__',' ' ];
     defaultFlags = '-O -D__NO_COPYRIGHT__ '; %% -D__SUPPRESSANYOUTPUT__
 
-    CPPFLAGS = [ CPPFLAGS, '-DLINUX -L/usr/local/lib -llcqpOASES -lmwblas -lqpOASES -losqp',' ' ];
+    CPPFLAGS = [ CPPFLAGS, '-DLINUX -llcqpOASES -lqpOASES -losqp',' ' ];
 
     if ( isempty(userFlags) > 0 )
         CPPFLAGS = [ CPPFLAGS, defaultFlags,' ' ];
@@ -179,7 +179,7 @@ function [ doClean,fcnNames,userIFlags ] = analyseMakeArguments( nArgs,args )
             end
             
         otherwise
-            fcnNames = { 'LCQPanther' };
+            fcnNames = { 'LCQPanther', 'LCQParrot' };
             
     end
     
