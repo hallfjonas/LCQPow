@@ -58,7 +58,7 @@ CD = cd
 CP = cp
 CMAKE = cmake
 MKDIR = mkdir
-CPPFLAGS = -Wall -pedantic -Wshadow -Wfloat-equal -O3 -Wconversion -Wsign-conversion -fPIC -DLINUX -D__USE_LONG_INTEGERS__ -D__NO_COPYRIGHT__
+CPPFLAGS = -Wall -pedantic -Wshadow -Wfloat-equal -O3 -Wconversion -Wsign-conversion -fPIC -DLINUX -D__NO_COPYRIGHT__
 
 # file extensions
 OBJEXT = o

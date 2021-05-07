@@ -35,7 +35,7 @@ IFLAGS      =  -I. \
 
 LFLAGS 		= ${QPOASES_LINK} ${OSQP_LINK} ${PYTHON3_LINK}
 
-DEBUGFLAGS = -g -Wall -pedantic -Wshadow -Wfloat-equal -D__USE_LONG_INTEGERS__ 
+DEBUGFLAGS = -g -Wall -pedantic -Wshadow -Wfloat-equal
 
 QPOASES_SRC = $(wildcard ${QPOASESDIR}/src/*.cpp)
 
