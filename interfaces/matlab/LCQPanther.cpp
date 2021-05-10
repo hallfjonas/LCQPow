@@ -74,7 +74,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     }
 
     // Validate number of input arguments
-    int nrhs_min = 1; int nrhs_max = 4;
+    int nrhs_min = 1; int nrhs_max = 10;
     if (nrhs < nrhs_min || nrhs > nrhs_max) {
         char *errorMsg = (char*)malloc(100*sizeof(char));
         sprintf(errorMsg, "Invalid number of input arguments (got %d but expected between %d and %d).\n", nrhs, nrhs_min, nrhs_max);
