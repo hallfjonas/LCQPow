@@ -31,7 +31,7 @@ namespace lcqpOASES {
 			return LCQPOBJECT_NOT_SETUP;
 
 		H = new double[nV*nV];
-		memcpy( H, H_new, (nV*nV)*sizeof(double) );
+		memcpy( H, H_new, (size_t)(nV*nV)*sizeof(double) );
 
 		return SUCCESSFUL_RETURN;
 	}
@@ -49,7 +49,7 @@ namespace lcqpOASES {
 			return INVALID_ARGUMENT;
 
 		g = new double[nV];
-		memcpy( g, g_new, nV*sizeof(double) );
+		memcpy( g, g_new, (size_t)nV*sizeof(double) );
 
 		return SUCCESSFUL_RETURN;
 	}
@@ -67,7 +67,7 @@ namespace lcqpOASES {
 
 		if ( lb_new != 0 )
 		{
-			memcpy( lb, lb_new, nV*sizeof(double) );
+			memcpy( lb, lb_new, (size_t)nV*sizeof(double) );
 		}
 		else
 		{
@@ -112,7 +112,7 @@ namespace lcqpOASES {
 
 		if ( ub_new != 0 )
 		{
-			memcpy( ub, ub_new, nV*sizeof(double) );
+			memcpy( ub, ub_new, (size_t)nV*sizeof(double) );
 		}
 		else
 		{
@@ -156,12 +156,12 @@ namespace lcqpOASES {
 		xk = new double[nV]();
 
 		if (_x0 != 0) {
-			memcpy(xk, _x0, nV*sizeof(double));
+			memcpy(xk, _x0, (size_t)nV*sizeof(double));
 		}
 
 		if (_y0 != 0) {
 			yk = new double[nV + nC + 2*nComp];
-			memcpy(yk, _y0, (nV + nC + 2*nComp)*sizeof(double));
+			memcpy(yk, _y0, (size_t)(nV + nC + 2*nComp)*sizeof(double));
 		} else {
 			yk = (double*)0;
 		}

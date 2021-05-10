@@ -47,8 +47,8 @@ namespace lcqpOASES {
         H = new double[nV*nV];
         A = new double[nC*nV];
 
-        memcpy(H, _H, (long unsigned int)(nV*nV)*sizeof(double));
-        memcpy(A, _A, (long unsigned int)(nC*nV)*sizeof(double));
+        memcpy(H, _H, (size_t)(nV*nV)*sizeof(double));
+        memcpy(A, _A, (size_t)(nC*nV)*sizeof(double));
 
     }
 
@@ -147,8 +147,8 @@ namespace lcqpOASES {
         H = new double[nV*nV];
         A = new double[nC*nV];
 
-        memcpy(H, rhs.H, (long unsigned int)(nV*nV)*sizeof(double));
-        memcpy(A, rhs.A, (long unsigned int)(nC*nV)*sizeof(double));
+        memcpy(H, rhs.H, (size_t)(nV*nV)*sizeof(double));
+        memcpy(A, rhs.A, (size_t)(nC*nV)*sizeof(double));
 
         qp = rhs.qp;
     }

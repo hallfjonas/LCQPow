@@ -328,7 +328,7 @@ namespace lcqpOASES {
 
 		// Initialization strategy
 		if (options.solveZeroPenaltyFirst) {
-			memcpy(gk, g, (long unsigned int)nV*sizeof(double));
+			memcpy(gk, g, (size_t)nV*sizeof(double));
 
 			if (solveQPSubproblem( true ) != SUCCESSFUL_RETURN) {
 				return INITIAL_SUBPROBLEM_FAILED;

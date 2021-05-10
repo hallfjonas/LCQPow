@@ -51,9 +51,9 @@ namespace lcqpOASES {
         g = new c_float[nVars];
         l = new c_float[nDuals];
         u = new c_float[nDuals];
-        memcpy(g, _g, nVars*sizeof(c_float));
-        memcpy(l, _l, nDuals*sizeof(c_float));
-        memcpy(u, _u, nDuals*sizeof(c_float));
+        memcpy(g, _g, (size_t)nVars*sizeof(c_float));
+        memcpy(l, _l, (size_t)nDuals*sizeof(c_float));
+        memcpy(u, _u, (size_t)nDuals*sizeof(c_float));
 
         // Fill data
         data->n = nVars;
@@ -186,7 +186,7 @@ namespace lcqpOASES {
         OSQPSolution *sol(work->solution);
 
         if (sol->x != 0) {
-            memcpy(x, sol->x, nVars*(sizeof(double)));
+            memcpy(x, sol->x, (size_t)nVars*(sizeof(double)));
         }
 
         // Copy duals with negative sign
@@ -208,9 +208,9 @@ namespace lcqpOASES {
         g = new c_float[nVars];
         l = new c_float[nDuals];
         u = new c_float[nDuals];
-        memcpy(g, rhs.g, nVars*sizeof(c_float));
-        memcpy(l, rhs.l, nDuals*sizeof(c_float));
-        memcpy(u, rhs.u, nDuals*sizeof(c_float));
+        memcpy(g, rhs.g, (size_t)nVars*sizeof(c_float));
+        memcpy(l, rhs.l, (size_t)nDuals*sizeof(c_float));
+        memcpy(u, rhs.u, (size_t)nDuals*sizeof(c_float));
 
         // Copy data
         data = (OSQPData *)c_malloc(sizeof(OSQPData));
