@@ -12,7 +12,8 @@ R = [0 1];
 
 % Run solver
 % xopt = LCQPanther(Q, g, L, R);
-[xopt, yopt] = LCQPanther(Q, g, L, R);
+% [xopt, yopt] = LCQPanther(Q, g, L, R)
+[xopt, yopt, stats] = LCQPanther(Q, g, L, R)
 
 % Algorithm parameters
 params.x0 = [1; 1];
