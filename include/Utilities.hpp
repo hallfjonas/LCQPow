@@ -266,6 +266,8 @@ namespace lcqpOASES {
             /** Default constructor. */
             OutputStatistics( );
 
+            OutputStatistics& operator=( const OutputStatistics& rhs );
+
             /** Update total iteration counter.
              *
              * @return Success or specifies the invalid argument.
@@ -295,6 +297,21 @@ namespace lcqpOASES {
              * @return Success or specifies the invalid argument.
             */
             returnValue updateSolutionStatus( algorithmStatus _status );
+
+            /** Get the total number of iterations. */
+            int getIterTotal( ) const;
+
+            /** Get the total number of outer iterations. */
+            int getIterOuter( ) const;
+
+            /** Get the total number of subproblem iterations. */
+            int getSubproblemIter( ) const;
+
+            /** Get the penalty parameter at the optimal solution (if found). */
+            double getRhoOpt( ) const;
+
+            /** Get the solution status (if solved it will return the stationarity type). */
+            algorithmStatus getSolutionStatus( ) const;
 
         private:
             int iter_total = 0;

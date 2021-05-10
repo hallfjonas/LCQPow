@@ -429,8 +429,8 @@ namespace lcqpOASES {
         sparse->x = new double[nnx];
 
         for (int i = 0; i < nnx; i++) {
-            sparse->i[i] = H_i[i];
-            sparse->x[i] = H_data[i];
+            sparse->i[i] = H_i[(size_t)i];
+            sparse->x[i] = H_data[(size_t)i];
         }
 
         return sparse;
@@ -513,6 +513,18 @@ namespace lcqpOASES {
     OutputStatistics::OutputStatistics( ) { }
 
 
+    OutputStatistics& OutputStatistics::operator=( const OutputStatistics& rhs )
+    {
+        iter_total = rhs.iter_total;
+        iter_outer = rhs.iter_outer;
+        subproblem_iter = rhs.subproblem_iter;
+        rho_opt = rhs.rho_opt;
+        status = rhs.status;
+
+        return *this;
+    }
+
+
     returnValue OutputStatistics::updateIterTotal( int delta_iter )
     {
         if (delta_iter < 0) return INVALID_TOTAL_ITER_COUNT;
@@ -553,6 +565,36 @@ namespace lcqpOASES {
     {
         status = _status;
         return SUCCESSFUL_RETURN;
+    }
+
+
+    int OutputStatistics::getIterTotal( ) const
+    {
+        return iter_total;
+    }
+
+
+    int OutputStatistics::getIterOuter( ) const
+    {
+        return iter_outer;
+    }
+
+
+    int OutputStatistics::getSubproblemIter( ) const
+    {
+        return subproblem_iter;
+    }
+
+
+    double OutputStatistics::getRhoOpt( ) const
+    {
+        return rho_opt;
+    }
+
+
+    algorithmStatus OutputStatistics::getSolutionStatus( ) const
+    {
+        return status;
     }
 
 

@@ -872,6 +872,12 @@ namespace lcqpOASES {
 	}
 
 
+	void LCQProblem::getOutputStatistics( OutputStatistics& _stats) const
+	{
+		_stats = stats;
+	}
+
+
 	/*
 	 *	 p r i n t I t e r a t i o n
 	 */

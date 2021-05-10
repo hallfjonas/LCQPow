@@ -248,6 +248,14 @@ namespace lcqpOASES {
 			 */
 			virtual int getNumerOfDuals( ) const;
 
+
+			/** Get the output statistics.
+			 *
+			 * @param _stats The output statistics pointer to copy the stats to.
+			 */
+			virtual void getOutputStatistics( OutputStatistics& stats) const;
+
+
 			/** Pass options for the LCQP.
 			 *
 			 * @param _options Options to be used.
