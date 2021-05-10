@@ -48,7 +48,6 @@ bool checkDimensionAndType(const mxArray* arr, size_t m, size_t n, const char* n
     return true;
 }
 
-
 bool checkStructType(const mxArray* arr, const char* name)
 {
     if (!mxIsStruct(arr)) {
@@ -65,18 +64,20 @@ bool checkStructType(const mxArray* arr, const char* name)
 void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 {
     // Validate number of output arguments
-    if (nlhs != 1) {
+    int nlhs_min = 1; int nlhs_max = 3;
+    if (nlhs < nlhs_min || nlhs > nlhs_max) {
         char *errorMsg = (char*)malloc(100*sizeof(char));
-        sprintf(errorMsg, "Invalid number of output arguments (got %d but expected 1).\n", nlhs);
+        sprintf(errorMsg, "Invalid number of output arguments (got %d but expected between %d and %d).\n", nlhs, nlhs_min, nlhs_max);
         mexErrMsgTxt(errorMsg);
         free(errorMsg);
         return;
     }
 
     // Validate number of input arguments
-    if (nrhs < 4 || nrhs > 10) {
+    int nrhs_min = 1; int nrhs_max = 4;
+    if (nrhs < nrhs_min || nrhs > nrhs_max) {
         char *errorMsg = (char*)malloc(100*sizeof(char));
-        sprintf(errorMsg, "Invalid number of input arguments (got %d but expected between 4 and 10).\n", nrhs);
+        sprintf(errorMsg, "Invalid number of input arguments (got %d but expected between %d and %d).\n", nrhs, nrhs_min, nrhs_max);
         mexErrMsgTxt(errorMsg);
         free(errorMsg);
         return;
@@ -214,22 +215,38 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         mexPrintf("Failed to solve LCQP (error code: %d).\n", ret);
     } else {
         // Succeeded to solve LCQP. Obtaining solution vector
-        double* xOpt_tmp = new double[nV];
-        lcqp.getPrimalSolution(xOpt_tmp);
 
         // Allocate output vector
         plhs[0] = mxCreateDoubleMatrix(nV, 1, mxREAL);
         if (plhs[0] == NULL) {
-            mexPrintf("Failed to allocate output.\n");
+            mexPrintf("Failed to allocate output of primal solution vector.\n");
             return;
         }
 
         // Point to the output object
         double* xOpt = (double*) mxGetPr(plhs[0]);
+        lcqp.getPrimalSolution(xOpt);
 
-        // Write output
-        for (int i = 0; i < nV; i++)
-            xOpt[i] = xOpt_tmp[i];
+
+        // Get duals
+        if (nlhs > 1) {
+            int nDuals = lcqp.getNumerOfDuals();
+
+            if (nDuals <= 0) {
+                mexPrintf("Failed to receive number of dual variables.\n");
+                return;
+            }
+
+            plhs[1] = mxCreateDoubleMatrix(nDuals, 1, mxREAL);
+            if (plhs[1] == NULL) {
+                mexPrintf("Failed to allocate output of dual solution vector.\n");
+                return;
+            }
+
+            // Pointer to the output object
+            double* yOpt = (double*) mxGetPr(plhs[1]);
+            lcqp.getDualSolution(yOpt);
+        }
     }
 
     // Destroy LCQProblem object
