@@ -37,13 +37,17 @@ namespace lcqpOASES {
         INVALID_PENALTY_UPDATE_VALUE = 101,             /**< Invalid penalty update value. Needs to be > 1. */
         INVALID_COMPLEMENTARITY_TOLERANCE = 102,        /**< Invalid complementarity tolerance. Must be no smaller than machine precision. */
         INVALID_INITIAL_PENALTY_VALUE = 103,            /**< Invalid initial penalty parameter. Must be positive. */
-        INVALID_MAX_OUTER_ITERATIONS_VALUE = 104,       /**< Invalid number of maximal outer iterations. Must be a positive integer */
+        INVALID_MAX_OUTER_ITERATIONS_VALUE = 104,       /**< Invalid number of maximal outer iterations. Must be a positive integer. */
         INVALID_MAX_INNER_ITERATIONS_VALUE = 105,       /**< Invalid number of maximal inner iterations. Must be a positive integer. */
         INVALID_NUMBER_OF_OPTIM_VARS = 106,             /**< Invalid number of optimization variables. Must be a positive integer. */
         INVALID_NUMBER_OF_COMP_VARS = 107,              /**< Invalid number of complementarity constraints. Must be a positive integer. */
         INVALID_NUMBER_OF_CONSTRAINT_VARS = 108,        /**< Invalid number of linear constraints. Must be a non-negative integer. */
         INVALID_RELAX_OPTIONS_TOLERANCE = 109,          /**< Invalid number of active set changes to switch to precision mode. Must be a positive integer. */
         INVALID_OSQP_BOX_CONSTRAINTS = 110,             /**< Invalid constraints passed to OSQP solver: This solver does not handle box constraints, please pass them through linear constraints. */
+        INVALID_TOTAL_ITER_COUNT = 111,                 /**< Invalid total number of iterations delta passed to output statistics (must be non-negative integer). */
+        INVALID_TOTAL_OUTER_ITER = 112,                 /**< Invalid total number of outer iterations delta passed to output statistics (must be non-negative integer). */
+        IVALID_SUBPROBLEM_ITER = 113,                   /**< Invalid total number of subproblem solver iterates delta passed to output statistics (must be non-negative integer). */
+        INVALID_RHO_OPT = 114,                          /**< Invalid rho value at solution passed to output statistics. (must be positive double). */
 
         // Algorithmic errors
         MAX_OUTER_ITERATIONS_REACHED = 200,             /**< Maximum number of outer iterations reached. */
@@ -255,6 +259,49 @@ namespace lcqpOASES {
             /** Maximum number of characters within a string.
              *	Note: this value should be at least 41! */
             constexpr static uint MAX_STRING_LENGTH = 160;
+    };
+
+    class OutputStatistics {
+        public:
+            /** Default constructor. */
+            OutputStatistics( );
+
+            /** Update total iteration counter.
+             *
+             * @return Success or specifies the invalid argument.
+            */
+            returnValue updateIterTotal( int delta_iter );
+
+            /** Update total outer iteration counter.
+             *
+             * @return Success or specifies the invalid argument.
+            */
+            returnValue updateIterOuter( int delta_iter );
+
+            /** Update total number of working set changes counter.
+             *
+             * @return Success or specifies the invalid argument.
+            */
+            returnValue updateSubproblemIter( int delta_iter );
+
+            /** Update rho at solution.
+             *
+             * @return Success or specifies the invalid argument.
+            */
+            returnValue updateRhoOpt( double _rho );
+
+            /** Update the solution status.
+             *
+             * @return Success or specifies the invalid argument.
+            */
+            returnValue updateSolutionStatus( algorithmStatus _status );
+
+        private:
+            int iter_total = 0;
+            int iter_outer = 0;
+            int subproblem_iter = 0;
+            double rho_opt = 0.0;
+            algorithmStatus status = PROBLEM_NOT_SOLVED;
     };
 
     class MessageHandler {

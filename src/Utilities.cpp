@@ -510,6 +510,52 @@ namespace lcqpOASES {
     }
 
 
+    OutputStatistics::OutputStatistics( ) { }
+
+
+    returnValue OutputStatistics::updateIterTotal( int delta_iter )
+    {
+        if (delta_iter < 0) return INVALID_TOTAL_ITER_COUNT;
+
+        iter_total += delta_iter;
+        return SUCCESSFUL_RETURN;
+    }
+
+
+    returnValue OutputStatistics::updateIterOuter( int delta_iter )
+    {
+        if (delta_iter < 0) return INVALID_TOTAL_OUTER_ITER;
+
+        iter_outer += delta_iter;
+        return SUCCESSFUL_RETURN;
+    }
+
+
+    returnValue OutputStatistics::updateSubproblemIter( int delta_iter )
+    {
+        if (delta_iter < 0) return IVALID_SUBPROBLEM_ITER;
+
+        subproblem_iter += delta_iter;
+        return SUCCESSFUL_RETURN;
+    }
+
+
+    returnValue OutputStatistics::updateRhoOpt( double _rho )
+    {
+        if (_rho <= 0) return INVALID_RHO_OPT;
+
+        rho_opt = _rho;
+        return SUCCESSFUL_RETURN;
+    }
+
+
+    returnValue OutputStatistics::updateSolutionStatus( algorithmStatus _status )
+    {
+        status = _status;
+        return SUCCESSFUL_RETURN;
+    }
+
+
     returnValue MessageHandler::PrintMessage( returnValue ret) {
 
         switch (ret) {
@@ -598,6 +644,22 @@ namespace lcqpOASES {
 
             case INVALID_OSQP_BOX_CONSTRAINTS:
                 printf("ERROR: Invalid constraints passed to OSQP solver: This solver does not handle box constraints, please pass them through linear constraints.\n");
+                break;
+
+            case INVALID_TOTAL_ITER_COUNT:
+                printf("ERROR: Invalid total number of iterations delta passed to output statistics (must be non-negative integer).\n");
+                break;
+
+            case INVALID_TOTAL_OUTER_ITER:
+                printf("ERROR: Invalid total number of outer iterations delta passed to output statistics (must be non-negative integer).\n");
+                break;
+
+            case IVALID_SUBPROBLEM_ITER:
+                printf("ERROR: Invalid total number of subproblem solver iterates delta passed to output statistics (must be non-negative integer).\n");
+                break;
+
+            case INVALID_RHO_OPT:
+                printf("ERROR: Invalid rho value at solution passed to output statistics (must be positive double).\n");
                 break;
         }
 

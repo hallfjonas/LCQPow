@@ -242,6 +242,12 @@ namespace lcqpOASES {
 			virtual algorithmStatus getDualSolution( double* const yOpt ) const;
 
 
+			/** Get the number of dual variables. This depends on the utilized subproblem solver.
+			 *
+			 * @return Returns the number of dual variables.
+			 */
+			virtual int getNumerOfDuals( ) const;
+
 			/** Pass options for the LCQP.
 			 *
 			 * @param _options Options to be used.
@@ -471,6 +477,9 @@ namespace lcqpOASES {
 			/** Update xk and gk. */
 			void updateStep( );
 
+			/** Update outer iteration counter. */
+			void updateOuterIter( );
+
 			/** Gradient perturbation method. */
 			void perturbGradient( );
 
@@ -539,6 +548,7 @@ namespace lcqpOASES {
 
 			Subsolver subsolver;					/**< Subsolver class for solving the QP subproblems. */
 
+			OutputStatistics stats;					/**< Output statistics. */
 	};
 }
 

@@ -366,6 +366,10 @@ namespace lcqpOASES {
 					// Determine C-,M-,S-Stationarity
 					determineStationarityType();
 
+					// Update output statistics
+					stats.updateRhoOpt( rho );
+					stats.updateSolutionStatus( algoStat );
+
 					// Print solution type
 					if (options.printLvl > printLevel::NONE)
 						MessageHandler::PrintSolution( algoStat );
@@ -375,7 +379,7 @@ namespace lcqpOASES {
 					updatePenalty();
 
 					// Update iterate counters
-					outerIter++;
+					updateOuterIter();
 					innerIter = -1;
 				}
 			}
@@ -615,6 +619,10 @@ namespace lcqpOASES {
 		// First solve convex subproblem
 		returnValue ret = subsolver.solve( initialSolve, qpIterk, gk, lbA, ubA, xk, yk, lb, ub );
 
+		// Update stats
+		stats.updateSubproblemIter(qpIterk);
+		stats.updateIterTotal(1);
+
 		// If no initial guess was passed, then need to allocate memory
 		if (xk == 0) {
 			xk = new double[nV];
@@ -681,7 +689,7 @@ namespace lcqpOASES {
 			updatePenalty( );
 
 			// Update iterate counters
-			outerIter++;
+			updateOuterIter();
 			innerIter = 0;
 		} else {
 			// xk = xk + alphak*pk
@@ -714,6 +722,12 @@ namespace lcqpOASES {
 
 			Utilities::WeightedVectorAdd(1, statk, -1, box_statk, statk, nV);
 		}
+	}
+
+
+	void LCQProblem::updateOuterIter( ) {
+		outerIter++;
+		stats.updateIterOuter(1);
 	}
 
 
@@ -849,6 +863,12 @@ namespace lcqpOASES {
 		}
 
 		return algoStat;
+	}
+
+
+	int LCQProblem::getNumerOfDuals( ) const
+	{
+		return nDuals;
 	}
 
 
