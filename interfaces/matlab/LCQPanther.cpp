@@ -117,7 +117,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             free(errorMsg);
             return;
         } else {
-            nC = mxGetM(prhs[2]);
+            nC = mxGetM(prhs[4]);
         }
     }
 
@@ -204,13 +204,6 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         mexErrMsgTxt("Passing the parameter field is not yet supported.\n");
         return;
     }
-
-    Utilities::printMatrix(H, nV, nV, "H");
-    Utilities::printMatrix(g, 1, nV, "H");
-    Utilities::printMatrix(S1, nComp, nV, "H");
-    Utilities::printMatrix(S2, nComp, nV, "H");
-
-    // double* xOpt;
 
     // Load data into LCQP object
     lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub);
