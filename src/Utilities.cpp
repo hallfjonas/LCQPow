@@ -134,7 +134,7 @@ namespace lcqpOASES {
 
 
     void Options::setMaxIterations( int val ) {
-        if (val <= Utilities::ZERO)
+        if (val <= 0)
             throw INVALID_MAX_ITERATIONS_VALUE;
 
         maxIterations = val;
