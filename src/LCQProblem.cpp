@@ -327,7 +327,7 @@ namespace lcqpOASES {
 		initializeSolver();
 
 		// Initialization strategy
-		if (options.solveZeroPenaltyFirst) {
+		if (options.getSolveZeroPenaltyFirst()) {
 			memcpy(gk, g, (size_t)nV*sizeof(double));
 
 			if (solveQPSubproblem( true ) != SUCCESSFUL_RETURN) {
@@ -335,6 +335,9 @@ namespace lcqpOASES {
 			}
 
 			Utilities::AffineLinearTransformation(rho, C, xk, g, gk, nV, nV);
+
+			// Print iteration
+			printIteration( );
 
 			if (solveQPSubproblem( false ) != SUCCESSFUL_RETURN) {
 				return SUBPROBLEM_SOLVER_ERROR;
@@ -371,7 +374,7 @@ namespace lcqpOASES {
 					stats.updateSolutionStatus( algoStat );
 
 					// Print solution type
-					if (options.printLvl > printLevel::NONE)
+					if (options.getPrintLevel() > printLevel::NONE)
 						MessageHandler::PrintSolution( algoStat );
 
 					return SUCCESSFUL_RETURN;
@@ -392,11 +395,12 @@ namespace lcqpOASES {
 			// Step length computation
 			getOptimalStepLength( );
 
-			if ( outerIter > options.maxOuterIterations )
-				return MAX_OUTER_ITERATIONS_REACHED;
+			// Update the total iteration counter
+			updateTotalIter();
 
-			if ( innerIter > options.maxInnerIterations )
-				return MAX_INNER_ITERATIONS_REACHED;
+			// (Failed) termination condition
+			if ( totalIter > options.getMaxIterations() )
+				return MAX_ITERATIONS_REACHED;
 
 			// Update inner iterate counter
 			innerIter++;
@@ -604,13 +608,17 @@ namespace lcqpOASES {
 	{
 		// Initialize variables and counters
 		alphak = 1;
-		rho = options.initialComplementarityPenalty;
+		rho = options.getInitialComplementarityPenalty( );
 		outerIter = 0;
 		innerIter = 0;
+		totalIter = 0;
 		algoStat = algorithmStatus::PROBLEM_NOT_SOLVED;
 
 		// Initialize subproblem solver
-		subsolver.setPrintLevel( options.printLvl );
+		subsolver.setPrintLevel( options.getPrintLevel() );
+
+		// Reset output statistics
+		stats.reset();
 	}
 
 
@@ -621,7 +629,6 @@ namespace lcqpOASES {
 
 		// Update stats
 		stats.updateSubproblemIter(qpIterk);
-		stats.updateIterTotal(1);
 
 		// If no initial guess was passed, then need to allocate memory
 		if (xk == 0) {
@@ -651,17 +658,17 @@ namespace lcqpOASES {
 
 
 	bool LCQProblem::stationarityCheck( ) {
-		return Utilities::MaxAbs(statk, nV) < options.stationarityTolerance;
+		return Utilities::MaxAbs(statk, nV) < options.getStationarityTolerance();
 	}
 
 
 	bool LCQProblem::complementarityCheck( ) {
-		return Utilities::QuadraticFormProduct(C, xk, nV) < 2*options.complementarityTolerance;
+		return Utilities::QuadraticFormProduct(C, xk, nV) < 2*options.getComplementarityTolerance();
 	}
 
 
 	void LCQProblem::updatePenalty( ) {
-		rho *= options.complementarityPenaltyUpdate;
+		rho *= options.getComplementarityPenaltyUpdate();
 	}
 
 
@@ -731,6 +738,12 @@ namespace lcqpOASES {
 	}
 
 
+	void LCQProblem::updateTotalIter( ) {
+		totalIter++;
+		stats.updateIterTotal(1);
+	}
+
+
 	void LCQProblem::perturbGradient( ) {
 
 		int randNum;
@@ -792,10 +805,10 @@ namespace lcqpOASES {
 				s_stationary = false;
 
 			// Check failure of m-/c-stationarity
-			if (std::abs(dualProd) >= options.complementarityTolerance && dualMin <= 0) {
+			if (std::abs(dualProd) >= options.getComplementarityTolerance() && dualMin <= 0) {
 
 				// Check failure of c-stationarity
-				if (dualProd <= options.complementarityTolerance) {
+				if (dualProd <= options.getComplementarityTolerance()) {
 					algoStat = algorithmStatus::W_STATIONARY_SOLUTION;
 					return;
 				}
@@ -831,8 +844,8 @@ namespace lcqpOASES {
 		std::vector<int> indices;
 
 		for (int i = 0; i < nComp; i++) {
-			if (S1x[i] <= options.complementarityTolerance)
-				if (S2x[i] <= options.complementarityTolerance)
+			if (S1x[i] <= options.getComplementarityTolerance())
+				if (S2x[i] <= options.getComplementarityTolerance())
 					indices.push_back(i);
 		}
 
@@ -883,12 +896,12 @@ namespace lcqpOASES {
 	 */
 	void LCQProblem::printIteration( )
 	{
-		if (options.printLvl == printLevel::NONE)
+		if (options.getPrintLevel() == printLevel::NONE)
 			return;
 
 		// Print header every 10 iters
-		bool headerInner = (options.printLvl >= printLevel::INNER_LOOP_ITERATES && innerIter % 10 == 0);
-		bool headerOuter = (options.printLvl == printLevel::OUTER_LOOP_ITERATES && outerIter % 10 == 0);
+		bool headerInner = (options.getPrintLevel() >= printLevel::INNER_LOOP_ITERATES && innerIter % 10 == 0);
+		bool headerOuter = (options.getPrintLevel() == printLevel::OUTER_LOOP_ITERATES && outerIter % 10 == 0);
 
 		if (headerInner || headerOuter)
 			printHeader();
@@ -899,7 +912,7 @@ namespace lcqpOASES {
 		printf("%6d", outerIter);
 
 		// Print innter iterate
-		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES)
+		if (options.getPrintLevel() >= printLevel::INNER_LOOP_ITERATES)
 			printf("%s%*d", sep, 6, innerIter);
 
 		// Print stationarity violation
@@ -917,7 +930,7 @@ namespace lcqpOASES {
 		tmpdbl = Utilities::MaxAbs(pk, nV);
 		printf("%s%10.3g", sep, tmpdbl);
 
-		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES) {
+		if (options.getPrintLevel() >= printLevel::INNER_LOOP_ITERATES) {
 			// Print optimal step length
 			printf("%s%10.3g", sep, alphak);
 
@@ -946,7 +959,7 @@ namespace lcqpOASES {
 
 		printf("%s",outer);
 
-		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES)
+		if (options.getPrintLevel() >= printLevel::INNER_LOOP_ITERATES)
 			printf("%s%s", sep, inner);
 
 		printf("%s%s", sep, stat);
@@ -954,7 +967,7 @@ namespace lcqpOASES {
 		printf("%s%s", sep, pen);
 		printf("%s%s", sep, np);
 
-		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES) {
+		if (options.getPrintLevel() >= printLevel::INNER_LOOP_ITERATES) {
 			printf("%s%s%s%s", sep, sl, sep, subIt);
 		}
 
@@ -972,10 +985,16 @@ namespace lcqpOASES {
 		const char* dSep = "----------";
 		const char* node = "-+-";
 
+		if (innerIter == 0 && outerIter == 0) {
+			// Print new line at very beginning as there is no guarantee
+			// that whatever was printed before ended with newline.
+			printf("\n");
+		}
+
 		printf("%s", iSep);
 
 		// Print innter iterate
-		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES)
+		if (options.getPrintLevel() >= printLevel::INNER_LOOP_ITERATES)
 			printf("%s%s", node, iSep);
 
 		printf("%s%s", node, dSep);
@@ -983,7 +1002,7 @@ namespace lcqpOASES {
 		printf("%s%s", node, dSep);
 		printf("%s%s", node, dSep);
 
-		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES) {
+		if (options.getPrintLevel() >= printLevel::INNER_LOOP_ITERATES) {
 			printf("%s%s%s%s", node, dSep, node, iSep);
 		}
 

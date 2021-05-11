@@ -488,6 +488,9 @@ namespace lcqpOASES {
 			/** Update outer iteration counter. */
 			void updateOuterIter( );
 
+			/** Update outer iteration counter. */
+			void updateTotalIter( );
+
 			/** Gradient perturbation method. */
 			void perturbGradient( );
 
@@ -541,8 +544,9 @@ namespace lcqpOASES {
 			double* constr_statk = NULL;			/**< Constraint contribution to stationarity equation. */
 			double* box_statk = NULL;				/**< Box Constraint contribution to stationarity equation. */
 
-			int outerIter;							/**< Outer iterate. */
-			int innerIter;							/**< Inner iterate- */
+			int outerIter;							/**< Outer iterate counter. */
+			int innerIter;							/**< Inner iterate counter. */
+			int totalIter;							/**< Total iterate counter. */
 
 			int qpIterk;							/**< Iterations taken by qpSolver to solve subproblem. */
 

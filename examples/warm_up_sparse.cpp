@@ -53,7 +53,7 @@ int main() {
     LCQProblem lcqp( nV, nC, nComp );
 
 	Options options;
-    options.printLvl = printLevel::INNER_LOOP_ITERATES;
+    options.setPrintLevel(printLevel::INNER_LOOP_ITERATES);
 	lcqp.setOptions( options );
 
     // Solve first LCQP

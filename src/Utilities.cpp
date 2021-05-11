@@ -61,32 +61,102 @@ namespace lcqpOASES {
         initialComplementarityPenalty = rhs.initialComplementarityPenalty;
         complementarityPenaltyUpdate = rhs.complementarityPenaltyUpdate;
         solveZeroPenaltyFirst = rhs.solveZeroPenaltyFirst;
-
-        maxOuterIterations = rhs.maxOuterIterations;
-        maxInnerIterations = rhs.maxInnerIterations;
-
+        maxIterations = rhs.maxIterations;
         printLvl = rhs.printLvl;
     }
 
 
-    returnValue Options::ensureConsistency( ) {
+    double Options::getStationarityTolerance( ) {
+        return stationarityTolerance;
+    }
 
-        if (complementarityPenaltyUpdate <= 1)
-            throw INVALID_PENALTY_UPDATE_VALUE;
 
-        if (complementarityTolerance < Utilities::EPS)
+    void Options::setStationarityTolerance( double val ) {
+        if (val <= Utilities::EPS)
+            throw INVALID_STATIONARITY_TOLERANCE;
+
+        stationarityTolerance = val;
+    }
+
+
+    double Options::getComplementarityTolerance( ) {
+        return complementarityTolerance;
+    }
+
+
+    void Options::setComplementarityTolerance( double val ) {
+        if (val <= Utilities::EPS)
             throw INVALID_COMPLEMENTARITY_TOLERANCE;
 
-        if (initialComplementarityPenalty <= 0)
+        complementarityTolerance = val;
+    }
+
+
+    double Options::getInitialComplementarityPenalty( ) {
+        return initialComplementarityPenalty;
+    }
+
+
+    void Options::setInitialComplementarityPenalty( double val ) {
+        if (val <= Utilities::ZERO)
             throw INVALID_INITIAL_PENALTY_VALUE;
 
-        if (maxOuterIterations <= 0)
-            throw INVALID_MAX_OUTER_ITERATIONS_VALUE;
+        initialComplementarityPenalty = val;
+    }
 
-        if (maxInnerIterations <= 0)
-            throw INVALID_MAX_INNER_ITERATIONS_VALUE;
 
-        return SUCCESSFUL_RETURN;
+    double Options::getComplementarityPenaltyUpdate( ) {
+        return complementarityPenaltyUpdate;
+    }
+
+
+    void Options::setComplementarityPenaltyUpdate( double val ) {
+        if (val <= 1)
+            throw INVALID_PENALTY_UPDATE_VALUE;
+
+        complementarityPenaltyUpdate = val;
+    }
+
+
+    bool Options::getSolveZeroPenaltyFirst( ) {
+        return solveZeroPenaltyFirst;
+    }
+
+
+    void Options::setSolveZeroPenaltyFirst( bool val ) {
+        solveZeroPenaltyFirst = val;
+    }
+
+
+    int Options::getMaxIterations( ) {
+        return maxIterations;
+    }
+
+
+    void Options::setMaxIterations( int val ) {
+        if (val <= Utilities::ZERO)
+            throw INVALID_MAX_ITERATIONS_VALUE;
+
+        maxIterations = val;
+    }
+
+
+    printLevel Options::getPrintLevel( ) {
+        return printLvl;
+    }
+
+
+    void Options::setPrintLevel( printLevel val ) {
+        printLvl = val;
+    }
+
+
+    void Options::setPrintLevel( int val ) {
+
+        if (val < printLevel::NONE || val > printLevel::SUBPROBLEM_SOLVER_ITERATES)
+            throw INVALID_PRINT_LEVEL_VALUE;
+
+        printLvl = (printLevel)val;
     }
 
 
@@ -98,8 +168,7 @@ namespace lcqpOASES {
 
         solveZeroPenaltyFirst = true;
 
-        maxOuterIterations = 100;
-        maxInnerIterations = 1000;
+        maxIterations = 1000;
 
         printLvl = printLevel::INNER_LOOP_ITERATES;
     }
@@ -519,6 +588,16 @@ namespace lcqpOASES {
     }
 
 
+    void OutputStatistics::reset( )
+    {
+        iter_total = 0;
+        iter_outer = 0;
+        subproblem_iter = 0;
+        rho_opt = 0.0;
+        status = PROBLEM_NOT_SOLVED;
+    }
+
+
     returnValue OutputStatistics::updateIterTotal( int delta_iter )
     {
         if (delta_iter < 0) return INVALID_TOTAL_ITER_COUNT;
@@ -618,12 +697,8 @@ namespace lcqpOASES {
                 printf("ERROR: Unable to read file.\n");
                 break;
 
-            case MAX_OUTER_ITERATIONS_REACHED:
-                printf("ERROR: Maximum number of outer iterations reached.\n");
-                break;
-
-            case MAX_INNER_ITERATIONS_REACHED:
-                printf("ERROR: Maximum number of inner iterations reached.\n");
+            case MAX_ITERATIONS_REACHED:
+                printf("ERROR: Maximum number of iterations reached.\n");
                 break;
 
             case INITIAL_SUBPROBLEM_FAILED:
@@ -658,12 +733,12 @@ namespace lcqpOASES {
                 printf("ERROR: Invalid argument passed (penalty update value).\n");
                 break;
 
-            case INVALID_MAX_OUTER_ITERATIONS_VALUE:
-                printf("ERROR: Invalid argument passed (maximum outer iterations).\n");
+            case INVALID_MAX_ITERATIONS_VALUE:
+                printf("ERROR: Invalid argument passed (maximum iterations).\n");
                 break;
 
-            case INVALID_MAX_INNER_ITERATIONS_VALUE:
-                printf("ERROR: Invalid argument passed (maximum inner iterations).\n");
+            case INVALID_STATIONARITY_TOLERANCE:
+                printf("ERROR: Invalid argument passed (stationarity tolerance).\n");
                 break;
 
             case INVALID_RELAX_OPTIONS_TOLERANCE:
@@ -696,6 +771,10 @@ namespace lcqpOASES {
 
             case INVALID_RHO_OPT:
                 printf("ERROR: Invalid rho value at solution passed to output statistics (must be positive double).\n");
+                break;
+
+            case INVALID_PRINT_LEVEL_VALUE:
+                printf("ERROR: Invalid integer to be parsed to print level passed (must be in range of enum).\n");
                 break;
         }
 

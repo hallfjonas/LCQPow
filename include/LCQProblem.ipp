@@ -175,7 +175,6 @@ namespace lcqpOASES {
 	inline void LCQProblem::setOptions( const Options& _options )
 	{
 		options = _options;
-		options.ensureConsistency( );
 	}
 }
 

@@ -302,18 +302,17 @@ TEST(UtilitiesTest, ReadFromFileAndMultiply) {
 // Testing Options constructors, default settings, consistency
 TEST(UtilitiesTest, Options) {
     lcqpOASES::Options opts;
-    ASSERT_EQ(opts.ensureConsistency(), lcqpOASES::SUCCESSFUL_RETURN);
 
     // Check changed values
-    opts.initialComplementarityPenalty = 100;
-    opts.complementarityPenaltyUpdate = 100;
-    ASSERT_EQ(opts.initialComplementarityPenalty, 100);
-    ASSERT_EQ(opts.complementarityPenaltyUpdate, 100);
+    opts.setInitialComplementarityPenalty( 100 );
+    opts.setComplementarityPenaltyUpdate( 100 );
+    ASSERT_EQ(opts.getInitialComplementarityPenalty(), 100);
+    ASSERT_EQ(opts.getComplementarityPenaltyUpdate(), 100);
 
     // Check copy constructor
     lcqpOASES::Options opts2(opts);
-    ASSERT_EQ(opts2.initialComplementarityPenalty, 100);
-    ASSERT_EQ(opts2.complementarityPenaltyUpdate, 100);
+    ASSERT_EQ(opts2.getInitialComplementarityPenalty(), 100);
+    ASSERT_EQ(opts2.getComplementarityPenaltyUpdate(), 100);
 }
 
 
@@ -443,7 +442,7 @@ TEST(SolverTest, RunWarmUp) {
     lcqpOASES::LCQProblem lcqp( nV, nC, nComp );
 
 	lcqpOASES::Options options;
-    options.printLvl = lcqpOASES::printLevel::NONE;
+    options.setPrintLevel(lcqpOASES::printLevel::NONE);
     lcqp.setOptions( options );
 
     int numExp = 100;
@@ -452,8 +451,10 @@ TEST(SolverTest, RunWarmUp) {
 
     for (int i = 0; i < numExp; i++) {
 
-        lcqpOASES::returnValue retVal = lcqp.solve( H, g, lb, ub, S1, S2, (double*)0, (double*)0, x0);
+        lcqpOASES::returnValue retVal = lcqp.loadLCQP( H, g, lb, ub, S1, S2, (double*)0, (double*)0, x0);
+        ASSERT_EQ(retVal, lcqpOASES::SUCCESSFUL_RETURN);
 
+        retVal = lcqp.runSolver( );
         ASSERT_EQ(retVal, lcqpOASES::SUCCESSFUL_RETURN);
 
         // Get solutions
@@ -463,13 +464,13 @@ TEST(SolverTest, RunWarmUp) {
         lcqp.getPrimalSolution( xOpt );
         lcqp.getDualSolution( yOpt );
 
-        bool sStat1Found = (std::abs(xOpt[0] - 1) <= options.stationarityTolerance) && (std::abs(xOpt[1]) <= options.stationarityTolerance);
-        bool sStat2Found = (std::abs(xOpt[1] - 1) <= options.stationarityTolerance) && (std::abs(xOpt[0]) <= options.stationarityTolerance);
+        bool sStat1Found = (std::abs(xOpt[0] - 1) <= options.getStationarityTolerance()) && (std::abs(xOpt[1]) <= options.getStationarityTolerance());
+        bool sStat2Found = (std::abs(xOpt[1] - 1) <= options.getStationarityTolerance()) && (std::abs(xOpt[0]) <= options.getStationarityTolerance());
 
         ASSERT_TRUE( sStat1Found || sStat2Found );
 
-        bool stat1 = std::abs(2*xOpt[0] - 2 - yOpt[0] - yOpt[2]) <= options.stationarityTolerance;
-        bool stat2 = std::abs(2*xOpt[1] - 2 - yOpt[1] - yOpt[3]) <= options.stationarityTolerance;
+        bool stat1 = std::abs(2*xOpt[0] - 2 - yOpt[0] - yOpt[2]) <= options.getStationarityTolerance();
+        bool stat2 = std::abs(2*xOpt[1] - 2 - yOpt[1] - yOpt[3]) <= options.getStationarityTolerance();
 
         // Printing for debugging
         // printf("Init = (%g, %g)          %d/%d\n", x0[0], x0[1], i, numExp);

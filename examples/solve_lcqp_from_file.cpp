@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
     lcqpOASES::LCQProblem lcqp( nV, nC, nComp );
 
     lcqpOASES::Options opts;
-    opts.printLvl = lcqpOASES::printLevel::NONE;
+    opts.setPrintLevel( lcqpOASES::printLevel::NONE );
 
     lcqp.setOptions( opts );
 

@@ -33,12 +33,12 @@ namespace lcqpOASES {
         SUCCESSFUL_RETURN = 0,						    /**< Successful return. */
 
         // Invalid arguments
-        INVALID_ARGUMENT = 100,                         /**< Invalid argument. */
-        INVALID_PENALTY_UPDATE_VALUE = 101,             /**< Invalid penalty update value. Needs to be > 1. */
+        INVALID_ARGUMENT = 100,                         /**< Generic invalid argument. */
+        INVALID_PENALTY_UPDATE_VALUE = 101,             /**< Invalid penalty update value. Must be > 1. */
         INVALID_COMPLEMENTARITY_TOLERANCE = 102,        /**< Invalid complementarity tolerance. Must be no smaller than machine precision. */
         INVALID_INITIAL_PENALTY_VALUE = 103,            /**< Invalid initial penalty parameter. Must be positive. */
-        INVALID_MAX_OUTER_ITERATIONS_VALUE = 104,       /**< Invalid number of maximal outer iterations. Must be a positive integer. */
-        INVALID_MAX_INNER_ITERATIONS_VALUE = 105,       /**< Invalid number of maximal inner iterations. Must be a positive integer. */
+        INVALID_MAX_ITERATIONS_VALUE = 104,             /**< Invalid number of maximal outer iterations. Must be a positive integer. */
+        INVALID_STATIONARITY_TOLERANCE = 105,           /**< Invalid stationarity tolerance. Must be no smaller than machine precision. */
         INVALID_NUMBER_OF_OPTIM_VARS = 106,             /**< Invalid number of optimization variables. Must be a positive integer. */
         INVALID_NUMBER_OF_COMP_VARS = 107,              /**< Invalid number of complementarity constraints. Must be a positive integer. */
         INVALID_NUMBER_OF_CONSTRAINT_VARS = 108,        /**< Invalid number of linear constraints. Must be a non-negative integer. */
@@ -48,10 +48,10 @@ namespace lcqpOASES {
         INVALID_TOTAL_OUTER_ITER = 112,                 /**< Invalid total number of outer iterations delta passed to output statistics (must be non-negative integer). */
         IVALID_SUBPROBLEM_ITER = 113,                   /**< Invalid total number of subproblem solver iterates delta passed to output statistics (must be non-negative integer). */
         INVALID_RHO_OPT = 114,                          /**< Invalid rho value at solution passed to output statistics. (must be positive double). */
+        INVALID_PRINT_LEVEL_VALUE = 115,                /**< Invalid integer to be parsed to print level passed (must be in range of enum). */
 
         // Algorithmic errors
-        MAX_OUTER_ITERATIONS_REACHED = 200,             /**< Maximum number of outer iterations reached. */
-        MAX_INNER_ITERATIONS_REACHED = 201,             /**< Maximum number of inner iterations reached. */
+        MAX_ITERATIONS_REACHED = 200,                   /**< Maximum number of iterations reached. */
         INITIAL_SUBPROBLEM_FAILED = 202,                /**< Failed to solve the initial QP. */
         SUBPROBLEM_SOLVER_ERROR = 203,                  /**< An error occured in the subproblem solver. */
 
@@ -110,9 +110,53 @@ namespace lcqpOASES {
             /** Sets all options to default values. */
             void setToDefault( );
 
+            /** Get stationarity tolerance. */
+            double getStationarityTolerance( );
 
-            /** Ensures the consistency of given options. */
-            returnValue ensureConsistency( );
+            /** Set stationarity tolerance. */
+            void setStationarityTolerance( double val );
+
+            /** Get complementarity tolerance. */
+            double getComplementarityTolerance( );
+
+            /** Set complementarity tolerance. */
+            void setComplementarityTolerance( double val );
+
+            /** Get initial penalty parameter. */
+            double getInitialComplementarityPenalty( );
+
+            /** Set complementarity tolerance. */
+            void setInitialComplementarityPenalty( double val );
+
+            /** Get penalty parameter update factor. */
+            double getComplementarityPenaltyUpdate( );
+
+            /** Set penalty parameter update factor. */
+            void setComplementarityPenaltyUpdate( double val );
+
+            /** Get whether to solve for (complement.) unconstrained global minumum first. */
+            bool getSolveZeroPenaltyFirst( );
+
+            /** Set whether to solve for (complement.) unconstrained global minumum first. */
+            void setSolveZeroPenaltyFirst( bool val );
+
+            /** Get maximum number of iterations. */
+            int getMaxIterations( );
+
+            /** Set maximum number of iterations. */
+            void setMaxIterations( int val );
+
+            /** Get print level. */
+            printLevel getPrintLevel( );
+
+            /** Set print level. */
+            void setPrintLevel( printLevel val );
+
+            /** Set print level (using an integer). */
+            void setPrintLevel( int val );
+
+        protected:
+            void copy( const Options& rhs );            /**< Copy each property. */
 
             double stationarityTolerance;               /**< Tolerance for 1-Norm of stationarity violation. */
             double complementarityTolerance;		    /**< Complementarity tolerance. */
@@ -121,13 +165,9 @@ namespace lcqpOASES {
 
             bool solveZeroPenaltyFirst;                 /**< Flag indicating whether first QP should ignore penalization. */
 
-            int maxOuterIterations;                     /**< Maximum number of outer iterations to be performed. */
-            int maxInnerIterations;                     /**< Maximum number of inner iterations to be performed. */
+            int maxIterations;                           /**< Maximum number of iterations to be performed. */
 
             printLevel printLvl;                        /**< Print level. */
-
-        protected:
-            void copy( const Options& rhs );        /**< Copy each property. */
     };
 
     class Utilities {
@@ -265,6 +305,8 @@ namespace lcqpOASES {
             OutputStatistics( );
 
             OutputStatistics& operator=( const OutputStatistics& rhs );
+
+            void reset( );
 
             /** Update total iteration counter.
              *
