@@ -336,9 +336,6 @@ namespace lcqpOASES {
 
 			Utilities::AffineLinearTransformation(rho, C, xk, g, gk, nV, nV);
 
-			// Print iteration
-			printIteration( );
-
 			if (solveQPSubproblem( false ) != SUCCESSFUL_RETURN) {
 				return SUBPROBLEM_SOLVER_ERROR;
 			}
