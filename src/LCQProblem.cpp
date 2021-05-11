@@ -616,6 +616,9 @@ namespace lcqpOASES {
 
 		// Reset output statistics
 		stats.reset();
+
+		// Set seed
+		srand( (unsigned int)time( NULL ) );
 	}
 
 
