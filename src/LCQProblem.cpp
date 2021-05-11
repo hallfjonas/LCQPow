@@ -899,6 +899,9 @@ namespace lcqpOASES {
 		if (options.getPrintLevel() == printLevel::NONE)
 			return;
 
+		if (options.getPrintLevel() == printLevel::OUTER_LOOP_ITERATES && innerIter % 10 > 0)
+			return;
+
 		// Print header every 10 iters
 		bool headerInner = (options.getPrintLevel() >= printLevel::INNER_LOOP_ITERATES && innerIter % 10 == 0);
 		bool headerOuter = (options.getPrintLevel() == printLevel::OUTER_LOOP_ITERATES && outerIter % 10 == 0);
