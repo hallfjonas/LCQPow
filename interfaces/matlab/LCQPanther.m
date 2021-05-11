@@ -14,10 +14,10 @@
 % You should have received a copy of the GNU Lesser General Public
 % License along with lcqpOASES; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-% 
+%
 %---------------------------------------------------------------------------------
 %
-%LCQPanther is intended for solving quadratic programs with 
+%LCQPanther is intended for solving quadratic programs with
 %linear complementarity constraints of the form
 %
 %                min   1/2*x'Hx + x'g
@@ -30,11 +30,11 @@
 %I) Call
 %
 %    [x] = LCQPanther( H,g,S1,S2,{params} )
-%or 
+%or
 %    [x] = LCQPanther( H,g,S1,S2,lb,ub,{params} )
-%or 
+%or
 %    [x] = LCQPanther( H,g,S1,S2,A,lbA,ubA,{params} )
-%or 
+%or
 %    [x] = LCQPanther( H,g,S1,S2,A,lbA,ubA,lb,ub,{params}).
 %
 %II) The optional params struct may contain the following fields:
@@ -46,9 +46,7 @@
 %  initialComplementarityPenalty : Start value for complementarity penalty term.
 %   complementarityPenaltyUpdate : Factor for updating penaltised complementarity term.
 %          solveZeroPenaltyFirst : Flag indicating whether first QP should ignore penalization.
-%             maxOuterIterations : Maximum number of outer iterations to be performed.
-%             maxInnerIterations : Maximum number of inner iterations to be performed.
-%          relaxOptionsTolerance : Number of active set changes until making subsolver options more percise.
+%                  maxIterations : Maximum number of iterations to be performed.
 %                     printLevel : The amount of output to be printed.
 %
 %
