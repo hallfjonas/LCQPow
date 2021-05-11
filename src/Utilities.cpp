@@ -86,9 +86,6 @@ namespace lcqpOASES {
         if (maxInnerIterations <= 0)
             throw INVALID_MAX_INNER_ITERATIONS_VALUE;
 
-        if (relaxOptionsTolerance <= 0)
-            throw INVALID_RELAX_OPTIONS_TOLERANCE;
-
         return SUCCESSFUL_RETURN;
     }
 
@@ -104,10 +101,7 @@ namespace lcqpOASES {
         maxOuterIterations = 100;
         maxInnerIterations = 1000;
 
-        relaxOptionsTolerance = 5;
-
         printLvl = printLevel::INNER_LOOP_ITERATES;
-
     }
 
 

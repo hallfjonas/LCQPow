@@ -124,8 +124,6 @@ namespace lcqpOASES {
             int maxOuterIterations;                     /**< Maximum number of outer iterations to be performed. */
             int maxInnerIterations;                     /**< Maximum number of inner iterations to be performed. */
 
-            int relaxOptionsTolerance;                  /**< Number of active set changes until making subsolver options more percise. */
-
             printLevel printLvl;                        /**< Print level. */
 
         protected:
