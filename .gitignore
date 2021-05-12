@@ -27,6 +27,7 @@ examples/example_data/ivocp
 bin
 plots
 doxygen
+.vscode
 
 ### C ###
 # Prerequisites
