@@ -82,6 +82,20 @@ bool checkTypeStruct(const mxArray* arr, const char* name)
     return true;
 }
 
+void colMajorToRowMajor(double* col_maj, int m, int n)
+{
+    double* tmp = new double[m*n];
+
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++)
+            tmp[i*n + j] = col_maj[j*m + i];
+
+    for (int i = 0; i < m*n; i++)
+        col_maj[i] = tmp[i];
+
+    delete tmp;
+}
+
 void printOptions( Options options ) {
     mexPrintf(" \n Using LCQPanther Options: \n");
     mexPrintf("          rho0: %g \n", options.getInitialComplementarityPenalty());
@@ -226,6 +240,17 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             lb = (double*) mxGetPr( prhs[7] );
             ub = (double*) mxGetPr( prhs[8] );
         }
+    }
+
+    // MATLAB stores in column major format (switch to row major)
+    if (S1 != NULL && nComp > 1 && nV > 1) {
+        colMajorToRowMajor(S1, nComp, nV);
+    }
+    if (S2 != NULL && nComp > 1 && nV > 1) {
+        colMajorToRowMajor(S2, nComp, nV);
+    }
+    if (A != NULL && nC > 1 && nV > 1) {
+        colMajorToRowMajor(A, nC, nV);
     }
 
     // Load settings
