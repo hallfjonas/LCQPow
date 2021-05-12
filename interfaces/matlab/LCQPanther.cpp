@@ -98,8 +98,8 @@ void colMajorToRowMajor(double* col_maj, int m, int n)
 
 void printOptions( Options options ) {
     mexPrintf(" \n Using LCQPanther Options: \n");
-    mexPrintf("          rho0: %g \n", options.getInitialComplementarityPenalty());
-    mexPrintf("          beta: %g \n", options.getComplementarityPenaltyUpdate());
+    mexPrintf("          rho0: %g \n", options.getInitialPenaltyParameter());
+    mexPrintf("          beta: %g \n", options.getPenaltyUpdateFactor());
     mexPrintf("     compl tol: %g \n", options.getComplementarityTolerance());
     mexPrintf("     stati tol: %g \n", options.getStationarityTolerance());
     mexPrintf("      max iter: %d \n", options.getMaxIterations());
@@ -266,11 +266,11 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             "x0",
             "stationarityTolerance",
             "complementarityTolerance",
-            "initialComplementarityPenalty",
-            "complementarityPenaltyUpdate",
+            "initialPenaltyParameter",
+            "penaltyUpdateFactor",
             "solveZeroPenaltyFirst",
             "maxIterations",
-            "printLvl"
+            "printLevel"
         };
 
         for (auto name : params_fieldnames) {
@@ -297,19 +297,19 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 continue;
             }
 
-            if ( name == "initialComplementarityPenalty") {
-                if (!checkDimensionAndTypeDouble(field, 1, 1, "params.initialComplementarityPenalty")) return;
+            if ( name == "initialPenaltyParameter") {
+                if (!checkDimensionAndTypeDouble(field, 1, 1, "params.initialPenaltyParameter")) return;
 
                 fld_ptr = (double*) mxGetPr(field);
-                options.setInitialComplementarityPenalty( fld_ptr[0] );
+                options.setInitialPenaltyParameter( fld_ptr[0] );
                 continue;
             }
 
-            if ( name == "complementarityPenaltyUpdate") {
-                if (!checkDimensionAndTypeDouble(field, 1, 1, "params.complementarityPenaltyUpdate")) return;
+            if ( name == "penaltyUpdateFactor") {
+                if (!checkDimensionAndTypeDouble(field, 1, 1, "params.penaltyUpdateFactor")) return;
 
                 fld_ptr = (double*) mxGetPr(field);
-                options.setComplementarityPenaltyUpdate( fld_ptr[0] );
+                options.setPenaltyUpdateFactor( fld_ptr[0] );
                 continue;
             }
 
@@ -329,8 +329,8 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 continue;
             }
 
-            if ( name == "printLvl") {
-                if (!checkDimensionAndTypeDouble(field, 1, 1, "params.printLvl")) return;
+            if ( name == "printLevel") {
+                if (!checkDimensionAndTypeDouble(field, 1, 1, "params.printLevel")) return;
 
                 fld_ptr = (double*) mxGetPr(field);
                 options.setPrintLevel( (int)fld_ptr[0] );
@@ -354,7 +354,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub, x0);
 
     // Run solver
-    lcqpOASES::returnValue ret = lcqp.runSolver();
+    lcqpOASES::ReturnValue ret = lcqp.runSolver();
     if (ret != lcqpOASES::SUCCESSFUL_RETURN) {
         mexPrintf("Failed to solve LCQP (error code: %d).\n", ret);
     } else {

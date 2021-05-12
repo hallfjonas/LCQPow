@@ -43,8 +43,8 @@
 %                             y0 : Initial dual guess.
 %          stationarityTolerance : Tolerance for 1-Norm of stationarity violation.
 %       complementarityTolerance : Complementarity tolerance.
-%  initialComplementarityPenalty : Start value for complementarity penalty term.
-%   complementarityPenaltyUpdate : Factor for updating penaltised complementarity term.
+%        initialPenaltyParameter : Start value for complementarity penalty term.
+%            penaltyUpdateFactor : Factor for updating penaltised complementarity term.
 %          solveZeroPenaltyFirst : Flag indicating whether first QP should ignore penalization.
 %                  maxIterations : Maximum number of iterations to be performed.
 %                     printLevel : The amount of output to be printed.

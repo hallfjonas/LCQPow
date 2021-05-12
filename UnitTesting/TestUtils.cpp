@@ -304,15 +304,15 @@ TEST(UtilitiesTest, Options) {
     lcqpOASES::Options opts;
 
     // Check changed values
-    opts.setInitialComplementarityPenalty( 100 );
-    opts.setComplementarityPenaltyUpdate( 100 );
-    ASSERT_EQ(opts.getInitialComplementarityPenalty(), 100);
-    ASSERT_EQ(opts.getComplementarityPenaltyUpdate(), 100);
+    opts.setInitialPenaltyParameter( 100 );
+    opts.setPenaltyUpdateFactor( 100 );
+    ASSERT_EQ(opts.getInitialPenaltyParameter(), 100);
+    ASSERT_EQ(opts.getPenaltyUpdateFactor(), 100);
 
     // Check copy constructor
     lcqpOASES::Options opts2(opts);
-    ASSERT_EQ(opts2.getInitialComplementarityPenalty(), 100);
-    ASSERT_EQ(opts2.getComplementarityPenaltyUpdate(), 100);
+    ASSERT_EQ(opts2.getInitialPenaltyParameter(), 100);
+    ASSERT_EQ(opts2.getPenaltyUpdateFactor(), 100);
 }
 
 
