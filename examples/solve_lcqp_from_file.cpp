@@ -131,12 +131,12 @@ int main(int argc, char **argv) {
     lcqpOASES::LCQProblem lcqp( nV, nC, nComp );
 
     lcqpOASES::Options opts;
-    opts.setPrintLevel( lcqpOASES::printLevel::NONE );
+    opts.setPrintLevel( lcqpOASES::PrintLevel::NONE );
 
     lcqp.setOptions( opts );
 
     // Run solver
-	lcqpOASES::returnValue ret = lcqp.loadLCQP( &H_file[0], &g_file[0], &lb_file[0], &ub_file[0], &S1_file[0], &S2_file[0], Af, lbAf, ubAf, x0f, y0f );
+	lcqpOASES::ReturnValue ret = lcqp.loadLCQP( &H_file[0], &g_file[0], &lb_file[0], &ub_file[0], &S1_file[0], &S2_file[0], Af, lbAf, ubAf, x0f, y0f );
 
     if (ret != lcqpOASES::SUCCESSFUL_RETURN)
     {

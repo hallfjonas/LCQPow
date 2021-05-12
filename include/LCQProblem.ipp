@@ -25,7 +25,7 @@ namespace lcqpOASES {
 	/*
 	*	s e t H
 	*/
-	inline returnValue LCQProblem::setH( const double* const H_new )
+	inline ReturnValue LCQProblem::setH( const double* const H_new )
 	{
 		if (nV <= 0)
 			return LCQPOBJECT_NOT_SETUP;
@@ -40,7 +40,7 @@ namespace lcqpOASES {
 	/*
 	*	s e t G
 	*/
-	inline returnValue LCQProblem::setG( const double* const g_new )
+	inline ReturnValue LCQProblem::setG( const double* const g_new )
 	{
 		if ( nV == 0 )
 			return LCQPOBJECT_NOT_SETUP;
@@ -58,7 +58,7 @@ namespace lcqpOASES {
 	/*
 	*	s e t L B
 	*/
-	inline returnValue LCQProblem::setLB( const double* const lb_new )
+	inline ReturnValue LCQProblem::setLB( const double* const lb_new )
 	{
 		if ( nV == 0 )
 			return LCQPOBJECT_NOT_SETUP;
@@ -83,7 +83,7 @@ namespace lcqpOASES {
 	/*
 	*	s e t L B
 	*/
-	inline returnValue LCQProblem::setLB( int number, double value )
+	inline ReturnValue LCQProblem::setLB( int number, double value )
 	{
 		if ( nV == 0 )
 			return LCQPOBJECT_NOT_SETUP;
@@ -103,7 +103,7 @@ namespace lcqpOASES {
 	/*
 	*	s e t U B
 	*/
-	inline returnValue LCQProblem::setUB( const double* const ub_new )
+	inline ReturnValue LCQProblem::setUB( const double* const ub_new )
 	{
 		if ( nV == 0 )
 			return LCQPOBJECT_NOT_SETUP;
@@ -128,7 +128,7 @@ namespace lcqpOASES {
 	/*
 	*	s e t U B
 	*/
-	inline returnValue LCQProblem::setUB( int number, double value )
+	inline ReturnValue LCQProblem::setUB( int number, double value )
 	{
 		if ( nV == 0 )
 			return LCQPOBJECT_NOT_SETUP;
@@ -148,7 +148,7 @@ namespace lcqpOASES {
 	/*
 	 *	 s e t I n i t i a l G u e s s
 	 */
-	inline returnValue LCQProblem::setInitialGuess( const double* const _x0, const double* const _y0 )
+	inline ReturnValue LCQProblem::setInitialGuess( const double* const _x0, const double* const _y0 )
 	{
 		if ( nV == 0 || nComp == 0)
 			return LCQPOBJECT_NOT_SETUP;

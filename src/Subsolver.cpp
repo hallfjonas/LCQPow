@@ -82,12 +82,12 @@ namespace lcqpOASES {
     }
 
 
-    void Subsolver::setPrintLevel( printLevel printlvl )
+    void Subsolver::setPrintLevel( PrintLevel printLevel )
     {
         switch (qpSolver) {
             case QPSubproblemSolver::QPOASES:
             {
-                if (printlvl < printLevel::SUBPROBLEM_SOLVER_ITERATES)
+                if (printLevel < PrintLevel::SUBPROBLEM_SOLVER_ITERATES)
                     optionsQPOASES.printLevel =  qpOASES::PrintLevel::PL_NONE;
                 else
                     optionsQPOASES.printLevel =  qpOASES::PrintLevel::PL_MEDIUM;
@@ -98,20 +98,20 @@ namespace lcqpOASES {
 
             case QPSubproblemSolver::OSQP:
             {
-                solverOSQP.setPrintlevl(printlvl >= printLevel::SUBPROBLEM_SOLVER_ITERATES);
+                solverOSQP.setPrintlevl(printLevel >= PrintLevel::SUBPROBLEM_SOLVER_ITERATES);
                 return;
             }
         }
     }
 
 
-    returnValue Subsolver::solve(   bool initialSolve, int& iterations,
+    ReturnValue Subsolver::solve(   bool initialSolve, int& iterations,
                                     const double* g,
                                     const double* lbA, const double* ubA,
                                     const double* x0, const double* y0,
                                     const double* lb, const double* ub)
     {
-        returnValue ret = returnValue::SUCCESSFUL_RETURN;
+        ReturnValue ret = ReturnValue::SUCCESSFUL_RETURN;
         switch (qpSolver) {
             case QPSubproblemSolver::QPOASES:
                 ret = solverQPOASES.solve( initialSolve, iterations, g, lbA, ubA, x0, y0, lb, ub );

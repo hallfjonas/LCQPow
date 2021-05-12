@@ -150,7 +150,7 @@ namespace lcqpOASES {
     }
 
 
-    returnValue SubsolverOSQP::solve(   bool initialSolve, int& iterations,
+    ReturnValue SubsolverOSQP::solve(   bool initialSolve, int& iterations,
                                         const double* const _g,
                                         const double* const _lbA, const double* const _ubA,
                                         const double* const x0, const double* const y0,
@@ -158,7 +158,7 @@ namespace lcqpOASES {
     {
         // Make sure that lb and ub are null pointers, as OSQP does not handle box constraints
         if (_lb != 0 || _ub != 0) {
-            return MessageHandler::PrintMessage( returnValue::INVALID_OSQP_BOX_CONSTRAINTS );
+            return MessageHandler::PrintMessage( ReturnValue::INVALID_OSQP_BOX_CONSTRAINTS );
         }
 
         // Update linear cost and bounds
@@ -174,10 +174,10 @@ namespace lcqpOASES {
 
         // Either pass error
         if (exitflag != 0)
-            return returnValue::SUBPROBLEM_SOLVER_ERROR;
+            return ReturnValue::SUBPROBLEM_SOLVER_ERROR;
 
         // Or pass successful return
-        return returnValue::SUCCESSFUL_RETURN;
+        return ReturnValue::SUCCESSFUL_RETURN;
     }
 
 

@@ -58,11 +58,11 @@ namespace lcqpOASES {
     void Options::copy( const Options& rhs ) {
         stationarityTolerance = rhs.stationarityTolerance;
         complementarityTolerance = rhs.complementarityTolerance;
-        initialComplementarityPenalty = rhs.initialComplementarityPenalty;
-        complementarityPenaltyUpdate = rhs.complementarityPenaltyUpdate;
+        initialPenaltyParameter = rhs.initialPenaltyParameter;
+        penaltyUpdateFactor = rhs.penaltyUpdateFactor;
         solveZeroPenaltyFirst = rhs.solveZeroPenaltyFirst;
         maxIterations = rhs.maxIterations;
-        printLvl = rhs.printLvl;
+        printLevel = rhs.printLevel;
     }
 
 
@@ -92,29 +92,29 @@ namespace lcqpOASES {
     }
 
 
-    double Options::getInitialComplementarityPenalty( ) {
-        return initialComplementarityPenalty;
+    double Options::getInitialPenaltyParameter( ) {
+        return initialPenaltyParameter;
     }
 
 
-    void Options::setInitialComplementarityPenalty( double val ) {
+    void Options::setInitialPenaltyParameter( double val ) {
         if (val <= Utilities::ZERO)
             throw INVALID_INITIAL_PENALTY_VALUE;
 
-        initialComplementarityPenalty = val;
+        initialPenaltyParameter = val;
     }
 
 
-    double Options::getComplementarityPenaltyUpdate( ) {
-        return complementarityPenaltyUpdate;
+    double Options::getPenaltyUpdateFactor( ) {
+        return penaltyUpdateFactor;
     }
 
 
-    void Options::setComplementarityPenaltyUpdate( double val ) {
+    void Options::setPenaltyUpdateFactor( double val ) {
         if (val <= 1)
             throw INVALID_PENALTY_UPDATE_VALUE;
 
-        complementarityPenaltyUpdate = val;
+        penaltyUpdateFactor = val;
     }
 
 
@@ -141,36 +141,36 @@ namespace lcqpOASES {
     }
 
 
-    printLevel Options::getPrintLevel( ) {
-        return printLvl;
+    PrintLevel Options::getPrintLevel( ) {
+        return printLevel;
     }
 
 
-    void Options::setPrintLevel( printLevel val ) {
-        printLvl = val;
+    void Options::setPrintLevel( PrintLevel val ) {
+        printLevel = val;
     }
 
 
     void Options::setPrintLevel( int val ) {
 
-        if (val < printLevel::NONE || val > printLevel::SUBPROBLEM_SOLVER_ITERATES)
+        if (val < PrintLevel::NONE || val > PrintLevel::SUBPROBLEM_SOLVER_ITERATES)
             throw INVALID_PRINT_LEVEL_VALUE;
 
-        printLvl = (printLevel)val;
+        printLevel = (PrintLevel)val;
     }
 
 
     void Options::setToDefault( ) {
         complementarityTolerance = 1.0e3 * Utilities::EPS;
         stationarityTolerance  = 1.0e3 * Utilities::EPS*1000;
-        initialComplementarityPenalty = 0.01;
-    	complementarityPenaltyUpdate  = 2.0;
+        initialPenaltyParameter = 0.01;
+    	penaltyUpdateFactor  = 2.0;
 
         solveZeroPenaltyFirst = true;
 
         maxIterations = 1000;
 
-        printLvl = printLevel::INNER_LOOP_ITERATES;
+        printLevel = PrintLevel::INNER_LOOP_ITERATES;
     }
 
 
@@ -278,7 +278,7 @@ namespace lcqpOASES {
     }
 
 
-    returnValue Utilities::readFromFile( int* data, int n, const char* datafilename )
+    ReturnValue Utilities::readFromFile( int* data, int n, const char* datafilename )
     {
         int i;
         FILE* datafile;
@@ -307,7 +307,7 @@ namespace lcqpOASES {
     }
 
 
-    returnValue Utilities::readFromFile( double* data, int n, const char* datafilename )
+    ReturnValue Utilities::readFromFile( double* data, int n, const char* datafilename )
     {
         int i;
         FILE* datafile;
@@ -336,7 +336,7 @@ namespace lcqpOASES {
     }
 
 
-    returnValue Utilities::writeToFile( double* data, int n, const char* datafilename )
+    ReturnValue Utilities::writeToFile( double* data, int n, const char* datafilename )
     {
         int i;
         FILE* datafile;
@@ -437,25 +437,25 @@ namespace lcqpOASES {
     }
 
 
-    returnValue Utilities::csc_to_dns(const csc* const sparse, double* full, int m, int n)
+    ReturnValue Utilities::csc_to_dns(const csc* const sparse, double* full, int m, int n)
     {
         for (int j = 0; j < n; j++) {
 			for (int i = sparse->p[j]; i < sparse->p[j+1]; i++) {
                 // Reached final element
                 if (i == sparse->nzmax) {
-                    return returnValue::SUCCESSFUL_RETURN;
+                    return ReturnValue::SUCCESSFUL_RETURN;
                 }
 
                 // Ensure validity of index
                 if (sparse->i[i]*n + j >= m*n || sparse->i[i]*n + j < 0) {
-                    return MessageHandler::PrintMessage( returnValue::INDEX_OUT_OF_BOUNDS );
+                    return MessageHandler::PrintMessage( ReturnValue::INDEX_OUT_OF_BOUNDS );
                 }
 
 				full[sparse->i[i]*n + j] = sparse->x[i];
 			}
 		}
 
-        return returnValue::SUCCESSFUL_RETURN;
+        return ReturnValue::SUCCESSFUL_RETURN;
     }
 
 
@@ -598,7 +598,7 @@ namespace lcqpOASES {
     }
 
 
-    returnValue OutputStatistics::updateIterTotal( int delta_iter )
+    ReturnValue OutputStatistics::updateIterTotal( int delta_iter )
     {
         if (delta_iter < 0) return INVALID_TOTAL_ITER_COUNT;
 
@@ -607,7 +607,7 @@ namespace lcqpOASES {
     }
 
 
-    returnValue OutputStatistics::updateIterOuter( int delta_iter )
+    ReturnValue OutputStatistics::updateIterOuter( int delta_iter )
     {
         if (delta_iter < 0) return INVALID_TOTAL_OUTER_ITER;
 
@@ -616,7 +616,7 @@ namespace lcqpOASES {
     }
 
 
-    returnValue OutputStatistics::updateSubproblemIter( int delta_iter )
+    ReturnValue OutputStatistics::updateSubproblemIter( int delta_iter )
     {
         if (delta_iter < 0) return IVALID_SUBPROBLEM_ITER;
 
@@ -625,7 +625,7 @@ namespace lcqpOASES {
     }
 
 
-    returnValue OutputStatistics::updateRhoOpt( double _rho )
+    ReturnValue OutputStatistics::updateRhoOpt( double _rho )
     {
         if (_rho <= 0) return INVALID_RHO_OPT;
 
@@ -634,7 +634,7 @@ namespace lcqpOASES {
     }
 
 
-    returnValue OutputStatistics::updateSolutionStatus( algorithmStatus _status )
+    ReturnValue OutputStatistics::updateSolutionStatus( AlgorithmStatus _status )
     {
         status = _status;
         return SUCCESSFUL_RETURN;
@@ -665,13 +665,13 @@ namespace lcqpOASES {
     }
 
 
-    algorithmStatus OutputStatistics::getSolutionStatus( ) const
+    AlgorithmStatus OutputStatistics::getSolutionStatus( ) const
     {
         return status;
     }
 
 
-    returnValue MessageHandler::PrintMessage( returnValue ret) {
+    ReturnValue MessageHandler::PrintMessage( ReturnValue ret) {
 
         switch (ret) {
             case SUCCESSFUL_RETURN:
@@ -784,7 +784,7 @@ namespace lcqpOASES {
     }
 
 
-    algorithmStatus MessageHandler::PrintSolution( algorithmStatus algoStat ) {
+    AlgorithmStatus MessageHandler::PrintSolution( AlgorithmStatus algoStat ) {
 
         if ( algoStat != PROBLEM_NOT_SOLVED)
             printf("\n\n#################################\n");

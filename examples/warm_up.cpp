@@ -41,11 +41,11 @@ int main() {
     LCQProblem lcqp( nV, nC, nComp );
 
 	Options options;
-    options.setPrintLevel(printLevel::INNER_LOOP_ITERATES);
+    options.setPrintLevel(PrintLevel::INNER_LOOP_ITERATES);
 	lcqp.setOptions( options );
 
     // Solve first LCQP
-	returnValue retVal = lcqp.loadLCQP( H, g, S1, S2 );
+	ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2 );
 
     if (retVal != SUCCESSFUL_RETURN)
     {

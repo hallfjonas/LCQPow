@@ -37,7 +37,7 @@ namespace lcqpOASES {
                                         double* _H, double* _A)
     {
         if (_nV <= 0  || _nC <= 0)
-            throw( MessageHandler::PrintMessage( returnValue::INVALID_ARGUMENT) );
+            throw( MessageHandler::PrintMessage( ReturnValue::INVALID_ARGUMENT) );
 
         nV = _nV;
         nC = _nC;
@@ -101,7 +101,7 @@ namespace lcqpOASES {
     /*
      *   s o l v e
      */
-    returnValue SubsolverQPOASES::solve(    bool initialSolve, int& iterations,
+    ReturnValue SubsolverQPOASES::solve(    bool initialSolve, int& iterations,
                                             const double* const g,
                                             const double* const lbA, const double* const ubA,
                                             const double* const x0, const double* const y0,
@@ -120,9 +120,9 @@ namespace lcqpOASES {
         iterations = (int)(nwsr);
 
         if (ret != qpOASES::returnValue::SUCCESSFUL_RETURN)
-            return returnValue::SUBPROBLEM_SOLVER_ERROR;
+            return ReturnValue::SUBPROBLEM_SOLVER_ERROR;
 
-        return returnValue::SUCCESSFUL_RETURN;
+        return ReturnValue::SUCCESSFUL_RETURN;
     }
 
 

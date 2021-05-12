@@ -62,10 +62,10 @@ namespace lcqpOASES {
             void getSolution( double* x, double* y );
 
             /** Options of subproblem solver. */
-            void setPrintLevel( printLevel printlvl );
+            void setPrintLevel( PrintLevel printLevel );
 
             /** Abstract method for solving the QP. */
-            returnValue solve(  bool initialSolve, int& iterations,
+            ReturnValue solve(  bool initialSolve, int& iterations,
                                 const double* g,
                                 const double* lbA, const double* ubA,
                                 const double* x0 = 0, const double* y0 = 0,

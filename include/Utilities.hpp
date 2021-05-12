@@ -27,7 +27,7 @@
 
 namespace lcqpOASES {
 
-    enum returnValue {
+    enum ReturnValue {
         // Special values
         NOT_YET_IMPLEMENTED = -1,                       /**< Not yet implemented (internal use only). */
         SUCCESSFUL_RETURN = 0,						    /**< Successful return. */
@@ -65,7 +65,7 @@ namespace lcqpOASES {
         INVALID_INDEX_ARRAY = 401                       /**< Invalid index array for a csc matrix. */
     };
 
-    enum algorithmStatus {
+    enum AlgorithmStatus {
         PROBLEM_NOT_SOLVED = 0,                         /**< The problem was not solved. */
         W_STATIONARY_SOLUTION = 1,                      /**< The solution corresponds to a weakly stationary point. */
         C_STATIONARY_SOLUTION = 2,                      /**< The solution corresponds to a Clarke stationary point. */
@@ -73,7 +73,7 @@ namespace lcqpOASES {
         S_STATIONARY_SOLUTION = 4                       /**< The solution corresponds to a strongly stationary point. */
     };
 
-    enum printLevel {
+    enum PrintLevel {
         NONE = 0,                                       /**< No Output. */
         OUTER_LOOP_ITERATES = 1,                        /**< Print stats for each outer loop iterate. */
         INNER_LOOP_ITERATES = 2,                        /**< Print stats for each inner loop iterate. */
@@ -123,16 +123,16 @@ namespace lcqpOASES {
             void setComplementarityTolerance( double val );
 
             /** Get initial penalty parameter. */
-            double getInitialComplementarityPenalty( );
+            double getInitialPenaltyParameter( );
 
             /** Set complementarity tolerance. */
-            void setInitialComplementarityPenalty( double val );
+            void setInitialPenaltyParameter( double val );
 
             /** Get penalty parameter update factor. */
-            double getComplementarityPenaltyUpdate( );
+            double getPenaltyUpdateFactor( );
 
             /** Set penalty parameter update factor. */
-            void setComplementarityPenaltyUpdate( double val );
+            void setPenaltyUpdateFactor( double val );
 
             /** Get whether to solve for (complement.) unconstrained global minumum first. */
             bool getSolveZeroPenaltyFirst( );
@@ -147,10 +147,10 @@ namespace lcqpOASES {
             void setMaxIterations( int val );
 
             /** Get print level. */
-            printLevel getPrintLevel( );
+            PrintLevel getPrintLevel( );
 
             /** Set print level. */
-            void setPrintLevel( printLevel val );
+            void setPrintLevel( PrintLevel val );
 
             /** Set print level (using an integer). */
             void setPrintLevel( int val );
@@ -160,14 +160,14 @@ namespace lcqpOASES {
 
             double stationarityTolerance;               /**< Tolerance for 1-Norm of stationarity violation. */
             double complementarityTolerance;		    /**< Complementarity tolerance. */
-            double initialComplementarityPenalty;	    /**< Start value for complementarity penalty term. */
-            double complementarityPenaltyUpdate;	    /**< Factor for updating penaltised complementarity term. */
+            double initialPenaltyParameter;	    /**< Start value for complementarity penalty term. */
+            double penaltyUpdateFactor;	    /**< Factor for updating penaltised complementarity term. */
 
             bool solveZeroPenaltyFirst;                 /**< Flag indicating whether first QP should ignore penalization. */
 
             int maxIterations;                           /**< Maximum number of iterations to be performed. */
 
-            printLevel printLvl;                        /**< Print level. */
+            PrintLevel printLevel;                        /**< Print level. */
     };
 
     class Utilities {
@@ -200,13 +200,13 @@ namespace lcqpOASES {
             static double MaxAbs(const double* const a, int m);
 
             // Read integral data from file
-            static returnValue readFromFile(int* data, int n, const char* datafilename);
+            static ReturnValue readFromFile(int* data, int n, const char* datafilename);
 
             // Read float data from file
-            static returnValue readFromFile(double* data, int n, const char* datafilename );
+            static ReturnValue readFromFile(double* data, int n, const char* datafilename );
 
             // Read float data from file
-            static returnValue writeToFile(double* data, int n, const char* datafilename );
+            static ReturnValue writeToFile(double* data, int n, const char* datafilename );
 
             // Print a double valued matrix
             static void printMatrix(const double* const A, int m, int n, const char* const name);
@@ -232,7 +232,7 @@ namespace lcqpOASES {
              *
              * @returns returnValue::SUCCESSFUL_RETURN, or returnValue::INDEX_OUT_OF_BOUNDSA if an index leads to invalid memory access of the dense array.
              */
-            static returnValue csc_to_dns(const csc* const sparse, double* full, int m, int n);
+            static ReturnValue csc_to_dns(const csc* const sparse, double* full, int m, int n);
 
 
             /** Transform a dense matrix to csc.
@@ -312,31 +312,31 @@ namespace lcqpOASES {
              *
              * @return Success or specifies the invalid argument.
             */
-            returnValue updateIterTotal( int delta_iter );
+            ReturnValue updateIterTotal( int delta_iter );
 
             /** Update total outer iteration counter.
              *
              * @return Success or specifies the invalid argument.
             */
-            returnValue updateIterOuter( int delta_iter );
+            ReturnValue updateIterOuter( int delta_iter );
 
             /** Update total number of working set changes counter.
              *
              * @return Success or specifies the invalid argument.
             */
-            returnValue updateSubproblemIter( int delta_iter );
+            ReturnValue updateSubproblemIter( int delta_iter );
 
             /** Update rho at solution.
              *
              * @return Success or specifies the invalid argument.
             */
-            returnValue updateRhoOpt( double _rho );
+            ReturnValue updateRhoOpt( double _rho );
 
             /** Update the solution status.
              *
              * @return Success or specifies the invalid argument.
             */
-            returnValue updateSolutionStatus( algorithmStatus _status );
+            ReturnValue updateSolutionStatus( AlgorithmStatus _status );
 
             /** Get the total number of iterations. */
             int getIterTotal( ) const;
@@ -351,21 +351,21 @@ namespace lcqpOASES {
             double getRhoOpt( ) const;
 
             /** Get the solution status (if solved it will return the stationarity type). */
-            algorithmStatus getSolutionStatus( ) const;
+            AlgorithmStatus getSolutionStatus( ) const;
 
         private:
             int iter_total = 0;
             int iter_outer = 0;
             int subproblem_iter = 0;
             double rho_opt = 0.0;
-            algorithmStatus status = PROBLEM_NOT_SOLVED;
+            AlgorithmStatus status = PROBLEM_NOT_SOLVED;
     };
 
     class MessageHandler {
         public:
-            static returnValue PrintMessage( returnValue ret );
+            static ReturnValue PrintMessage( ReturnValue ret );
 
-            static algorithmStatus PrintSolution( algorithmStatus algoStat );
+            static AlgorithmStatus PrintSolution( AlgorithmStatus algoStat );
 
             static void PrintSolutionLine( );
     };
