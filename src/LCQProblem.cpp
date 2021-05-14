@@ -155,20 +155,6 @@ namespace lcqpOASES {
 			return MessageHandler::PrintMessage( ret );
 		}
 
-		double* _lb = new double[nV];
-		ret = Utilities::readFromFile( _lb, nV, lb_file );
-		if ( ret != SUCCESSFUL_RETURN ) {
-			delete[] _lb;
-			return MessageHandler::PrintMessage( ret );
-		}
-
-		double* _ub = new double[nV];
-		ret = Utilities::readFromFile( _ub, nV, ub_file );
-		if ( ret != SUCCESSFUL_RETURN ) {
-			delete[] _ub;
-			return MessageHandler::PrintMessage( ret );
-		}
-
 		double* _S1 = new double[nComp*nV];
 		ret = Utilities::readFromFile( _S1, nComp*nV, S1_file );
 		if ( ret != SUCCESSFUL_RETURN ) {
@@ -213,12 +199,32 @@ namespace lcqpOASES {
 			}
 		}
 
+		double* _lb = NULL;
+		if (lb_file != 0) {
+			_lb = new double[nV];
+			ret = Utilities::readFromFile( _lb, nV, lb_file );
+			if ( ret != SUCCESSFUL_RETURN ) {
+				delete[] _lb;
+				return MessageHandler::PrintMessage( ret );
+			}
+		}
+
+		double* _ub = NULL;
+		if (ub_file != 0) {
+			_ub = new double[nV];
+			ret = Utilities::readFromFile( _ub, nV, ub_file );
+			if ( ret != SUCCESSFUL_RETURN ) {
+				delete[] _ub;
+				return MessageHandler::PrintMessage( ret );
+			}
+		}
+
 		double* _x0 = NULL;
 		if (x0_file != 0) {
-			_x0 = new double[nC + 2*nComp];
-			ret = Utilities::readFromFile( _x0, nC + 2*nComp, x0_file );
+			_x0 = new double[nV];
+			ret = Utilities::readFromFile( _x0, nV, x0_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
-				delete[] _S1;
+				delete[] _x0;
 				return MessageHandler::PrintMessage( ret );
 			}
 		}
@@ -228,38 +234,58 @@ namespace lcqpOASES {
 			_y0 = new double[nC + 2*nComp];
 			ret = Utilities::readFromFile( _y0, nC + 2*nComp, y0_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
-				delete[] _S2;
+				delete[] _y0;
 				return MessageHandler::PrintMessage( ret );
 			}
 		}
 
 		// Fill vaues
 		ret = setH( _H );
+		delete[] _H;
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
 		ret = setG( _g );
+		delete[] _g;
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
 		ret = setLB( _lb );
+		if (_lb != 0)
+			delete[] _lb;
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
 		ret = setUB( _ub );
+		if (_ub != 0)
+			delete[] _ub;
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
 		ret = setConstraints( _S1, _S2, _A, _lbA, _ubA );
 
+		delete[] _S1; delete[] _S2;
+
+		if (_A != 0)
+			delete[] _A;
+
+		if (_lbA != 0)
+			delete[] _lbA;
+
+		if (_ubA != 0)
+			delete[] _ubA;
+
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
 		ret = setInitialGuess( _x0, _y0 );
+
+		if (_x0 != 0) delete[] _x0;
+		if (_y0 != 0) delete[] _y0;
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
