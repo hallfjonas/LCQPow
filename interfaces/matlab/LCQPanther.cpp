@@ -24,6 +24,7 @@ using lcqpOASES::LCQProblem;
 using lcqpOASES::Options;
 
 #include <mex.h>
+#include <chrono>
 
 LCQProblem lcqp;
 
@@ -82,18 +83,11 @@ bool checkTypeStruct(const mxArray* arr, const char* name)
     return true;
 }
 
-void colMajorToRowMajor(double* col_maj, int m, int n)
+void colMajorToRowMajor(double* col_maj, double* row_maj, int m, int n)
 {
-    double* tmp = new double[m*n];
-
     for (int i = 0; i < m; i++)
         for (int j = 0; j < n; j++)
-            tmp[i*n + j] = col_maj[j*m + i];
-
-    for (int i = 0; i < m*n; i++)
-        col_maj[i] = tmp[i];
-
-    delete tmp;
+            row_maj[i*n + j] = col_maj[j*m + i];
 }
 
 void printOptions( Options options ) {
@@ -223,16 +217,21 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     double* x0 = NULL;
     double* y0 = NULL;
 
+    // Temporary matrices to keep the column major formats
+    double* S1_col = NULL;
+    double* S2_col = NULL;
+    double* A_col = NULL;
+
     H = (double*) mxGetPr( prhs[0] );
     g = (double*) mxGetPr( prhs[1] );
-    S1 = (double*) mxGetPr( prhs[2] );
-    S2 = (double*) mxGetPr( prhs[3] );
+    S1_col = (double*) mxGetPr( prhs[2] );
+    S2_col = (double*) mxGetPr( prhs[3] );
 
     if (nrhs == 6 || (nrhs == 7 && nC == 0)) {
         lb = (double*) mxGetPr( prhs[4] );
         ub = (double*) mxGetPr( prhs[5] );
     } else if (nrhs >= 7) {
-        A = (double*) mxGetPr( prhs[4] );
+        A_col = (double*) mxGetPr( prhs[4] );
         lbA = (double*) mxGetPr( prhs[5] );
         ubA = (double*) mxGetPr( prhs[6] );
 
@@ -243,14 +242,17 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     }
 
     // MATLAB stores in column major format (switch to row major)
-    if (S1 != NULL && nComp > 1 && nV > 1) {
-        colMajorToRowMajor(S1, nComp, nV);
+    if (S1_col != NULL && nComp > 1 && nV > 1) {
+        S1 = new double[nComp*nV];
+        colMajorToRowMajor(S1_col, S1, nComp, nV);
     }
-    if (S2 != NULL && nComp > 1 && nV > 1) {
-        colMajorToRowMajor(S2, nComp, nV);
+    if (S2_col != NULL && nComp > 1 && nV > 1) {
+        S2 = new double[nComp*nV];
+        colMajorToRowMajor(S2_col, S2, nComp, nV);
     }
-    if (A != NULL && nC > 1 && nV > 1) {
-        colMajorToRowMajor(A, nC, nV);
+    if (A_col != NULL && nC > 1 && nV > 1) {
+        A = new double[nC*nV];
+        colMajorToRowMajor(A_col, A, nC, nV);
     }
 
     // Load settings
@@ -348,13 +350,31 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         lcqp.setOptions( options );
     }
 
-    printOptions( options );
+    // printOptions( options );
 
     // Load data into LCQP object
     lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub, x0);
 
+    // Clear A, S1, S2
+    if (A != 0)
+        delete[] A;
+
+    if (S1 != 0)
+        delete[] S1;
+
+    if (S2 != 0)
+        delete[] S2;
+
+
+    // Start time
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
     // Run solver
     lcqpOASES::ReturnValue ret = lcqp.runSolver();
+
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    double elapsed_secs = (end - begin).count()/1000.0/1000.0/1000.0;
+
     if (ret != lcqpOASES::SUCCESSFUL_RETURN) {
         mexPrintf("Failed to solve LCQP (error code: %d).\n", ret);
     } else {
@@ -393,9 +413,9 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         // 3) Output statistics
         if (nlhs > 2) {
             // assign fieldnames
-            int numberStatOutputs = 4;
+            int numberStatOutputs = 5;
 
-            const char* fieldnames[] = {"iters_total", "iters_outer", "iters_subproblem", "rho_opt"};
+            const char* fieldnames[] = {"iters_total", "iters_outer", "iters_subproblem", "rho_opt", "elapsed_time"};
 
             // Allocate memory
             plhs[2] = mxCreateStructMatrix(1,1,numberStatOutputs, fieldnames);
@@ -414,26 +434,26 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             mxArray* iterOuter = mxCreateDoubleMatrix(1, 1, mxREAL);
             mxArray* iterSubpr = mxCreateDoubleMatrix(1, 1, mxREAL);
             mxArray* rhoOpt = mxCreateDoubleMatrix(1, 1, mxREAL);
+            mxArray* elapsed_time = mxCreateDoubleMatrix(1, 1, mxREAL);
 
             double* itrTot = mxGetPr(iterTotal);
             double* itrOutr = mxGetPr(iterOuter);
             double* itrSubp = mxGetPr(iterSubpr);
             double* rOpt = mxGetPr(rhoOpt);
+            double* elapsed = mxGetPr(elapsed_time);
 
             itrTot[0] = stats.getIterTotal();
             itrOutr[0] = stats.getIterOuter();
             itrSubp[0] = stats.getSubproblemIter();
             rOpt[0] = stats.getRhoOpt();
+            elapsed[0] = elapsed_secs;
 
             // assign values to struct
             mxSetFieldByNumber(plhs[2], 0, 0, iterTotal);
             mxSetFieldByNumber(plhs[2], 0, 1, iterOuter);
             mxSetFieldByNumber(plhs[2], 0, 2, iterSubpr);
             mxSetFieldByNumber(plhs[2], 0, 3, rhoOpt);
-
-            // Pointer to the output object
-            double* yOpt = (double*) mxGetPr(plhs[1]);
-            lcqp.getDualSolution(yOpt);
+            mxSetFieldByNumber(plhs[2], 0, 4, elapsed_time);
         }
     }
 
