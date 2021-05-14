@@ -34,7 +34,7 @@ src:
 	@cd $@; ${MAKE} -s
 
 examples: src
-	@cd $@; ${MAKE} -s
+	@cd $@; ${MAKE} examples -s
 
 doc:
 	@cd $@; ${MAKE} -s
