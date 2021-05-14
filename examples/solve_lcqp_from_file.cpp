@@ -131,12 +131,12 @@ int main(int argc, char **argv) {
     lcqpOASES::LCQProblem lcqp( nV, nC, nComp );
 
     lcqpOASES::Options opts;
-    opts.setPrintLevel( lcqpOASES::PrintLevel::NONE );
+    opts.setPrintLevel( lcqpOASES::PrintLevel::SUBPROBLEM_SOLVER_ITERATES );
 
     lcqp.setOptions( opts );
 
     // Run solver
-	lcqpOASES::ReturnValue ret = lcqp.loadLCQP( &H_file[0], &g_file[0], &lb_file[0], &ub_file[0], &S1_file[0], &S2_file[0], Af, lbAf, ubAf, x0f, y0f );
+	lcqpOASES::ReturnValue ret = lcqp.loadLCQP( &H_file[0], &g_file[0], &S1_file[0], &S2_file[0], Af, lbAf, ubAf, &lb_file[0], &ub_file[0], x0f, y0f );
 
     if (ret != lcqpOASES::SUCCESSFUL_RETURN)
     {
@@ -144,35 +144,13 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    // Record start time
-    auto start = std::chrono::high_resolution_clock::now();
-
     ret = lcqp.runSolver();
-
-    // Record end time
-    auto finish = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed = finish - start;
 
     if (ret != lcqpOASES::SUCCESSFUL_RETURN)
     {
         printf("Failed to solve LCQP.\n");
         return 1;
-    } else {
-        printf("Solved lcqp in %g[s]\n\n", elapsed.count());
     }
 
-    double* xOpt = new double[nV];
-    double* yOpt = new double[nV];
-    double* time = new double[1];
-    lcqp.getPrimalSolution( xOpt );
-    lcqp.getDualSolution( yOpt );
-    time[0] = elapsed.count();
-
-    WriteToFile(xOpt, nV, inputdir + "/x_opt.txt");
-    WriteToFile(yOpt, nV, inputdir + "/y_opt.txt");
-    WriteToFile(time, 1, inputdir + "/time.txt");
-
-    delete[] xOpt; delete[] yOpt; delete[] time;
-
-    return ret;
+    return 0;
 }
