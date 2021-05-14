@@ -44,12 +44,12 @@ void WriteToFile(const double* const vec, int n, std::string path)
 
 int main(int argc, char **argv) {
 
-    if (argc != 2) {
-        printf("Wrong amount of arguments passed (not 2).");
-        return -1;
-    }
+    // if (argc != 2) {
+    //     printf("Wrong amount of arguments passed (not 2).");
+    //     return -1;
+    // }
 
-    std::string inputdir = argv[1];
+    std::string inputdir = "examples/example_data/one_ivocp_example";
 
     if (!PathExists(inputdir)) {
         printf("Input directory does not exist.");
@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
     lcqpOASES::LCQProblem lcqp( nV, nC, nComp );
 
     lcqpOASES::Options opts;
-    opts.setPrintLevel( lcqpOASES::PrintLevel::SUBPROBLEM_SOLVER_ITERATES );
+    opts.setPrintLevel( lcqpOASES::PrintLevel::INNER_LOOP_ITERATES );
 
     lcqp.setOptions( opts );
 

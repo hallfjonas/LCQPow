@@ -438,6 +438,10 @@ namespace lcqpOASES {
 			);
 
 
+			/** Set Qk. */
+			void setQk( );
+
+
 			/** Returns the NLP stationarity vector.
 			 *
 			 * @param x_eval The point at which the stationarity should be evaluated (TODO: why no y_eval?).
@@ -485,6 +489,9 @@ namespace lcqpOASES {
 			/** Update xk and gk. */
 			void updateStep( );
 
+			/** Update Qk. */
+			void updateQk( );
+
 			/** Update outer iteration counter. */
 			void updateOuterIter( );
 
@@ -525,6 +532,10 @@ namespace lcqpOASES {
 			double* S1 = NULL;						/**< LHS of complementarity product. */
 			double* S2 = NULL;						/**< RHS of complementarity product. */
 			double* C = NULL;						/**< Complementarity matrix (S1'*S2 + S2'*S1). */
+
+			csc* C_sparse = NULL;					/**< Sparse C. */
+			csc* Qk_sparse = NULL;					/**< Sparse Qk. */
+			std::vector<int> Qk_indices_of_C;		/**< Remember the indices of Qk corresponding to C (for fast Qk update). */
 
 			double rho; 							/**< Current penalty value. */
 

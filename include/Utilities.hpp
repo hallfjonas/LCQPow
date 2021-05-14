@@ -178,11 +178,17 @@ namespace lcqpOASES {
             // C = A'*B
             static void TransponsedMatrixMultiplication(const double* const A, const double* const B, double* C, int m, int n, int p);
 
+            // c = A'*b
+            static void TransponsedMatrixMultiplication(const csc* const A, const double* const b, double* c, int m, int n);
+
             // C = A'*B + B'*A
             static void MatrixSymmetrizationProduct(const double* const A, const double* const B, double* C, int m, int n);
 
             // d = A*b + c
             static void AffineLinearTransformation(const double alpha, const double* const A, const double* const b, const double* const c, double* d, int m, int n);
+
+            // d = A*b + c
+            static void AffineLinearTransformation(const double alpha, const csc* const S, const double* const b, const double* const c, double* d, int m);
 
             // C = alpha*A + beta*B
             static void WeightedMatrixAdd(const double alpha, const double* const A, const double beta, const double* const B, double* C, int m, int n);
@@ -193,11 +199,17 @@ namespace lcqpOASES {
             // returns p' * Q * p
             static double QuadraticFormProduct(const double* const Q, const double* const p, int m);
 
+            // returns p' * Q * p
+            static double QuadraticFormProduct(const csc* const S, const double* const p, int m);
+
             // returns a'*b
             static double DotProduct(const double* const a, const double* const b, int m);
 
             // returns 1-norm
             static double MaxAbs(const double* const a, int m);
+
+            // Clear sparse matrix
+            static void ClearSparseMat(csc* M);
 
             // Read integral data from file
             static ReturnValue readFromFile(int* data, int n, const char* datafilename);

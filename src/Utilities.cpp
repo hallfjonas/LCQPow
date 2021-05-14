@@ -200,6 +200,16 @@ namespace lcqpOASES {
     }
 
 
+    void Utilities::TransponsedMatrixMultiplication(const csc* const A, const double* const b, double* c, int m, int n) {
+        for (int j = 0; j < n; j++) {
+            c[j] = 0;
+            for (int k = A->p[j]; k < A->p[j+1]; k++) {
+                c[j] += b[A->i[k]]*A->x[k];
+            }
+        }
+    }
+
+
     void Utilities::MatrixSymmetrizationProduct(const double* const A, const double* const B, double* C, int m, int n) {
         for (int i = 0; i < n; i++) {
             for (int j = 0; j <= i; j++) {
@@ -224,6 +234,19 @@ namespace lcqpOASES {
             }
 
             d[i] = alpha*tmp + c[i];
+        }
+    }
+
+
+    void Utilities::AffineLinearTransformation(const double alpha, const csc* const S, const double* const b, const double* const c, double* d, int m) {
+        for (int j = 0; j < m; j++) {
+
+            double tmp = 0;
+            for (int k = S->p[j]; k < S->p[j+1]; k++) {
+                tmp += S->x[k]*b[S->i[k]];
+            }
+
+            d[j] = alpha*tmp + c[j];
         }
     }
 
@@ -254,6 +277,22 @@ namespace lcqpOASES {
     }
 
 
+    double Utilities::QuadraticFormProduct(const csc* const S, const double* const p, int m) {
+        double ret = 0;
+        for (int j = 0; j < m; j++) {
+
+            double tmp = 0;
+            for (int k = S->p[j]; k < S->p[j+1]; k++) {
+                tmp += S->x[k]*p[S->i[k]];
+            }
+
+            ret += p[j]*tmp;
+        }
+
+        return ret;
+    }
+
+
     double Utilities::DotProduct(const double* const a, const double* const b, int m) {
         double ret = 0;
         for (int i = 0; i < m; i++)
@@ -275,6 +314,30 @@ namespace lcqpOASES {
         }
 
         return Utilities::getMax(mx, -mn);
+    }
+
+
+    void Utilities::ClearSparseMat(csc* M)
+    {
+        if (M != 0) {
+			if (M->p != 0) {
+				delete[] M->p;
+				M->p = NULL;
+			}
+
+			if (M->i != 0) {
+				delete[] M->i;
+				M->i = NULL;
+			}
+
+			if (M->x != 0) {
+				delete[] M->x;
+				M->x = NULL;
+			}
+
+			c_free(M);
+			M = NULL;
+		}
     }
 
 

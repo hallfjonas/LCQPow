@@ -360,14 +360,14 @@ namespace lcqpOASES {
 				return INITIAL_SUBPROBLEM_FAILED;
 			}
 
-			Utilities::AffineLinearTransformation(rho, C, xk, g, gk, nV, nV);
+			Utilities::AffineLinearTransformation(rho, C_sparse, xk, g, gk, nV);
 
 			if (solveQPSubproblem( false ) != SUCCESSFUL_RETURN) {
 				return SUBPROBLEM_SOLVER_ERROR;
 			}
 
 		} else {
-			Utilities::AffineLinearTransformation(rho, C, xk, g, gk, nV, nV);
+			Utilities::AffineLinearTransformation(rho, C_sparse, xk, g, gk, nV);
 
 			if (solveQPSubproblem( true ) != SUCCESSFUL_RETURN) {
 				return INITIAL_SUBPROBLEM_FAILED;
@@ -498,6 +498,9 @@ namespace lcqpOASES {
 		C = new double[nV*nV];
 		Utilities::MatrixSymmetrizationProduct(S1, S2, C, nComp, nV);
 
+		C_sparse = Utilities::dns_to_csc(C, nV, nV);
+		A_sparse = Utilities::dns_to_csc(A, nC + 2*nComp, nV);
+
 		return SUCCESSFUL_RETURN;
 	}
 
@@ -627,6 +630,94 @@ namespace lcqpOASES {
 	}
 
 
+	void LCQProblem::setQk( )
+	{
+		std::vector<double> Qk_data;
+		std::vector<double> Qk_row;
+		int* Qk_p = new int[nV+1]();
+
+		// Iterate over columns
+		for (int j = 0; j < nV; j++) {
+			Qk_p[j+1] = Qk_p[j];
+
+			int idx_H = H_sparse->p[j];
+			int idx_C = C_sparse->p[j];
+
+			while (idx_H < H_sparse->p[j+1] || idx_C < C_sparse->p[j+1]) {
+				// Only elements of H left in this column
+				if (idx_H < H_sparse->p[j+1] && idx_C >= C_sparse->p[j+1]) {
+					Qk_data.push_back(H_sparse->x[idx_H]);
+					Qk_row.push_back(H_sparse->i[idx_H]);
+
+					idx_H++;
+				}
+
+				// Only elements of C left in this column
+				else if (idx_H >= H_sparse->p[j+1] && idx_C < C_sparse->p[j+1]) {
+					Qk_data.push_back(rho*C_sparse->x[idx_C]);
+					Qk_row.push_back(C_sparse->i[idx_C]);
+
+					Qk_indices_of_C.push_back(Qk_p[j+1]);
+
+					idx_C++;
+				}
+
+				// Element of H is in higher row than C
+				else if (H_sparse->i[idx_H] < C_sparse->i[idx_C]) {
+					Qk_data.push_back(H_sparse->x[idx_H]);
+					Qk_row.push_back(H_sparse->i[idx_H]);
+
+					idx_H++;
+				}
+
+				// Element of C are in higher row than H
+				else if (H_sparse->i[idx_H] > C_sparse->i[idx_C]) {
+					Qk_data.push_back(rho*C_sparse->x[idx_C]);
+					Qk_row.push_back(C_sparse->i[idx_C]);
+
+					Qk_indices_of_C.push_back(Qk_p[j+1]);
+
+					idx_C++;
+				}
+
+				// Add both and update index only once!
+				else {
+					Qk_data.push_back(H_sparse->x[idx_H] + rho*C_sparse->x[idx_C]);
+					Qk_row.push_back(H_sparse->i[idx_H]);
+
+					idx_H++;
+					idx_C++;
+
+					Qk_indices_of_C.push_back(Qk_p[j+1]);
+				}
+
+				Qk_p[j+1]++;
+			}
+		}
+
+		int Qk_nnx = (int) Qk_data.size();
+		double* Qk_x = new double[Qk_nnx]();
+		int* Qk_i = new int[Qk_nnx]();
+
+		for (int i = 0; i < Qk_nnx; i++) {
+			Qk_x[i] = Qk_data[i];
+			Qk_i[i] = Qk_row[i];
+		}
+
+		Qk_sparse = (csc *)c_malloc(sizeof(csc));
+		Qk_sparse->n = nV;
+		Qk_sparse->m = nV;
+		Qk_sparse->p = Qk_p;
+		Qk_sparse->i = Qk_i;
+		Qk_sparse->x = Qk_x;
+		Qk_sparse->nz = -1;
+		Qk_sparse->nzmax = Qk_nnx;
+
+		Qk_data.clear();
+		Qk_row.clear();
+	}
+
+
 	void LCQProblem::initializeSolver( )
 	{
 		// Initialize variables and counters
@@ -689,7 +780,7 @@ namespace lcqpOASES {
 
 
 	bool LCQProblem::complementarityCheck( ) {
-		return Utilities::QuadraticFormProduct(C, xk, nV) < 2*options.getComplementarityTolerance();
+		return Utilities::QuadraticFormProduct(C_sparse, xk, nV) < 2*options.getComplementarityTolerance();
 	}
 
 
@@ -700,9 +791,9 @@ namespace lcqpOASES {
 
 	void LCQProblem::getOptimalStepLength( ) {
 
-		double qk = Utilities::QuadraticFormProduct(Qk, pk, nV);
+		double qk = Utilities::QuadraticFormProduct(Qk_sparse, pk, nV);
 
-		Utilities::AffineLinearTransformation(1, Qk, xk, g, lk_tmp, nV, nV);
+		Utilities::AffineLinearTransformation(1, Qk_sparse, xk, g, lk_tmp, nV);
 
 		double lk = Utilities::DotProduct(pk, lk_tmp, nV);
 
@@ -729,7 +820,7 @@ namespace lcqpOASES {
 			Utilities::WeightedVectorAdd(1, xk, alphak, pk, xk, nV);
 
 			// gk = new linearization + g
-			Utilities::AffineLinearTransformation(rho, C, xk, g, gk, nV, nV);
+			Utilities::AffineLinearTransformation(rho, C_sparse, xk, g, gk, nV);
 
 			// Add some +/- EPS to each coordinate
 			perturbGradient();
@@ -737,15 +828,19 @@ namespace lcqpOASES {
 		}
 
 		// Update Qk = H + rho*C (only required on first inner iteration)
-		if (innerIter == 0)
-			Utilities::WeightedMatrixAdd(1, H, rho, C, Qk, nV, nV);
+		if (innerIter == 0 && outerIter == 0) {
+			setQk();
+		} else if (innerIter == 0) {
+			updateQk();
+		}
 
 		// stat = Qk*xk + g - A'*yk_A - yk_x
 		// 1) Objective contribution: Qk*xk + g
-		Utilities::AffineLinearTransformation(1, Qk, xk, g, statk, nV, nV);
+		Utilities::AffineLinearTransformation(1, Qk_sparse, xk, g, statk, nV);
 
 		// 2) Constraint contribution: A'*yk
-		Utilities::TransponsedMatrixMultiplication(A, yk_A, constr_statk, nC + 2*nComp, nV, 1);
+		// Utilities::TransponsedMatrixMultiplication(A, yk_A, constr_statk, nC + 2*nComp, nV, 1);
+		Utilities::TransponsedMatrixMultiplication(A_sparse, yk_A, constr_statk, nC + 2*nComp, nV);
 		Utilities::WeightedVectorAdd(1, statk, -1, constr_statk, statk, nV);
 
 		// 3) Box constraint contribution
@@ -754,6 +849,14 @@ namespace lcqpOASES {
 				box_statk[i] = yk[i];
 
 			Utilities::WeightedVectorAdd(1, statk, -1, box_statk, statk, nV);
+		}
+	}
+
+
+	void LCQProblem::updateQk( ) {
+		double factor = rho*(1 - 1.0/options.getPenaltyUpdateFactor());
+		for (int j = 0; j < (int) Qk_indices_of_C.size(); j++) {
+			Qk_sparse->x[Qk_indices_of_C[j]] += factor*C_sparse->x[j];
 		}
 	}
 
@@ -949,7 +1052,7 @@ namespace lcqpOASES {
 		printf("%s%10.3g", sep, tmpdbl);
 
 		// Print complementarity violation
-		tmpdbl = Utilities::QuadraticFormProduct(C, xk, nV)/2.0;
+		tmpdbl = Utilities::QuadraticFormProduct(C_sparse, xk, nV)/2.0;
 		printf("%s%10.3g", sep, tmpdbl);
 
 		// Print current penalty parameter
@@ -1162,15 +1265,10 @@ namespace lcqpOASES {
 			tmpA_i = NULL;
 		}
 
-		if (H_sparse != 0) {
-			c_free(H_sparse);
-			H_sparse = NULL;
-		}
-
-		if (A_sparse != 0) {
-			c_free(A_sparse);
-			A_sparse = NULL;
-		}
+		Utilities::ClearSparseMat(C_sparse);
+		Utilities::ClearSparseMat(A_sparse);
+		Utilities::ClearSparseMat(H_sparse);
+		Utilities::ClearSparseMat(Qk_sparse);
 	}
 }
 
