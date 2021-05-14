@@ -11,7 +11,7 @@
 ##
 ##	lcqpOASES is distributed in the hope that it will be useful,
 ##	but WITHOUT ANY WARRANTY; without even the implied warranty of
-##	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+##	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ##	See the GNU Lesser General Public License for more details.
 ##
 ##	You should have received a copy of the GNU Lesser General Public
@@ -24,8 +24,10 @@ build
 src/qpOASES
 debug
 examples/example_data/ivocp
+bin
 plots
 doxygen
+.vscode
 
 ### C ###
 # Prerequisites
@@ -71,6 +73,11 @@ doxygen
 *.su
 *.idb
 *.pdb
+
+# Image files
+*.png
+*.tikz
+*.pdf
 
 # Kernel Module Compile Results
 *.mod*

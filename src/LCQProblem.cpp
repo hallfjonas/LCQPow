@@ -81,14 +81,14 @@ namespace lcqpOASES {
 	}
 
 
-	returnValue LCQProblem::loadLCQP(	const double* const _H, const double* const _g,
+	ReturnValue LCQProblem::loadLCQP(	const double* const _H, const double* const _g,
 										const double* const _S1, const double* const _S2,
 										const double* const _A, const double* const _lbA, const double* const _ubA,
 										const double* const _lb, const double* const _ub,
 										const double* const _x0, const double* const _y0
 										)
 	{
-		returnValue ret;
+		ReturnValue ret;
 
 		ret = setH( _H );
 
@@ -128,18 +128,18 @@ namespace lcqpOASES {
 		Subsolver tmp( nV, nC + 2*nComp, H, A );
 		subsolver = tmp;
 
-		return returnValue::SUCCESSFUL_RETURN;
+		return ReturnValue::SUCCESSFUL_RETURN;
 	}
 
 
-	returnValue LCQProblem::loadLCQP(	const char* const H_file, const char* const g_file,
+	ReturnValue LCQProblem::loadLCQP(	const char* const H_file, const char* const g_file,
 										const char* const S1_file, const char* const S2_file,
 										const char* const A_file, const char* const lbA_file, const char* const ubA_file,
 										const char* const lb_file, const char* const ub_file,
 										const char* const x0_file, const char* const y0_file
 										)
 	{
-		returnValue ret;
+		ReturnValue ret;
 
 		double* _H = new double[nV*nV];
 		ret = Utilities::readFromFile( _H, nV*nV, H_file );
@@ -152,20 +152,6 @@ namespace lcqpOASES {
 		ret = Utilities::readFromFile( _g, nV, g_file );
 		if ( ret != SUCCESSFUL_RETURN ) {
 			delete[] _g;
-			return MessageHandler::PrintMessage( ret );
-		}
-
-		double* _lb = new double[nV];
-		ret = Utilities::readFromFile( _lb, nV, lb_file );
-		if ( ret != SUCCESSFUL_RETURN ) {
-			delete[] _lb;
-			return MessageHandler::PrintMessage( ret );
-		}
-
-		double* _ub = new double[nV];
-		ret = Utilities::readFromFile( _ub, nV, ub_file );
-		if ( ret != SUCCESSFUL_RETURN ) {
-			delete[] _ub;
 			return MessageHandler::PrintMessage( ret );
 		}
 
@@ -213,12 +199,32 @@ namespace lcqpOASES {
 			}
 		}
 
+		double* _lb = NULL;
+		if (lb_file != 0) {
+			_lb = new double[nV];
+			ret = Utilities::readFromFile( _lb, nV, lb_file );
+			if ( ret != SUCCESSFUL_RETURN ) {
+				delete[] _lb;
+				return MessageHandler::PrintMessage( ret );
+			}
+		}
+
+		double* _ub = NULL;
+		if (ub_file != 0) {
+			_ub = new double[nV];
+			ret = Utilities::readFromFile( _ub, nV, ub_file );
+			if ( ret != SUCCESSFUL_RETURN ) {
+				delete[] _ub;
+				return MessageHandler::PrintMessage( ret );
+			}
+		}
+
 		double* _x0 = NULL;
 		if (x0_file != 0) {
-			_x0 = new double[nC + 2*nComp];
-			ret = Utilities::readFromFile( _x0, nC + 2*nComp, x0_file );
+			_x0 = new double[nV];
+			ret = Utilities::readFromFile( _x0, nV, x0_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
-				delete[] _S1;
+				delete[] _x0;
 				return MessageHandler::PrintMessage( ret );
 			}
 		}
@@ -228,38 +234,58 @@ namespace lcqpOASES {
 			_y0 = new double[nC + 2*nComp];
 			ret = Utilities::readFromFile( _y0, nC + 2*nComp, y0_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
-				delete[] _S2;
+				delete[] _y0;
 				return MessageHandler::PrintMessage( ret );
 			}
 		}
 
 		// Fill vaues
 		ret = setH( _H );
+		delete[] _H;
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
 		ret = setG( _g );
+		delete[] _g;
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
 		ret = setLB( _lb );
+		if (_lb != 0)
+			delete[] _lb;
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
 		ret = setUB( _ub );
+		if (_ub != 0)
+			delete[] _ub;
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
 		ret = setConstraints( _S1, _S2, _A, _lbA, _ubA );
 
+		delete[] _S1; delete[] _S2;
+
+		if (_A != 0)
+			delete[] _A;
+
+		if (_lbA != 0)
+			delete[] _lbA;
+
+		if (_ubA != 0)
+			delete[] _ubA;
+
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
 		ret = setInitialGuess( _x0, _y0 );
+
+		if (_x0 != 0) delete[] _x0;
+		if (_y0 != 0) delete[] _y0;
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
@@ -272,18 +298,18 @@ namespace lcqpOASES {
 		Subsolver tmp( nV, nC + 2*nComp, H, A );
 		subsolver = tmp;
 
-		return returnValue::SUCCESSFUL_RETURN;
+		return ReturnValue::SUCCESSFUL_RETURN;
 	}
 
 
-	returnValue LCQProblem::loadLCQP(	double* _H_data, int _H_nnx, int* _H_i, int* _H_p, double* _g,
+	ReturnValue LCQProblem::loadLCQP(	double* _H_data, int _H_nnx, int* _H_i, int* _H_p, double* _g,
 										double* _S1_data, int _S1_nnx, int* _S1_i, int* _S1_p,
 										double* _S2_data, int _S2_nnx, int* _S2_i, int* _S2_p,
 										double* _A_data, int _A_nnx, int* _A_i, int* _A_p,
 										double* _lbA, double* _ubA,	double* _x0, double* _y0
 										)
 	{
-		returnValue ret;
+		ReturnValue ret;
 
 		ret = setH( _H_data, _H_nnx, _H_i, _H_p );
 
@@ -317,18 +343,18 @@ namespace lcqpOASES {
 		Subsolver tmp(nV, nC + 2*nComp, H_sparse, A_sparse, g, lbA, ubA);
 		subsolver = tmp;
 
-		return returnValue::SUCCESSFUL_RETURN;
+		return ReturnValue::SUCCESSFUL_RETURN;
 	}
 
 
-	returnValue LCQProblem::runSolver( )
+	ReturnValue LCQProblem::runSolver( )
 	{
 		// Initialize variables
 		initializeSolver();
 
 		// Initialization strategy
-		if (options.solveZeroPenaltyFirst) {
-			memcpy(gk, g, (long unsigned int)nV*sizeof(double));
+		if (options.getSolveZeroPenaltyFirst()) {
+			memcpy(gk, g, (size_t)nV*sizeof(double));
 
 			if (solveQPSubproblem( true ) != SUCCESSFUL_RETURN) {
 				return INITIAL_SUBPROBLEM_FAILED;
@@ -366,8 +392,12 @@ namespace lcqpOASES {
 					// Determine C-,M-,S-Stationarity
 					determineStationarityType();
 
+					// Update output statistics
+					stats.updateRhoOpt( rho );
+					stats.updateSolutionStatus( algoStat );
+
 					// Print solution type
-					if (options.printLvl > printLevel::NONE)
+					if (options.getPrintLevel() > PrintLevel::NONE)
 						MessageHandler::PrintSolution( algoStat );
 
 					return SUCCESSFUL_RETURN;
@@ -375,7 +405,7 @@ namespace lcqpOASES {
 					updatePenalty();
 
 					// Update iterate counters
-					outerIter++;
+					updateOuterIter();
 					innerIter = -1;
 				}
 			}
@@ -388,11 +418,12 @@ namespace lcqpOASES {
 			// Step length computation
 			getOptimalStepLength( );
 
-			if ( outerIter > options.maxOuterIterations )
-				return MAX_OUTER_ITERATIONS_REACHED;
+			// Update the total iteration counter
+			updateTotalIter();
 
-			if ( innerIter > options.maxInnerIterations )
-				return MAX_INNER_ITERATIONS_REACHED;
+			// (Failed) termination condition
+			if ( totalIter > options.getMaxIterations() )
+				return MAX_ITERATIONS_REACHED;
 
 			// Update inner iterate counter
 			innerIter++;
@@ -400,7 +431,7 @@ namespace lcqpOASES {
 	}
 
 
-	returnValue LCQProblem::setConstraints( 	const double* const S1_new, const double* const S2_new,
+	ReturnValue LCQProblem::setConstraints( 	const double* const S1_new, const double* const S2_new,
 												const double* const A_new, const double* const lbA_new, const double* const ubA_new )
 	{
 		if ( nV == 0 || nComp == 0 )
@@ -471,7 +502,7 @@ namespace lcqpOASES {
 	}
 
 
-	returnValue LCQProblem::setConstraints(	double* S1_data, int S1_nnx, int* S1_i, int* S1_p,
+	ReturnValue LCQProblem::setConstraints(	double* S1_data, int S1_nnx, int* S1_i, int* S1_p,
 											double* S2_data, int S2_nnx, int* S2_i, int* S2_p,
 											double* A_data, int A_nnx, int* A_i, int* A_p,
 											double* lbA_new, double* ubA_new
@@ -554,7 +585,7 @@ namespace lcqpOASES {
 
 		// Create dense matrices
 		A = new double[(nC + 2*nComp)*nV]();
-		lcqpOASES::returnValue ret = Utilities::csc_to_dns(A_sparse, A, nC + 2*nComp, nV);
+		lcqpOASES::ReturnValue ret = Utilities::csc_to_dns(A_sparse, A, nC + 2*nComp, nV);
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage(ret);
 
@@ -582,7 +613,7 @@ namespace lcqpOASES {
 	}
 
 
-	returnValue LCQProblem::setH( double* H_data, int H_nnx, int* H_i, int* H_p )
+	ReturnValue LCQProblem::setH( double* H_data, int H_nnx, int* H_i, int* H_p )
 	{
 		if (nV <= 0)
 			return LCQPOBJECT_NOT_SETUP;
@@ -592,7 +623,7 @@ namespace lcqpOASES {
 		H = new double[nV*nV]();
 		Utilities::csc_to_dns(H_sparse, H, nV, nV);
 
-		return returnValue::SUCCESSFUL_RETURN;
+		return ReturnValue::SUCCESSFUL_RETURN;
 	}
 
 
@@ -600,20 +631,30 @@ namespace lcqpOASES {
 	{
 		// Initialize variables and counters
 		alphak = 1;
-		rho = options.initialComplementarityPenalty;
+		rho = options.getInitialPenaltyParameter( );
 		outerIter = 0;
 		innerIter = 0;
-		algoStat = algorithmStatus::PROBLEM_NOT_SOLVED;
+		totalIter = 0;
+		algoStat = AlgorithmStatus::PROBLEM_NOT_SOLVED;
 
 		// Initialize subproblem solver
-		subsolver.setPrintLevel( options.printLvl );
+		subsolver.setPrintLevel( options.getPrintLevel() );
+
+		// Reset output statistics
+		stats.reset();
+
+		// Set seed
+		srand( (unsigned int)time( NULL ) );
 	}
 
 
-	returnValue LCQProblem::solveQPSubproblem(bool initialSolve)
+	ReturnValue LCQProblem::solveQPSubproblem(bool initialSolve)
 	{
 		// First solve convex subproblem
-		returnValue ret = subsolver.solve( initialSolve, qpIterk, gk, lbA, ubA, xk, yk, lb, ub );
+		ReturnValue ret = subsolver.solve( initialSolve, qpIterk, gk, lbA, ubA, xk, yk, lb, ub );
+
+		// Update stats
+		stats.updateSubproblemIter(qpIterk);
 
 		// If no initial guess was passed, then need to allocate memory
 		if (xk == 0) {
@@ -643,17 +684,17 @@ namespace lcqpOASES {
 
 
 	bool LCQProblem::stationarityCheck( ) {
-		return Utilities::MaxAbs(statk, nV) < options.stationarityTolerance;
+		return Utilities::MaxAbs(statk, nV) < options.getStationarityTolerance();
 	}
 
 
 	bool LCQProblem::complementarityCheck( ) {
-		return Utilities::QuadraticFormProduct(C, xk, nV) < 2*options.complementarityTolerance;
+		return Utilities::QuadraticFormProduct(C, xk, nV) < 2*options.getComplementarityTolerance();
 	}
 
 
 	void LCQProblem::updatePenalty( ) {
-		rho *= options.complementarityPenaltyUpdate;
+		rho *= options.getPenaltyUpdateFactor();
 	}
 
 
@@ -681,7 +722,7 @@ namespace lcqpOASES {
 			updatePenalty( );
 
 			// Update iterate counters
-			outerIter++;
+			updateOuterIter();
 			innerIter = 0;
 		} else {
 			// xk = xk + alphak*pk
@@ -714,6 +755,18 @@ namespace lcqpOASES {
 
 			Utilities::WeightedVectorAdd(1, statk, -1, box_statk, statk, nV);
 		}
+	}
+
+
+	void LCQProblem::updateOuterIter( ) {
+		outerIter++;
+		stats.updateIterOuter(1);
+	}
+
+
+	void LCQProblem::updateTotalIter( ) {
+		totalIter++;
+		stats.updateIterTotal(1);
 	}
 
 
@@ -778,11 +831,11 @@ namespace lcqpOASES {
 				s_stationary = false;
 
 			// Check failure of m-/c-stationarity
-			if (std::abs(dualProd) >= options.complementarityTolerance && dualMin <= 0) {
+			if (std::abs(dualProd) >= options.getComplementarityTolerance() && dualMin <= 0) {
 
 				// Check failure of c-stationarity
-				if (dualProd <= options.complementarityTolerance) {
-					algoStat = algorithmStatus::W_STATIONARY_SOLUTION;
+				if (dualProd <= options.getComplementarityTolerance()) {
+					algoStat = AlgorithmStatus::W_STATIONARY_SOLUTION;
 					return;
 				}
 
@@ -791,17 +844,17 @@ namespace lcqpOASES {
 		}
 
 		if (s_stationary) {
-			algoStat = algorithmStatus::S_STATIONARY_SOLUTION;
+			algoStat = AlgorithmStatus::S_STATIONARY_SOLUTION;
 			return;
 		}
 
 
 		if (m_stationary) {
-			algoStat = algorithmStatus::M_STATIONARY_SOLUTION;
+			algoStat = AlgorithmStatus::M_STATIONARY_SOLUTION;
 			return;
 		}
 
-		algoStat = algorithmStatus::C_STATIONARY_SOLUTION;
+		algoStat = AlgorithmStatus::C_STATIONARY_SOLUTION;
 		return;
 	}
 
@@ -817,8 +870,8 @@ namespace lcqpOASES {
 		std::vector<int> indices;
 
 		for (int i = 0; i < nComp; i++) {
-			if (S1x[i] <= options.complementarityTolerance)
-				if (S2x[i] <= options.complementarityTolerance)
+			if (S1x[i] <= options.getComplementarityTolerance())
+				if (S2x[i] <= options.getComplementarityTolerance())
 					indices.push_back(i);
 		}
 
@@ -830,9 +883,9 @@ namespace lcqpOASES {
 	}
 
 
-	algorithmStatus LCQProblem::getPrimalSolution( double* const xOpt ) const
+	AlgorithmStatus LCQProblem::getPrimalSolution( double* const xOpt ) const
 	{
-		if (algoStat != algorithmStatus::PROBLEM_NOT_SOLVED) {
+		if (algoStat != AlgorithmStatus::PROBLEM_NOT_SOLVED) {
 			for (int i = 0; i < nV; i++)
 				xOpt[i] = xk[i];
 		}
@@ -841,9 +894,9 @@ namespace lcqpOASES {
 	}
 
 
-	algorithmStatus LCQProblem::getDualSolution( double* const yOpt ) const
+	AlgorithmStatus LCQProblem::getDualSolution( double* const yOpt ) const
 	{
-		if (algoStat != algorithmStatus::PROBLEM_NOT_SOLVED) {
+		if (algoStat != AlgorithmStatus::PROBLEM_NOT_SOLVED) {
 			for (int i = 0; i < nDuals; i++)
 				yOpt[i] = yk[i];
 		}
@@ -852,17 +905,32 @@ namespace lcqpOASES {
 	}
 
 
+	int LCQProblem::getNumerOfDuals( ) const
+	{
+		return nDuals;
+	}
+
+
+	void LCQProblem::getOutputStatistics( OutputStatistics& _stats) const
+	{
+		_stats = stats;
+	}
+
+
 	/*
 	 *	 p r i n t I t e r a t i o n
 	 */
 	void LCQProblem::printIteration( )
 	{
-		if (options.printLvl == printLevel::NONE)
+		if (options.getPrintLevel() == PrintLevel::NONE)
+			return;
+
+		if (options.getPrintLevel() == PrintLevel::OUTER_LOOP_ITERATES && innerIter % 10 > 0)
 			return;
 
 		// Print header every 10 iters
-		bool headerInner = (options.printLvl >= printLevel::INNER_LOOP_ITERATES && innerIter % 10 == 0);
-		bool headerOuter = (options.printLvl == printLevel::OUTER_LOOP_ITERATES && outerIter % 10 == 0);
+		bool headerInner = (options.getPrintLevel() >= PrintLevel::INNER_LOOP_ITERATES && innerIter % 10 == 0);
+		bool headerOuter = (options.getPrintLevel() == PrintLevel::OUTER_LOOP_ITERATES && outerIter % 10 == 0);
 
 		if (headerInner || headerOuter)
 			printHeader();
@@ -873,7 +941,7 @@ namespace lcqpOASES {
 		printf("%6d", outerIter);
 
 		// Print innter iterate
-		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES)
+		if (options.getPrintLevel() >= PrintLevel::INNER_LOOP_ITERATES)
 			printf("%s%*d", sep, 6, innerIter);
 
 		// Print stationarity violation
@@ -891,7 +959,7 @@ namespace lcqpOASES {
 		tmpdbl = Utilities::MaxAbs(pk, nV);
 		printf("%s%10.3g", sep, tmpdbl);
 
-		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES) {
+		if (options.getPrintLevel() >= PrintLevel::INNER_LOOP_ITERATES) {
 			// Print optimal step length
 			printf("%s%10.3g", sep, alphak);
 
@@ -920,7 +988,7 @@ namespace lcqpOASES {
 
 		printf("%s",outer);
 
-		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES)
+		if (options.getPrintLevel() >= PrintLevel::INNER_LOOP_ITERATES)
 			printf("%s%s", sep, inner);
 
 		printf("%s%s", sep, stat);
@@ -928,7 +996,7 @@ namespace lcqpOASES {
 		printf("%s%s", sep, pen);
 		printf("%s%s", sep, np);
 
-		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES) {
+		if (options.getPrintLevel() >= PrintLevel::INNER_LOOP_ITERATES) {
 			printf("%s%s%s%s", sep, sl, sep, subIt);
 		}
 
@@ -946,10 +1014,16 @@ namespace lcqpOASES {
 		const char* dSep = "----------";
 		const char* node = "-+-";
 
+		if (innerIter == 0 && outerIter == 0) {
+			// Print new line at very beginning as there is no guarantee
+			// that whatever was printed before ended with newline.
+			printf("\n");
+		}
+
 		printf("%s", iSep);
 
 		// Print innter iterate
-		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES)
+		if (options.getPrintLevel() >= PrintLevel::INNER_LOOP_ITERATES)
 			printf("%s%s", node, iSep);
 
 		printf("%s%s", node, dSep);
@@ -957,7 +1031,7 @@ namespace lcqpOASES {
 		printf("%s%s", node, dSep);
 		printf("%s%s", node, dSep);
 
-		if (options.printLvl >= printLevel::INNER_LOOP_ITERATES) {
+		if (options.getPrintLevel() >= PrintLevel::INNER_LOOP_ITERATES) {
 			printf("%s%s%s%s", node, dSep, node, iSep);
 		}
 

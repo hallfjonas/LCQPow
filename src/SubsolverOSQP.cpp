@@ -51,9 +51,9 @@ namespace lcqpOASES {
         g = new c_float[nVars];
         l = new c_float[nDuals];
         u = new c_float[nDuals];
-        memcpy(g, _g, nVars*sizeof(c_float));
-        memcpy(l, _l, nDuals*sizeof(c_float));
-        memcpy(u, _u, nDuals*sizeof(c_float));
+        memcpy(g, _g, (size_t)nVars*sizeof(c_float));
+        memcpy(l, _l, (size_t)nDuals*sizeof(c_float));
+        memcpy(u, _u, (size_t)nDuals*sizeof(c_float));
 
         // Fill data
         data->n = nVars;
@@ -150,7 +150,7 @@ namespace lcqpOASES {
     }
 
 
-    returnValue SubsolverOSQP::solve(   bool initialSolve, int& iterations,
+    ReturnValue SubsolverOSQP::solve(   bool initialSolve, int& iterations,
                                         const double* const _g,
                                         const double* const _lbA, const double* const _ubA,
                                         const double* const x0, const double* const y0,
@@ -158,7 +158,7 @@ namespace lcqpOASES {
     {
         // Make sure that lb and ub are null pointers, as OSQP does not handle box constraints
         if (_lb != 0 || _ub != 0) {
-            return MessageHandler::PrintMessage( returnValue::INVALID_OSQP_BOX_CONSTRAINTS );
+            return MessageHandler::PrintMessage( ReturnValue::INVALID_OSQP_BOX_CONSTRAINTS );
         }
 
         // Update linear cost and bounds
@@ -174,10 +174,10 @@ namespace lcqpOASES {
 
         // Either pass error
         if (exitflag != 0)
-            return returnValue::SUBPROBLEM_SOLVER_ERROR;
+            return ReturnValue::SUBPROBLEM_SOLVER_ERROR;
 
         // Or pass successful return
-        return returnValue::SUCCESSFUL_RETURN;
+        return ReturnValue::SUCCESSFUL_RETURN;
     }
 
 
@@ -186,7 +186,7 @@ namespace lcqpOASES {
         OSQPSolution *sol(work->solution);
 
         if (sol->x != 0) {
-            memcpy(x, sol->x, nVars*(sizeof(double)));
+            memcpy(x, sol->x, (size_t)nVars*(sizeof(double)));
         }
 
         // Copy duals with negative sign
@@ -208,9 +208,9 @@ namespace lcqpOASES {
         g = new c_float[nVars];
         l = new c_float[nDuals];
         u = new c_float[nDuals];
-        memcpy(g, rhs.g, nVars*sizeof(c_float));
-        memcpy(l, rhs.l, nDuals*sizeof(c_float));
-        memcpy(u, rhs.u, nDuals*sizeof(c_float));
+        memcpy(g, rhs.g, (size_t)nVars*sizeof(c_float));
+        memcpy(l, rhs.l, (size_t)nDuals*sizeof(c_float));
+        memcpy(u, rhs.u, (size_t)nDuals*sizeof(c_float));
 
         // Copy data
         data = (OSQPData *)c_malloc(sizeof(OSQPData));

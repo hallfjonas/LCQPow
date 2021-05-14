@@ -57,7 +57,7 @@ namespace lcqpOASES {
             void setPrintlevl( bool verbose );
 
             /** Run OSQP solver. */
-            returnValue solve(  bool initialSolve, int& iterations,
+            ReturnValue solve(  bool initialSolve, int& iterations,
                                 const double* const _g,
                                 const double* const _lbA, const double* const _ubA,
                                 const double* const x0 = 0, const double* const y0 = 0,

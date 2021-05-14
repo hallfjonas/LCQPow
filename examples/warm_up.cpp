@@ -41,11 +41,11 @@ int main() {
     LCQProblem lcqp( nV, nC, nComp );
 
 	Options options;
-    options.printLvl = printLevel::INNER_LOOP_ITERATES;
+    options.setPrintLevel(PrintLevel::INNER_LOOP_ITERATES);
 	lcqp.setOptions( options );
 
     // Solve first LCQP
-	returnValue retVal = lcqp.loadLCQP( H, g, S1, S2 );
+	ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2 );
 
     if (retVal != SUCCESSFUL_RETURN)
     {
@@ -64,10 +64,13 @@ int main() {
     // Get solutions
     double* xOpt = new double[2];
 	double* yOpt = new double[nV + nC + 2*nComp];
+    lcqpOASES::OutputStatistics stats;
 	lcqp.getPrimalSolution( xOpt );
 	lcqp.getDualSolution( yOpt );
-	printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g, %g, %g ]; \n\n",
-			xOpt[0],xOpt[1],yOpt[0],yOpt[1],yOpt[2],yOpt[3] );
+    lcqp.getOutputStatistics( stats );
+	printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g, %g, %g ]; i = %d; k = %d; rho = %g; WSR = %d \n\n",
+			xOpt[0],xOpt[1],yOpt[0],yOpt[1],yOpt[2],yOpt[3],
+            stats.getIterTotal(), stats.getIterOuter(), stats.getRhoOpt(), stats.getSubproblemIter() );
 
     // Clean Up
     delete[] xOpt; delete[] yOpt;

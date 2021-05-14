@@ -76,7 +76,7 @@ namespace lcqpOASES {
 			 *
 			 * @returns SUCCESSFUL_RETURN if a solution is found. Otherwise the return value will indicate an occured error.
 			*/
-			returnValue loadLCQP(
+			ReturnValue loadLCQP(
 				const double* const _H,
 				const double* const _g,
 				const double* const _S1,
@@ -108,7 +108,7 @@ namespace lcqpOASES {
 			 *
 			 * @returns SUCCESSFUL_RETURN if a solution is found. Otherwise the return value will indicate an occured error.
 			*/
-			returnValue loadLCQP(
+			ReturnValue loadLCQP(
 				const char* const H_file,
 				const char* const g_file,
 				const char* const S1_file,
@@ -149,7 +149,7 @@ namespace lcqpOASES {
 			 *
 			 * @returns SUCCESSFUL_RETURN if a solution is found. Otherwise the return value will indicate an occured error.
 			*/
-			returnValue loadLCQP(
+			ReturnValue loadLCQP(
 				double* _H_data,
 				int _H_nnx,
 				int* _H_i,
@@ -199,7 +199,7 @@ namespace lcqpOASES {
 			 *
 			 * @returns SUCCESSFUL_RETURN if a solution is found. Otherwise the return value will indicate an occured error.
 			*/
-			returnValue loadLCQP(
+			ReturnValue loadLCQP(
 				const char* const H_data_file,
 				const char* const H_i_file,
 				const char* const H_p_file,
@@ -222,7 +222,7 @@ namespace lcqpOASES {
 			);
 
 			/** After problem is set up, call this function and solve LCQP. */
-			returnValue runSolver( );
+			ReturnValue runSolver( );
 
 			/** Writes the primal solution vector.
 			 *
@@ -230,7 +230,7 @@ namespace lcqpOASES {
 			 *
 			 * @returns If the problem was solved successfully the stationarity type is passed. Else PROBLEM_NOT_SOLVED is returned.
 			 */
-			virtual algorithmStatus getPrimalSolution( double* const xOpt ) const;
+			virtual AlgorithmStatus getPrimalSolution( double* const xOpt ) const;
 
 
 			/** Writes the dual solution vector.
@@ -239,7 +239,21 @@ namespace lcqpOASES {
 			 *
 			 * @returns If the problem was solved successfully the stationarity type is passed. Else PROBLEM_NOT_SOLVED is returned.
 			 */
-			virtual algorithmStatus getDualSolution( double* const yOpt ) const;
+			virtual AlgorithmStatus getDualSolution( double* const yOpt ) const;
+
+
+			/** Get the number of dual variables. This depends on the utilized subproblem solver.
+			 *
+			 * @return Returns the number of dual variables.
+			 */
+			virtual int getNumerOfDuals( ) const;
+
+
+			/** Get the output statistics.
+			 *
+			 * @param _stats The output statistics pointer to copy the stats to.
+			 */
+			virtual void getOutputStatistics( OutputStatistics& stats) const;
 
 
 			/** Pass options for the LCQP.
@@ -261,7 +275,7 @@ namespace lcqpOASES {
 			 *
 			 * @param rhs The LCQProblem to be copied.
 			 */
-			returnValue copy( const LCQProblem& rhs );
+			ReturnValue copy( const LCQProblem& rhs );
 
 
 			/** Prints concise information on the current iteration. */
@@ -280,7 +294,7 @@ namespace lcqpOASES {
 			 *
 			 * @param H_new New dense Hessian matrix (with correct dimension!), a shallow copy is made.
 			 */
-			inline returnValue setH( const double* const H_new );
+			inline ReturnValue setH( const double* const H_new );
 
 
 			/** Store the (sparse) Hessian matrix H internally.
@@ -290,7 +304,7 @@ namespace lcqpOASES {
 			 * @param _H_i Row indicies of non-zero values.
 			 * @param _H_p Pointer to column starts.
 			 */
-			inline returnValue setH(
+			inline ReturnValue setH(
 				double* H_data,
 				int H_nnx,
 				int* H_i,
@@ -299,13 +313,13 @@ namespace lcqpOASES {
 
 
 
-			inline returnValue setG( const double* const g_new );
+			inline ReturnValue setG( const double* const g_new );
 
 			/** Store the lower (box) bounds internally.
 			 *
 			 * @param lb_new New lower bound vector (with correct dimension!).
 			 */
-			inline returnValue setLB( const double* const lb_new );
+			inline ReturnValue setLB( const double* const lb_new );
 
 
 			/** Store a specific lower (box) bound internally.
@@ -313,7 +327,7 @@ namespace lcqpOASES {
 			 * @param number Number of entry to be changed.
 			 * @param value New value for entry of lower bound vector.
 			 */
-			inline returnValue setLB(
+			inline ReturnValue setLB(
 				int number,
 				double value
 			);
@@ -323,7 +337,7 @@ namespace lcqpOASES {
 			 *
 			 * @param ub_new New upper bound vector (with correct dimension!).
 			 */
-			inline returnValue setUB( const double* const ub_new );
+			inline ReturnValue setUB( const double* const ub_new );
 
 
 			/** Store a specific upper (box) bound internally.
@@ -331,7 +345,7 @@ namespace lcqpOASES {
 			 * @param number Number of entry to be changed.
 			 * @param value New value for entry of lower bound vector.
 			 */
-			inline returnValue setUB(
+			inline ReturnValue setUB(
 				int number,
 				double value
 			);
@@ -345,7 +359,7 @@ namespace lcqpOASES {
 			 * @param lbA New lower bounds for A.
 			 * @param ubA New upper bounds for A.
 			 */
-			returnValue setConstraints(
+			ReturnValue setConstraints(
 				const double* const S1_new,
 				const double* const S2_new,
 				const double* const A_new,
@@ -371,7 +385,7 @@ namespace lcqpOASES {
 			 * @param lbA The constraint's lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
 			 * @param ubA The constraint's upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
 			 */
-			returnValue setConstraints(
+			ReturnValue setConstraints(
 				double* S1_data,
 				int S1_nnx,
 				int* S1_i,
@@ -392,21 +406,21 @@ namespace lcqpOASES {
 			/** Set the complementarity matrix (requires the constraints to be set) as the symmetrization product of S1 and S2.
 			 *  C = S1'*S2 + S2'*S1
 			 */
-			returnValue setC( );
+			ReturnValue setC( );
 
 			/** Sets the initial guess x0 and y0.
 			 *
 			 * @param _x0 The primal initial guess.
 			 * @param _y0 The dual initial guess.
 			 */
-			inline returnValue setInitialGuess(
+			inline ReturnValue setInitialGuess(
 				const double* const _x0,
 				const double* const _y0
 			);
 
 
 			/** TODO: Write description. */
-			inline returnValue setSparseMatrix(
+			inline ReturnValue setSparseMatrix(
 				const double* const _M_data,
 				const int _M_nnx,
 				const int* const _M_i,
@@ -415,7 +429,7 @@ namespace lcqpOASES {
 			);
 
 			/** TODO: Write description. */
-			inline returnValue setSparseMatrix(
+			inline ReturnValue setSparseMatrix(
 				const double* const _M_data,
 				const int _M_nnx,
 				const int* const _M_i,
@@ -454,7 +468,7 @@ namespace lcqpOASES {
 			 *
 			 * @param initialSolve Pass true on first solve of sequence, false on subsequent calls (initialization vs hotstart).
 			 */
-			returnValue solveQPSubproblem( bool initialSolve );
+			ReturnValue solveQPSubproblem( bool initialSolve );
 
 			/** Check outer stationarity at current iterate xk. */
 			bool stationarityCheck( );
@@ -470,6 +484,12 @@ namespace lcqpOASES {
 
 			/** Update xk and gk. */
 			void updateStep( );
+
+			/** Update outer iteration counter. */
+			void updateOuterIter( );
+
+			/** Update outer iteration counter. */
+			void updateTotalIter( );
 
 			/** Gradient perturbation method. */
 			void perturbGradient( );
@@ -524,12 +544,13 @@ namespace lcqpOASES {
 			double* constr_statk = NULL;			/**< Constraint contribution to stationarity equation. */
 			double* box_statk = NULL;				/**< Box Constraint contribution to stationarity equation. */
 
-			int outerIter;							/**< Outer iterate. */
-			int innerIter;							/**< Inner iterate- */
+			int outerIter;							/**< Outer iterate counter. */
+			int innerIter;							/**< Inner iterate counter. */
+			int totalIter;							/**< Total iterate counter. */
 
 			int qpIterk;							/**< Iterations taken by qpSolver to solve subproblem. */
 
-			algorithmStatus algoStat;				/**< Status of algorithm. */
+			AlgorithmStatus algoStat;				/**< Status of algorithm. */
 
 			csc* H_sparse = NULL;					/**< Sparse objective Hessian matrix. */
 			csc* A_sparse = NULL;					/**< Sparse constraint matrix. */
@@ -539,6 +560,7 @@ namespace lcqpOASES {
 
 			Subsolver subsolver;					/**< Subsolver class for solving the QP subproblems. */
 
+			OutputStatistics stats;					/**< Output statistics. */
 	};
 }
 

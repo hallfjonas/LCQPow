@@ -25,13 +25,13 @@ namespace lcqpOASES {
 	/*
 	*	s e t H
 	*/
-	inline returnValue LCQProblem::setH( const double* const H_new )
+	inline ReturnValue LCQProblem::setH( const double* const H_new )
 	{
 		if (nV <= 0)
 			return LCQPOBJECT_NOT_SETUP;
 
 		H = new double[nV*nV];
-		memcpy( H, H_new, (nV*nV)*sizeof(double) );
+		memcpy( H, H_new, (size_t)(nV*nV)*sizeof(double) );
 
 		return SUCCESSFUL_RETURN;
 	}
@@ -40,7 +40,7 @@ namespace lcqpOASES {
 	/*
 	*	s e t G
 	*/
-	inline returnValue LCQProblem::setG( const double* const g_new )
+	inline ReturnValue LCQProblem::setG( const double* const g_new )
 	{
 		if ( nV == 0 )
 			return LCQPOBJECT_NOT_SETUP;
@@ -49,7 +49,7 @@ namespace lcqpOASES {
 			return INVALID_ARGUMENT;
 
 		g = new double[nV];
-		memcpy( g, g_new, nV*sizeof(double) );
+		memcpy( g, g_new, (size_t)nV*sizeof(double) );
 
 		return SUCCESSFUL_RETURN;
 	}
@@ -58,7 +58,7 @@ namespace lcqpOASES {
 	/*
 	*	s e t L B
 	*/
-	inline returnValue LCQProblem::setLB( const double* const lb_new )
+	inline ReturnValue LCQProblem::setLB( const double* const lb_new )
 	{
 		if ( nV == 0 )
 			return LCQPOBJECT_NOT_SETUP;
@@ -67,7 +67,7 @@ namespace lcqpOASES {
 
 		if ( lb_new != 0 )
 		{
-			memcpy( lb, lb_new, nV*sizeof(double) );
+			memcpy( lb, lb_new, (size_t)nV*sizeof(double) );
 		}
 		else
 		{
@@ -83,7 +83,7 @@ namespace lcqpOASES {
 	/*
 	*	s e t L B
 	*/
-	inline returnValue LCQProblem::setLB( int number, double value )
+	inline ReturnValue LCQProblem::setLB( int number, double value )
 	{
 		if ( nV == 0 )
 			return LCQPOBJECT_NOT_SETUP;
@@ -103,7 +103,7 @@ namespace lcqpOASES {
 	/*
 	*	s e t U B
 	*/
-	inline returnValue LCQProblem::setUB( const double* const ub_new )
+	inline ReturnValue LCQProblem::setUB( const double* const ub_new )
 	{
 		if ( nV == 0 )
 			return LCQPOBJECT_NOT_SETUP;
@@ -112,7 +112,7 @@ namespace lcqpOASES {
 
 		if ( ub_new != 0 )
 		{
-			memcpy( ub, ub_new, nV*sizeof(double) );
+			memcpy( ub, ub_new, (size_t)nV*sizeof(double) );
 		}
 		else
 		{
@@ -128,7 +128,7 @@ namespace lcqpOASES {
 	/*
 	*	s e t U B
 	*/
-	inline returnValue LCQProblem::setUB( int number, double value )
+	inline ReturnValue LCQProblem::setUB( int number, double value )
 	{
 		if ( nV == 0 )
 			return LCQPOBJECT_NOT_SETUP;
@@ -148,7 +148,7 @@ namespace lcqpOASES {
 	/*
 	 *	 s e t I n i t i a l G u e s s
 	 */
-	inline returnValue LCQProblem::setInitialGuess( const double* const _x0, const double* const _y0 )
+	inline ReturnValue LCQProblem::setInitialGuess( const double* const _x0, const double* const _y0 )
 	{
 		if ( nV == 0 || nComp == 0)
 			return LCQPOBJECT_NOT_SETUP;
@@ -156,12 +156,12 @@ namespace lcqpOASES {
 		xk = new double[nV]();
 
 		if (_x0 != 0) {
-			memcpy(xk, _x0, nV*sizeof(double));
+			memcpy(xk, _x0, (size_t)nV*sizeof(double));
 		}
 
 		if (_y0 != 0) {
 			yk = new double[nV + nC + 2*nComp];
-			memcpy(yk, _y0, (nV + nC + 2*nComp)*sizeof(double));
+			memcpy(yk, _y0, (size_t)(nV + nC + 2*nComp)*sizeof(double));
 		} else {
 			yk = (double*)0;
 		}
@@ -175,7 +175,6 @@ namespace lcqpOASES {
 	inline void LCQProblem::setOptions( const Options& _options )
 	{
 		options = _options;
-		options.ensureConsistency( );
 	}
 }
 

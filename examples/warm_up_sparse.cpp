@@ -29,9 +29,9 @@ int main() {
     std::cout << "Preparing warm up problem...\n";
 
     /* Setup data of first QP. */
-    int H_nnx = 3;
-    double H_data[3] = { 2.0, 2.0 };
-    int H_i[3] = {0, 1};
+    int H_nnx = 2;
+    double H_data[2] = { 2.0, 2.0 };
+    int H_i[2] = {0, 1};
     int H_p[3] = {0, 1, 2};
 
     double g[2] = { -2.0, -2.0 };
@@ -53,11 +53,11 @@ int main() {
     LCQProblem lcqp( nV, nC, nComp );
 
 	Options options;
-    options.printLvl = printLevel::INNER_LOOP_ITERATES;
+    options.setPrintLevel(PrintLevel::INNER_LOOP_ITERATES);
 	lcqp.setOptions( options );
 
     // Solve first LCQP
-	returnValue retVal = lcqp.loadLCQP( H_data, H_nnx, H_i, H_p, g, S1_data, S1_nnx, S1_i, S1_p, S2_data, S2_nnx, S2_i, S2_p );
+	ReturnValue retVal = lcqp.loadLCQP( H_data, H_nnx, H_i, H_p, g, S1_data, S1_nnx, S1_i, S1_p, S2_data, S2_nnx, S2_i, S2_p );
 
     if (retVal != SUCCESSFUL_RETURN)
     {

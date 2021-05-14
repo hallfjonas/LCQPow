@@ -34,7 +34,7 @@ BINDIR = ${TOP}/bin
 LIBDIR = ${TOP}/lib
 DEBUGDIR = ${TOP}/debug
 BUILDDIR = ${TOP}/build
-
+INSTALLDIR = /usr/local/lib
 # qpOASES
 QPOASES_IDIR = ${TOP}/external/qpOASES/include
 QPOASES_LINK = -lqpOASES

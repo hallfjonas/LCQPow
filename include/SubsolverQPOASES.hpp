@@ -50,7 +50,7 @@ namespace lcqpOASES {
             void setOptions( qpOASES::Options options );
 
             /** Run qpOASES solver. */
-            returnValue solve(  bool initialSolve, int& iterations,
+            ReturnValue solve(  bool initialSolve, int& iterations,
                                 const double* const _g,
                                 const double* const _lbA,
                                 const double* const _ubA,

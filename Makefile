@@ -11,7 +11,7 @@
 ##
 ##	lcqpOASES is distributed in the hope that it will be useful,
 ##	but WITHOUT ANY WARRANTY; without even the implied warranty of
-##	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+##	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ##	See the GNU Lesser General Public License for more details.
 ##
 ##	You should have received a copy of the GNU Lesser General Public
@@ -31,34 +31,37 @@ all: src examples
 #src_aw testing
 
 src:
-	@cd $@; ${MAKE} -s 
+	@cd $@; ${MAKE} -s
 
 examples: src
 	@cd $@; ${MAKE} -s
 
 doc:
-	@cd $@; ${MAKE} -s 
+	@cd $@; ${MAKE} -s
 
 test:
 	@mkdir -p ${BUILDDIR}
-	@cd build && ${CMAKE} .. 
+	@cd build && ${CMAKE} ..
 	@cd build && ${MAKE}
 	build/TestUtils
 
 debugging:
-	@cd $@; ${MAKE} -s 
+	@cd $@; ${MAKE} -s
 
 clean:
 	@cd src               			&& ${MAKE} -s clean
 	@cd examples          			&& ${MAKE} -s clean
 	@${ECHO} "Cleaning up (debug)"  && ${RM} -rf debug
-	@${ECHO} "Cleaning up (bin)"  	&& ${RM} -rf bin	
-	@${ECHO} "Cleaning up (build)"  && ${RM} -rf build	
-	@${ECHO} "Cleaning up (lib)"  	&& ${RM} -rf lib	
+	@${ECHO} "Cleaning up (bin)"  	&& ${RM} -rf bin
+	@${ECHO} "Cleaning up (build)"  && ${RM} -rf build
+	@${ECHO} "Cleaning up (lib)"  	&& ${RM} -rf lib
 
 clobber: clean
 
-dependencies: 
+install:
+	@${CP} ${LIBDIR}/* ${INSTALLDIR}
+
+dependencies:
 	@${ECHO} "Building dependency qpOASES at ${TOP}/external/qpOASES"
 	@${CD} ${TOP}/external/qpOASES; ${MKDIR} -p bin; ${MAKE} all; ${CP} bin/libqpOASES.* /usr/local/lib; ${MAKE} clean
 

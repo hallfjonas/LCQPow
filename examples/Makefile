@@ -35,7 +35,7 @@ IFLAGS      =  -I. \
 
 LFLAGS 		= ${QPOASES_LINK} ${OSQP_LINK} ${PYTHON3_LINK}
 
-DEBUGFLAGS = -g -Wall -pedantic -Wshadow -Wfloat-equal
+DEBUGFLAGS = -g -pg -Wall -pedantic -Wshadow -Wfloat-equal
 
 QPOASES_SRC = $(wildcard ${QPOASESDIR}/src/*.cpp)
 
@@ -47,14 +47,15 @@ LCQPOASES_EXAMPLES = \
 	${BINDIR}/warm_up${EXE} \
 	${BINDIR}/warm_up_w_A${EXE} \
 	${BINDIR}/warm_up_sparse${EXE} \
-	${BINDIR}/solve_lcqp_from_file${EXE}
+	${BINDIR}/solve_lcqp_from_file${EXE} \
+	${BINDIR}/OptimizeOnCircle${EXE}
 
 LCQPOASES_DEBUG = \
 	${DEBUGDIR}/warm_up${EXE} \
 	${DEBUGDIR}/warm_up_w_A${EXE} \
 	${DEBUGDIR}/warm_up_sparse${EXE} \
-	${DEBUGDIR}/solve_lcqp_from_file${EXE}
-
+	${DEBUGDIR}/solve_lcqp_from_file${EXE} \
+	${DEBUGDIR}/OptimizeOnCircle${EXE}
 
 LCQPOASES_SRC = $(wildcard ${SRCDIR}/*.cpp)
 OSQP_SRC = $(wildcard /usr/local/osqp/src/*.c)
