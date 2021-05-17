@@ -347,7 +347,9 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
     // Set options and print them
     lcqp.setOptions( options );
-    printOptions( options );
+
+    // For debug sakes
+    // printOptions( options );
 
     // Load data into LCQP object
     lcqpOASES::ReturnValue ret = lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub, x0);
