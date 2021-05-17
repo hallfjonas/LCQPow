@@ -239,15 +239,15 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     }
 
     // MATLAB stores in column major format (switch to row major)
-    if (S1_col != NULL && nComp > 1 && nV > 1) {
+    if (S1_col != NULL && nComp > 0 && nV > 0) {
         S1 = new double[nComp*nV];
         colMajorToRowMajor(S1_col, S1, nComp, nV);
     }
-    if (S2_col != NULL && nComp > 1 && nV > 1) {
+    if (S2_col != NULL && nComp > 0 && nV > 0) {
         S2 = new double[nComp*nV];
         colMajorToRowMajor(S2_col, S2, nComp, nV);
     }
-    if (A_col != NULL && nC > 1 && nV > 1) {
+    if (A_col != NULL && nC > 0 && nV > 0) {
         A = new double[nC*nV];
         colMajorToRowMajor(A_col, A, nC, nV);
     }
