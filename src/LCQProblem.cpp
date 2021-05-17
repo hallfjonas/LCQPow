@@ -633,7 +633,7 @@ namespace lcqpOASES {
 	void LCQProblem::setQk( )
 	{
 		std::vector<double> Qk_data;
-		std::vector<double> Qk_row;
+		std::vector<int> Qk_row;
 		int* Qk_p = new int[nV+1]();
 
 		// Iterate over columns
@@ -699,7 +699,7 @@ namespace lcqpOASES {
 		double* Qk_x = new double[Qk_nnx]();
 		int* Qk_i = new int[Qk_nnx]();
 
-		for (int i = 0; i < Qk_nnx; i++) {
+		for (size_t i = 0; i < (size_t) Qk_nnx; i++) {
 			Qk_x[i] = Qk_data[i];
 			Qk_i[i] = Qk_row[i];
 		}
@@ -855,7 +855,7 @@ namespace lcqpOASES {
 
 	void LCQProblem::updateQk( ) {
 		double factor = rho*(1 - 1.0/options.getPenaltyUpdateFactor());
-		for (int j = 0; j < (int) Qk_indices_of_C.size(); j++) {
+		for (size_t j = 0; j < Qk_indices_of_C.size(); j++) {
 			Qk_sparse->x[Qk_indices_of_C[j]] += factor*C_sparse->x[j];
 		}
 	}
