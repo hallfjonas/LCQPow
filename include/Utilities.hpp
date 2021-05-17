@@ -42,13 +42,15 @@ namespace lcqpOASES {
         INVALID_NUMBER_OF_OPTIM_VARS = 106,             /**< Invalid number of optimization variables. Must be a positive integer. */
         INVALID_NUMBER_OF_COMP_VARS = 107,              /**< Invalid number of complementarity constraints. Must be a positive integer. */
         INVALID_NUMBER_OF_CONSTRAINT_VARS = 108,        /**< Invalid number of linear constraints. Must be a non-negative integer. */
-        INVALID_RELAX_OPTIONS_TOLERANCE = 109,          /**< Invalid number of active set changes to switch to precision mode. Must be a positive integer. */
         INVALID_OSQP_BOX_CONSTRAINTS = 110,             /**< Invalid constraints passed to OSQP solver: This solver does not handle box constraints, please pass them through linear constraints. */
         INVALID_TOTAL_ITER_COUNT = 111,                 /**< Invalid total number of iterations delta passed to output statistics (must be non-negative integer). */
         INVALID_TOTAL_OUTER_ITER = 112,                 /**< Invalid total number of outer iterations delta passed to output statistics (must be non-negative integer). */
         IVALID_SUBPROBLEM_ITER = 113,                   /**< Invalid total number of subproblem solver iterates delta passed to output statistics (must be non-negative integer). */
         INVALID_RHO_OPT = 114,                          /**< Invalid rho value at solution passed to output statistics. (must be positive double). */
         INVALID_PRINT_LEVEL_VALUE = 115,                /**< Invalid integer to be parsed to print level passed (must be in range of enum). */
+        INVALID_OBJECTIVE_LINEAR_TERM = 116,            /**< Invalid objective linear term passed (must be a double array of length n). */
+        INVALID_CONSTRAINT_MATRIX = 117,                /**< Invalid constraint matrix passed (matrix was null pointer but number of constraints is positive). */
+        INVALID_COMPLEMENTARITY_MATRIX = 118,           /**< Invalid complementarity matrix passed (can not be null pointer). */
 
         // Algorithmic errors
         MAX_ITERATIONS_REACHED = 200,                   /**< Maximum number of iterations reached. */
@@ -114,46 +116,46 @@ namespace lcqpOASES {
             double getStationarityTolerance( );
 
             /** Set stationarity tolerance. */
-            void setStationarityTolerance( double val );
+            ReturnValue setStationarityTolerance( double val );
 
             /** Get complementarity tolerance. */
             double getComplementarityTolerance( );
 
             /** Set complementarity tolerance. */
-            void setComplementarityTolerance( double val );
+            ReturnValue setComplementarityTolerance( double val );
 
             /** Get initial penalty parameter. */
             double getInitialPenaltyParameter( );
 
             /** Set complementarity tolerance. */
-            void setInitialPenaltyParameter( double val );
+            ReturnValue setInitialPenaltyParameter( double val );
 
             /** Get penalty parameter update factor. */
             double getPenaltyUpdateFactor( );
 
             /** Set penalty parameter update factor. */
-            void setPenaltyUpdateFactor( double val );
+            ReturnValue setPenaltyUpdateFactor( double val );
 
             /** Get whether to solve for (complement.) unconstrained global minumum first. */
             bool getSolveZeroPenaltyFirst( );
 
             /** Set whether to solve for (complement.) unconstrained global minumum first. */
-            void setSolveZeroPenaltyFirst( bool val );
+            ReturnValue setSolveZeroPenaltyFirst( bool val );
 
             /** Get maximum number of iterations. */
             int getMaxIterations( );
 
             /** Set maximum number of iterations. */
-            void setMaxIterations( int val );
+            ReturnValue setMaxIterations( int val );
 
             /** Get print level. */
             PrintLevel getPrintLevel( );
 
             /** Set print level. */
-            void setPrintLevel( PrintLevel val );
+            ReturnValue setPrintLevel( PrintLevel val );
 
             /** Set print level (using an integer). */
-            void setPrintLevel( int val );
+            ReturnValue setPrintLevel( int val );
 
         protected:
             void copy( const Options& rhs );            /**< Copy each property. */

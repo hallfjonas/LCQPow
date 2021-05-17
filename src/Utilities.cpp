@@ -71,11 +71,12 @@ namespace lcqpOASES {
     }
 
 
-    void Options::setStationarityTolerance( double val ) {
+    ReturnValue Options::setStationarityTolerance( double val ) {
         if (val <= Utilities::EPS)
-            throw INVALID_STATIONARITY_TOLERANCE;
+            return (MessageHandler::PrintMessage(INVALID_STATIONARITY_TOLERANCE) );
 
         stationarityTolerance = val;
+        return ReturnValue::SUCCESSFUL_RETURN;
     }
 
 
@@ -84,11 +85,12 @@ namespace lcqpOASES {
     }
 
 
-    void Options::setComplementarityTolerance( double val ) {
+    ReturnValue Options::setComplementarityTolerance( double val ) {
         if (val <= Utilities::EPS)
-            throw INVALID_COMPLEMENTARITY_TOLERANCE;
+            return (MessageHandler::PrintMessage(INVALID_COMPLEMENTARITY_TOLERANCE) ) ;
 
         complementarityTolerance = val;
+        return ReturnValue::SUCCESSFUL_RETURN;
     }
 
 
@@ -97,11 +99,12 @@ namespace lcqpOASES {
     }
 
 
-    void Options::setInitialPenaltyParameter( double val ) {
+    ReturnValue Options::setInitialPenaltyParameter( double val ) {
         if (val <= Utilities::ZERO)
-            throw INVALID_INITIAL_PENALTY_VALUE;
+            return (MessageHandler::PrintMessage(INVALID_INITIAL_PENALTY_VALUE) );
 
         initialPenaltyParameter = val;
+        return ReturnValue::SUCCESSFUL_RETURN;
     }
 
 
@@ -110,11 +113,12 @@ namespace lcqpOASES {
     }
 
 
-    void Options::setPenaltyUpdateFactor( double val ) {
+    ReturnValue Options::setPenaltyUpdateFactor( double val ) {
         if (val <= 1)
-            throw INVALID_PENALTY_UPDATE_VALUE;
+            return (MessageHandler::PrintMessage(INVALID_PENALTY_UPDATE_VALUE) ) ;
 
         penaltyUpdateFactor = val;
+        return ReturnValue::SUCCESSFUL_RETURN;
     }
 
 
@@ -123,8 +127,9 @@ namespace lcqpOASES {
     }
 
 
-    void Options::setSolveZeroPenaltyFirst( bool val ) {
+    ReturnValue Options::setSolveZeroPenaltyFirst( bool val ) {
         solveZeroPenaltyFirst = val;
+        return ReturnValue::SUCCESSFUL_RETURN;
     }
 
 
@@ -133,11 +138,12 @@ namespace lcqpOASES {
     }
 
 
-    void Options::setMaxIterations( int val ) {
+    ReturnValue Options::setMaxIterations( int val ) {
         if (val <= 0)
-            throw INVALID_MAX_ITERATIONS_VALUE;
+            return (MessageHandler::PrintMessage(INVALID_MAX_ITERATIONS_VALUE) );
 
         maxIterations = val;
+        return ReturnValue::SUCCESSFUL_RETURN;
     }
 
 
@@ -146,17 +152,19 @@ namespace lcqpOASES {
     }
 
 
-    void Options::setPrintLevel( PrintLevel val ) {
+    ReturnValue Options::setPrintLevel( PrintLevel val ) {
         printLevel = val;
+        return ReturnValue::SUCCESSFUL_RETURN;
     }
 
 
-    void Options::setPrintLevel( int val ) {
+    ReturnValue Options::setPrintLevel( int val ) {
 
         if (val < PrintLevel::NONE || val > PrintLevel::SUBPROBLEM_SOLVER_ITERATES)
-            throw INVALID_PRINT_LEVEL_VALUE;
+            return (MessageHandler::PrintMessage(INVALID_PRINT_LEVEL_VALUE) );
 
         printLevel = (PrintLevel)val;
+        return ReturnValue::SUCCESSFUL_RETURN;
     }
 
 
@@ -335,7 +343,7 @@ namespace lcqpOASES {
 				M->x = NULL;
 			}
 
-			c_free(M);
+            free (M);
 			M = NULL;
 		}
     }
@@ -785,27 +793,23 @@ namespace lcqpOASES {
                 break;
 
             case INVALID_COMPLEMENTARITY_TOLERANCE:
-                printf("ERROR: Invalid argument passed (complementarity tolerance).\n");
+                printf("WARNING: Ignoring invalid complementarity tolerance.\n");
                 break;
 
             case INVALID_INITIAL_PENALTY_VALUE:
-                printf("ERROR: Invalid argument passed (initial penalty value).\n");
+                printf("WARNING: Invalid argument passed (initial penalty value).\n");
                 break;
 
             case INVALID_PENALTY_UPDATE_VALUE:
-                printf("ERROR: Invalid argument passed (penalty update value).\n");
+                printf("WARNING: Ignoring invalid penalty update value.\n");
                 break;
 
             case INVALID_MAX_ITERATIONS_VALUE:
-                printf("ERROR: Invalid argument passed (maximum iterations).\n");
+                printf("WARNING: Ignoring invalid number of maximum iterations.\n");
                 break;
 
             case INVALID_STATIONARITY_TOLERANCE:
-                printf("ERROR: Invalid argument passed (stationarity tolerance).\n");
-                break;
-
-            case INVALID_RELAX_OPTIONS_TOLERANCE:
-                printf("ERROR: Invalid argument passed (relax optiopns tolerance).\n");
+                printf("WARNING: Ignoring invalid stationarity tolerance.\n");
                 break;
 
             case INVALID_INDEX_POINTER:
@@ -837,7 +841,19 @@ namespace lcqpOASES {
                 break;
 
             case INVALID_PRINT_LEVEL_VALUE:
-                printf("ERROR: Invalid integer to be parsed to print level passed (must be in range of enum).\n");
+                printf("WARNING: Ignoring invalid integer to be parsed to print level passed (must be in range of enum).\n");
+                break;
+
+            case INVALID_OBJECTIVE_LINEAR_TERM:
+                printf("ERROR: Invalid objective linear term passed (must be a double array of length n).\n");
+                break;
+
+            case INVALID_CONSTRAINT_MATRIX:
+                printf("ERROR: Invalid constraint matrix passed (matrix was null pointer but number of constraints is positive).\n");
+                break;
+
+            case INVALID_COMPLEMENTARITY_MATRIX:
+                printf("ERROR: Invalid complementarity matrix passed (can not be null pointer).\n");
                 break;
         }
 

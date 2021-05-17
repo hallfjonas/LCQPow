@@ -162,9 +162,6 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         }
     }
 
-    // Debug statement
-    // mexPrintf("Got LCQP of dimension (nV x nComp x nC) = (%d x %d x %d).\n", nV, nComp, nC);
-
     // Check all dimensions (except for params)
     if (!checkDimensionAndTypeDouble(prhs[0], nV, nV, "H")) return;
     if (!checkDimensionAndTypeDouble(prhs[1], nV, 1, "g")) return;
@@ -242,15 +239,15 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     }
 
     // MATLAB stores in column major format (switch to row major)
-    if (S1_col != NULL && nComp > 1 && nV > 1) {
+    if (S1_col != NULL && nComp > 0 && nV > 0) {
         S1 = new double[nComp*nV];
         colMajorToRowMajor(S1_col, S1, nComp, nV);
     }
-    if (S2_col != NULL && nComp > 1 && nV > 1) {
+    if (S2_col != NULL && nComp > 0 && nV > 0) {
         S2 = new double[nComp*nV];
         colMajorToRowMajor(S2_col, S2, nComp, nV);
     }
-    if (A_col != NULL && nC > 1 && nV > 1) {
+    if (A_col != NULL && nC > 0 && nV > 0) {
         A = new double[nC*nV];
         colMajorToRowMajor(A_col, A, nC, nV);
     }
@@ -346,14 +343,14 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 continue;
             }
         }
-
-        lcqp.setOptions( options );
     }
 
-    // printOptions( options );
+    // Set options and print them
+    lcqp.setOptions( options );
+    printOptions( options );
 
     // Load data into LCQP object
-    lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub, x0);
+    lcqpOASES::ReturnValue ret = lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub, x0);
 
     // Clear A, S1, S2
     if (A != 0)
@@ -365,12 +362,16 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     if (S2 != 0)
         delete[] S2;
 
+    if (ret != lcqpOASES::ReturnValue::SUCCESSFUL_RETURN) {
+        mexPrintf("Failed to load LCQP.\n");
+        return;
+    }
 
     // Start time
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
     // Run solver
-    lcqpOASES::ReturnValue ret = lcqp.runSolver();
+    ret = lcqp.runSolver();
 
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
     double elapsed_secs = (end - begin).count()/1000.0/1000.0/1000.0;
@@ -456,9 +457,6 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             mxSetFieldByNumber(plhs[2], 0, 4, elapsed_time);
         }
     }
-
-    // Destroy LCQProblem object
-    lcqp.~LCQProblem();
 
     return;
 }

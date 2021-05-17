@@ -36,9 +36,6 @@ namespace lcqpOASES {
     SubsolverQPOASES::SubsolverQPOASES( int _nV, int _nC,
                                         double* _H, double* _A)
     {
-        if (_nV <= 0  || _nC <= 0)
-            throw( MessageHandler::PrintMessage( ReturnValue::INVALID_ARGUMENT) );
-
         nV = _nV;
         nC = _nC;
 

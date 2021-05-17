@@ -90,6 +90,9 @@ namespace lcqpOASES {
 	{
 		ReturnValue ret;
 
+		if ( nV <= 0 || nComp <= 0 )
+            return( MessageHandler::PrintMessage(ReturnValue::LCQPOBJECT_NOT_SETUP) );
+
 		ret = setH( _H );
 
 		if (ret != SUCCESSFUL_RETURN)
@@ -438,7 +441,7 @@ namespace lcqpOASES {
 			return LCQPOBJECT_NOT_SETUP;
 
 		if ( A_new == 0 && nC > 0)
-			return INVALID_ARGUMENT;
+			return INVALID_CONSTRAINT_MATRIX;
 
 		// Set up new constraint matrix (A; L; R)
 		A = new double[(nC + 2*nComp)*nV];
@@ -485,7 +488,7 @@ namespace lcqpOASES {
 
 		// Set complementarities
 		if ( S1_new == 0 || S2_new == 0 )
-			return INVALID_ARGUMENT;
+			return INVALID_COMPLEMENTARITY_MATRIX;
 
 		S1 = new double[nComp*nV];
 		S2 = new double[nComp*nV];
