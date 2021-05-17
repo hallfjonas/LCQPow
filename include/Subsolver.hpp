@@ -27,23 +27,24 @@
 
 namespace lcqpOASES {
 
-    enum QPSubproblemSolver {
-        QPOASES = 0,                                /**< qpOASES. */
-        OSQP = 1
-    };
-
     class Subsolver {
         public:
 			/** Default constructor. */
 			Subsolver( );
 
-            /** Constructor for dense matrices. */
+            /** Constructor for dense matrices (qpOASES). */
             Subsolver(  int nV,
                         int nC,
                         double* H,
                         double* A );
 
-            /** Constructor for sparse matrices. */
+            /** Constructor for sparse matrices (qpOASES). */
+            Subsolver(  int nV,
+                        int nC,
+                        csc* H,
+                        csc* A);
+
+            /** Constructor for sparse matrices (OSQP). */
             Subsolver(  int nV,
                         int nC,
                         csc* H,
@@ -78,7 +79,7 @@ namespace lcqpOASES {
 
         private:
             // The solver type
-            QPSubproblemSolver qpSolver;        	/**< Inidicating which qpSolver to use. */
+            QPSolver qpSolver;        	/**< Inidicating which qpSolver to use. */
 
             // The different solvers
         	SubsolverQPOASES solverQPOASES;			/**< When using qpOASES. */

@@ -29,19 +29,16 @@ int main() {
     std::cout << "Preparing warm up problem...\n";
 
     /* Setup data of first QP. */
-    int H_nnx = 2;
     double H_data[2] = { 2.0, 2.0 };
     int H_i[2] = {0, 1};
     int H_p[3] = {0, 1, 2};
 
     double g[2] = { -2.0, -2.0 };
 
-    int S1_nnx = 1;
     double S1_data[1] = { 1.0 };
     int S1_i[1] = {0};
     int S1_p[3] = {0, 1, 1};
 
-    int S2_nnx = 1;
     double S2_data[1] = { 1.0 };
     int S2_i[1] = {0};
     int S2_p[3] = {0, 0, 1};
@@ -57,7 +54,7 @@ int main() {
 	lcqp.setOptions( options );
 
     // Solve first LCQP
-	ReturnValue retVal = lcqp.loadLCQP( H_data, H_nnx, H_i, H_p, g, S1_data, S1_nnx, S1_i, S1_p, S2_data, S2_nnx, S2_i, S2_p );
+	ReturnValue retVal = lcqp.loadLCQP( H_data, H_i, H_p, g, S1_data, S1_i, S1_p, S2_data, S2_i, S2_p, 0, 0, 0, 0, 0, 0, 0, 0, 0, lcqpOASES::QPSolver::QPOASES );
 
     if (retVal != SUCCESSFUL_RETURN)
     {

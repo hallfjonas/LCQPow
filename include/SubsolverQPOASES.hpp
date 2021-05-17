@@ -37,6 +37,12 @@ namespace lcqpOASES {
                                 double* H,
                                 double* A);
 
+            /** Constructor. */
+            SubsolverQPOASES(   int nV,
+                                int nC,
+                                csc* H,
+                                csc* A);
+
             /** Copy constructor. */
             SubsolverQPOASES(const SubsolverQPOASES& rhs);
 
@@ -70,8 +76,15 @@ namespace lcqpOASES {
             int nV;
             int nC;
 
+            // Dense types
             double* H = NULL;
             double* A = NULL;
+
+            bool isSparse = false;
+
+            // Sparse types (must be of generic types for duplicate method)
+            qpOASES::SymmetricMatrix* H_sparse = NULL;
+            qpOASES::Matrix* A_sparse = NULL;
 
             qpOASES::QProblem qp;
     };

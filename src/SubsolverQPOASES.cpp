@@ -46,7 +46,32 @@ namespace lcqpOASES {
 
         memcpy(H, _H, (size_t)(nV*nV)*sizeof(double));
         memcpy(A, _A, (size_t)(nC*nV)*sizeof(double));
+    }
 
+
+    /*
+     *   S u b s o l v e r Q P O A S E S
+     */
+    SubsolverQPOASES::SubsolverQPOASES( int _nV, int _nC,
+                                        csc* _H, csc* _A)
+    {
+        nV = _nV;
+        nC = _nC;
+
+        qp = qpOASES::QProblem(nV, nC);
+
+        if (H_sparse != NULL) {
+            free(H_sparse);
+            H_sparse = NULL;
+        }
+
+        if (A_sparse != NULL) {
+            free(A_sparse);
+            A_sparse = NULL;
+        }
+
+        H_sparse = new qpOASES::SymSparseMat(_nV, _nV, _H->i, _H->p, _H->x);
+        A_sparse = new qpOASES::SparseMatrix(_nC, _nV, _A->i, _A->p, _A->x);
     }
 
     /*
@@ -70,6 +95,16 @@ namespace lcqpOASES {
         if (A != 0) {
             delete[] A;
             A = NULL;
+        }
+
+        if (H_sparse != NULL) {
+            free(H_sparse);
+            H_sparse = NULL;
+        }
+
+        if (A_sparse != NULL) {
+            free(A_sparse);
+            A_sparse = NULL;
         }
     }
 
@@ -109,7 +144,11 @@ namespace lcqpOASES {
         qpOASES::int_t nwsr = 1000000;
 
         if (initialSolve) {
-            ret = qp.init(H, g, A, lb, ub, lbA, ubA, nwsr, (double*)0, x0, y0);
+            if (isSparse) {
+                ret = qp.init(H_sparse, g, A_sparse, lb, ub, lbA, ubA, nwsr, (double*)0, x0, y0);
+            } else {
+                ret = qp.init(H, g, A, lb, ub, lbA, ubA, nwsr, (double*)0, x0, y0);
+            }
         } else {
             ret = qp.hotstart(g, lb, ub, lbA, ubA, nwsr);
         }
@@ -146,6 +185,9 @@ namespace lcqpOASES {
 
         memcpy(H, rhs.H, (size_t)(nV*nV)*sizeof(double));
         memcpy(A, rhs.A, (size_t)(nC*nV)*sizeof(double));
+
+        H_sparse = rhs.H_sparse->duplicateSym();
+        A_sparse = rhs.A_sparse->duplicate();
 
         qp = rhs.qp;
     }

@@ -101,6 +101,155 @@ void printOptions( Options options ) {
     mexPrintf("          prnt: %d \n\n", options.getPrintLevel());
 }
 
+void readSparseMatrix(const mxArray* mat, double* M_data, int* M_i, int* M_p, int nCol)
+{
+
+    mwIndex *mat_ir = mxGetIr( mat );
+    mwIndex *mat_jc = mxGetJc( mat );
+    double *v = (double*)mxGetPr( mat );
+    int M_nnx = mat_jc[nCol];
+    M_data = new double[M_nnx];
+    M_i = new int[M_nnx];
+    M_p = new int[nCol+1];
+    for (int i = 0; i < M_nnx; i++) {
+        M_data[i] = mat_ir[i];
+        M_i[i] = v[i];
+    }
+
+    for (int i = 0; i < nCol+1; i++) {
+        M_p[i] = mat_jc[i];
+    }
+}
+
+void readVectors(const mxArray** prhs, int nrhs, int nC, double* g, double* lbA, double* ubA, double* lb, double* ub)
+{
+    g = (double*) mxGetPr( prhs[1] );
+    if (nrhs == 6 || (nrhs == 7 && nC == 0)) {
+        lb = (double*) mxGetPr( prhs[4] );
+        ub = (double*) mxGetPr( prhs[5] );
+    } else if (nrhs >= 7) {
+        lbA = (double*) mxGetPr( prhs[5] );
+        ubA = (double*) mxGetPr( prhs[6] );
+
+        if (nrhs >= 9) {
+            lb = (double*) mxGetPr( prhs[7] );
+            ub = (double*) mxGetPr( prhs[8] );
+        }
+    }
+}
+
+int LCQPSparse(LCQProblem& lcqp, int nV, int nComp, int nC, int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[], double* x0, double* y0) {
+
+    if ( !mxIsSparse(prhs[0]) || !mxIsSparse(prhs[2]) || !mxIsSparse(prhs[3]) || (nC > 0 && !mxIsSparse(prhs[4])) )
+	{
+        mexPrintf("If using the sparse mode, please make sure to provide all matrices in sparse format!\n");
+        return 1;
+    }
+
+    // Vectors for data types
+    double* H_data = NULL;
+    int* H_i = NULL;
+    int* H_p = NULL;
+    double* g;
+    double* S1_data = NULL;
+    int* S1_i = NULL;
+    int* S1_p = NULL;
+    double* S2_data = NULL;
+    int* S2_i = NULL;
+    int* S2_p = NULL;
+    double* A_data = NULL;
+    int* A_i = NULL;
+    int* A_p = NULL;
+    double* lbA = NULL;
+    double* ubA = NULL;
+    double* lb = NULL;
+    double* ub = NULL;
+
+    // Read sparse matrices
+    readSparseMatrix(prhs[0], H_data, H_i, H_p, nV);
+    readSparseMatrix(prhs[2], S1_data, S1_i, S1_p, nV);
+    readSparseMatrix(prhs[3], S2_data, S2_i, S2_p, nV);
+    if (nC > 0) {
+        readSparseMatrix(prhs[4], A_data, A_i, A_p, nV);
+    }
+
+    // Read vectors
+    readVectors(prhs, nrhs, nC, g, lbA, ubA, lb, ub);
+
+    // Load data into LCQP object
+    lcqpOASES::ReturnValue ret = lcqp.loadLCQP(
+        H_data, H_i, H_p, g,
+        S1_data, S1_i, S1_p, S2_data, S2_i, S2_p,
+        A_data, A_i, A_p, lbA, ubA, lb, ub, x0, y0
+    );
+
+}
+
+int LCQPDense(LCQProblem& lcqp, int nV, int nComp, int nC, int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[], const double* const x0, const double* const y0)
+{
+    // Load data
+    double* H = NULL;
+    double* g = NULL;
+    double* S1 = NULL;
+    double* S2 = NULL;
+    double* lb = NULL;
+    double* ub = NULL;
+    double* A = NULL;
+    double* lbA = NULL;
+    double* ubA = NULL;
+
+    // Temporary matrices to keep the column major formats
+    double* S1_col = NULL;
+    double* S2_col = NULL;
+    double* A_col = NULL;
+
+    H = (double*) mxGetPr( prhs[0] );
+    S1_col = (double*) mxGetPr( prhs[2] );
+    S2_col = (double*) mxGetPr( prhs[3] );
+
+    if (nC > 0) {
+        A_col = (double*) mxGetPr( prhs[4] );
+    }
+
+    // Read all vectors
+    readVectors(prhs, nrhs, nC, g, lbA, ubA, lb, ub);
+
+    // MATLAB stores in column major format (switch to row major)
+    if (S1_col != NULL && nComp > 0 && nV > 0) {
+        S1 = new double[nComp*nV];
+        colMajorToRowMajor(S1_col, S1, nComp, nV);
+    }
+    if (S2_col != NULL && nComp > 0 && nV > 0) {
+        S2 = new double[nComp*nV];
+        colMajorToRowMajor(S2_col, S2, nComp, nV);
+    }
+    if (A_col != NULL && nC > 0 && nV > 0) {
+        A = new double[nC*nV];
+        colMajorToRowMajor(A_col, A, nC, nV);
+    }
+
+    // Load data into LCQP object
+    lcqpOASES::ReturnValue ret = lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub, x0);
+
+    // Clear A, S1, S2
+    if (A != 0)
+        delete[] A;
+
+    if (S1 != 0)
+        delete[] S1;
+
+    if (S2 != 0)
+        delete[] S2;
+
+    if (ret != lcqpOASES::ReturnValue::SUCCESSFUL_RETURN) {
+        mexPrintf("Failed to load LCQP.\n");
+        return 1;
+    }
+
+    return 0;
+}
+
+
 void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 {
     // Validate number of output arguments
@@ -191,68 +340,18 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     if (nrhs == 8 && !checkTypeStruct(prhs[7], "params")) return;
     if (nrhs == 10 && !checkTypeStruct(prhs[9], "params")) return;
 
-    // Sparsity checks
-    if (mxIsSparse(prhs[0]) || (nC > 0 && mxIsSparse(prhs[4]))) {
-        mexErrMsgTxt("Sparsity is not yet suported.\n");
-        return;
-    }
-
-    // Create LCQP and options objects
-    LCQProblem lcqp((int)nV, (int)nC, (int)nComp);
-    Options options;
-
-    // Load data
-    double* H = NULL;
-    double* g = NULL;
-    double* S1 = NULL;
-    double* S2 = NULL;
-    double* lb = NULL;
-    double* ub = NULL;
-    double* A = NULL;
-    double* lbA = NULL;
-    double* ubA = NULL;
+    // Initial guess variables
     double* x0 = NULL;
     double* y0 = NULL;
 
-    // Temporary matrices to keep the column major formats
-    double* S1_col = NULL;
-    double* S2_col = NULL;
-    double* A_col = NULL;
+    // TODO: This needs to be adjusted in OSQP case (increase flexibility)
+    int nDuals = nV + nC + 2*nComp;
 
-    H = (double*) mxGetPr( prhs[0] );
-    g = (double*) mxGetPr( prhs[1] );
-    S1_col = (double*) mxGetPr( prhs[2] );
-    S2_col = (double*) mxGetPr( prhs[3] );
-
-    if (nrhs == 6 || (nrhs == 7 && nC == 0)) {
-        lb = (double*) mxGetPr( prhs[4] );
-        ub = (double*) mxGetPr( prhs[5] );
-    } else if (nrhs >= 7) {
-        A_col = (double*) mxGetPr( prhs[4] );
-        lbA = (double*) mxGetPr( prhs[5] );
-        ubA = (double*) mxGetPr( prhs[6] );
-
-        if (nrhs >= 9) {
-            lb = (double*) mxGetPr( prhs[7] );
-            ub = (double*) mxGetPr( prhs[8] );
-        }
-    }
-
-    // MATLAB stores in column major format (switch to row major)
-    if (S1_col != NULL && nComp > 0 && nV > 0) {
-        S1 = new double[nComp*nV];
-        colMajorToRowMajor(S1_col, S1, nComp, nV);
-    }
-    if (S2_col != NULL && nComp > 0 && nV > 0) {
-        S2 = new double[nComp*nV];
-        colMajorToRowMajor(S2_col, S2, nComp, nV);
-    }
-    if (A_col != NULL && nC > 0 && nV > 0) {
-        A = new double[nC*nV];
-        colMajorToRowMajor(A_col, A, nC, nV);
-    }
+    // Create LCQP and options objects
+    LCQProblem lcqp((int)nV, (int)nC, (int)nComp);
 
     // Load settings
+    Options options;
     int structIdx = -1;
     if (nrhs == 5 && checkTypeStruct(prhs[4], "params")) { structIdx = 4; }
     if (nrhs == 7 && !mxIsDouble(prhs[6]) && checkTypeStruct(prhs[6], "params"))  { structIdx = 6; }
@@ -263,6 +362,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
         const char* params_fieldnames[] = {
             "x0",
+            "y0",
             "stationarityTolerance",
             "complementarityTolerance",
             "initialPenaltyParameter",
@@ -342,6 +442,13 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 x0 = (double*) mxGetPr(field);
                 continue;
             }
+
+            if ( name == "y0") {
+                if (!checkDimensionAndTypeDouble(field, nDuals, 1, "params.y0")) return;
+
+                y0 = (double*) mxGetPr(field);
+                continue;
+            }
         }
     }
 
@@ -351,20 +458,15 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     // For debug sakes
     // printOptions( options );
 
-    // Load data into LCQP object
-    lcqpOASES::ReturnValue ret = lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub, x0);
+    // Sparsity checks
+    int ret = 0;
+    if (mxIsSparse(prhs[0]) || mxIsSparse(prhs[2]) || mxIsSparse(prhs[3])|| (nC > 0 && mxIsSparse(prhs[4]))) {
+        ret = LCQPSparse(lcqp, nV, nComp, nC, nlhs, plhs, nrhs, prhs, x0, y0);
+    } else {
+        ret = LCQPDense(lcqp, nV, nComp, nC, nlhs, plhs, nrhs, prhs, x0, y0);
+    }
 
-    // Clear A, S1, S2
-    if (A != 0)
-        delete[] A;
-
-    if (S1 != 0)
-        delete[] S1;
-
-    if (S2 != 0)
-        delete[] S2;
-
-    if (ret != lcqpOASES::ReturnValue::SUCCESSFUL_RETURN) {
+    if (ret != 0) {
         mexPrintf("Failed to load LCQP.\n");
         return;
     }

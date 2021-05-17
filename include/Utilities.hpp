@@ -42,6 +42,7 @@ namespace lcqpOASES {
         INVALID_NUMBER_OF_OPTIM_VARS = 106,             /**< Invalid number of optimization variables. Must be a positive integer. */
         INVALID_NUMBER_OF_COMP_VARS = 107,              /**< Invalid number of complementarity constraints. Must be a positive integer. */
         INVALID_NUMBER_OF_CONSTRAINT_VARS = 108,        /**< Invalid number of linear constraints. Must be a non-negative integer. */
+        INVALID_QPSOLVER = 109,                         /**< Invalid QPSolver passed. */
         INVALID_OSQP_BOX_CONSTRAINTS = 110,             /**< Invalid constraints passed to OSQP solver: This solver does not handle box constraints, please pass them through linear constraints. */
         INVALID_TOTAL_ITER_COUNT = 111,                 /**< Invalid total number of iterations delta passed to output statistics (must be non-negative integer). */
         INVALID_TOTAL_OUTER_ITER = 112,                 /**< Invalid total number of outer iterations delta passed to output statistics (must be non-negative integer). */
@@ -80,6 +81,11 @@ namespace lcqpOASES {
         OUTER_LOOP_ITERATES = 1,                        /**< Print stats for each outer loop iterate. */
         INNER_LOOP_ITERATES = 2,                        /**< Print stats for each inner loop iterate. */
         SUBPROBLEM_SOLVER_ITERATES = 3                  /**< Print stats for each inner loop (and possibly output of subproblem solver). */
+    };
+
+    enum QPSolver {
+        QPOASES = 0,                                    /**< QP solver qpOASES. */
+        OSQP = 1                                        /**< QP solver OSQP. */
     };
 
 

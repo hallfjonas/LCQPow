@@ -31,9 +31,19 @@ namespace lcqpOASES {
     Subsolver::Subsolver(   int nV, int nC,
                             double* H, double* A )
     {
-        qpSolver = QPSubproblemSolver::QPOASES;
+        qpSolver = QPSolver::QPOASES;
 
         SubsolverQPOASES tmp(nV, nC, H, A);
+        solverQPOASES = tmp;
+    }
+
+
+    Subsolver::Subsolver(   int nV, int nC,
+                            csc* H, csc* A )
+    {
+        qpSolver = QPSolver::QPOASES;
+
+        SubsolverQPOASES tmp(nV, nC, H, A );
         solverQPOASES = tmp;
     }
 
@@ -44,7 +54,7 @@ namespace lcqpOASES {
                             const double* l,
                             const double* u )
     {
-        qpSolver = QPSubproblemSolver::OSQP;
+        qpSolver = QPSolver::OSQP;
 
         SubsolverOSQP tmp(H, A, g, l, u);
         solverOSQP = tmp;
@@ -71,11 +81,11 @@ namespace lcqpOASES {
     void Subsolver::getSolution( double* x, double* y )
     {
         switch (qpSolver) {
-            case QPSubproblemSolver::QPOASES:
+            case QPSolver::QPOASES:
                 solverQPOASES.getSolution( x, y );
                 return;
 
-            case QPSubproblemSolver::OSQP:
+            case QPSolver::OSQP:
                 solverOSQP.getSolution( x, y );
                 return;
         }
@@ -85,7 +95,7 @@ namespace lcqpOASES {
     void Subsolver::setPrintLevel( PrintLevel printLevel )
     {
         switch (qpSolver) {
-            case QPSubproblemSolver::QPOASES:
+            case QPSolver::QPOASES:
             {
                 if (printLevel < PrintLevel::SUBPROBLEM_SOLVER_ITERATES)
                     optionsQPOASES.printLevel =  qpOASES::PrintLevel::PL_NONE;
@@ -96,7 +106,7 @@ namespace lcqpOASES {
                 break;
             }
 
-            case QPSubproblemSolver::OSQP:
+            case QPSolver::OSQP:
             {
                 solverOSQP.setPrintlevl(printLevel >= PrintLevel::SUBPROBLEM_SOLVER_ITERATES);
                 return;
@@ -113,11 +123,11 @@ namespace lcqpOASES {
     {
         ReturnValue ret = ReturnValue::SUCCESSFUL_RETURN;
         switch (qpSolver) {
-            case QPSubproblemSolver::QPOASES:
+            case QPSolver::QPOASES:
                 ret = solverQPOASES.solve( initialSolve, iterations, g, lbA, ubA, x0, y0, lb, ub );
                 break;
 
-            case QPSubproblemSolver::OSQP:
+            case QPSolver::OSQP:
                 ret = solverOSQP.solve( initialSolve, iterations, g, lbA, ubA, x0, y0, lb, ub );
                 break;
         }
@@ -130,13 +140,13 @@ namespace lcqpOASES {
     {
         qpSolver = rhs.qpSolver;
 
-        if (qpSolver == QPSubproblemSolver::QPOASES) {
+        if (qpSolver == QPSolver::QPOASES) {
             SubsolverQPOASES tmp( rhs.solverQPOASES );
             solverQPOASES = tmp;
             return;
         }
 
-        if (qpSolver == QPSubproblemSolver::OSQP) {
+        if (qpSolver == QPSolver::OSQP) {
             SubsolverOSQP tmp( rhs.solverOSQP );
             solverOSQP = tmp;
             return;

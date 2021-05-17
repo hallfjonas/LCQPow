@@ -792,6 +792,10 @@ namespace lcqpOASES {
                 printf("ERROR: Invalid number of optimization variables passed (required to be >= 0).\n");
                 break;
 
+            case INVALID_QPSOLVER:
+                printf("ERROR: Invalid QPSolver passed.\n");
+                break;
+
             case INVALID_COMPLEMENTARITY_TOLERANCE:
                 printf("WARNING: Ignoring invalid complementarity tolerance.\n");
                 break;

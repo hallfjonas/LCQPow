@@ -142,8 +142,10 @@ namespace lcqpOASES {
 			 * @param _A_nnx Number of non-zero values of A.
 			 * @param _A_i Row indicies of non-zero values of A.
 			 * @param _A_p Pointer to column starts of A.
-			 * @param _lbA The constraint's lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
-			 * @param _ubA The constraint's upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
+			 * @param _lbA The constraints lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
+			 * @param _ubA The constraints upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
+			 * @param _lb The box constraints lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
+			 * @param _ub The box constraints upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
 			 * @param _x0 The initial guess for the optimal primal solution vector. If a `NULL` pointer is passed the zero vector is used.
 			 * @param _y0 The initial guess for the optimal dual solution vector. If a `NULL` pointer is passed, then the initialization depends on the subsolver and its options.
 			 *
@@ -151,26 +153,25 @@ namespace lcqpOASES {
 			*/
 			ReturnValue loadLCQP(
 				double* _H_data,
-				int _H_nnx,
 				int* _H_i,
 				int* _H_p,
 				double* _g,
 				double* _S1_data,
-				int _S1_nnx,
 				int* _S1_i,
 				int* _S1_p,
 				double* _S2_data,
-				int _S2_nnx,
 				int* _S2_i,
 				int* _S2_p,
 				double* _A_data = 0,
-				int _A_nnx = 0,
 				int* _A_i = 0,
 				int* _A_p = 0,
 				double* _lbA = 0,
 				double* _ubA = 0,
+				double* _lb = 0,
+				double* _ub = 0,
 				double* _x0 = 0,
-				double* _y0 = 0
+				double* _y0 = 0,
+				QPSolver qpSolver = QPSolver::OSQP
 			);
 
 
@@ -300,13 +301,11 @@ namespace lcqpOASES {
 			/** Store the (sparse) Hessian matrix H internally.
 			 *
 			 * @param _H_data Non-zero Hessian matrix values.
-			 * @param _H_nnx Number of non-zero values of Hessian.
 			 * @param _H_i Row indicies of non-zero values.
 			 * @param _H_p Pointer to column starts.
 			 */
 			inline ReturnValue setH(
 				double* H_data,
-				int H_nnx,
 				int* H_i,
 				int* H_p
 			);
@@ -371,15 +370,12 @@ namespace lcqpOASES {
 			/** Set the new linear constraint consisting of (dense) complementarity pairs and regular linear constraints.
 			 *
 			 * @param S1_data Non-zero values of LHS of complementarity product.
-			 * @param S1_nnx Number of non-zero values of S1.
 			 * @param S1_i Row indicies of non-zero values of S1.
 			 * @param S1_p Pointer to column starts of S1.
 			 * @param S2_data Non-zero values of RHS of complementarity product.
-			 * @param S1_nnx Number of non-zero values of S2.
 			 * @param S1_i Row indicies of non-zero values of S2.
 			 * @param S1_p Pointer to column starts of S2.
 			 * @param A_data Non-zero values of constraint matrix.
-			 * @param A_nnx Number of non-zero values of A.
 			 * @param A_i Row indicies of non-zero values of A.
 			 * @param A_p Pointer to column starts of A.
 			 * @param lbA The constraint's lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
@@ -387,15 +383,12 @@ namespace lcqpOASES {
 			 */
 			ReturnValue setConstraints(
 				double* S1_data,
-				int S1_nnx,
 				int* S1_i,
 				int* S1_p,
 				double* S2_data,
-				int S2_nnx,
 				int* S2_i,
 				int* S2_p,
 				double* A_data,
-				int A_nnx,
 				int* A_i,
 				int* A_p,
 				double* lbA,

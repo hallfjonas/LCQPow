@@ -305,16 +305,17 @@ namespace lcqpOASES {
 	}
 
 
-	ReturnValue LCQProblem::loadLCQP(	double* _H_data, int _H_nnx, int* _H_i, int* _H_p, double* _g,
-										double* _S1_data, int _S1_nnx, int* _S1_i, int* _S1_p,
-										double* _S2_data, int _S2_nnx, int* _S2_i, int* _S2_p,
-										double* _A_data, int _A_nnx, int* _A_i, int* _A_p,
-										double* _lbA, double* _ubA,	double* _x0, double* _y0
+	ReturnValue LCQProblem::loadLCQP(	double* _H_data, int* _H_i, int* _H_p, double* _g,
+										double* _S1_data, int* _S1_i, int* _S1_p,
+										double* _S2_data, int* _S2_i, int* _S2_p,
+										double* _A_data, int* _A_i, int* _A_p,
+										double* _lbA, double* _ubA,	double* _lb, double* _ub,
+										double* _x0, double* _y0, QPSolver qpSolver
 										)
 	{
 		ReturnValue ret;
 
-		ret = setH( _H_data, _H_nnx, _H_i, _H_p );
+		ret = setH( _H_data, _H_i, _H_p );
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
@@ -324,7 +325,7 @@ namespace lcqpOASES {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
-		ret = setConstraints( _S1_data, _S1_nnx, _S1_i, _S1_p, _S2_data, _S2_nnx, _S2_i, _S2_p, _A_data, _A_nnx, _A_i, _A_p, _lbA, _ubA );
+		ret = setConstraints( _S1_data, _S1_i, _S1_p, _S2_data, _S2_i, _S2_p, _A_data, _A_i, _A_p, _lbA, _ubA );
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
@@ -334,17 +335,34 @@ namespace lcqpOASES {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
-		// Make sure that box constraints are null pointers in OSQP case
-		lb = NULL;
-		ub = NULL;
+		if (qpSolver == QPSolver::OSQP) {
+			lb = NULL;
+			ub = NULL;
 
-		// Number of duals in OSQP case:
-		nDuals = nC + 2*nComp;
-		boxDualOffset = 0;
+			nDuals = nC + 2*nComp;
+			boxDualOffset = 0;
 
-		// Use OSQP in sparse formulations
-		Subsolver tmp(nV, nC + 2*nComp, H_sparse, A_sparse, g, lbA, ubA);
-		subsolver = tmp;
+			Subsolver tmp(nV, nDuals, H_sparse, A_sparse, g, lbA, ubA);
+			subsolver = tmp;
+		} else if (qpSolver == QPSolver::QPOASES) {
+			ret = setLB( _lb );
+
+			if (ret != SUCCESSFUL_RETURN)
+				return MessageHandler::PrintMessage( ret );
+
+			ret = setUB ( _ub );
+
+			if (ret != SUCCESSFUL_RETURN)
+				return MessageHandler::PrintMessage( ret );
+
+			nDuals = nV + nC + 2*nComp;
+			boxDualOffset = nV;
+
+			Subsolver tmp(nV, nDuals, H_sparse, A_sparse);
+			subsolver = tmp;
+		} else {
+			return ReturnValue::INVALID_QPSOLVER;
+		}
 
 		return ReturnValue::SUCCESSFUL_RETURN;
 	}
@@ -508,14 +526,14 @@ namespace lcqpOASES {
 	}
 
 
-	ReturnValue LCQProblem::setConstraints(	double* S1_data, int S1_nnx, int* S1_i, int* S1_p,
-											double* S2_data, int S2_nnx, int* S2_i, int* S2_p,
-											double* A_data, int A_nnx, int* A_i, int* A_p,
+	ReturnValue LCQProblem::setConstraints(	double* S1_data, int* S1_i, int* S1_p,
+											double* S2_data, int* S2_i, int* S2_p,
+											double* A_data, int* A_i, int* A_p,
 											double* lbA_new, double* ubA_new
 											)
 	{
 
-		int tmpA_nnx = A_nnx + S1_nnx + S2_nnx;
+		int tmpA_nnx = A_p[nV] + S1_p[nV] + S2_p[nV];
 		tmpA_data = new double[tmpA_nnx];
 		tmpA_i = new int[tmpA_nnx];
 		tmpA_p = new int[nV+1];
@@ -619,13 +637,14 @@ namespace lcqpOASES {
 	}
 
 
-	ReturnValue LCQProblem::setH( double* H_data, int H_nnx, int* H_i, int* H_p )
+	ReturnValue LCQProblem::setH( double* H_data, int* H_i, int* H_p )
 	{
 		if (nV <= 0)
 			return LCQPOBJECT_NOT_SETUP;
 
-		H_sparse = csc_matrix(nV, nV, H_nnx, H_data, H_i, H_p);
+		H_sparse = csc_matrix(nV, nV, H_p[nV], H_data, H_i, H_p);
 
+		// TODO: Verify why we need dense H here.
 		H = new double[nV*nV]();
 		Utilities::csc_to_dns(H_sparse, H, nV, nV);
 
