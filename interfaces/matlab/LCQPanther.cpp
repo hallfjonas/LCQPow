@@ -162,9 +162,6 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         }
     }
 
-    // Debug statement
-    // mexPrintf("Got LCQP of dimension (nV x nComp x nC) = (%d x %d x %d).\n", nV, nComp, nC);
-
     // Check all dimensions (except for params)
     if (!checkDimensionAndTypeDouble(prhs[0], nV, nV, "H")) return;
     if (!checkDimensionAndTypeDouble(prhs[1], nV, 1, "g")) return;
@@ -346,14 +343,14 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 continue;
             }
         }
-
-        lcqp.setOptions( options );
     }
 
-    // printOptions( options );
+    // Set options and print them
+    lcqp.setOptions( options );
+    printOptions( options );
 
     // Load data into LCQP object
-    lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub, x0);
+    lcqpOASES::ReturnValue ret = lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub, x0);
 
     // Clear A, S1, S2
     if (A != 0)
@@ -365,12 +362,16 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     if (S2 != 0)
         delete[] S2;
 
+    if (ret != lcqpOASES::ReturnValue::SUCCESSFUL_RETURN) {
+        mexPrintf("Failed to load LCQP.\n");
+        return;
+    }
 
     // Start time
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
     // Run solver
-    lcqpOASES::ReturnValue ret = lcqp.runSolver();
+    ret = lcqp.runSolver();
 
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
     double elapsed_secs = (end - begin).count()/1000.0/1000.0/1000.0;

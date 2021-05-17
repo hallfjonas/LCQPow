@@ -48,7 +48,7 @@ namespace lcqpOASES {
 			return LCQPOBJECT_NOT_SETUP;
 
 		if ( g_new == 0 )
-			return INVALID_ARGUMENT;
+			return INVALID_OBJECTIVE_LINEAR_TERM;
 
 		g = new double[nV];
 		memcpy( g, g_new, (size_t)nV*sizeof(double) );
