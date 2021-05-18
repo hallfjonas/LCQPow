@@ -70,16 +70,23 @@ int main() {
         return 1;
     }
 
+    int nDuals = lcqp.getNumerOfDuals();
+
     // Get solutions
     double* xOpt = new double[2];
-	double* yOpt = new double[nV + nC + 2*nComp];
+	double* yOpt = new double[nDuals];
 	lcqp.getPrimalSolution( xOpt );
 	lcqp.getDualSolution( yOpt );
-	printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g ]; \n\n",
+
+    if (nDuals == 2) {
+        printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g ]; \n\n",
 			xOpt[0],xOpt[1],yOpt[0],yOpt[1]);
+    } else if (nDuals == 4) {
+        printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g, %g, %g ]; \n\n",
+			xOpt[0],xOpt[1],yOpt[0],yOpt[1],yOpt[2],yOpt[3]);
+    }
 
     delete[] xOpt; delete[] yOpt;
-
 
     return 0;
 }
