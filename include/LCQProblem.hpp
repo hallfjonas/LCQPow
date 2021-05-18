@@ -529,12 +529,6 @@ namespace lcqpOASES {
 			double* S2 = NULL;						/**< RHS of complementarity product. */
 			double* C = NULL;						/**< Complementarity matrix (S1'*S2 + S2'*S1). */
 
-			csc* S1_sparse = NULL;					/**< Sparse S1. */
-			csc* S2_sparse = NULL;					/**< Sparse S2. */
-			csc* C_sparse = NULL;					/**< Sparse C. */
-			csc* Qk_sparse = NULL;					/**< Sparse Qk. */
-			std::vector<int> Qk_indices_of_C;		/**< Remember the indices of Qk corresponding to C (for fast Qk update). */
-
 			double rho; 							/**< Current penalty value. */
 
 			double* gk;								/**< Current objective linear term. */
@@ -561,11 +555,15 @@ namespace lcqpOASES {
 
 			AlgorithmStatus algoStat;				/**< Status of algorithm. */
 
+			bool sparseSolver = false;				/**< Whether to use sparse algebra or dense. */
+
 			csc* H_sparse = NULL;					/**< Sparse objective Hessian matrix. */
 			csc* A_sparse = NULL;					/**< Sparse constraint matrix. */
-			double* tmpA_data = NULL;				/**< Temporary data vector for building CSC matrix. */
-			int* tmpA_i = NULL;						/**< Temporary row pointer for building CSC matrix. */
-			int* tmpA_p = NULL;						/**< Temporary column pointer for building CSC matrix. */
+			csc* S1_sparse = NULL;					/**< Sparse S1. */
+			csc* S2_sparse = NULL;					/**< Sparse S2. */
+			csc* C_sparse = NULL;					/**< Sparse C. */
+			csc* Qk_sparse = NULL;					/**< Sparse Qk. */
+			std::vector<int> Qk_indices_of_C;		/**< Remember the indices of Qk corresponding to C (for fast Qk update). */
 
 			Subsolver subsolver;					/**< Subsolver class for solving the QP subproblems. */
 

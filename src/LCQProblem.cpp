@@ -1253,21 +1253,6 @@ namespace lcqpOASES {
 			lk_tmp = NULL;
 		}
 
-		if (tmpA_data != 0) {
-			free(tmpA_data);
-			tmpA_data = NULL;
-		}
-
-		if (tmpA_p != 0) {
-			free(tmpA_p);
-			tmpA_p = NULL;
-		}
-
-		if (tmpA_i != 0) {
-			free(tmpA_i);
-			tmpA_i = NULL;
-		}
-
 		Utilities::ClearSparseMat(C_sparse);
 		Utilities::ClearSparseMat(A_sparse);
 		Utilities::ClearSparseMat(H_sparse);
