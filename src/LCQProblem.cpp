@@ -381,14 +381,14 @@ namespace lcqpOASES {
 				return INITIAL_SUBPROBLEM_FAILED;
 			}
 
-			Utilities::AffineLinearTransformation(rho, C_sparse, xk, g, gk, nV);
+			updateLinearization();
 
 			if (solveQPSubproblem( false ) != SUCCESSFUL_RETURN) {
 				return SUBPROBLEM_SOLVER_ERROR;
 			}
 
 		} else {
-			Utilities::AffineLinearTransformation(rho, C_sparse, xk, g, gk, nV);
+			updateLinearization();
 
 			if (solveQPSubproblem( true ) != SUCCESSFUL_RETURN) {
 				return INITIAL_SUBPROBLEM_FAILED;
@@ -823,7 +823,7 @@ namespace lcqpOASES {
 			Utilities::WeightedVectorAdd(1, xk, alphak, pk, xk, nV);
 
 			// gk = new linearization + g
-			Utilities::AffineLinearTransformation(rho, C_sparse, xk, g, gk, nV);
+			updateLinearization();
 
 			// Add some +/- EPS to each coordinate
 			perturbGradient();

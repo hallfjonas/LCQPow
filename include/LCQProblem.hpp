@@ -461,6 +461,9 @@ namespace lcqpOASES {
 			/** Called in runSolver to initialize variables. */
 			void initializeSolver( );
 
+			/** Update the penalty linearization. */
+			void updateLinearization( );
+
 			/** Solves the qp subproblem wrt H, gk, A, S1, S2 .
 			 *
 			 * @param initialSolve Pass true on first solve of sequence, false on subsequent calls (initialization vs hotstart).
