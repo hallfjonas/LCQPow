@@ -519,9 +519,6 @@ namespace lcqpOASES {
 		C = new double[nV*nV];
 		Utilities::MatrixSymmetrizationProduct(S1, S2, C, nComp, nV);
 
-		C_sparse = Utilities::dns_to_csc(C, nV, nV);
-		A_sparse = Utilities::dns_to_csc(A, nC + 2*nComp, nV);
-
 		return SUCCESSFUL_RETURN;
 	}
 
@@ -532,23 +529,22 @@ namespace lcqpOASES {
 											double* lbA_new, double* ubA_new
 											)
 	{
-
 		// Create sparse matrices
-		S1_sparse = Utilities::createCSC(nComp, nV, S1_p[nV], S1_data, S1_i, S1_p);
-		S2_sparse = Utilities::createCSC(nComp, nV, S2_p[nV], S2_data, S2_i, S2_p);
+		S1_sparse = Utilities::copyCSC(nComp, nV, S1_p[nV], S1_data, S1_i, S1_p);
+		S2_sparse = Utilities::copyCSC(nComp, nV, S2_p[nV], S2_data, S2_i, S2_p);
 
 		// Get number of elements
 		int tmpA_nnx = S1_p[nV] + S2_p[nV];
 		tmpA_nnx += A_p != 0 ? A_p[nV] : 0;
 
 		// Data array
-		tmpA_data = (double*)malloc(tmpA_nnx*sizeof(double));
+		double* tmpA_data = (double*)malloc(tmpA_nnx*sizeof(double));
 
 		// Row indices
-		tmpA_i = (int*)malloc(tmpA_nnx*sizeof(int));
+		int* tmpA_i = (int*)malloc(tmpA_nnx*sizeof(int));
 
 		// Column pointers
-		tmpA_p = (int*)malloc((nV+1)*sizeof(int));
+		int* tmpA_p = (int*)malloc((nV+1)*sizeof(int));
 
 		int index_data = 0;
 		tmpA_p[0] = 0;
@@ -633,7 +629,7 @@ namespace lcqpOASES {
 		if (nV <= 0)
 			return LCQPOBJECT_NOT_SETUP;
 
-		H_sparse = Utilities::createCSC(nV, nV, H_p[nV], H_data, H_i, H_p);
+		H_sparse = Utilities::copyCSC(nV, nV, H_p[nV], H_data, H_i, H_p);
 
 		return ReturnValue::SUCCESSFUL_RETURN;
 	}
@@ -641,83 +637,87 @@ namespace lcqpOASES {
 
 	void LCQProblem::setQk( )
 	{
-		std::vector<double> Qk_data;
-		std::vector<int> Qk_row;
-		int* Qk_p = (int*)malloc((nV+1)*sizeof(int));
-		Qk_p[0] = 0;
+		if (sparseSolver) {
+			std::vector<double> Qk_data;
+			std::vector<int> Qk_row;
+			int* Qk_p = (int*)malloc((nV+1)*sizeof(int));
+			Qk_p[0] = 0;
 
-		// Iterate over columns
-		for (int j = 0; j < nV; j++) {
-			Qk_p[j+1] = Qk_p[j];
+			// Iterate over columns
+			for (int j = 0; j < nV; j++) {
+				Qk_p[j+1] = Qk_p[j];
 
-			int idx_H = H_sparse->p[j];
-			int idx_C = C_sparse->p[j];
+				int idx_H = H_sparse->p[j];
+				int idx_C = C_sparse->p[j];
 
-			while (idx_H < H_sparse->p[j+1] || idx_C < C_sparse->p[j+1]) {
-				// Only elements of H left in this column
-				if (idx_H < H_sparse->p[j+1] && idx_C >= C_sparse->p[j+1]) {
-					Qk_data.push_back(H_sparse->x[idx_H]);
-					Qk_row.push_back(H_sparse->i[idx_H]);
+				while (idx_H < H_sparse->p[j+1] || idx_C < C_sparse->p[j+1]) {
+					// Only elements of H left in this column
+					if (idx_H < H_sparse->p[j+1] && idx_C >= C_sparse->p[j+1]) {
+						Qk_data.push_back(H_sparse->x[idx_H]);
+						Qk_row.push_back(H_sparse->i[idx_H]);
 
-					idx_H++;
+						idx_H++;
+					}
+
+					// Only elements of C left in this column
+					else if (idx_H >= H_sparse->p[j+1] && idx_C < C_sparse->p[j+1]) {
+						Qk_data.push_back(rho*C_sparse->x[idx_C]);
+						Qk_row.push_back(C_sparse->i[idx_C]);
+
+						Qk_indices_of_C.push_back(Qk_p[j+1]);
+
+						idx_C++;
+					}
+
+					// Element of H is in higher row than C
+					else if (H_sparse->i[idx_H] < C_sparse->i[idx_C]) {
+						Qk_data.push_back(H_sparse->x[idx_H]);
+						Qk_row.push_back(H_sparse->i[idx_H]);
+
+						idx_H++;
+					}
+
+					// Element of C are in higher row than H
+					else if (H_sparse->i[idx_H] > C_sparse->i[idx_C]) {
+						Qk_data.push_back(rho*C_sparse->x[idx_C]);
+						Qk_row.push_back(C_sparse->i[idx_C]);
+
+						Qk_indices_of_C.push_back(Qk_p[j+1]);
+
+						idx_C++;
+					}
+
+					// Add both and update index only once!
+					else {
+						Qk_data.push_back(H_sparse->x[idx_H] + rho*C_sparse->x[idx_C]);
+						Qk_row.push_back(H_sparse->i[idx_H]);
+
+						idx_H++;
+						idx_C++;
+
+						Qk_indices_of_C.push_back(Qk_p[j+1]);
+					}
+
+					Qk_p[j+1]++;
 				}
-
-				// Only elements of C left in this column
-				else if (idx_H >= H_sparse->p[j+1] && idx_C < C_sparse->p[j+1]) {
-					Qk_data.push_back(rho*C_sparse->x[idx_C]);
-					Qk_row.push_back(C_sparse->i[idx_C]);
-
-					Qk_indices_of_C.push_back(Qk_p[j+1]);
-
-					idx_C++;
-				}
-
-				// Element of H is in higher row than C
-				else if (H_sparse->i[idx_H] < C_sparse->i[idx_C]) {
-					Qk_data.push_back(H_sparse->x[idx_H]);
-					Qk_row.push_back(H_sparse->i[idx_H]);
-
-					idx_H++;
-				}
-
-				// Element of C are in higher row than H
-				else if (H_sparse->i[idx_H] > C_sparse->i[idx_C]) {
-					Qk_data.push_back(rho*C_sparse->x[idx_C]);
-					Qk_row.push_back(C_sparse->i[idx_C]);
-
-					Qk_indices_of_C.push_back(Qk_p[j+1]);
-
-					idx_C++;
-				}
-
-				// Add both and update index only once!
-				else {
-					Qk_data.push_back(H_sparse->x[idx_H] + rho*C_sparse->x[idx_C]);
-					Qk_row.push_back(H_sparse->i[idx_H]);
-
-					idx_H++;
-					idx_C++;
-
-					Qk_indices_of_C.push_back(Qk_p[j+1]);
-				}
-
-				Qk_p[j+1]++;
 			}
+
+			int Qk_nnx = (int) Qk_data.size();
+			double* Qk_x = (double*)malloc(Qk_nnx*sizeof(double));
+			int* Qk_i =  (int*)malloc(Qk_nnx*sizeof(int));
+
+			for (size_t i = 0; i < (size_t) Qk_nnx; i++) {
+				Qk_x[i] = Qk_data[i];
+				Qk_i[i] = Qk_row[i];
+			}
+
+			Qk_sparse = Utilities::createCSC(nV, nV, Qk_nnx, Qk_x, Qk_i, Qk_p);
+
+			Qk_data.clear();
+			Qk_row.clear();
+		} else {
+			Utilities::WeightedMatrixAdd(1, H, rho, C, Qk, nV, nV);
 		}
-
-		int Qk_nnx = (int) Qk_data.size();
-		double* Qk_x = (double*)malloc(Qk_nnx*sizeof(double));
-		int* Qk_i =  (int*)malloc(Qk_nnx*sizeof(int));
-
-		for (size_t i = 0; i < (size_t) Qk_nnx; i++) {
-			Qk_x[i] = Qk_data[i];
-			Qk_i[i] = Qk_row[i];
-		}
-
-		Qk_sparse = Utilities::createCSC(nV, nV, Qk_nnx, Qk_x, Qk_i, Qk_p);
-
-		Qk_data.clear();
-		Qk_row.clear();
 	}
 
 

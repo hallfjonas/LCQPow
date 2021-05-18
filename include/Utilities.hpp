@@ -253,6 +253,9 @@ namespace lcqpOASES {
             // Construct a csc matrix (like csc_matrix in OSQP)
             static csc* createCSC(int m, int n, int nnz, double* x, int* i, int* p);
 
+            // Copy a csc matrix (like create CSC but deep copy is made)
+            static csc* copyCSC(int m, int n, int nnz, double* x, int* i, int* p);
+
             /** Transform a csc matrix to dense.
              *
              * @param sparse A sparse matrix.
