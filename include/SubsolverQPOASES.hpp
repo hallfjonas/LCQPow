@@ -83,8 +83,16 @@ namespace lcqpOASES {
             bool isSparse = false;
 
             // Sparse types (must be of generic types for duplicate method)
-            qpOASES::SymmetricMatrix* H_sparse = NULL;
-            qpOASES::Matrix* A_sparse = NULL;
+            qpOASES::SymSparseMat* H_sparse = NULL;
+            qpOASES::SparseMatrix* A_sparse = NULL;
+
+            double* H_x = NULL;
+            int* H_i = NULL;
+            int* H_p = NULL;
+
+            double* A_x = NULL;
+            int* A_i = NULL;
+            int* A_p = NULL;
 
             qpOASES::QProblem qp;
     };

@@ -39,6 +39,7 @@ namespace lcqpOASES {
         nV = _nV;
         nC = _nC;
 
+        isSparse = false;
         qp = qpOASES::QProblem(nV, nC);
 
         H = new double[nV*nV];
@@ -58,6 +59,7 @@ namespace lcqpOASES {
         nV = _nV;
         nC = _nC;
 
+        isSparse = true;
         qp = qpOASES::QProblem(nV, nC);
 
         if (H_sparse != NULL) {
@@ -70,8 +72,25 @@ namespace lcqpOASES {
             A_sparse = NULL;
         }
 
-        H_sparse = new qpOASES::SymSparseMat(_nV, _nV, _H->i, _H->p, _H->x);
-        A_sparse = new qpOASES::SparseMatrix(_nC, _nV, _A->i, _A->p, _A->x);
+        H_i = new int[_H->p[_nV]];
+        H_x = new double[_H->p[_nV]];
+        H_p = new int[_nV+1];
+
+        A_i = new int[_A->p[_nV]];
+        A_x = new double[_A->p[_nV]];
+        A_p = new int[_nV+1];
+
+        memcpy(H_p, _H->p, (nV+1)*sizeof(int));
+        memcpy(H_i, _H->i, (_H->p[nV])*sizeof(int));
+        memcpy(H_x, _H->x, (_H->p[nV])*sizeof(double));
+        memcpy(A_p, _A->p, (nV+1)*sizeof(int));
+        memcpy(A_i, _A->i, (_A->p[nV])*sizeof(int));
+        memcpy(A_x, _A->x, (_A->p[nV])*sizeof(double));
+
+        H_sparse = new qpOASES::SymSparseMat(nV, nV, H_i, H_p, H_x);
+        A_sparse = new qpOASES::SparseMatrix(nC, nV, A_i, A_p, A_x);
+        H_sparse->createDiagInfo();
+        A_sparse->createDiagInfo();
     }
 
     /*
@@ -97,14 +116,38 @@ namespace lcqpOASES {
             A = NULL;
         }
 
-        if (H_sparse != NULL) {
-            free(H_sparse);
-            H_sparse = NULL;
+        if (H_i != 0) {
+            delete[] H_i;
         }
 
-        if (A_sparse != NULL) {
-            free(A_sparse);
-            A_sparse = NULL;
+        if (H_p != 0) {
+            delete[] H_p;
+        }
+
+        if (H_x != 0) {
+            delete[] H_x;
+        }
+
+        if (A_i != 0) {
+            delete[] A_i;
+        }
+
+        if (A_p != 0) {
+            delete[] A_p;
+        }
+
+        if (A_x != 0) {
+            delete[] A_x;
+        }
+
+        if (H_sparse != 0) {
+            delete H_sparse;
+            H_sparse = 0;
+        }
+
+        if (A_sparse != 0) {
+            delete A_sparse;
+            A_sparse = 0;
         }
     }
 
@@ -180,14 +223,35 @@ namespace lcqpOASES {
         nV = rhs.nV;
         nC = rhs.nC;
 
-        H = new double[nV*nV];
-        A = new double[nC*nV];
+        isSparse = rhs.isSparse;
 
-        memcpy(H, rhs.H, (size_t)(nV*nV)*sizeof(double));
-        memcpy(A, rhs.A, (size_t)(nC*nV)*sizeof(double));
+        if (isSparse) {
+            H_i = new int[rhs.H_p[nV]];
+            H_x = new double[rhs.H_p[nV]];
+            H_p = new int[nV+1];
 
-        H_sparse = rhs.H_sparse->duplicateSym();
-        A_sparse = rhs.A_sparse->duplicate();
+            A_i = new int[rhs.A_p[nV]];
+            A_x = new double[rhs.A_p[nV]];
+            A_p = new int[nV+1];
+
+            memcpy(H_p, rhs.H_p, (nV+1)*sizeof(int));
+            memcpy(H_i, rhs.H_i, (rhs.H_p[nV])*sizeof(int));
+            memcpy(H_x, rhs.H_x, (rhs.H_p[nV])*sizeof(double));
+            memcpy(A_p, rhs.A_p, (nV+1)*sizeof(int));
+            memcpy(A_i, rhs.A_i, (rhs.A_p[nV])*sizeof(int));
+            memcpy(A_x, rhs.A_x, (rhs.A_p[nV])*sizeof(double));
+
+            H_sparse = new qpOASES::SymSparseMat(nV, nV, H_i, H_p, H_x);
+            A_sparse = new qpOASES::SparseMatrix(nC, nV, A_i, A_p, A_x);
+            H_sparse->createDiagInfo();
+            A_sparse->createDiagInfo();
+        } else {
+            H = new double[nV*nV];
+            A = new double[nC*nV];
+
+            memcpy(H, rhs.H, (size_t)(nV*nV)*sizeof(double));
+            memcpy(A, rhs.A, (size_t)(nC*nV)*sizeof(double));
+        }
 
         qp = rhs.qp;
     }
