@@ -57,6 +57,7 @@ namespace lcqpOASES {
         MAX_ITERATIONS_REACHED = 200,                   /**< Maximum number of iterations reached. */
         INITIAL_SUBPROBLEM_FAILED = 202,                /**< Failed to solve the initial QP. */
         SUBPROBLEM_SOLVER_ERROR = 203,                  /**< An error occured in the subproblem solver. */
+        FAILED_SYM_COMPLEMENTARITY_MATRIX = 204,        /**< Failed to compute the symmetric complementarity matrix C. */
 
         // Generic errors
         LCQPOBJECT_NOT_SETUP = 300,                     /**< Constructor has not been called. */
@@ -183,6 +184,9 @@ namespace lcqpOASES {
             // C = A*B.
             static void MatrixMultiplication(const double* const A, const double* const B, double* C, int m, int n, int p);
 
+            // C = A*B.
+            static void MatrixMultiplication(const csc* const A, const double* const b, double* c);
+
             // C = A'*B
             static void TransponsedMatrixMultiplication(const double* const A, const double* const B, double* C, int m, int n, int p);
 
@@ -191,6 +195,9 @@ namespace lcqpOASES {
 
             // C = A'*B + B'*A
             static void MatrixSymmetrizationProduct(const double* const A, const double* const B, double* C, int m, int n);
+
+            // C = A'*B + B'*A
+            static csc* MatrixSymmetrizationProduct(double* S1_x, int* S1_i, int* S1_p, double* S2_x, int* S2_i, int* S2_p, int m, int n);
 
             // d = A*b + c
             static void AffineLinearTransformation(const double alpha, const double* const A, const double* const b, const double* const c, double* d, int m, int n);
@@ -242,6 +249,9 @@ namespace lcqpOASES {
 
             // Printing bounds
             static void printBounds(double* lb, double* xk, double* ub, int m);
+
+            // Construct a csc matrix (like csc_matrix in OSQP)
+            static csc* createCSC(int m, int n, int nnz, double* x, int* i, int* p);
 
             /** Transform a csc matrix to dense.
              *
@@ -317,6 +327,9 @@ namespace lcqpOASES {
             /** Maximum number of characters within a string.
              *	Note: this value should be at least 41! */
             constexpr static uint MAX_STRING_LENGTH = 160;
+
+        private:
+            static int getIndexOfIn(int val, int* sorted_lst, int beg, int end);
     };
 
     class OutputStatistics {
