@@ -131,6 +131,8 @@ namespace lcqpOASES {
 		Subsolver tmp( nV, nC + 2*nComp, H, A );
 		subsolver = tmp;
 
+		sparseSolver = false;
+
 		return ReturnValue::SUCCESSFUL_RETURN;
 	}
 
@@ -301,6 +303,8 @@ namespace lcqpOASES {
 		Subsolver tmp( nV, nC + 2*nComp, H, A );
 		subsolver = tmp;
 
+		sparseSolver = false;
+
 		return ReturnValue::SUCCESSFUL_RETURN;
 	}
 
@@ -363,6 +367,8 @@ namespace lcqpOASES {
 		} else {
 			return ReturnValue::INVALID_QPSOLVER;
 		}
+
+		sparseSolver = true;
 
 		return ReturnValue::SUCCESSFUL_RETURN;
 	}
@@ -742,6 +748,16 @@ namespace lcqpOASES {
 	}
 
 
+	void LCQProblem::updateLinearization()
+	{
+		if (sparseSolver) {
+			Utilities::AffineLinearTransformation(rho, C_sparse, xk, g, gk, nV);
+		} else {
+			Utilities::AffineLinearTransformation(rho, C, xk, g, gk, nV, nV);
+		}
+	}
+
+
 	ReturnValue LCQProblem::solveQPSubproblem(bool initialSolve)
 	{
 		// First solve convex subproblem
@@ -783,7 +799,12 @@ namespace lcqpOASES {
 
 
 	bool LCQProblem::complementarityCheck( ) {
-		return Utilities::QuadraticFormProduct(C_sparse, xk, nV) < 2*options.getComplementarityTolerance();
+		if (sparseSolver) {
+			return Utilities::QuadraticFormProduct(C_sparse, xk, nV) < 2*options.getComplementarityTolerance();
+		} else {
+			return Utilities::QuadraticFormProduct(C, xk, nV) < 2*options.getComplementarityTolerance();
+		}
+
 	}
 
 
@@ -794,9 +815,15 @@ namespace lcqpOASES {
 
 	void LCQProblem::getOptimalStepLength( ) {
 
-		double qk = Utilities::QuadraticFormProduct(Qk_sparse, pk, nV);
+		double qk;
 
-		Utilities::AffineLinearTransformation(1, Qk_sparse, xk, g, lk_tmp, nV);
+		if (sparseSolver) {
+			qk = Utilities::QuadraticFormProduct(Qk_sparse, pk, nV);
+			Utilities::AffineLinearTransformation(1, Qk_sparse, xk, g, lk_tmp, nV);
+		} else {
+			qk = Utilities::QuadraticFormProduct(Qk, pk, nV);
+			Utilities::AffineLinearTransformation(1, Qk, xk, g, lk_tmp, nV, nV);
+		}
 
 		double lk = Utilities::DotProduct(pk, lk_tmp, nV);
 
@@ -839,11 +866,20 @@ namespace lcqpOASES {
 
 		// stat = Qk*xk + g - A'*yk_A - yk_x
 		// 1) Objective contribution: Qk*xk + g
-		Utilities::AffineLinearTransformation(1, Qk_sparse, xk, g, statk, nV);
+		if (sparseSolver) {
+			Utilities::AffineLinearTransformation(1, Qk_sparse, xk, g, statk, nV);
+		} else {
+			Utilities::AffineLinearTransformation(1, Qk, xk, g, statk, nV, nV);
+		}
 
 		// 2) Constraint contribution: A'*yk
 		// Utilities::TransponsedMatrixMultiplication(A, yk_A, constr_statk, nC + 2*nComp, nV, 1);
-		Utilities::TransponsedMatrixMultiplication(A_sparse, yk_A, constr_statk, nC + 2*nComp, nV);
+		if (sparseSolver) {
+			Utilities::TransponsedMatrixMultiplication(A_sparse, yk_A, constr_statk, nC + 2*nComp, nV);
+		} else {
+			Utilities::TransponsedMatrixMultiplication(A, yk_A, constr_statk, nC + 2*nComp, nV, 1);
+		}
+
 		Utilities::WeightedVectorAdd(1, statk, -1, constr_statk, statk, nV);
 
 		// 3) Box constraint contribution
@@ -857,10 +893,16 @@ namespace lcqpOASES {
 
 
 	void LCQProblem::updateQk( ) {
-		double factor = rho*(1 - 1.0/options.getPenaltyUpdateFactor());
-		for (size_t j = 0; j < Qk_indices_of_C.size(); j++) {
-			Qk_sparse->x[Qk_indices_of_C[j]] += factor*C_sparse->x[j];
+		// Smart update in sparse case
+		if (sparseSolver) {
+			double factor = rho*(1 - 1.0/options.getPenaltyUpdateFactor());
+			for (size_t j = 0; j < Qk_indices_of_C.size(); j++) {
+				Qk_sparse->x[Qk_indices_of_C[j]] += factor*C_sparse->x[j];
+			}
+		} else {
+			Utilities::WeightedMatrixAdd(1, H, rho, C, Qk, nV, nV);
 		}
+
 	}
 
 
@@ -905,13 +947,23 @@ namespace lcqpOASES {
 		double* tmp = new double[nComp];
 
 		// y_S1 = y - rho*S2*xk
-		Utilities::MatrixMultiplication(S2, xk, tmp, nComp, nV, 1);
+		if (sparseSolver) {
+			Utilities::MatrixMultiplication(S2_sparse, xk, tmp);
+		} else {
+			Utilities::MatrixMultiplication(S2, xk, tmp, nComp, nV, 1);
+		}
+
 		for (int i = 0; i < nComp; i++) {
 			yk[boxDualOffset + nC + i] = yk[boxDualOffset + nC + i] - rho*tmp[i];
 		}
 
 		// y_S2 = y - rho*S1*xk
-		Utilities::MatrixMultiplication(S1, xk, tmp, nComp, nV, 1);
+		if (sparseSolver) {
+			Utilities::MatrixMultiplication(S1_sparse, xk, tmp);
+		} else {
+			Utilities::MatrixMultiplication(S1, xk, tmp, nComp, nV, 1);
+		}
+
 		for (int i = 0; i < nComp; i++) {
 			yk[boxDualOffset + nC + nComp + i] = yk[boxDualOffset + nC + nComp + i] - rho*tmp[i];
 		}
@@ -970,8 +1022,13 @@ namespace lcqpOASES {
 		double* S1x = new double[nComp];
 		double* S2x = new double[nComp];
 
-		Utilities::MatrixMultiplication(S1, xk, S1x, nComp, nV, 1);
-		Utilities::MatrixMultiplication(S2, xk, S2x, nComp, nV, 1);
+		if (sparseSolver) {
+			Utilities::MatrixMultiplication(S1_sparse, xk, S1x);
+			Utilities::MatrixMultiplication(S2_sparse, xk, S2x);
+		} else {
+			Utilities::MatrixMultiplication(S1, xk, S1x, nComp, nV, 1);
+			Utilities::MatrixMultiplication(S2, xk, S2x, nComp, nV, 1);
+		}
 
 		std::vector<int> indices;
 
@@ -1055,7 +1112,12 @@ namespace lcqpOASES {
 		printf("%s%10.3g", sep, tmpdbl);
 
 		// Print complementarity violation
-		tmpdbl = Utilities::QuadraticFormProduct(C_sparse, xk, nV)/2.0;
+		if (sparseSolver) {
+			tmpdbl = Utilities::QuadraticFormProduct(C_sparse, xk, nV)/2.0;
+		} else {
+			tmpdbl = Utilities::QuadraticFormProduct(C, xk, nV)/2.0;
+		}
+
 		printf("%s%10.3g", sep, tmpdbl);
 
 		// Print current penalty parameter

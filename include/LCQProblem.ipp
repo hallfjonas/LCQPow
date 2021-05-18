@@ -33,8 +33,6 @@ namespace lcqpOASES {
 		H = new double[nV*nV];
 		memcpy( H, H_new, (size_t)(nV*nV)*sizeof(double) );
 
-		H_sparse = Utilities::dns_to_csc(H, nV, nV);
-
 		return SUCCESSFUL_RETURN;
 	}
 
