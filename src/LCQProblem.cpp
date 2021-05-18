@@ -533,10 +533,22 @@ namespace lcqpOASES {
 											)
 	{
 
-		int tmpA_nnx = A_p[nV] + S1_p[nV] + S2_p[nV];
-		tmpA_data = new double[tmpA_nnx];
-		tmpA_i = new int[tmpA_nnx];
-		tmpA_p = new int[nV+1];
+		// Create sparse matrices
+		S1_sparse = Utilities::createCSC(nComp, nV, S1_p[nV], S1_data, S1_i, S1_p);
+		S2_sparse = Utilities::createCSC(nComp, nV, S2_p[nV], S2_data, S2_i, S2_p);
+
+		// Get number of elements
+		int tmpA_nnx = S1_p[nV] + S2_p[nV];
+		tmpA_nnx += A_p != 0 ? A_p[nV] : 0;
+
+		// Data array
+		tmpA_data = (double*)malloc(tmpA_nnx*sizeof(double));
+
+		// Row indices
+		tmpA_i = (int*)malloc(tmpA_nnx*sizeof(int));
+
+		// Column pointers
+		tmpA_p = (int*)malloc((nV+1)*sizeof(int));
 
 		int index_data = 0;
 		tmpA_p[0] = 0;
@@ -573,7 +585,7 @@ namespace lcqpOASES {
 		}
 
 		// Create sparse matrix
-		A_sparse = csc_matrix(nC + 2*nComp, nV, tmpA_nnx, tmpA_data, tmpA_i, tmpA_p);
+		A_sparse = Utilities::createCSC(nC + 2*nComp, nV, tmpA_nnx, tmpA_data, tmpA_i, tmpA_p);
 
 		// Set up new constraint bounds (lbA; 0; 0) & (ubA; INFINITY; INFINITY)
 		lbA = new double[nC + 2*nComp];
@@ -606,32 +618,11 @@ namespace lcqpOASES {
 			ubA[i + nC] = INFINITY;
 		}
 
+		C_sparse = Utilities::MatrixSymmetrizationProduct(S1_data, S1_i, S1_p, S2_data, S2_i, S2_p, nComp, nV);
 
-		// Create dense matrices
-		A = new double[(nC + 2*nComp)*nV]();
-		lcqpOASES::ReturnValue ret = Utilities::csc_to_dns(A_sparse, A, nC + 2*nComp, nV);
-		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage(ret);
-
-		// For now store S1, S2, and C in dense format.
-		// If we can manage to adapt all operations required for C (specifically S1'*S2 + S2'*S1 = C)
-		// we should instantly switch to sparse format!
-		S1 = new double[nComp*nV]();
-		for (int j = 0; j < nV; j++) {
-			for (int i = 0; i < S1_p[j+1] - S1_p[j]; i++) {
-				S1[(S1_p[j]+i)*nV + j] = S1_data[S1_p[j]+i];
-			}
+		if (C_sparse == 0) {
+			return FAILED_SYM_COMPLEMENTARITY_MATRIX;
 		}
-
-		S2 = new double[nComp*nV]();
-		for (int j = 0; j < nV; j++) {
-			for (int i = 0; i < S2_p[j+1] - S2_p[j]; i++) {
-				S2[(S2_p[j]+i)*nV + j] = S2_data[S2_p[j]+i];
-			}
-		}
-
-		C = new double[nV*nV];
-		Utilities::MatrixSymmetrizationProduct(S1, S2, C, nComp, nV);
 
 		return SUCCESSFUL_RETURN;
 	}
@@ -642,11 +633,7 @@ namespace lcqpOASES {
 		if (nV <= 0)
 			return LCQPOBJECT_NOT_SETUP;
 
-		H_sparse = csc_matrix(nV, nV, H_p[nV], H_data, H_i, H_p);
-
-		// TODO: Verify why we need dense H here.
-		H = new double[nV*nV]();
-		Utilities::csc_to_dns(H_sparse, H, nV, nV);
+		H_sparse = Utilities::createCSC(nV, nV, H_p[nV], H_data, H_i, H_p);
 
 		return ReturnValue::SUCCESSFUL_RETURN;
 	}
@@ -656,7 +643,8 @@ namespace lcqpOASES {
 	{
 		std::vector<double> Qk_data;
 		std::vector<int> Qk_row;
-		int* Qk_p = new int[nV+1]();
+		int* Qk_p = (int*)malloc((nV+1)*sizeof(int));
+		Qk_p[0] = 0;
 
 		// Iterate over columns
 		for (int j = 0; j < nV; j++) {
@@ -718,22 +706,15 @@ namespace lcqpOASES {
 		}
 
 		int Qk_nnx = (int) Qk_data.size();
-		double* Qk_x = new double[Qk_nnx]();
-		int* Qk_i = new int[Qk_nnx]();
+		double* Qk_x = (double*)malloc(Qk_nnx*sizeof(double));
+		int* Qk_i =  (int*)malloc(Qk_nnx*sizeof(int));
 
 		for (size_t i = 0; i < (size_t) Qk_nnx; i++) {
 			Qk_x[i] = Qk_data[i];
 			Qk_i[i] = Qk_row[i];
 		}
 
-		Qk_sparse = (csc *)c_malloc(sizeof(csc));
-		Qk_sparse->n = nV;
-		Qk_sparse->m = nV;
-		Qk_sparse->p = Qk_p;
-		Qk_sparse->i = Qk_i;
-		Qk_sparse->x = Qk_x;
-		Qk_sparse->nz = -1;
-		Qk_sparse->nzmax = Qk_nnx;
+		Qk_sparse = Utilities::createCSC(nV, nV, Qk_nnx, Qk_x, Qk_i, Qk_p);
 
 		Qk_data.clear();
 		Qk_row.clear();
@@ -1273,17 +1254,17 @@ namespace lcqpOASES {
 		}
 
 		if (tmpA_data != 0) {
-			delete[] tmpA_data;
+			free(tmpA_data);
 			tmpA_data = NULL;
 		}
 
 		if (tmpA_p != 0) {
-			delete[] tmpA_p;
+			free(tmpA_p);
 			tmpA_p = NULL;
 		}
 
 		if (tmpA_i != 0) {
-			delete[] tmpA_i;
+			free(tmpA_i);
 			tmpA_i = NULL;
 		}
 
@@ -1291,6 +1272,8 @@ namespace lcqpOASES {
 		Utilities::ClearSparseMat(A_sparse);
 		Utilities::ClearSparseMat(H_sparse);
 		Utilities::ClearSparseMat(Qk_sparse);
+		Utilities::ClearSparseMat(S1_sparse);
+		Utilities::ClearSparseMat(S2_sparse);
 	}
 }
 

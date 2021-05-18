@@ -526,6 +526,8 @@ namespace lcqpOASES {
 			double* S2 = NULL;						/**< RHS of complementarity product. */
 			double* C = NULL;						/**< Complementarity matrix (S1'*S2 + S2'*S1). */
 
+			csc* S1_sparse = NULL;					/**< Sparse S1. */
+			csc* S2_sparse = NULL;					/**< Sparse S2. */
 			csc* C_sparse = NULL;					/**< Sparse C. */
 			csc* Qk_sparse = NULL;					/**< Sparse Qk. */
 			std::vector<int> Qk_indices_of_C;		/**< Remember the indices of Qk corresponding to C (for fast Qk update). */
