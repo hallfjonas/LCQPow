@@ -630,6 +630,7 @@ namespace lcqpOASES {
         std::vector<double> H_data;
         std::vector<int> H_rows;
         int* H_p = (int*)malloc((n+1)*sizeof(int));
+        H_p[0] = 0;
 
         for (int i = 0; i < n; i++) {
             // Begin column pointer with previous value
