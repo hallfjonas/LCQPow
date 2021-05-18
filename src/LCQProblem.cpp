@@ -358,7 +358,7 @@ namespace lcqpOASES {
 			nDuals = nV + nC + 2*nComp;
 			boxDualOffset = nV;
 
-			Subsolver tmp(nV, nDuals, H_sparse, A_sparse);
+			Subsolver tmp(nV, nC + 2*nComp, H_sparse, A_sparse);
 			subsolver = tmp;
 		} else {
 			return ReturnValue::INVALID_QPSOLVER;
