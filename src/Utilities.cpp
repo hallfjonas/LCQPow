@@ -562,11 +562,40 @@ namespace lcqpOASES {
 
         if (M == 0) return 0;
 
-		M->n = m;
-		M->m = n;
+		M->m = m;
+		M->n = n;
 		M->p = p;
 		M->i = i;
 		M->x = x;
+		M->nz = -1;
+		M->nzmax = nnx;
+
+        return M;
+    }
+
+
+    csc* Utilities::copyCSC(int m, int n, int nnx, double* x, int* i, int* p)
+    {
+        csc* M = (csc *)malloc(sizeof(csc));
+
+        if (M == 0) return 0;
+
+        // Allocate space
+		int* rows = (int*) malloc(nnx*sizeof(int));
+		double* data = (double*) malloc(nnx*sizeof(double));
+		int* cols = (int*) malloc((n+1)*sizeof(int));
+
+        // Copy sparse matrix data
+        memcpy(rows, i, nnx*sizeof(int));
+        memcpy(data, x, nnx*sizeof(double));
+        memcpy(cols, p, (n+1)*sizeof(int));
+
+        // Assign copied data
+		M->m = m;
+		M->n = n;
+		M->p = cols;
+		M->i = rows;
+		M->x = data;
 		M->nz = -1;
 		M->nzmax = nnx;
 
