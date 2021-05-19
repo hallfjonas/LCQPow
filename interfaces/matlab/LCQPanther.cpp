@@ -101,39 +101,38 @@ void printOptions( Options options ) {
     mexPrintf("          prnt: %d \n\n", options.getPrintLevel());
 }
 
-void readSparseMatrix(const mxArray* mat, double* M_data, int* M_i, int* M_p, int nCol)
+void readSparseMatrix(const mxArray* mat, double** M_data, int** M_i, int** M_p, int nRow, int nCol)
 {
-
     mwIndex *mat_ir = mxGetIr( mat );
     mwIndex *mat_jc = mxGetJc( mat );
     double *v = (double*)mxGetPr( mat );
     int M_nnx = mat_jc[nCol];
-    M_data = new double[M_nnx];
-    M_i = new int[M_nnx];
-    M_p = new int[nCol+1];
+    *M_data = new double[M_nnx];
+    *M_i = new int[M_nnx];
+    *M_p = new int[nCol+1];
     for (int i = 0; i < M_nnx; i++) {
-        M_data[i] = mat_ir[i];
-        M_i[i] = v[i];
+        (*M_data)[i] = v[i];
+        (*M_i)[i] = (int) mat_ir[i];
     }
 
     for (int i = 0; i < nCol+1; i++) {
-        M_p[i] = mat_jc[i];
+        (*M_p)[i] = (int) mat_jc[i];
     }
 }
 
-void readVectors(const mxArray** prhs, int nrhs, int nC, double* g, double* lbA, double* ubA, double* lb, double* ub)
+void readVectors(const mxArray** prhs, int nrhs, int nC, double** g, double** lbA, double** ubA, double** lb, double** ub)
 {
-    g = (double*) mxGetPr( prhs[1] );
+    *g = (double*) mxGetPr( prhs[1] );
     if (nrhs == 6 || (nrhs == 7 && nC == 0)) {
-        lb = (double*) mxGetPr( prhs[4] );
-        ub = (double*) mxGetPr( prhs[5] );
+        *lb = (double*) mxGetPr( prhs[4] );
+        *ub = (double*) mxGetPr( prhs[5] );
     } else if (nrhs >= 7) {
-        lbA = (double*) mxGetPr( prhs[5] );
-        ubA = (double*) mxGetPr( prhs[6] );
+        *lbA = (double*) mxGetPr( prhs[5] );
+        *ubA = (double*) mxGetPr( prhs[6] );
 
         if (nrhs >= 9) {
-            lb = (double*) mxGetPr( prhs[7] );
-            ub = (double*) mxGetPr( prhs[8] );
+            *lb = (double*) mxGetPr( prhs[7] );
+            *ub = (double*) mxGetPr( prhs[8] );
         }
     }
 }
@@ -166,15 +165,15 @@ int LCQPSparse(LCQProblem& lcqp, int nV, int nComp, int nC, int nlhs, mxArray* p
     double* ub = NULL;
 
     // Read sparse matrices
-    readSparseMatrix(prhs[0], H_data, H_i, H_p, nV);
-    readSparseMatrix(prhs[2], S1_data, S1_i, S1_p, nV);
-    readSparseMatrix(prhs[3], S2_data, S2_i, S2_p, nV);
+    readSparseMatrix(prhs[0], &H_data, &H_i, &H_p, nV, nV);
+    readSparseMatrix(prhs[2], &S1_data, &S1_i, &S1_p, nComp, nV);
+    readSparseMatrix(prhs[3], &S2_data, &S2_i, &S2_p, nComp, nV);
     if (nC > 0) {
-        readSparseMatrix(prhs[4], A_data, A_i, A_p, nV);
+        readSparseMatrix(prhs[4], &A_data, &A_i, &A_p, nC, nV);
     }
 
     // Read vectors
-    readVectors(prhs, nrhs, nC, g, lbA, ubA, lb, ub);
+    readVectors(prhs, nrhs, nC, &g, &lbA, &ubA, &lb, &ub);
 
     // Load data into LCQP object
     lcqpOASES::ReturnValue ret = lcqp.loadLCQP(
@@ -183,6 +182,21 @@ int LCQPSparse(LCQProblem& lcqp, int nV, int nComp, int nC, int nlhs, mxArray* p
         A_data, A_i, A_p, lbA, ubA, lb, ub, x0, y0
     );
 
+    // Clear sparse specific memory
+    if (H_data != 0) {delete[] H_data; H_data = NULL;}
+    if (H_i != 0) {delete[] H_i; H_i = NULL;}
+    if (H_p != 0) {delete[] H_p; H_p = NULL;}
+    if (S1_data != 0) {delete[] S1_data; S1_data = NULL;}
+    if (S1_i != 0) {delete[] S1_i; S1_i = NULL;}
+    if (S1_p != 0) {delete[] S1_p; S1_p = NULL;}
+    if (S2_data != 0) {delete[] S2_data; S2_data = NULL;}
+    if (S2_i != 0) {delete[] S2_i; S2_i = NULL;}
+    if (S2_p != 0) {delete[] S2_p; S2_p = NULL;}
+    if (A_data != 0) {delete[] A_data; A_data = NULL;}
+    if (A_i != 0) {delete[] A_i; A_i = NULL;}
+    if (A_p != 0) {delete[] A_p; A_p = NULL;}
+
+    return ret;
 }
 
 int LCQPDense(LCQProblem& lcqp, int nV, int nComp, int nC, int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[], const double* const x0, const double* const y0)
@@ -212,7 +226,7 @@ int LCQPDense(LCQProblem& lcqp, int nV, int nComp, int nC, int nlhs, mxArray* pl
     }
 
     // Read all vectors
-    readVectors(prhs, nrhs, nC, g, lbA, ubA, lb, ub);
+    readVectors(prhs, nrhs, nC, &g, &lbA, &ubA, &lb, &ub);
 
     // MATLAB stores in column major format (switch to row major)
     if (S1_col != NULL && nComp > 0 && nV > 0) {
