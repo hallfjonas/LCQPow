@@ -383,7 +383,8 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             "penaltyUpdateFactor",
             "solveZeroPenaltyFirst",
             "maxIterations",
-            "printLevel"
+            "printLevel",
+            "qpSolver"
         };
 
         for (auto name : params_fieldnames) {
@@ -450,6 +451,14 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 continue;
             }
 
+            if ( name == "qpSolver") {
+                if (!checkDimensionAndTypeDouble(field, 1, 1, "params.qpSolver")) return;
+
+                fld_ptr = (double*) mxGetPr(field);
+                options.setQPSolver( (int)fld_ptr[0] );
+                continue;
+            }
+
             if ( name == "x0") {
                 if (!checkDimensionAndTypeDouble(field, nV, 1, "params.x0")) return;
 
@@ -481,7 +490,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     }
 
     if (ret != 0) {
-        mexPrintf("Failed to load LCQP.\n");
+        mexPrintf("Failed to load LCQP (error code %d).\n", ret);
         return;
     }
 
