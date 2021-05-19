@@ -123,14 +123,6 @@ namespace lcqpOASES {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
-		// Number of duals in qpOASES case (box constraints + linear constraints + complementarity bounds):
-		nDuals = nV + nC + 2*nComp;
-		boxDualOffset = nV;
-
-		// USe qpOASES in dense formulations
-		Subsolver tmp( nV, nC + 2*nComp, H, A );
-		subsolver = tmp;
-
 		sparseSolver = false;
 
 		return ReturnValue::SUCCESSFUL_RETURN;
@@ -295,14 +287,6 @@ namespace lcqpOASES {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
-		// Number of duals in qpOASES case (box constraints + linear constraints + complementarity bounds):
-		nDuals = nV + nC + 2*nComp;
-		boxDualOffset = nV;
-
-		// USe qpOASES in dense formulations
-		Subsolver tmp( nV, nC + 2*nComp, H, A );
-		subsolver = tmp;
-
 		sparseSolver = false;
 
 		return ReturnValue::SUCCESSFUL_RETURN;
@@ -314,7 +298,7 @@ namespace lcqpOASES {
 										double* _S2_data, int* _S2_i, int* _S2_p,
 										double* _A_data, int* _A_i, int* _A_p,
 										double* _lbA, double* _ubA,	double* _lb, double* _ub,
-										double* _x0, double* _y0, QPSolver qpSolver
+										double* _x0, double* _y0
 										)
 	{
 		ReturnValue ret;
@@ -339,34 +323,15 @@ namespace lcqpOASES {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
-		if (qpSolver == QPSolver::OSQP) {
-			lb = NULL;
-			ub = NULL;
+		ret = setLB( _lb );
 
-			nDuals = nC + 2*nComp;
-			boxDualOffset = 0;
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
 
-			Subsolver tmp(nV, nDuals, H_sparse, A_sparse, g, lbA, ubA);
-			subsolver = tmp;
-		} else if (qpSolver == QPSolver::QPOASES) {
-			ret = setLB( _lb );
+		ret = setUB ( _ub );
 
-			if (ret != SUCCESSFUL_RETURN)
-				return MessageHandler::PrintMessage( ret );
-
-			ret = setUB ( _ub );
-
-			if (ret != SUCCESSFUL_RETURN)
-				return MessageHandler::PrintMessage( ret );
-
-			nDuals = nV + nC + 2*nComp;
-			boxDualOffset = nV;
-
-			Subsolver tmp(nV, nC + 2*nComp, H_sparse, A_sparse);
-			subsolver = tmp;
-		} else {
-			return ReturnValue::INVALID_QPSOLVER;
-		}
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
 
 		sparseSolver = true;
 
@@ -377,27 +342,32 @@ namespace lcqpOASES {
 	ReturnValue LCQProblem::runSolver( )
 	{
 		// Initialize variables
-		initializeSolver();
+		ReturnValue ret = initializeSolver();
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage(ret);
 
 		// Initialization strategy
 		if (options.getSolveZeroPenaltyFirst()) {
 			memcpy(gk, g, (size_t)nV*sizeof(double));
 
-			if (solveQPSubproblem( true ) != SUCCESSFUL_RETURN) {
-				return INITIAL_SUBPROBLEM_FAILED;
+			ret = solveQPSubproblem( true );
+			if (ret != SUCCESSFUL_RETURN) {
+				return MessageHandler::PrintMessage(ret);
 			}
 
 			updateLinearization();
 
-			if (solveQPSubproblem( false ) != SUCCESSFUL_RETURN) {
-				return SUBPROBLEM_SOLVER_ERROR;
+			ret = solveQPSubproblem( false );
+			if (ret != SUCCESSFUL_RETURN) {
+				return MessageHandler::PrintMessage(ret);
 			}
 
 		} else {
 			updateLinearization();
 
-			if (solveQPSubproblem( true ) != SUCCESSFUL_RETURN) {
-				return INITIAL_SUBPROBLEM_FAILED;
+			ret = solveQPSubproblem( true );
+			if (ret != SUCCESSFUL_RETURN) {
+				return MessageHandler::PrintMessage(ret);
 			}
 		}
 
@@ -438,8 +408,9 @@ namespace lcqpOASES {
 			}
 
 			// Step computation
-			if (solveQPSubproblem( false ) != SUCCESSFUL_RETURN) {
-				return SUBPROBLEM_SOLVER_ERROR;
+			ret = solveQPSubproblem( false );
+			if (ret != SUCCESSFUL_RETURN) {
+				return MessageHandler::PrintMessage(ret);
 			}
 
 			// Step length computation
@@ -727,8 +698,52 @@ namespace lcqpOASES {
 	}
 
 
-	void LCQProblem::initializeSolver( )
+	ReturnValue LCQProblem::initializeSolver( )
 	{
+		if (options.getQPSolver() == QPSolver::QPOASES_DENSE) {
+			nDuals = nV + nC + 2*nComp;
+			boxDualOffset = nV;
+
+			if (sparseSolver) {
+				ReturnValue ret = switchToDenseMode( );
+				if (ret != SUCCESSFUL_RETURN)
+					return ret;
+			}
+
+			Subsolver tmp(nV, nC + 2*nComp, H, A);
+			subsolver = tmp;
+		} else if (options.getQPSolver() == QPSolver::QPOASES_SPARSE) {
+			nDuals = nV + nC + 2*nComp;
+			boxDualOffset = nV;
+
+			if (!sparseSolver) {
+				ReturnValue ret = switchToSparseMode( );
+				if (ret != SUCCESSFUL_RETURN)
+					return ret;
+			}
+
+			Subsolver tmp(nV, nC + 2*nComp, H_sparse, A_sparse);
+			subsolver = tmp;
+		} else if (options.getQPSolver() == QPSolver::OSQP_SPARSE) {
+			if (lb != 0 || ub != 0) {
+				return INVALID_OSQP_BOX_CONSTRAINTS;
+			}
+
+			nDuals = nC + 2*nComp;
+			boxDualOffset = 0;
+
+			if (!sparseSolver) {
+				ReturnValue ret = switchToSparseMode( );
+				if (ret != SUCCESSFUL_RETURN)
+					return ret;
+			}
+
+			Subsolver tmp(nV, nDuals, H_sparse, A_sparse, g, lbA, ubA);
+			subsolver = tmp;
+		} else {
+			return ReturnValue::INVALID_QPSOLVER;
+		}
+
 		// Initialize variables and counters
 		alphak = 1;
 		rho = options.getInitialPenaltyParameter( );
@@ -745,6 +760,65 @@ namespace lcqpOASES {
 
 		// Set seed
 		srand( (unsigned int)time( NULL ) );
+
+		return SUCCESSFUL_RETURN;
+	}
+
+
+	ReturnValue LCQProblem::switchToSparseMode( )
+	{
+		H_sparse = Utilities::dns_to_csc(H, nV, nV);
+		A_sparse = Utilities::dns_to_csc(A, nC + 2*nComp, nV);
+
+		S1_sparse = Utilities::dns_to_csc(S1, nComp, nV);
+		S2_sparse = Utilities::dns_to_csc(S2, nComp, nV);
+		C_sparse = Utilities::dns_to_csc(C, nV, nV);
+
+		// Make sure that all sparse matrices are not null pointer
+		if (H_sparse == 0 || A_sparse == 0 || S1_sparse == 0 || S2_sparse == 0 || C_sparse == 0) {
+			return FAILED_SWITCH_TO_SPARSE;
+		}
+
+		// Clean up dense data (only if succeeded)
+		delete[] H; H = NULL;
+		delete[] A; A = NULL;
+		delete[] S1; S1 = NULL;
+		delete[] S2; S2 = NULL;
+		delete[] C; C = NULL;
+
+		// Toggle sparsity flag
+		sparseSolver = true;
+
+		return SUCCESSFUL_RETURN;
+	}
+
+
+	ReturnValue LCQProblem::switchToDenseMode( )
+	{
+		H = Utilities::csc_to_dns(H_sparse);
+		A = Utilities::csc_to_dns(A_sparse);
+
+		S1 = Utilities::csc_to_dns(S1_sparse);
+		S2 = Utilities::csc_to_dns(S2_sparse);
+		C = Utilities::csc_to_dns(C_sparse);
+
+		// Make sure that all sparse matrices are not null pointer
+		if (H == 0 || A == 0 || S1 == 0 || S2 == 0 || C == 0) {
+			return FAILED_SWITCH_TO_DENSE;
+		}
+
+		// Clean up sparse data (only if succeeded)
+		Utilities::ClearSparseMat(C_sparse);
+		Utilities::ClearSparseMat(A_sparse);
+		Utilities::ClearSparseMat(H_sparse);
+		Utilities::ClearSparseMat(Qk_sparse);
+		Utilities::ClearSparseMat(S1_sparse);
+		Utilities::ClearSparseMat(S2_sparse);
+
+		// Toggle sparsity flag
+		sparseSolver = false;
+
+		return SUCCESSFUL_RETURN;
 	}
 
 

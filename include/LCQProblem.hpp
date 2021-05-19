@@ -170,8 +170,7 @@ namespace lcqpOASES {
 				double* _lb = 0,
 				double* _ub = 0,
 				double* _x0 = 0,
-				double* _y0 = 0,
-				QPSolver qpSolver = QPSolver::OSQP
+				double* _y0 = 0
 			);
 
 
@@ -459,7 +458,13 @@ namespace lcqpOASES {
 		private:
 
 			/** Called in runSolver to initialize variables. */
-			void initializeSolver( );
+			ReturnValue initializeSolver( );
+
+			/** Switch to sparse mode (if initialized with dense data but want to use sparse solver). */
+			ReturnValue switchToSparseMode( );
+
+			/** Switch to dense mode (if initialized with sparse data but want to use dense solver). */
+			ReturnValue switchToDenseMode( );
 
 			/** Update the penalty linearization. */
 			void updateLinearization( );

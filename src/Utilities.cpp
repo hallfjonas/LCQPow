@@ -63,6 +63,7 @@ namespace lcqpOASES {
         solveZeroPenaltyFirst = rhs.solveZeroPenaltyFirst;
         maxIterations = rhs.maxIterations;
         printLevel = rhs.printLevel;
+        qpSolver = rhs.qpSolver;
     }
 
 
@@ -168,6 +169,26 @@ namespace lcqpOASES {
     }
 
 
+    QPSolver Options::getQPSolver( ) {
+        return qpSolver;
+    }
+
+
+    ReturnValue Options::setQPSolver( QPSolver val ) {
+        qpSolver = val;
+        return SUCCESSFUL_RETURN;
+    }
+
+
+    ReturnValue Options::setQPSolver( int val ) {
+        if (val < QPSolver::QPOASES_DENSE || val > QPSolver::OSQP_SPARSE)
+            return (MessageHandler::PrintMessage(INVALID_QPSOLVER));
+
+        qpSolver = (QPSolver) val;
+        return SUCCESSFUL_RETURN;
+    }
+
+
     void Options::setToDefault( ) {
         complementarityTolerance = 1.0e3 * Utilities::EPS;
         stationarityTolerance  = 1.0e3 * Utilities::EPS*1000;
@@ -179,6 +200,8 @@ namespace lcqpOASES {
         maxIterations = 1000;
 
         printLevel = PrintLevel::INNER_LOOP_ITERATES;
+
+        qpSolver = QPSolver::QPOASES_DENSE;
     }
 
 
@@ -978,6 +1001,14 @@ namespace lcqpOASES {
 
             case FAILED_SYM_COMPLEMENTARITY_MATRIX:
                 printf("Failed to compute the symmetric complementarity matrix C.\n");
+                break;
+
+            case FAILED_SWITCH_TO_SPARSE:
+                printf("Failed to switch to sparse mode (a to be created sparse matrix was nullpointer).\n");
+                break;
+
+            case FAILED_SWITCH_TO_DENSE:
+                printf("Failed to switch to dense mode (an array to be created was nullpointer).\n");
                 break;
         }
 

@@ -51,10 +51,11 @@ int main() {
 
 	Options options;
     options.setPrintLevel(PrintLevel::INNER_LOOP_ITERATES);
+    options.setQPSolver(QPSolver::QPOASES_SPARSE);
 	lcqp.setOptions( options );
 
     // Solve first LCQP
-	ReturnValue retVal = lcqp.loadLCQP( H_data, H_i, H_p, g, S1_data, S1_i, S1_p, S2_data, S2_i, S2_p, 0, 0, 0, 0, 0, 0, 0, 0, 0, lcqpOASES::QPSolver::QPOASES );
+	ReturnValue retVal = lcqp.loadLCQP( H_data, H_i, H_p, g, S1_data, S1_i, S1_p, S2_data, S2_i, S2_p);
 
     if (retVal != SUCCESSFUL_RETURN)
     {

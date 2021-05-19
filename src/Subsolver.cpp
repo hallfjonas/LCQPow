@@ -31,7 +31,7 @@ namespace lcqpOASES {
     Subsolver::Subsolver(   int nV, int nC,
                             double* H, double* A )
     {
-        qpSolver = QPSolver::QPOASES;
+        qpSolver = QPSolver::QPOASES_DENSE;
 
         SubsolverQPOASES tmp(nV, nC, H, A);
         solverQPOASES = tmp;
@@ -41,7 +41,7 @@ namespace lcqpOASES {
     Subsolver::Subsolver(   int nV, int nC,
                             csc* H, csc* A )
     {
-        qpSolver = QPSolver::QPOASES;
+        qpSolver = QPSolver::QPOASES_SPARSE;
 
         SubsolverQPOASES tmp(nV, nC, H, A );
         solverQPOASES = tmp;
@@ -54,7 +54,7 @@ namespace lcqpOASES {
                             const double* l,
                             const double* u )
     {
-        qpSolver = QPSolver::OSQP;
+        qpSolver = QPSolver::OSQP_SPARSE;
 
         SubsolverOSQP tmp(H, A, g, l, u);
         solverOSQP = tmp;
@@ -80,37 +80,25 @@ namespace lcqpOASES {
 
     void Subsolver::getSolution( double* x, double* y )
     {
-        switch (qpSolver) {
-            case QPSolver::QPOASES:
-                solverQPOASES.getSolution( x, y );
-                return;
-
-            case QPSolver::OSQP:
-                solverOSQP.getSolution( x, y );
-                return;
+        if (qpSolver == QPSolver::QPOASES_DENSE || qpSolver == QPSolver::QPOASES_SPARSE) {
+            solverQPOASES.getSolution( x, y );
+        } else if (qpSolver == QPSolver::OSQP_SPARSE) {
+            solverOSQP.getSolution( x, y );
         }
     }
 
 
     void Subsolver::setPrintLevel( PrintLevel printLevel )
     {
-        switch (qpSolver) {
-            case QPSolver::QPOASES:
-            {
-                if (printLevel < PrintLevel::SUBPROBLEM_SOLVER_ITERATES)
-                    optionsQPOASES.printLevel =  qpOASES::PrintLevel::PL_NONE;
-                else
-                    optionsQPOASES.printLevel =  qpOASES::PrintLevel::PL_MEDIUM;
+        if (qpSolver == QPSolver::QPOASES_DENSE || qpSolver == QPSolver::QPOASES_SPARSE) {
+            if (printLevel < PrintLevel::SUBPROBLEM_SOLVER_ITERATES)
+                optionsQPOASES.printLevel =  qpOASES::PrintLevel::PL_NONE;
+            else
+                optionsQPOASES.printLevel =  qpOASES::PrintLevel::PL_MEDIUM;
 
-                solverQPOASES.setOptions( optionsQPOASES );
-                break;
-            }
-
-            case QPSolver::OSQP:
-            {
-                solverOSQP.setPrintlevl(printLevel >= PrintLevel::SUBPROBLEM_SOLVER_ITERATES);
-                return;
-            }
+            solverQPOASES.setOptions( optionsQPOASES );
+        } else if (qpSolver == QPSolver::OSQP_SPARSE) {
+            solverOSQP.setPrintlevl(printLevel >= PrintLevel::SUBPROBLEM_SOLVER_ITERATES);
         }
     }
 
@@ -122,14 +110,12 @@ namespace lcqpOASES {
                                     const double* lb, const double* ub)
     {
         ReturnValue ret = ReturnValue::SUCCESSFUL_RETURN;
-        switch (qpSolver) {
-            case QPSolver::QPOASES:
-                ret = solverQPOASES.solve( initialSolve, iterations, g, lbA, ubA, x0, y0, lb, ub );
-                break;
-
-            case QPSolver::OSQP:
-                ret = solverOSQP.solve( initialSolve, iterations, g, lbA, ubA, x0, y0, lb, ub );
-                break;
+        if (qpSolver == QPSolver::QPOASES_DENSE || qpSolver == QPSolver::QPOASES_SPARSE) {
+            ret = solverQPOASES.solve( initialSolve, iterations, g, lbA, ubA, x0, y0, lb, ub );
+        } else if (qpSolver == QPSolver::OSQP_SPARSE) {
+            ret = solverOSQP.solve( initialSolve, iterations, g, lbA, ubA, x0, y0, lb, ub );
+        } else {
+            ret = INVALID_QPSOLVER;
         }
 
         return ret;
@@ -140,17 +126,12 @@ namespace lcqpOASES {
     {
         qpSolver = rhs.qpSolver;
 
-        if (qpSolver == QPSolver::QPOASES) {
+        if (qpSolver == QPSolver::QPOASES_DENSE || qpSolver == QPSolver::QPOASES_SPARSE) {
             SubsolverQPOASES tmp( rhs.solverQPOASES );
             solverQPOASES = tmp;
-            return;
-        }
-
-        if (qpSolver == QPSolver::OSQP) {
+        } else if (qpSolver == QPSolver::OSQP_SPARSE) {
             SubsolverOSQP tmp( rhs.solverOSQP );
             solverOSQP = tmp;
-            return;
         }
     }
-
 }

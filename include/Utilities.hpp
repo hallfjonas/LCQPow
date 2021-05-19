@@ -58,6 +58,8 @@ namespace lcqpOASES {
         INITIAL_SUBPROBLEM_FAILED = 202,                /**< Failed to solve the initial QP. */
         SUBPROBLEM_SOLVER_ERROR = 203,                  /**< An error occured in the subproblem solver. */
         FAILED_SYM_COMPLEMENTARITY_MATRIX = 204,        /**< Failed to compute the symmetric complementarity matrix C. */
+        FAILED_SWITCH_TO_SPARSE = 205,                  /**< Failed to switch to sparse mode (a to be created sparse matrix was nullpointer). */
+        FAILED_SWITCH_TO_DENSE = 206,                   /**< Failed to switch to dense mode (an array to be created was nullpointer). */
 
         // Generic errors
         LCQPOBJECT_NOT_SETUP = 300,                     /**< Constructor has not been called. */
@@ -85,8 +87,9 @@ namespace lcqpOASES {
     };
 
     enum QPSolver {
-        QPOASES = 0,                                    /**< QP solver qpOASES. */
-        OSQP = 1                                        /**< QP solver OSQP. */
+        QPOASES_DENSE = 0,                              /**< QP solver qpOASES in dense mode. */
+        QPOASES_SPARSE = 1,                             /**< QP solver qpOASES in sparse mode. */
+        OSQP_SPARSE = 2                                 /**< QP solver OSQP. */
     };
 
 
@@ -164,6 +167,15 @@ namespace lcqpOASES {
             /** Set print level (using an integer). */
             ReturnValue setPrintLevel( int val );
 
+            /** Get QP solver. */
+            QPSolver getQPSolver( );
+
+            /** Set print level. */
+            ReturnValue setQPSolver( QPSolver val );
+
+            /** Set print level (using an integer). */
+            ReturnValue setQPSolver( int val );
+
         protected:
             void copy( const Options& rhs );            /**< Copy each property. */
 
@@ -178,6 +190,7 @@ namespace lcqpOASES {
 
             PrintLevel printLevel;                      /**< Print level. */
 
+            QPSolver qpSolver;                          /**< The QP solver to be used. */
     };
 
     class Utilities {
