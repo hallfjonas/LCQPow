@@ -536,8 +536,7 @@ namespace lcqpOASES {
             return;
 
         // Get dense representation
-        double* dense = new double[A->m*A->n]();
-        Utilities::csc_to_dns(A, dense, A->m, A->n);
+        double* dense = Utilities::csc_to_dns(A);
 
         // Print the dense matrix
         Utilities::printMatrix(dense, A->m, A->n, name);
@@ -616,25 +615,30 @@ namespace lcqpOASES {
     }
 
 
-    ReturnValue Utilities::csc_to_dns(const csc* const sparse, double* full, int m, int n)
+    double* Utilities::csc_to_dns(const csc* const sparse)
     {
+        int m = sparse->m;
+        int n = sparse->n;
+        double* full = new double[m*n]();
+
         for (int j = 0; j < n; j++) {
 			for (int i = sparse->p[j]; i < sparse->p[j+1]; i++) {
                 // Reached final element
                 if (i == sparse->nzmax) {
-                    return ReturnValue::SUCCESSFUL_RETURN;
+                    return full;
                 }
 
                 // Ensure validity of index
                 if (sparse->i[i]*n + j >= m*n || sparse->i[i]*n + j < 0) {
-                    return MessageHandler::PrintMessage( ReturnValue::INDEX_OUT_OF_BOUNDS );
+                    MessageHandler::PrintMessage( ReturnValue::INDEX_OUT_OF_BOUNDS );
+                    return 0;
                 }
 
 				full[sparse->i[i]*n + j] = sparse->x[i];
 			}
 		}
 
-        return ReturnValue::SUCCESSFUL_RETURN;
+        return full;
     }
 
 

@@ -264,9 +264,9 @@ namespace lcqpOASES {
              * @param m Number of rows of `H_sparse` (in its dense representation).
              * @param n Number of columns of `H_sparse` (in its dense representation).
              *
-             * @returns returnValue::SUCCESSFUL_RETURN, or returnValue::INDEX_OUT_OF_BOUNDSA if an index leads to invalid memory access of the dense array.
+             * @returns An dense array representing sparse (or null pointer if failed).
              */
-            static ReturnValue csc_to_dns(const csc* const sparse, double* full, int m, int n);
+            static double* csc_to_dns(const csc* const sparse);
 
 
             /** Transform a dense matrix to csc.
