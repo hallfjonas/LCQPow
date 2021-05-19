@@ -433,6 +433,28 @@ namespace lcqpOASES {
     }
 
 
+    void Utilities::ClearSparseMat(csc** M)
+    {
+        if (*M != 0) {
+            if ((*M)->p != 0) {
+                free((*M)->p);
+                (*M)->p = NULL;
+            }
+            if ((*M)->i != 0) {
+                free((*M)->i);
+                (*M)->i = NULL;
+            }
+            if ((*M)->x != 0) {
+                free((*M)->x);
+                (*M)->x = NULL;
+            }
+
+            free (*M);
+			*M = NULL;
+		}
+    }
+
+
     ReturnValue Utilities::readFromFile( int* data, int n, const char* datafilename )
     {
         int i;

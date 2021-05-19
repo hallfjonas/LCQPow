@@ -240,6 +240,9 @@ namespace lcqpOASES {
             // Clear sparse matrix
             static void ClearSparseMat(csc* M);
 
+            // Clear sparse matrix
+            static void ClearSparseMat(csc** M);
+
             // Read integral data from file
             static ReturnValue readFromFile(int* data, int n, const char* datafilename);
 

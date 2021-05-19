@@ -808,12 +808,11 @@ namespace lcqpOASES {
 		}
 
 		// Clean up sparse data (only if succeeded)
-		Utilities::ClearSparseMat(C_sparse);
-		Utilities::ClearSparseMat(A_sparse);
-		Utilities::ClearSparseMat(H_sparse);
-		Utilities::ClearSparseMat(Qk_sparse);
-		Utilities::ClearSparseMat(S1_sparse);
-		Utilities::ClearSparseMat(S2_sparse);
+		Utilities::ClearSparseMat(&C_sparse);
+		Utilities::ClearSparseMat(&A_sparse);
+		Utilities::ClearSparseMat(&H_sparse);
+		Utilities::ClearSparseMat(&S1_sparse);
+		Utilities::ClearSparseMat(&S2_sparse);
 
 		// Toggle sparsity flag
 		sparseSolver = false;
@@ -1389,12 +1388,12 @@ namespace lcqpOASES {
 			lk_tmp = NULL;
 		}
 
-		Utilities::ClearSparseMat(C_sparse);
-		Utilities::ClearSparseMat(A_sparse);
-		Utilities::ClearSparseMat(H_sparse);
-		Utilities::ClearSparseMat(Qk_sparse);
-		Utilities::ClearSparseMat(S1_sparse);
-		Utilities::ClearSparseMat(S2_sparse);
+		Utilities::ClearSparseMat(&C_sparse);
+		Utilities::ClearSparseMat(&A_sparse);
+		Utilities::ClearSparseMat(&H_sparse);
+		Utilities::ClearSparseMat(&Qk_sparse);
+		Utilities::ClearSparseMat(&S1_sparse);
+		Utilities::ClearSparseMat(&S2_sparse);
 	}
 }
 
