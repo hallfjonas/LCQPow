@@ -200,7 +200,7 @@ namespace lcqpOASES {
 
         for (int j = 0; j < A->n; j++) {
             for (int i = A->p[j]; i < A->p[j+1]; i++) {
-                c[i] += A->x[A->i[i]]*b[j];
+                c[A->i[i]] += A->x[i]*b[j];
             }
         }
     }
