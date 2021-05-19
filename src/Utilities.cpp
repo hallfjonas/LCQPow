@@ -662,7 +662,7 @@ namespace lcqpOASES {
         double* H_x = (double*)malloc(H_p[n] * sizeof(double));
 
         for (int i = 0; i < H_p[n]; i++) {
-            H_i[i] = H_i[(size_t)i];
+            H_i[i] = H_rows[(size_t)i];
             H_x[i] = H_data[(size_t)i];
         }
 
