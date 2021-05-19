@@ -247,7 +247,7 @@ namespace lcqpOASES {
     csc* Utilities::MatrixSymmetrizationProduct(double* S1_x, int* S1_i, int* S1_p, double* S2_x, int* S2_i, int* S2_p, int m, int n) {
         std::vector<int> C_rows;
         std::vector<double> C_data;
-        int* C_p = (int*) malloc((n+1)*sizeof(int));
+        int* C_p = (int*) malloc((size_t)(n+1)*sizeof(int));
         C_p[0] = 0;
 
         for (int j = 0; j < n; j++) {
@@ -283,12 +283,12 @@ namespace lcqpOASES {
         if (C_p[n] == 0)
             return 0;
 
-        int* C_i = (int*) malloc(C_p[n]*sizeof(int));
-        double* C_x = (double*) malloc(C_p[n]*sizeof(double));
+        int* C_i = (int*) malloc((size_t)C_p[n]*sizeof(int));
+        double* C_x = (double*) malloc((size_t)C_p[n]*sizeof(double));
 
         for (int i = 0; i < C_p[n]; i++) {
-            C_i[i] = C_rows[i];
-            C_x[i] = C_data[i];
+            C_i[i] = C_rows[(size_t)i];
+            C_x[i] = C_data[(size_t)i];
         }
 
         csc* M = createCSC(n, n, C_p[n], C_x, C_i, C_p);
@@ -594,14 +594,14 @@ namespace lcqpOASES {
         if (M == 0) return 0;
 
         // Allocate space
-		int* rows = (int*) malloc(nnx*sizeof(int));
-		double* data = (double*) malloc(nnx*sizeof(double));
-		int* cols = (int*) malloc((n+1)*sizeof(int));
+		int* rows = (int*) malloc((size_t)nnx*sizeof(int));
+		double* data = (double*) malloc((size_t)nnx*sizeof(double));
+		int* cols = (int*) malloc((size_t)(n+1)*sizeof(int));
 
         // Copy sparse matrix data
-        memcpy(rows, i, nnx*sizeof(int));
-        memcpy(data, x, nnx*sizeof(double));
-        memcpy(cols, p, (n+1)*sizeof(int));
+        memcpy(rows, i, (size_t)nnx*sizeof(int));
+        memcpy(data, x, (size_t)nnx*sizeof(double));
+        memcpy(cols, p, (size_t)(n+1)*sizeof(int));
 
         // Assign copied data
 		M->m = m;
@@ -642,7 +642,7 @@ namespace lcqpOASES {
     {
         std::vector<double> H_data;
         std::vector<int> H_rows;
-        int* H_p = (int*)malloc((n+1)*sizeof(int));
+        int* H_p = (int*)malloc((size_t)(n+1)*sizeof(int));
         H_p[0] = 0;
 
         for (int i = 0; i < n; i++) {
@@ -658,8 +658,8 @@ namespace lcqpOASES {
             }
         }
 
-        int* H_i = (int*)malloc(H_p[n] * sizeof(int));
-        double* H_x = (double*)malloc(H_p[n] * sizeof(double));
+        int* H_i = (int*)malloc((size_t)H_p[n] * sizeof(int));
+        double* H_x = (double*)malloc((size_t)H_p[n] * sizeof(double));
 
         for (int i = 0; i < H_p[n]; i++) {
             H_i[i] = H_rows[(size_t)i];

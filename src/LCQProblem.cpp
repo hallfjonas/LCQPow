@@ -544,13 +544,13 @@ namespace lcqpOASES {
 		tmpA_nnx += A_p != 0 ? A_p[nV] : 0;
 
 		// Data array
-		double* tmpA_data = (double*)malloc(tmpA_nnx*sizeof(double));
+		double* tmpA_data = (double*)malloc((size_t)tmpA_nnx*sizeof(double));
 
 		// Row indices
-		int* tmpA_i = (int*)malloc(tmpA_nnx*sizeof(int));
+		int* tmpA_i = (int*)malloc((size_t)tmpA_nnx*sizeof(int));
 
 		// Column pointers
-		int* tmpA_p = (int*)malloc((nV+1)*sizeof(int));
+		int* tmpA_p = (int*)malloc((size_t)(nV+1)*sizeof(int));
 
 		int index_data = 0;
 		tmpA_p[0] = 0;
@@ -646,7 +646,7 @@ namespace lcqpOASES {
 		if (sparseSolver) {
 			std::vector<double> Qk_data;
 			std::vector<int> Qk_row;
-			int* Qk_p = (int*)malloc((nV+1)*sizeof(int));
+			int* Qk_p = (int*)malloc((size_t)(nV+1)*sizeof(int));
 			Qk_p[0] = 0;
 
 			// Iterate over columns
@@ -709,8 +709,8 @@ namespace lcqpOASES {
 			}
 
 			int Qk_nnx = (int) Qk_data.size();
-			double* Qk_x = (double*)malloc(Qk_nnx*sizeof(double));
-			int* Qk_i =  (int*)malloc(Qk_nnx*sizeof(int));
+			double* Qk_x = (double*)malloc((size_t)Qk_nnx*sizeof(double));
+			int* Qk_i =  (int*)malloc((size_t)Qk_nnx*sizeof(int));
 
 			for (size_t i = 0; i < (size_t) Qk_nnx; i++) {
 				Qk_x[i] = Qk_data[i];

@@ -80,12 +80,12 @@ namespace lcqpOASES {
         A_x = new double[_A->p[_nV]];
         A_p = new int[_nV+1];
 
-        memcpy(H_p, _H->p, (nV+1)*sizeof(int));
-        memcpy(H_i, _H->i, (_H->p[nV])*sizeof(int));
-        memcpy(H_x, _H->x, (_H->p[nV])*sizeof(double));
-        memcpy(A_p, _A->p, (nV+1)*sizeof(int));
-        memcpy(A_i, _A->i, (_A->p[nV])*sizeof(int));
-        memcpy(A_x, _A->x, (_A->p[nV])*sizeof(double));
+        memcpy(H_p, _H->p, (size_t)(nV+1)*sizeof(int));
+        memcpy(H_i, _H->i, (size_t)(_H->p[nV])*sizeof(int));
+        memcpy(H_x, _H->x, (size_t)(_H->p[nV])*sizeof(double));
+        memcpy(A_p, _A->p, (size_t)(nV+1)*sizeof(int));
+        memcpy(A_i, _A->i, (size_t)(_A->p[nV])*sizeof(int));
+        memcpy(A_x, _A->x, (size_t)(_A->p[nV])*sizeof(double));
 
         H_sparse = new qpOASES::SymSparseMat(nV, nV, H_i, H_p, H_x);
         A_sparse = new qpOASES::SparseMatrix(nC, nV, A_i, A_p, A_x);
@@ -234,12 +234,12 @@ namespace lcqpOASES {
             A_x = new double[rhs.A_p[nV]];
             A_p = new int[nV+1];
 
-            memcpy(H_p, rhs.H_p, (nV+1)*sizeof(int));
-            memcpy(H_i, rhs.H_i, (rhs.H_p[nV])*sizeof(int));
-            memcpy(H_x, rhs.H_x, (rhs.H_p[nV])*sizeof(double));
-            memcpy(A_p, rhs.A_p, (nV+1)*sizeof(int));
-            memcpy(A_i, rhs.A_i, (rhs.A_p[nV])*sizeof(int));
-            memcpy(A_x, rhs.A_x, (rhs.A_p[nV])*sizeof(double));
+            memcpy(H_p, rhs.H_p, (size_t)(nV+1)*sizeof(int));
+            memcpy(H_i, rhs.H_i, (size_t)(rhs.H_p[nV])*sizeof(int));
+            memcpy(H_x, rhs.H_x, (size_t)(rhs.H_p[nV])*sizeof(double));
+            memcpy(A_p, rhs.A_p, (size_t)(nV+1)*sizeof(int));
+            memcpy(A_i, rhs.A_i, (size_t)(rhs.A_p[nV])*sizeof(int));
+            memcpy(A_x, rhs.A_x, (size_t)(rhs.A_p[nV])*sizeof(double));
 
             H_sparse = new qpOASES::SymSparseMat(nV, nV, H_i, H_p, H_x);
             A_sparse = new qpOASES::SparseMatrix(nC, nV, A_i, A_p, A_x);
