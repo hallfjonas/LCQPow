@@ -169,14 +169,15 @@ namespace lcqpOASES {
 
             double stationarityTolerance;               /**< Tolerance for 1-Norm of stationarity violation. */
             double complementarityTolerance;		    /**< Complementarity tolerance. */
-            double initialPenaltyParameter;	    /**< Start value for complementarity penalty term. */
-            double penaltyUpdateFactor;	    /**< Factor for updating penaltised complementarity term. */
+            double initialPenaltyParameter;	            /**< Start value for complementarity penalty term. */
+            double penaltyUpdateFactor;	                /**< Factor for updating penaltised complementarity term. */
 
             bool solveZeroPenaltyFirst;                 /**< Flag indicating whether first QP should ignore penalization. */
 
-            int maxIterations;                           /**< Maximum number of iterations to be performed. */
+            int maxIterations;                          /**< Maximum number of iterations to be performed. */
 
-            PrintLevel printLevel;                        /**< Print level. */
+            PrintLevel printLevel;                      /**< Print level. */
+
     };
 
     class Utilities {
