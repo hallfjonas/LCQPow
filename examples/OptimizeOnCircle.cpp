@@ -41,6 +41,7 @@ int main() {
     LCQProblem lcqp( nV, nC, nComp );
 	Options options;
     options.setPrintLevel(PrintLevel::INNER_LOOP_ITERATES);
+    options.setQPSolver(QPSolver::QPOASES_SPARSE);
     lcqp.setOptions( options );
 
 
