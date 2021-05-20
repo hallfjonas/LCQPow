@@ -126,20 +126,16 @@ namespace lcqpOASES {
 			/** Run solver passing the desired LCQP in sparse format (OSQP is used on subsolver level).
 			 *
 			 * @param _H_data Non-zero Hessian matrix values.
-			 * @param _H_nnx Number of non-zero values of Hessian.
 			 * @param _H_i Row indicies of non-zero values.
 			 * @param _H_p Pointer to column starts.
 			 * @param _g The objective's linear term.
 			 * @param _S1_data Non-zero values of LHS of complementarity product.
-			 * @param _S1_nnx Number of non-zero values of S1.
 			 * @param _S1_i Row indicies of non-zero values of S1.
 			 * @param _S1_p Pointer to column starts of S1.
 			 * @param _S2_data Non-zero values of RHS of complementarity product.
-			 * @param _S1_nnx Number of non-zero values of S2.
 			 * @param _S1_i Row indicies of non-zero values of S2.
 			 * @param _S1_p Pointer to column starts of S2.
 			 * @param _A_data Non-zero values of constraint matrix.
-			 * @param _A_nnx Number of non-zero values of A.
 			 * @param _A_i Row indicies of non-zero values of A.
 			 * @param _A_p Pointer to column starts of A.
 			 * @param _lbA The constraints lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
