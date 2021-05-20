@@ -280,7 +280,7 @@ namespace lcqpOASES {
 
                 // (S1'*S2)_ij
                 for (int k = S1_p[i]; k < S1_p[i+1]; k++) {
-                    int ind_s2 = getIndexOfIn(k, S2_i, S2_p[j], S2_p[j+1]);
+                    int ind_s2 = getIndexOfIn(S1_i[k], S2_i, S2_p[j], S2_p[j+1]);
                     if (ind_s2 != -1) {
                         tmp += S1_x[k]*S2_x[ind_s2];
                     }
@@ -288,7 +288,8 @@ namespace lcqpOASES {
 
                 // (S2'*S1)_ij
                 for (int k = S2_p[i]; k < S2_p[i+1]; k++) {
-                    int ind_s1 = getIndexOfIn(k, S1_i, S1_p[j], S1_p[j+1]);
+                    int ind_s1 = getIndexOfIn(S2_i[k], S1_i, S1_p[j], S1_p[j+1]);
+
                     if (ind_s1 != -1) {
                         tmp += S2_x[k]*S1_x[ind_s1];
                     }
