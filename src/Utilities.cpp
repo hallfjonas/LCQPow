@@ -23,7 +23,11 @@
 #include "Utilities.hpp"
 #include <iostream>
 #include <vector>
-#include <osqp.h>
+
+extern "C" {
+    #include <osqp.h>
+}
+
 
 namespace lcqpOASES {
 

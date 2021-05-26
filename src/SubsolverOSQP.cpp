@@ -19,12 +19,14 @@
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <SubsolverOSQP.hpp>
-#include "osqp.h"
+#include "SubsolverOSQP.hpp"
+
+extern "C" {
+    #include <osqp.h>
+}
+
 
 namespace lcqpOASES {
-
-
     SubsolverOSQP::SubsolverOSQP( ) {
         data = NULL;
         settings = NULL;

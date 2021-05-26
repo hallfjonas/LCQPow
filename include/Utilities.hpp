@@ -23,7 +23,9 @@
 #ifndef LCQPOASES_UTILITIES_HPP
 #define LCQPOASES_UTILITIES_HPP
 
-#include <osqp.h>
+extern "C" {
+    #include <osqp.h>
+}
 
 namespace lcqpOASES {
 
