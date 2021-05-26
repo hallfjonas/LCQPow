@@ -60,8 +60,8 @@ function [] = make( varargin )
     
     %% define compiler settings
     LCQPOASES_IFLAG = '-I../../include ';
-    QPOASES_IFLAG = '-I../../external/qpOASES/include ';
-    OSQP_IFLAG = '-I../../external/osqp/include ';
+    QPOASES_IFLAG = '-I/home/syscop/qpOASES/include ';
+    OSQP_IFLAG = '-I/home/syscop/osqp/include ';
     
     DEBUGFLAGS = ' ';
     %DEBUGFLAGS = ' -v -g CXXDEBUGFLAGS=''$CXXDEBUGFLAGS -Wall -pedantic -Wshadow'' ';
