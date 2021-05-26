@@ -41,7 +41,7 @@ int main() {
     LCQProblem lcqp( nV, nC, nComp );
 	Options options;
     options.setPrintLevel(PrintLevel::INNER_LOOP_ITERATES);
-    options.setQPSolver(QPSolver::QPOASES_SPARSE);
+    options.setQPSolver(QPSolver::OSQP_SPARSE);
     lcqp.setOptions( options );
 
 
@@ -53,13 +53,18 @@ int main() {
     double* A = new double[nC*nV]();
     double* lbA = new double[nC]();
     double* ubA = new double[nC]();
-    double* lb = new double[nV]();
-    double* ub = new double[nV]();
     double* x0 = new double[nV]();
+    x0[0] = x_ref[0];
+    x0[1] = x_ref[1];
 
     // Assign problem data
     H[0] = 17; H[1*nV + 1] = 17;
-    H[0*nV + 1] = -15; H[1*nV + 0] = -15;
+    H[0*nV + 1] = -15;
+
+    // OSQP want triangular matrices
+    if (options.getQPSolver() != QPSolver::OSQP_SPARSE){
+        H[1*nV + 0] = -15;
+    }
 
     // Regularization on H
     for (int i = 2; i < nV; i++)
@@ -87,22 +92,17 @@ int main() {
         // constraint bounds
         lbA[i] = 1;
         ubA[i] = 1;
+
+        x0[2*i + 2] = 1;
+        x0[2*i + 3] = 1;
     }
 
     // Constraint bound for last constraint
     lbA[N] = 1;
     ubA[N] = 1;
 
-    // Bounds and initial guess
-    for (int i = 0; i < nV; i++) {
-        lb[i] = i < 2 ? -INFINITY : 0;
-        ub[i] = INFINITY;
-
-        x0[i] = i < 2 ? x_ref[i] : 1;
-    }
-
     // Solve first LCQP
-	ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2, A, lbA, ubA, lb, ub, x0 );
+	ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2, A, lbA, ubA, 0, 0, x0 );
 
     if (retVal != SUCCESSFUL_RETURN)
     {
@@ -138,7 +138,7 @@ int main() {
     // Clean Up
     delete[] xOpt; delete[] yOpt;
     delete[] H; delete[] g; delete[] S1; delete[] S2; delete[] A;
-    delete[] lbA; delete[] ubA; delete[] lb; delete[] ub; delete[] x0;
+    delete[] lbA; delete[] ubA; delete[] x0;
 
     return 0;
 }
