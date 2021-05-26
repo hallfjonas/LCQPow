@@ -28,12 +28,10 @@ include ../make.mk
 IFLAGS      =  -I. \
                -I${IDIR} \
 			   -isystem${QPOASES_IDIR}\
-			   -isystem${OSQP_IDIR}\
-			   -isystem${PLOTLIB_IDIR}\
-			   -isystem${PYTHON3_IDIR}
+			   -isystem${OSQP_IDIR}
 
 
-LFLAGS 		= ${QPOASES_LINK} ${OSQP_LINK} ${PYTHON3_LINK}
+LFLAGS 		= ${QPOASES_LINK} ${OSQP_LINK}
 
 DEBUGFLAGS = -g -Wall -pedantic -Wshadow -Wfloat-equal
 
