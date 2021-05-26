@@ -160,7 +160,11 @@ namespace lcqpOASES {
     {
         // Make sure that lb and ub are null pointers, as OSQP does not handle box constraints
         if (_lb != 0 || _ub != 0) {
-            return MessageHandler::PrintMessage( ReturnValue::INVALID_OSQP_BOX_CONSTRAINTS );
+            return ReturnValue::INVALID_OSQP_BOX_CONSTRAINTS;
+        }
+
+        if (work == 0) {
+            return ReturnValue::OSQP_WORKSPACE_NOT_SET_UP;
         }
 
         // Update linear cost and bounds

@@ -1066,6 +1066,10 @@ namespace lcqpOASES {
             case FAILED_SWITCH_TO_DENSE:
                 printf("Failed to switch to dense mode (an array to be created was nullpointer).\n");
                 break;
+
+            case OSQP_WORKSPACE_NOT_SET_UP:
+                printf("OSQP Workspace is not set up (please check for OSQP errors).\n");
+                break;
         }
 
         fflush(stdout);

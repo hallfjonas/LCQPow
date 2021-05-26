@@ -62,6 +62,7 @@ namespace lcqpOASES {
         FAILED_SYM_COMPLEMENTARITY_MATRIX = 204,        /**< Failed to compute the symmetric complementarity matrix C. */
         FAILED_SWITCH_TO_SPARSE = 205,                  /**< Failed to switch to sparse mode (a to be created sparse matrix was nullpointer). */
         FAILED_SWITCH_TO_DENSE = 206,                   /**< Failed to switch to dense mode (an array to be created was nullpointer). */
+        OSQP_WORKSPACE_NOT_SET_UP = 207,                /**< OSQP Workspace is not set up. */
 
         // Generic errors
         LCQPOBJECT_NOT_SETUP = 300,                     /**< Constructor has not been called. */
