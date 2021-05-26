@@ -661,6 +661,35 @@ namespace lcqpOASES {
     }
 
 
+    csc* Utilities::copyCSC(const csc* const _M)
+    {
+        csc* M = (csc *)malloc(sizeof(csc));
+
+        if (M == 0) return 0;
+
+        // Allocate space
+		int* rows = (int*) malloc((size_t)_M->nzmax*sizeof(int));
+		double* data = (double*) malloc((size_t)_M->nzmax*sizeof(double));
+		int* cols = (int*) malloc((size_t)(_M->n+1)*sizeof(int));
+
+        // Copy sparse matrix data
+        memcpy(rows, _M->i, (size_t)_M->nzmax*sizeof(int));
+        memcpy(data, _M->x, (size_t)_M->nzmax*sizeof(double));
+        memcpy(cols, _M->p, (size_t)(_M->n+1)*sizeof(int));
+
+        // Assign copied data
+		M->m = _M->m;
+		M->n = _M->n;
+		M->p = cols;
+		M->i = rows;
+		M->x = data;
+		M->nz = -1;
+		M->nzmax = _M->nzmax;
+
+        return M;
+    }
+
+
     double* Utilities::csc_to_dns(const csc* const sparse)
     {
         int m = sparse->m;

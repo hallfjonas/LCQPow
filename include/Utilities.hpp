@@ -273,6 +273,9 @@ namespace lcqpOASES {
             // Copy a csc matrix (like create CSC but deep copy is made)
             static csc* copyCSC(int m, int n, int nnz, double* x, int* i, int* p);
 
+            // Copy a csc matrix (override of copyCSC)
+            static csc* copyCSC(const csc* const M);
+
             /** Transform a csc matrix to dense.
              *
              * @param sparse A sparse matrix.
