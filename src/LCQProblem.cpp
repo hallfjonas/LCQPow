@@ -293,6 +293,8 @@ namespace lcqpOASES {
 	}
 
 
+
+
 	ReturnValue LCQProblem::loadLCQP(	double* _H_data, int* _H_i, int* _H_p, double* _g,
 										double* _S1_data, int* _S1_i, int* _S1_p,
 										double* _S2_data, int* _S2_i, int* _S2_p,
@@ -323,21 +325,23 @@ namespace lcqpOASES {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
-		ret = setLB( _lb );
+		// Only copy lb and ub to temporary variables
+		// Build them once we know what solver is used
 
-		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
+		if (_lb != 0) {
+			lb_tmp = new double[nV];
+			memcpy(lb_tmp, _lb, (size_t) nV*sizeof(double));
+		}
 
-		ret = setUB ( _ub );
-
-		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
+		if (_ub != 0) {
+			ub_tmp = new double[nV];
+			memcpy(ub_tmp, _ub, (size_t) nV*sizeof(double));
+		}
 
 		sparseSolver = true;
 
 		return ReturnValue::SUCCESSFUL_RETURN;
 	}
-
 
 	ReturnValue LCQProblem::runSolver( )
 	{
@@ -700,15 +704,26 @@ namespace lcqpOASES {
 
 	ReturnValue LCQProblem::initializeSolver( )
 	{
+		ReturnValue ret = SUCCESSFUL_RETURN;
 		if (options.getQPSolver() == QPSolver::QPOASES_DENSE) {
 			nDuals = nV + nC + 2*nComp;
 			boxDualOffset = nV;
 
 			if (sparseSolver) {
-				ReturnValue ret = switchToDenseMode( );
+				ret = switchToDenseMode( );
 				if (ret != SUCCESSFUL_RETURN)
 					return ret;
 			}
+
+			ret = setLB( lb_tmp );
+
+			if (ret != SUCCESSFUL_RETURN)
+				return ret;
+
+			ret = setUB ( ub_tmp );
+
+			if (ret != SUCCESSFUL_RETURN)
+				return ret;
 
 			Subsolver tmp(nV, nC + 2*nComp, H, A);
 			subsolver = tmp;
@@ -717,12 +732,23 @@ namespace lcqpOASES {
 			boxDualOffset = nV;
 
 			if (!sparseSolver) {
-				ReturnValue ret = switchToSparseMode( );
+				ret = switchToSparseMode( );
 				if (ret != SUCCESSFUL_RETURN)
 					return ret;
 			}
 
 			Subsolver tmp(nV, nC + 2*nComp, H_sparse, A_sparse);
+			ret = setLB( lb_tmp );
+
+			if (ret != SUCCESSFUL_RETURN)
+				return ret;
+
+			ret = setUB( ub_tmp );
+
+			if (ret != SUCCESSFUL_RETURN)
+				return ret;
+
+
 			subsolver = tmp;
 		} else if (options.getQPSolver() == QPSolver::OSQP_SPARSE) {
 			if (lb != 0 || ub != 0) {
@@ -733,9 +759,13 @@ namespace lcqpOASES {
 			boxDualOffset = 0;
 
 			if (!sparseSolver) {
-				ReturnValue ret = switchToSparseMode( );
+				ret = switchToSparseMode( );
 				if (ret != SUCCESSFUL_RETURN)
 					return ret;
+			}
+
+			if (lb_tmp != 0 || ub_tmp != 0) {
+				return ReturnValue::INVALID_OSQP_BOX_CONSTRAINTS;
 			}
 
 			Subsolver tmp(nV, nDuals, H_sparse, A_sparse, g, lbA, ubA);
@@ -761,7 +791,18 @@ namespace lcqpOASES {
 		// Set seed
 		srand( (unsigned int)time( NULL ) );
 
-		return SUCCESSFUL_RETURN;
+		// Clean up temporary box constraints
+		if (lb_tmp != 0) {
+			delete[] lb_tmp;
+			lb_tmp = NULL;
+		}
+
+		if (ub_tmp != 0) {
+			delete[] ub_tmp;
+			ub_tmp = NULL;
+		}
+
+		return ret;
 	}
 
 
@@ -1301,6 +1342,16 @@ namespace lcqpOASES {
 		if (ub != 0) {
 			delete[] ub;
 			ub = NULL;
+		}
+
+		if (lb_tmp != 0) {
+			delete[] lb_tmp;
+			lb_tmp = NULL;
+		}
+
+		if (ub_tmp != 0) {
+			delete[] ub_tmp;
+			ub_tmp = NULL;
 		}
 
 		if (A != 0) {

@@ -519,8 +519,11 @@ namespace lcqpOASES {
 			double* H = NULL;						/**< Objective Hessian term. */
 
 			double* g = NULL;						/**< Objective linear term. */
+
 			double* lb = NULL;						/**< Lower bound vector (on variables). */
 			double* ub = NULL;						/**< Upper bound vector (on variables). */
+			double* lb_tmp = NULL;						/**< Temporary box constraints. */
+			double* ub_tmp = NULL;						/**< Temporary box constraints. */
 
 			double* A = NULL;						/**< Constraint matrix. */
 			double* lbA = NULL;						/**< Lower bound vector (on constraints). */
