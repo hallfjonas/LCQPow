@@ -132,7 +132,7 @@ int main(int argc, char **argv) {
 
     lcqpOASES::Options opts;
     opts.setPrintLevel( lcqpOASES::PrintLevel::INNER_LOOP_ITERATES );
-    opts.setQPSolver( lcqpOASES::QPSolver::QPOASES_SPARSE);
+    opts.setQPSolver( lcqpOASES::QPSolver::QPOASES_SPARSE_SCHUR);
     lcqp.setOptions( opts );
 
     // Run solver

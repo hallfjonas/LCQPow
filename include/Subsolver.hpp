@@ -42,7 +42,8 @@ namespace lcqpOASES {
             Subsolver(  int nV,
                         int nC,
                         csc* H,
-                        csc* A);
+                        csc* A,
+                        bool useSchur);
 
             /** Constructor for sparse matrices (OSQP). */
             Subsolver(  int nV,

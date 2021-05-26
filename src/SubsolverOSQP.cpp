@@ -20,7 +20,12 @@
  */
 
 #include <SubsolverOSQP.hpp>
+
+extern "C" {
 #include "osqp.h"
+}
+
+
 
 namespace lcqpOASES {
 
@@ -46,8 +51,8 @@ namespace lcqpOASES {
         data = (OSQPData *)c_malloc(sizeof(OSQPData));
 
         // Copy matrices
-        H = copy_csc_mat(_H);
-        A = copy_csc_mat(_A);
+        H = Utilities::copyCSC(_H);
+        A = Utilities::copyCSC(_A);
         g = new c_float[nVars];
         l = new c_float[nDuals];
         u = new c_float[nDuals];
@@ -203,8 +208,9 @@ namespace lcqpOASES {
         nVars = rhs.nVars;
         nDuals = rhs.nDuals;
 
-        H = copy_csc_mat(rhs.H);
-        A = copy_csc_mat(rhs.A);
+        H = Utilities::copyCSC(rhs.H);
+        A = Utilities::copyCSC(rhs.A);
+
         g = new c_float[nVars];
         l = new c_float[nDuals];
         u = new c_float[nDuals];

@@ -39,11 +39,11 @@ namespace lcqpOASES {
 
 
     Subsolver::Subsolver(   int nV, int nC,
-                            csc* H, csc* A )
+                            csc* H, csc* A, bool useSchur )
     {
-        qpSolver = QPSolver::QPOASES_SPARSE;
+        qpSolver = useSchur ? QPSolver::QPOASES_SPARSE_SCHUR : QPSolver::QPOASES_SPARSE;
 
-        SubsolverQPOASES tmp(nV, nC, H, A );
+        SubsolverQPOASES tmp(nV, nC, H, A, useSchur );
         solverQPOASES = tmp;
     }
 
@@ -110,7 +110,7 @@ namespace lcqpOASES {
                                     const double* lb, const double* ub)
     {
         ReturnValue ret = ReturnValue::SUCCESSFUL_RETURN;
-        if (qpSolver == QPSolver::QPOASES_DENSE || qpSolver == QPSolver::QPOASES_SPARSE) {
+        if (qpSolver >= QPSolver::QPOASES_DENSE && qpSolver <= QPSolver::QPOASES_SPARSE_SCHUR) {
             ret = solverQPOASES.solve( initialSolve, iterations, g, lbA, ubA, x0, y0, lb, ub );
         } else if (qpSolver == QPSolver::OSQP_SPARSE) {
             ret = solverOSQP.solve( initialSolve, iterations, g, lbA, ubA, x0, y0, lb, ub );
@@ -126,7 +126,7 @@ namespace lcqpOASES {
     {
         qpSolver = rhs.qpSolver;
 
-        if (qpSolver == QPSolver::QPOASES_DENSE || qpSolver == QPSolver::QPOASES_SPARSE) {
+        if (qpSolver >= QPSolver::QPOASES_DENSE || qpSolver <= QPSolver::QPOASES_SPARSE_SCHUR) {
             SubsolverQPOASES tmp( rhs.solverQPOASES );
             solverQPOASES = tmp;
         } else if (qpSolver == QPSolver::OSQP_SPARSE) {

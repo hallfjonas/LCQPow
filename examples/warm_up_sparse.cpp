@@ -50,8 +50,8 @@ int main() {
     LCQProblem lcqp( nV, nC, nComp );
 
 	Options options;
-    options.setPrintLevel(PrintLevel::INNER_LOOP_ITERATES);
-    options.setQPSolver(QPSolver::QPOASES_SPARSE);
+    options.setPrintLevel(PrintLevel::SUBPROBLEM_SOLVER_ITERATES);
+    options.setQPSolver(QPSolver::OSQP_SPARSE);
 	lcqp.setOptions( options );
 
     // Solve first LCQP
@@ -67,7 +67,7 @@ int main() {
 
     if (retVal != SUCCESSFUL_RETURN)
     {
-        printf("Failed to solve LCQP.\n");
+        printf("Failed to solve LCQP (code %d).\n", retVal);
         return 1;
     }
 

@@ -41,7 +41,8 @@ namespace lcqpOASES {
             SubsolverQPOASES(   int nV,
                                 int nC,
                                 csc* H,
-                                csc* A);
+                                csc* A,
+                                bool useSchur);
 
             /** Copy constructor. */
             SubsolverQPOASES(const SubsolverQPOASES& rhs);
@@ -95,6 +96,9 @@ namespace lcqpOASES {
             int* A_p = NULL;
 
             qpOASES::QProblem qp;
+
+            bool useSchur = false;
+            qpOASES::SQProblemSchur qpSchur;
     };
 }
 

@@ -727,7 +727,8 @@ namespace lcqpOASES {
 
 			Subsolver tmp(nV, nC + 2*nComp, H, A);
 			subsolver = tmp;
-		} else if (options.getQPSolver() == QPSolver::QPOASES_SPARSE) {
+		} else if (options.getQPSolver() == QPSolver::QPOASES_SPARSE_SCHUR ||
+		           options.getQPSolver() == QPSolver::QPOASES_SPARSE) {
 			nDuals = nV + nC + 2*nComp;
 			boxDualOffset = nV;
 
@@ -737,7 +738,6 @@ namespace lcqpOASES {
 					return ret;
 			}
 
-			Subsolver tmp(nV, nC + 2*nComp, H_sparse, A_sparse);
 			ret = setLB( lb_tmp );
 
 			if (ret != SUCCESSFUL_RETURN)
@@ -748,7 +748,9 @@ namespace lcqpOASES {
 			if (ret != SUCCESSFUL_RETURN)
 				return ret;
 
+			bool schurFlag = options.getQPSolver() == QPSolver::QPOASES_SPARSE_SCHUR;
 
+			Subsolver tmp(nV, nC + 2*nComp, H_sparse, A_sparse, schurFlag);
 			subsolver = tmp;
 		} else if (options.getQPSolver() == QPSolver::OSQP_SPARSE) {
 			if (lb != 0 || ub != 0) {

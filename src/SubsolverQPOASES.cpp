@@ -54,13 +54,20 @@ namespace lcqpOASES {
      *   S u b s o l v e r Q P O A S E S
      */
     SubsolverQPOASES::SubsolverQPOASES( int _nV, int _nC,
-                                        csc* _H, csc* _A)
+                                        csc* _H, csc* _A, bool _useSchur)
     {
         nV = _nV;
         nC = _nC;
 
         isSparse = true;
-        qp = qpOASES::QProblem(nV, nC);
+        useSchur = _useSchur;
+
+        if (useSchur) {
+            qpSchur = qpOASES::SQProblemSchur(nV, nC);
+        } else {
+            qp = qpOASES::QProblem(nV, nC);
+        }
+
 
         if (H_sparse != NULL) {
             free(H_sparse);
@@ -169,7 +176,11 @@ namespace lcqpOASES {
      */
     void SubsolverQPOASES::setOptions( qpOASES::Options options )
     {
-        qp.setOptions( options );
+        if (useSchur) {
+            qpSchur.setOptions( options );
+        } else {
+            qp.setOptions( options );
+        }
     }
 
 
@@ -188,12 +199,20 @@ namespace lcqpOASES {
 
         if (initialSolve) {
             if (isSparse) {
-                ret = qp.init(H_sparse, g, A_sparse, lb, ub, lbA, ubA, nwsr, (double*)0, x0, y0);
+                if (useSchur) {
+                    ret = qpSchur.init(H_sparse, g, A_sparse, lb, ub, lbA, ubA, nwsr, (double*)0, x0, y0);
+                } else {
+                    ret = qp.init(H_sparse, g, A_sparse, lb, ub, lbA, ubA, nwsr, (double*)0, x0, y0);
+                }
             } else {
                 ret = qp.init(H, g, A, lb, ub, lbA, ubA, nwsr, (double*)0, x0, y0);
             }
         } else {
-            ret = qp.hotstart(g, lb, ub, lbA, ubA, nwsr);
+            if (useSchur) {
+                ret = qpSchur.hotstart(g, lb, ub, lbA, ubA, nwsr);
+            } else {
+                ret = qp.hotstart(g, lb, ub, lbA, ubA, nwsr);
+            }
         }
 
         iterations = (int)(nwsr);
@@ -210,8 +229,13 @@ namespace lcqpOASES {
      */
     void SubsolverQPOASES::getSolution( double* x, double* y )
     {
-        qp.getPrimalSolution( x );
-        qp.getDualSolution( y );
+        if (useSchur) {
+            qpSchur.getPrimalSolution( x );
+            qpSchur.getDualSolution( y );
+        } else {
+            qp.getPrimalSolution( x );
+            qp.getDualSolution( y );
+        }
     }
 
 
@@ -224,6 +248,7 @@ namespace lcqpOASES {
         nC = rhs.nC;
 
         isSparse = rhs.isSparse;
+        useSchur = rhs.useSchur;
 
         if (isSparse) {
             H_i = new int[rhs.H_p[nV]];
@@ -253,6 +278,10 @@ namespace lcqpOASES {
             memcpy(A, rhs.A, (size_t)(nC*nV)*sizeof(double));
         }
 
-        qp = rhs.qp;
+        if (useSchur) {
+            qpSchur = rhs.qpSchur;
+        } else {
+            qp = rhs.qp;
+        }
     }
 }
