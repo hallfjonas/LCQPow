@@ -505,84 +505,84 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
     if (ret != lcqpOASES::SUCCESSFUL_RETURN) {
         mexPrintf("Failed to solve LCQP (error code: %d).\n", ret);
-    } else {
-        // Succeeded to solve LCQP. Obtaining solution vector
-        // 1) Primal solution vector
-        plhs[0] = mxCreateDoubleMatrix(nV, 1, mxREAL);
-        if (plhs[0] == NULL) {
-            mexPrintf("Failed to allocate output of primal solution vector.\n");
+    }
+
+    // Succeeded to solve LCQP. Obtaining solution vector
+    // 1) Primal solution vector
+    plhs[0] = mxCreateDoubleMatrix(nV, 1, mxREAL);
+    if (plhs[0] == NULL) {
+        mexPrintf("Failed to allocate output of primal solution vector.\n");
+        return;
+    }
+
+    // Point to the output object
+    double* xOpt = (double*) mxGetPr(plhs[0]);
+    lcqp.getPrimalSolution(xOpt);
+
+    // 2) Dual solution vector
+    if (nlhs > 1) {
+        int nDuals = lcqp.getNumerOfDuals();
+
+        if (nDuals <= 0) {
+            mexPrintf("Failed to receive number of dual variables.\n");
             return;
         }
 
-        // Point to the output object
-        double* xOpt = (double*) mxGetPr(plhs[0]);
-        lcqp.getPrimalSolution(xOpt);
-
-        // 2) Dual solution vector
-        if (nlhs > 1) {
-            int nDuals = lcqp.getNumerOfDuals();
-
-            if (nDuals <= 0) {
-                mexPrintf("Failed to receive number of dual variables.\n");
-                return;
-            }
-
-            plhs[1] = mxCreateDoubleMatrix(nDuals, 1, mxREAL);
-            if (plhs[1] == NULL) {
-                mexPrintf("Failed to allocate output of dual solution vector.\n");
-                return;
-            }
-
-            // Pointer to the output object
-            double* yOpt = (double*) mxGetPr(plhs[1]);
-            lcqp.getDualSolution(yOpt);
+        plhs[1] = mxCreateDoubleMatrix(nDuals, 1, mxREAL);
+        if (plhs[1] == NULL) {
+            mexPrintf("Failed to allocate output of dual solution vector.\n");
+            return;
         }
 
-        // 3) Output statistics
-        if (nlhs > 2) {
-            // assign fieldnames
-            int numberStatOutputs = 5;
+        // Pointer to the output object
+        double* yOpt = (double*) mxGetPr(plhs[1]);
+        lcqp.getDualSolution(yOpt);
+    }
 
-            const char* fieldnames[] = {"iters_total", "iters_outer", "iters_subproblem", "rho_opt", "elapsed_time"};
+    // 3) Output statistics
+    if (nlhs > 2) {
+        // assign fieldnames
+        int numberStatOutputs = 5;
 
-            // Allocate memory
-            plhs[2] = mxCreateStructMatrix(1,1,numberStatOutputs, fieldnames);
+        const char* fieldnames[] = {"iters_total", "iters_outer", "iters_subproblem", "rho_opt", "elapsed_time"};
 
-            // assert that allocation went ok
-            if (plhs[2] == NULL) {
-                mexPrintf("Failed to allocate output of statistics struct.\n");
-                return;
-            }
+        // Allocate memory
+        plhs[2] = mxCreateStructMatrix(1,1,numberStatOutputs, fieldnames);
 
-            // Get the statistics
-            lcqpOASES::OutputStatistics stats;
-            lcqp.getOutputStatistics(stats);
-
-            mxArray* iterTotal = mxCreateDoubleMatrix(1, 1, mxREAL);
-            mxArray* iterOuter = mxCreateDoubleMatrix(1, 1, mxREAL);
-            mxArray* iterSubpr = mxCreateDoubleMatrix(1, 1, mxREAL);
-            mxArray* rhoOpt = mxCreateDoubleMatrix(1, 1, mxREAL);
-            mxArray* elapsed_time = mxCreateDoubleMatrix(1, 1, mxREAL);
-
-            double* itrTot = mxGetPr(iterTotal);
-            double* itrOutr = mxGetPr(iterOuter);
-            double* itrSubp = mxGetPr(iterSubpr);
-            double* rOpt = mxGetPr(rhoOpt);
-            double* elapsed = mxGetPr(elapsed_time);
-
-            itrTot[0] = stats.getIterTotal();
-            itrOutr[0] = stats.getIterOuter();
-            itrSubp[0] = stats.getSubproblemIter();
-            rOpt[0] = stats.getRhoOpt();
-            elapsed[0] = elapsed_secs;
-
-            // assign values to struct
-            mxSetFieldByNumber(plhs[2], 0, 0, iterTotal);
-            mxSetFieldByNumber(plhs[2], 0, 1, iterOuter);
-            mxSetFieldByNumber(plhs[2], 0, 2, iterSubpr);
-            mxSetFieldByNumber(plhs[2], 0, 3, rhoOpt);
-            mxSetFieldByNumber(plhs[2], 0, 4, elapsed_time);
+        // assert that allocation went ok
+        if (plhs[2] == NULL) {
+            mexPrintf("Failed to allocate output of statistics struct.\n");
+            return;
         }
+
+        // Get the statistics
+        lcqpOASES::OutputStatistics stats;
+        lcqp.getOutputStatistics(stats);
+
+        mxArray* iterTotal = mxCreateDoubleMatrix(1, 1, mxREAL);
+        mxArray* iterOuter = mxCreateDoubleMatrix(1, 1, mxREAL);
+        mxArray* iterSubpr = mxCreateDoubleMatrix(1, 1, mxREAL);
+        mxArray* rhoOpt = mxCreateDoubleMatrix(1, 1, mxREAL);
+        mxArray* elapsed_time = mxCreateDoubleMatrix(1, 1, mxREAL);
+
+        double* itrTot = mxGetPr(iterTotal);
+        double* itrOutr = mxGetPr(iterOuter);
+        double* itrSubp = mxGetPr(iterSubpr);
+        double* rOpt = mxGetPr(rhoOpt);
+        double* elapsed = mxGetPr(elapsed_time);
+
+        itrTot[0] = stats.getIterTotal();
+        itrOutr[0] = stats.getIterOuter();
+        itrSubp[0] = stats.getSubproblemIter();
+        rOpt[0] = stats.getRhoOpt();
+        elapsed[0] = elapsed_secs;
+
+        // assign values to struct
+        mxSetFieldByNumber(plhs[2], 0, 0, iterTotal);
+        mxSetFieldByNumber(plhs[2], 0, 1, iterOuter);
+        mxSetFieldByNumber(plhs[2], 0, 2, iterSubpr);
+        mxSetFieldByNumber(plhs[2], 0, 3, rhoOpt);
+        mxSetFieldByNumber(plhs[2], 0, 4, elapsed_time);
     }
 
     return;
