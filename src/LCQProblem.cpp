@@ -103,12 +103,17 @@ namespace lcqpOASES {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
-		ret = setLB( _lb );
+		// Only copy lb and ub to temporary variables
+		// Build them once we know what solver is used
+		if (_lb != 0) {
+			lb_tmp = new double[nV];
+			memcpy(lb_tmp, _lb, (size_t) nV*sizeof(double));
+		}
 
-		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
-
-		ret = setUB( _ub );
+		if (_ub != 0) {
+			ub_tmp = new double[nV];
+			memcpy(ub_tmp, _ub, (size_t) nV*sizeof(double));
+		}
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
@@ -249,16 +254,19 @@ namespace lcqpOASES {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
-		ret = setLB( _lb );
-		if (_lb != 0)
+		// Only copy lb and ub to temporary variables
+		// Build them once we know what solver is used
+		if (_lb != 0) {
+			lb_tmp = new double[nV];
+			memcpy(lb_tmp, _lb, (size_t) nV*sizeof(double));
 			delete[] _lb;
+		}
 
-		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
-
-		ret = setUB( _ub );
-		if (_ub != 0)
+		if (_ub != 0) {
+			ub_tmp = new double[nV];
+			memcpy(ub_tmp, _ub, (size_t) nV*sizeof(double));
 			delete[] _ub;
+		}
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
@@ -327,7 +335,6 @@ namespace lcqpOASES {
 
 		// Only copy lb and ub to temporary variables
 		// Build them once we know what solver is used
-
 		if (_lb != 0) {
 			lb_tmp = new double[nV];
 			memcpy(lb_tmp, _lb, (size_t) nV*sizeof(double));
