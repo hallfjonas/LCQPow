@@ -76,7 +76,7 @@ SHARED = -shared
 LCQPanther_LIBS = ${LIBDIR}/libLCQPanther.${LIBEXT} ${LIBDIR}/libLCQPanther.${DLLEXT}
 LCQPanther_LINK = -L${LIBDIR} -lLCQPanther
 
-LINK_LIBRARIES = ${QPOASES_LINK} ${OSQP_LINK}
+LINK_LIBRARIES = -L${LIBDIR} ${QPOASES_LINK} -L${LIBDIR} ${OSQP_LINK}
 
 ##
 ##	end of file
