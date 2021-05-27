@@ -1,21 +1,21 @@
 /*
- *	This file is part of lcqpOASES.
+ *	This file is part of LCQPanther.
  *
- *	lcqpOASES -- A Solver for Quadratic Programs with Commplementarity Constraints.
+ *	LCQPanther -- A Solver for Quadratic Programs with Commplementarity Constraints.
  *	Copyright (C) 2020 - 2021 by Jonas Hall et al.
  *
- *	lcqpOASES is free software; you can redistribute it and/or
+ *	LCQPanther is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
  *	License as published by the Free Software Foundation; either
  *	version 2.1 of the License, or (at your option) any later version.
  *
- *	lcqpOASES is distributed in the hope that it will be useful,
+ *	LCQPanther is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
- *	License along with lcqpOASES; if not, write to the Free Software
+ *	License along with LCQPanther; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
@@ -40,7 +40,7 @@ TEST(UtilitiesTest, MatrixMultiplicationTest) {
     double* B = new double[n*p] { 2, 0, 0, 2, 1, 0, 0, 1, 0, -1, -1, 0 };
     double* C = new double[m*p];
 
-    lcqpOASES::Utilities::MatrixMultiplication(A, B, C, m, n, p);
+    LCQPanther::Utilities::MatrixMultiplication(A, B, C, m, n, p);
 
     ASSERT_EQ(C[0], 2);
     ASSERT_EQ(C[1], -2);
@@ -66,7 +66,7 @@ TEST(UtilitiesTest, TransposedMatrixMultiplicationTest) {
     double* B = new double[n*m] { 98, -10 };
     double* C = new double[n*p];
 
-    lcqpOASES::Utilities::TransponsedMatrixMultiplication(A, B, C, m, n, p);
+    LCQPanther::Utilities::TransponsedMatrixMultiplication(A, B, C, m, n, p);
     ASSERT_EQ(C[0], 68);
     ASSERT_EQ(C[1], -10);
     ASSERT_EQ(C[2], 186);
@@ -83,7 +83,7 @@ TEST(UtilitiesTest, MatrixSymmetrization) {
     double* A = new double[m*n] { 1, 0, 2, 3, 1, 1 };
     double* B = new double[n*m] { 2, 0, 1, 0, 0, -1 };
     double* C = new double[n*n];
-    lcqpOASES::Utilities::MatrixSymmetrizationProduct(A, B, C, m, n);
+    LCQPanther::Utilities::MatrixSymmetrizationProduct(A, B, C, m, n);
 
     ASSERT_EQ(C[0], 4);
     ASSERT_EQ(C[1], 0);
@@ -113,7 +113,7 @@ TEST(UtilitiesTest, AffineTransformation) {
     double* c = new double[m] { -3, -3 };
     double* d = new double[m];
 
-    lcqpOASES::Utilities::AffineLinearTransformation(alpha, A, b, c, d, m, n);
+    LCQPanther::Utilities::AffineLinearTransformation(alpha, A, b, c, d, m, n);
     ASSERT_EQ(d[0], 5);
     ASSERT_EQ(d[1], 11);
 }
@@ -136,7 +136,7 @@ TEST(UtilitiesTest, MatrixAdd) {
     double* B = new double[m*n] { 2, 0, 0, 4, 2, 2 };
     double* C = new double[m*n];
 
-    lcqpOASES::Utilities::WeightedMatrixAdd(alpha, A, beta, B, C, m, n);
+    LCQPanther::Utilities::WeightedMatrixAdd(alpha, A, beta, B, C, m, n);
     ASSERT_EQ(C[0], 1);
     ASSERT_EQ(C[1], -1);
     ASSERT_EQ(C[2], -3);
@@ -162,7 +162,7 @@ TEST(UtilitiesTest, VectorAdd) {
     double* b = new double[m] { 10, 2, 0, 3 };
     double* d = new double[m];
 
-    lcqpOASES::Utilities::WeightedVectorAdd(alpha, a, beta, b, d, m);
+    LCQPanther::Utilities::WeightedVectorAdd(alpha, a, beta, b, d, m);
     ASSERT_EQ(d[0], -10);
     ASSERT_EQ(d[1], 0);
     ASSERT_EQ(d[2], 4);
@@ -179,7 +179,7 @@ TEST(UtilitiesTest, QuadraticFormProduct) {
     double* p = new double[m] { 1, 2, 3 };
     double* Q = new double[m*m] { 0, 1, 0, 1, 2, 1, 0, 1, 0 };
 
-    double ret = lcqpOASES::Utilities::QuadraticFormProduct(Q, p, m);
+    double ret = LCQPanther::Utilities::QuadraticFormProduct(Q, p, m);
     ASSERT_EQ(ret, 24);
 }
 
@@ -193,7 +193,7 @@ TEST(UtilitiesTest, DotProduct) {
     double* a = new double[m] { 0, 1, 2, 3 };
     double* b = new double[m] { 10, 2, 0, 3 };
 
-    double ret = lcqpOASES::Utilities::DotProduct(a, b, m);
+    double ret = LCQPanther::Utilities::DotProduct(a, b, m);
     ASSERT_EQ(ret, 11);
 }
 
@@ -204,19 +204,19 @@ TEST(UtilitiesTest, MaxAbs) {
     // a = [0; 1; 2; 3]
     // ret = 3
     double* a = new double[m] { 0, 1, 2, 3 };
-    double ret = lcqpOASES::Utilities::MaxAbs(a, m);
+    double ret = LCQPanther::Utilities::MaxAbs(a, m);
     ASSERT_EQ(ret, 3);
 
     // a = [0; -1; 2; 0]
     // ret = 2
     a = new double[m] { 0, -1, 2, 0 };
-    ret = lcqpOASES::Utilities::MaxAbs(a, m);
+    ret = LCQPanther::Utilities::MaxAbs(a, m);
     ASSERT_EQ(ret, 2);
 
     // a = [0; -4; 2; 0]
     // ret = 4
     a = new double[m] { 0, -4, 2, 0 };
-    ret = lcqpOASES::Utilities::MaxAbs(a, m);
+    ret = LCQPanther::Utilities::MaxAbs(a, m);
     ASSERT_EQ(ret, 4);
 }
 
@@ -225,7 +225,7 @@ TEST(UtilitiesTest, ReadFromFile) {
     const char* fpath = "examples/example_data/H.txt";
 
     double* H = new double[4];
-    lcqpOASES::Utilities::readFromFile(H, 4, fpath);
+    LCQPanther::Utilities::readFromFile(H, 4, fpath);
 
     ASSERT_EQ(H[0], 2);
     ASSERT_EQ(H[1], 0);
@@ -263,13 +263,13 @@ TEST(UtilitiesTest, ReadFromFileAndMultiply) {
     int nC = ((int)Avals.size())/nV;
 
     double* x0 = new double[nV];
-    lcqpOASES::Utilities::readFromFile(x0, nV, x0path);
+    LCQPanther::Utilities::readFromFile(x0, nV, x0path);
 
     double* A = new double[nC*nV];
-    lcqpOASES::Utilities::readFromFile(A, nV*nC, Apath);
+    LCQPanther::Utilities::readFromFile(A, nV*nC, Apath);
 
     double* lbA = new double[nC];
-    lcqpOASES::Utilities::readFromFile(lbA, nC, lbApath);
+    LCQPanther::Utilities::readFromFile(lbA, nC, lbApath);
 
     for (int i = 0; i < nV*nC; i++) {
         // Check lower bounds
@@ -287,7 +287,7 @@ TEST(UtilitiesTest, ReadFromFileAndMultiply) {
     }
 
     double* Ax = new double[nC]();
-    lcqpOASES::Utilities::AffineLinearTransformation(1, A, x0, lbA, Ax, nC, nV);
+    LCQPanther::Utilities::AffineLinearTransformation(1, A, x0, lbA, Ax, nC, nV);
 
     for (int i = 0; i < nC; i++) {
         double val = lbA[i];
@@ -301,7 +301,7 @@ TEST(UtilitiesTest, ReadFromFileAndMultiply) {
 
 // Testing Options constructors, default settings, consistency
 TEST(UtilitiesTest, Options) {
-    lcqpOASES::Options opts;
+    LCQPanther::Options opts;
 
     // Check changed values
     opts.setInitialPenaltyParameter( 100 );
@@ -310,7 +310,7 @@ TEST(UtilitiesTest, Options) {
     ASSERT_EQ(opts.getPenaltyUpdateFactor(), 100);
 
     // Check copy constructor
-    lcqpOASES::Options opts2(opts);
+    LCQPanther::Options opts2(opts);
     ASSERT_EQ(opts2.getInitialPenaltyParameter(), 100);
     ASSERT_EQ(opts2.getPenaltyUpdateFactor(), 100);
 }
@@ -332,8 +332,8 @@ TEST(UtilitiesTest, CSCtoDNS) {
     csc* H = csc_matrix(m, n, H_nnx, H_data, H_i, H_p);
 
     double* H_full = new double[m*n]();
-    lcqpOASES::returnValue ret = lcqpOASES::Utilities::csc_to_dns(H, H_full, m, n);
-    ASSERT_TRUE(ret == lcqpOASES::returnValue::SUCCESSFUL_RETURN);
+    LCQPanther::returnValue ret = LCQPanther::Utilities::csc_to_dns(H, H_full, m, n);
+    ASSERT_TRUE(ret == LCQPanther::returnValue::SUCCESSFUL_RETURN);
 
     ASSERT_DOUBLE_EQ(H_full[0], 2);
     ASSERT_DOUBLE_EQ(H_full[1], 1);
@@ -352,8 +352,8 @@ TEST(UtilitiesTest, CSCtoDNS) {
     H = csc_matrix(m, n, H_nnx, H_data, H_i, H_p);
 
     H_full = new double[m*n]();
-    ret = lcqpOASES::Utilities::csc_to_dns(H, H_full, m, n);
-    ASSERT_TRUE(ret == lcqpOASES::returnValue::SUCCESSFUL_RETURN);
+    ret = LCQPanther::Utilities::csc_to_dns(H, H_full, m, n);
+    ASSERT_TRUE(ret == LCQPanther::returnValue::SUCCESSFUL_RETURN);
 
     ASSERT_EQ(H_full[0], 2);
     ASSERT_EQ(H_full[1], 0);
@@ -375,8 +375,8 @@ TEST(UtilitiesTest, CSCtoDNS) {
     csc* T = csc_matrix(m, n, T_nnx, T_data, T_i, T_p);
 
     double* T_full = new double[m*n];
-    ret = lcqpOASES::Utilities::csc_to_dns(T, T_full, m, n);
-    ASSERT_TRUE(ret == lcqpOASES::returnValue::SUCCESSFUL_RETURN);
+    ret = LCQPanther::Utilities::csc_to_dns(T, T_full, m, n);
+    ASSERT_TRUE(ret == LCQPanther::returnValue::SUCCESSFUL_RETURN);
 
     ASSERT_EQ(T_full[0], 2.0);
     ASSERT_EQ(T_full[1], 1.0);
@@ -415,10 +415,10 @@ TEST(UtilitiesTest, SparseDenseBackAndForth) {
         }
 
         // Convert to sparse
-        csc* H_sparse = lcqpOASES::Utilities::dns_to_csc(H, m, n);
+        csc* H_sparse = LCQPanther::Utilities::dns_to_csc(H, m, n);
 
         double* H_control = new double[m*n]();
-        lcqpOASES::Utilities::csc_to_dns(H_sparse, H_control, m, n);
+        LCQPanther::Utilities::csc_to_dns(H_sparse, H_control, m, n);
 
         for (int j = 0; j < m*n; j++)
             ASSERT_FLOAT_EQ(H_control[j], H[j]);
@@ -426,7 +426,7 @@ TEST(UtilitiesTest, SparseDenseBackAndForth) {
     }
 }
 
-// Testing lcqpOASES solver set up
+// Testing LCQPanther solver set up
 TEST(SolverTest, RunWarmUp) {
     double H[2*2] = { 2.0, 0.0, 0.0, 2.0 };
     double g[2] = { -2.0, -2.0 };
@@ -439,10 +439,10 @@ TEST(SolverTest, RunWarmUp) {
     int nC = 0;
     int nComp = 1;
 
-    lcqpOASES::LCQProblem lcqp( nV, nC, nComp );
+    LCQPanther::LCQProblem lcqp( nV, nC, nComp );
 
-	lcqpOASES::Options options;
-    options.setPrintLevel(lcqpOASES::printLevel::NONE);
+	LCQPanther::Options options;
+    options.setPrintLevel(LCQPanther::printLevel::NONE);
     lcqp.setOptions( options );
 
     int numExp = 100;
@@ -451,11 +451,11 @@ TEST(SolverTest, RunWarmUp) {
 
     for (int i = 0; i < numExp; i++) {
 
-        lcqpOASES::returnValue retVal = lcqp.loadLCQP( H, g, lb, ub, S1, S2, (double*)0, (double*)0, x0);
-        ASSERT_EQ(retVal, lcqpOASES::SUCCESSFUL_RETURN);
+        LCQPanther::returnValue retVal = lcqp.loadLCQP( H, g, lb, ub, S1, S2, (double*)0, (double*)0, x0);
+        ASSERT_EQ(retVal, LCQPanther::SUCCESSFUL_RETURN);
 
         retVal = lcqp.runSolver( );
-        ASSERT_EQ(retVal, lcqpOASES::SUCCESSFUL_RETURN);
+        ASSERT_EQ(retVal, LCQPanther::SUCCESSFUL_RETURN);
 
         // Get solutions
         double* xOpt = new double[2];

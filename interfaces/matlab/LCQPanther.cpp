@@ -1,27 +1,27 @@
 /*
- *	This file is part of lcqpOASES.
+ *	This file is part of LCQPanther.
  *
- *	lcqpOASES -- A Solver for Quadratic Programs with Commplementarity Constraints.
+ *	LCQPanther -- A Solver for Quadratic Programs with Commplementarity Constraints.
  *	Copyright (C) 2020 - 2021 by Jonas Hall et al.
  *
- *	lcqpOASES is free software; you can redistribute it and/or
+ *	LCQPanther is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
  *	License as published by the Free Software Foundation; either
  *	version 2.1 of the License, or (at your option) any later version.
  *
- *	lcqpOASES is distributed in the hope that it will be useful,
+ *	LCQPanther is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
- *	License along with lcqpOASES; if not, write to the Free Software
+ *	License along with LCQPanther; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 #include "LCQProblem.hpp"
-using lcqpOASES::LCQProblem;
-using lcqpOASES::Options;
+using LCQPanther::LCQProblem;
+using LCQPanther::Options;
 
 #include <mex.h>
 #include <chrono>
@@ -180,7 +180,7 @@ int LCQPSparse(LCQProblem& lcqp, int nV, int nComp, int nC, int nlhs, mxArray* p
     readVectors(prhs, nrhs, nC, &g, &lbA, &ubA, &lb, &ub);
 
     // Load data into LCQP object
-    lcqpOASES::ReturnValue ret = lcqp.loadLCQP(
+    LCQPanther::ReturnValue ret = lcqp.loadLCQP(
         H_data, H_i, H_p, g,
         S1_data, S1_i, S1_p, S2_data, S2_i, S2_p,
         A_data, A_i, A_p, lbA, ubA, lb, ub, x0, y0
@@ -247,7 +247,7 @@ int LCQPDense(LCQProblem& lcqp, int nV, int nComp, int nC, int nlhs, mxArray* pl
     }
 
     // Load data into LCQP object
-    lcqpOASES::ReturnValue ret = lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub, x0);
+    LCQPanther::ReturnValue ret = lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub, x0);
 
     // Clear A, S1, S2
     if (A != 0)
@@ -259,7 +259,7 @@ int LCQPDense(LCQProblem& lcqp, int nV, int nComp, int nC, int nlhs, mxArray* pl
     if (S2 != 0)
         delete[] S2;
 
-    if (ret != lcqpOASES::ReturnValue::SUCCESSFUL_RETURN) {
+    if (ret != LCQPanther::ReturnValue::SUCCESSFUL_RETURN) {
         mexPrintf("Failed to load LCQP.\n");
         return 1;
     }
@@ -509,7 +509,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
     double elapsed_secs = (end - begin).count()/1000.0/1000.0/1000.0;
 
-    if (ret != lcqpOASES::SUCCESSFUL_RETURN) {
+    if (ret != LCQPanther::SUCCESSFUL_RETURN) {
         mexPrintf("Failed to solve LCQP (error code: %d).\n", ret);
     }
 
@@ -562,7 +562,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         }
 
         // Get the statistics
-        lcqpOASES::OutputStatistics stats;
+        LCQPanther::OutputStatistics stats;
         lcqp.getOutputStatistics(stats);
 
         mxArray* iterTotal = mxCreateDoubleMatrix(1, 1, mxREAL);

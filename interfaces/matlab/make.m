@@ -47,7 +47,7 @@ function [] = make( varargin )
     %% consistency check
     if ( exist( [pwd, '/make.m'],'file' ) == 0 )
         error( ['ERROR (',mfilename '.m): Run this make script directly within the directory ', ...
-                '<lcqpOASES-inst-dir>/interfaces/matlab, please.'] );
+                '<LCQPanther-inst-dir>/interfaces/matlab, please.'] );
     end
 
 
@@ -59,18 +59,18 @@ function [] = make( varargin )
 
     
     %% define compiler settings
-    LCQPOASES_IFLAG = '-I../../include ';
+    LCQPanther_IFLAG = '-I../../include ';
     QPOASES_IFLAG = '-I/home/syscop/qpOASES/include ';
     OSQP_IFLAG = '-I/home/syscop/osqp/include ';
     
     DEBUGFLAGS = ' ';
     %DEBUGFLAGS = ' -v -g CXXDEBUGFLAGS=''$CXXDEBUGFLAGS -Wall -pedantic -Wshadow'' ';
 
-    IFLAGS = [ '-I. ', LCQPOASES_IFLAG, QPOASES_IFLAG, OSQP_IFLAG];
+    IFLAGS = [ '-I. ', LCQPanther_IFLAG, QPOASES_IFLAG, OSQP_IFLAG];
     CPPFLAGS = [ IFLAGS, DEBUGFLAGS, '-largeArrayDims -D__cpluplus -D__MATLAB__',' ' ];
     defaultFlags = '-O -D__NO_COPYRIGHT__ '; %% -D__SUPPRESSANYOUTPUT__
 
-    CPPFLAGS = [ CPPFLAGS, '-DLINUX -llcqpOASES -lqpOASES -losqp',' ' ];
+    CPPFLAGS = [ CPPFLAGS, '-DLINUX -lLCQPanther -lqpOASES -losqp',' ' ];
 
     if ( isempty(userFlags) > 0 )
         CPPFLAGS = [ CPPFLAGS, defaultFlags,' ' ];
