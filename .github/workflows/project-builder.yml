@@ -1,0 +1,27 @@
+name: CI build and run
+on: [push]
+jobs:
+  build-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: git submodule update --init --recursive
+      - run: make dependencies
+  build:
+    needs: build-dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: git submodule update --init --recursive
+      - run: make dependencies
+      - run: make
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: git submodule update --init --recursive
+      - run: sudo make dependencies
+      - run: make
+      - run: bin/warm_up
+    
