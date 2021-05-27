@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: git submodule update --init --recursive
-      - run: sudo make dependencies
+      - run: make dependencies
       - run: make
       - run: bin/warm_up
     
