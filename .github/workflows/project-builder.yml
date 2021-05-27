@@ -15,6 +15,9 @@ jobs:
       - run: git submodule update --init --recursive
       - run: make dependencies
       - run: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/lib
+      - run: echo $LD_LIBRARY_PATH
+      - run: ls
+      - run: ls lib
       - run: make
   test:
     needs: build
