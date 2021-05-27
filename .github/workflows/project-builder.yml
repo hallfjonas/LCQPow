@@ -8,8 +8,5 @@ jobs:
       - run: git submodule update --init --recursive
       - run: make dependencies
       - run: make
-      - run: |
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/lib
-        echo $LD_LIBRARY_PATH
-        bin/warm_up
+      - run: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/lib; echo $LD_LIBRARY_PATH; bin/warm_up
     
