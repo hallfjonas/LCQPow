@@ -1,6 +1,6 @@
 [submodule "external/qpOASES"]
 	path = external/qpOASES
-	url = https://github.com/coin-or/qpOASES
+	url = https://github.com/hallfjonas/qpOASES.git
 [submodule "external/osqp"]
 	path = external/osqp
-	url = https://github.com/oxfordcontrol/osqp
+	url = https://github.com/hallfjonas/osqp.git
