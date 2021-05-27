@@ -26,14 +26,6 @@
 ## 		In this case, make sure that your system can find this library (e.g. by setting the LD_LIBRARY_PATH)
 
 ## Adapt to your local settings
-# qpOASES
-QPOASES_IDIR = /home/syscop/qpOASES/include
-QPOASES_LINK = -lqpOASES
-
-# OSQP
-OSQP_IDIR = /home/syscop/osqp/include
-OSQP_LINK = -losqp
-
 # MATLAB (required for the matlab interface)
 MATLAB_IDIR   = /usr/local/MATLAB/R2021a/extern/include
 MATLAB_LIBDIR = /usr/local/MATLAB/R2021a/bin/glnxa64
@@ -48,6 +40,15 @@ LIBDIR = ${TOP}/lib
 DEBUGDIR = ${TOP}/debug
 BUILDDIR = ${TOP}/build
 INSTALLDIR = /usr/local/lib
+
+## SUBMODULES
+# qpOASES
+QPOASES_IDIR = ${TOP}/external/qpOASES/include
+QPOASES_LINK = -lqpOASES
+
+# OSQP
+OSQP_IDIR = ${TOP}/external/osqp/include
+OSQP_LINK = -losqp
 
 # Compiler flags
 CPP = g++

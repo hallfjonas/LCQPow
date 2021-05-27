@@ -58,6 +58,14 @@ clean:
 
 clobber: clean
 
+dependencies:
+	@${ECHO} "Building dependency qpOASES at ${TOP}/external/qpOASES"
+	@${CD} ${TOP}/external/qpOASES; ${MKDIR} -p bin; ${MAKE} all; ${CP} bin/libqpOASES.* ${INSTALLDIR}; ${MAKE} clean
+
+	@${ECHO} "Building dependency OSQP at ${TOP}/external/osqp"
+	@${RM} -r ${TOP}/external/osqp/build; ${MKDIR} -p ${TOP}/external/osqp/build
+	@${CD} ${TOP}/external/osqp/build; ${CMAKE} -G "Unix Makefiles" -DDLONG=OFF ..; ${CMAKE} --build .; ${CMAKE} --build . --target install;
+
 install:
 	@${CP} ${LIBDIR}/* ${INSTALLDIR}
 
