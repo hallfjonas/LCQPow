@@ -27,10 +27,10 @@ add_subdirectory(UnitTesting/googletest) # add googletest subdirectory
 
 AUX_SOURCE_DIRECTORY(src SRC_FILES)
 
-add_compile_options(-Wall -pedantic -Wshadow -Wfloat-equal -O3 -Wconversion -Wsign-conversion -fPIC -DLINUX -D__USE_LONG_INTEGERS__ -D__USE_LONG_FINTS__)
+add_compile_options(-Wall -pedantic -Wshadow -Wfloat-equal -O3 -Wconversion -Wsign-conversion -fPIC -DLINUX)
 
-include_directories(SYSTEM /usr/local/include/osqp include /usr/local/qpOASES/include /usr/local/matplotlib-cpp /usr/include/python3.6m) # this is so we can #include <gtest/gtest.h>
+include_directories(SYSTEM external/osqp/include include external/qpOASES/include) # this is so we can #include <gtest/gtest.h>
 
-add_executable(TestUtils UnitTesting/TestUtils.cpp ${SRC_FILES}) # add this executable
+add_executable(RunUnitTests UnitTesting/RunUnitTests.cpp ${SRC_FILES}) # add this executable
 
-target_link_libraries(TestUtils PRIVATE gtest qpOASES osqp python3.6m) # link google test to this executable
+target_link_libraries(RunUnitTests PRIVATE gtest qpOASES osqp) # link google test to this executable

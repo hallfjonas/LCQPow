@@ -22,6 +22,7 @@
 
 #include "Utilities.hpp"
 #include "LCQProblem.hpp"
+
 #include <gtest/gtest.h>
 #include <iostream>
 #include <fstream>
@@ -222,81 +223,20 @@ TEST(UtilitiesTest, MaxAbs) {
 
 // Testing read from file functionality
 TEST(UtilitiesTest, ReadFromFile) {
-    const char* fpath = "examples/example_data/H.txt";
+    const char* fpath = "../examples/example_data/one_ivocp_example/lbA.txt";
 
-    double* H = new double[4];
-    LCQPanther::Utilities::readFromFile(H, 4, fpath);
+    // Read first four values from lbA (0, 1, 0, 1)
+    double* lbA = new double[4];
+    LCQPanther::ReturnValue ret = LCQPanther::Utilities::readFromFile(lbA, 4, fpath);
 
-    ASSERT_EQ(H[0], 2);
-    ASSERT_EQ(H[1], 0);
-    ASSERT_EQ(H[2], 0);
-    ASSERT_EQ(H[3], 2);
-}
+    // Assert that reading file went ok
+    ASSERT_EQ(ret, LCQPanther::ReturnValue::SUCCESSFUL_RETURN);
 
-// Testing read from file and multiply functionality
-TEST(UtilitiesTest, ReadFromFileAndMultiply) {
-    const char* Apath = "examples/example_data/one_ivocp_example/A.txt";
-    const char* x0path = "examples/example_data/one_ivocp_example/x0.txt";
-    const char* lbApath = "examples/example_data/one_ivocp_example/lbA.txt";
-
-    std::vector<double> Avals, x0vals, lbAvals;
-
-    std::string line;
-
-    std::ifstream x0file(x0path);
-    while (std::getline(x0file, line))
-        x0vals.push_back(std::stod(line));
-
-    std::ifstream Afile(Apath);
-    while (std::getline(Afile, line))
-        Avals.push_back(std::stod(line));
-
-    std::ifstream lbAfile(lbApath);
-    while (std::getline(lbAfile, line))
-        lbAvals.push_back(std::stod(line));
-
-    x0file.close();
-    Afile.close();
-    lbAfile.close();
-
-    int nV = (int) x0vals.size();
-    int nC = ((int)Avals.size())/nV;
-
-    double* x0 = new double[nV];
-    LCQPanther::Utilities::readFromFile(x0, nV, x0path);
-
-    double* A = new double[nC*nV];
-    LCQPanther::Utilities::readFromFile(A, nV*nC, Apath);
-
-    double* lbA = new double[nC];
-    LCQPanther::Utilities::readFromFile(lbA, nC, lbApath);
-
-    for (int i = 0; i < nV*nC; i++) {
-        // Check lower bounds
-        if (i < nC) {
-            ASSERT_EQ(lbA[i], lbAvals[i]);
-        }
-
-        // Check x vals
-        if (i < nV) {
-            ASSERT_EQ(x0[i], x0vals[i]);
-        }
-
-        // Check contraint
-        ASSERT_EQ(A[i], Avals[i]);
-    }
-
-    double* Ax = new double[nC]();
-    LCQPanther::Utilities::AffineLinearTransformation(1, A, x0, lbA, Ax, nC, nV);
-
-    for (int i = 0; i < nC; i++) {
-        double val = lbA[i];
-        for (int j = 0; j < nV; j++)
-            val += A[i*nV + j]*x0[j];
-
-        ASSERT_FLOAT_EQ(val, Ax[i]);
-    }
-
+    // Assert that values have been read correctly
+    ASSERT_EQ(lbA[0], 0);
+    ASSERT_EQ(lbA[1], 1);
+    ASSERT_EQ(lbA[2], 0);
+    ASSERT_EQ(lbA[3], 1);
 }
 
 // Testing Options constructors, default settings, consistency
@@ -315,7 +255,6 @@ TEST(UtilitiesTest, Options) {
     ASSERT_EQ(opts2.getPenaltyUpdateFactor(), 100);
 }
 
-
 // Testing csc to dns
 TEST(UtilitiesTest, CSCtoDNS) {
     // First test matrix
@@ -331,9 +270,8 @@ TEST(UtilitiesTest, CSCtoDNS) {
 
     csc* H = csc_matrix(m, n, H_nnx, H_data, H_i, H_p);
 
-    double* H_full = new double[m*n]();
-    LCQPanther::returnValue ret = LCQPanther::Utilities::csc_to_dns(H, H_full, m, n);
-    ASSERT_TRUE(ret == LCQPanther::returnValue::SUCCESSFUL_RETURN);
+    double* H_full = LCQPanther::Utilities::csc_to_dns(H);
+    ASSERT_TRUE(H_full != 0);
 
     ASSERT_DOUBLE_EQ(H_full[0], 2);
     ASSERT_DOUBLE_EQ(H_full[1], 1);
@@ -341,6 +279,7 @@ TEST(UtilitiesTest, CSCtoDNS) {
     ASSERT_DOUBLE_EQ(H_full[3], 0);
     ASSERT_DOUBLE_EQ(H_full[4], 2);
     ASSERT_DOUBLE_EQ(H_full[5], 0);
+    delete[] H_full;
 
     // Modify some values: Second test matrix
     // | 2 0 0  |
@@ -351,9 +290,8 @@ TEST(UtilitiesTest, CSCtoDNS) {
     H_i[1] = 1;
     H = csc_matrix(m, n, H_nnx, H_data, H_i, H_p);
 
-    H_full = new double[m*n]();
-    ret = LCQPanther::Utilities::csc_to_dns(H, H_full, m, n);
-    ASSERT_TRUE(ret == LCQPanther::returnValue::SUCCESSFUL_RETURN);
+    H_full = LCQPanther::Utilities::csc_to_dns(H);
+    ASSERT_TRUE(H_full != 0);
 
     ASSERT_EQ(H_full[0], 2);
     ASSERT_EQ(H_full[1], 0);
@@ -361,6 +299,7 @@ TEST(UtilitiesTest, CSCtoDNS) {
     ASSERT_EQ(H_full[3], 1);
     ASSERT_EQ(H_full[4], 0);
     ASSERT_EQ(H_full[5], 10);
+    delete[] H_full;
 
     // Transpose: Third test matrix
     // | 2  1 |
@@ -374,9 +313,8 @@ TEST(UtilitiesTest, CSCtoDNS) {
     int T_nnx = 3;
     csc* T = csc_matrix(m, n, T_nnx, T_data, T_i, T_p);
 
-    double* T_full = new double[m*n];
-    ret = LCQPanther::Utilities::csc_to_dns(T, T_full, m, n);
-    ASSERT_TRUE(ret == LCQPanther::returnValue::SUCCESSFUL_RETURN);
+    double* T_full = LCQPanther::Utilities::csc_to_dns(T);
+    ASSERT_TRUE(T_full != 0);
 
     ASSERT_EQ(T_full[0], 2.0);
     ASSERT_EQ(T_full[1], 1.0);
@@ -384,6 +322,7 @@ TEST(UtilitiesTest, CSCtoDNS) {
     ASSERT_EQ(T_full[3], 0.0);
     ASSERT_EQ(T_full[4], 10.0);
     ASSERT_EQ(T_full[5], 0.0);
+    delete[] T_full;
 }
 
 // Testing csc to dns and vice versa
@@ -393,7 +332,7 @@ TEST(UtilitiesTest, SparseDenseBackAndForth) {
     int m = 2;
     int n = 5;
 
-    srand (time(NULL));
+    srand((unsigned int)time(NULL));
 
     for (int i = 0; i < numExp; i++) {
         double* H = new double[m*n]();
@@ -417,12 +356,15 @@ TEST(UtilitiesTest, SparseDenseBackAndForth) {
         // Convert to sparse
         csc* H_sparse = LCQPanther::Utilities::dns_to_csc(H, m, n);
 
-        double* H_control = new double[m*n]();
-        LCQPanther::Utilities::csc_to_dns(H_sparse, H_control, m, n);
+        double* H_control = LCQPanther::Utilities::csc_to_dns(H_sparse);
 
         for (int j = 0; j < m*n; j++)
-            ASSERT_FLOAT_EQ(H_control[j], H[j]);
+            ASSERT_DOUBLE_EQ(H_control[j], H[j]);
 
+        // Clear memory
+        delete[] H;
+        delete[] H_control;
+        c_free(H_sparse);
     }
 }
 
@@ -430,11 +372,8 @@ TEST(UtilitiesTest, SparseDenseBackAndForth) {
 TEST(SolverTest, RunWarmUp) {
     double H[2*2] = { 2.0, 0.0, 0.0, 2.0 };
     double g[2] = { -2.0, -2.0 };
-    double lb[2] = { 0, 0 };
-    double ub[2] = { INFINITY, INFINITY };
     double S1[1*2] = {1.0, 0.0};
     double S2[1*2] = {0.0, 1.0};
-    double x0[2] = { 1.0, 1.0 };
     int nV = 2;
     int nC = 0;
     int nComp = 1;
@@ -442,24 +381,22 @@ TEST(SolverTest, RunWarmUp) {
     LCQPanther::LCQProblem lcqp( nV, nC, nComp );
 
 	LCQPanther::Options options;
-    options.setPrintLevel(LCQPanther::printLevel::NONE);
+    options.setPrintLevel(LCQPanther::PrintLevel::NONE);
     lcqp.setOptions( options );
 
     int numExp = 100;
 
-    srand (time(NULL));
+    // Allocate solution vectors
+    double* xOpt = new double[2];
+    double* yOpt = new double[nV + nC + 2*nComp];
 
     for (int i = 0; i < numExp; i++) {
 
-        LCQPanther::returnValue retVal = lcqp.loadLCQP( H, g, lb, ub, S1, S2, (double*)0, (double*)0, x0);
+        LCQPanther::ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2 );
         ASSERT_EQ(retVal, LCQPanther::SUCCESSFUL_RETURN);
 
         retVal = lcqp.runSolver( );
         ASSERT_EQ(retVal, LCQPanther::SUCCESSFUL_RETURN);
-
-        // Get solutions
-        double* xOpt = new double[2];
-        double* yOpt = new double[nV + nC + 2*nComp];
 
         lcqp.getPrimalSolution( xOpt );
         lcqp.getDualSolution( yOpt );
@@ -472,21 +409,12 @@ TEST(SolverTest, RunWarmUp) {
         bool stat1 = std::abs(2*xOpt[0] - 2 - yOpt[0] - yOpt[2]) <= options.getStationarityTolerance();
         bool stat2 = std::abs(2*xOpt[1] - 2 - yOpt[1] - yOpt[3]) <= options.getStationarityTolerance();
 
-        // Printing for debugging
-        // printf("Init = (%g, %g)          %d/%d\n", x0[0], x0[1], i, numExp);
-        // printf("Solution = (%g, %g, %g, %g, %g, %g)\n", xOpt[0], xOpt[1], yOpt[0], yOpt[1], yOpt[2], yOpt[3]);
-        // printf("stat1 = %f\n", std::abs(2*xOpt[0] - 2 - yOpt[0] - yOpt[2]));
-        // printf("stat2 = %f\n", std::abs(2*xOpt[1] - 2 - yOpt[1] - yOpt[3]));
-
         ASSERT_TRUE( stat1 );
         ASSERT_TRUE( stat2 );
-
-        // After first initialization use random feasible values
-        int rd_idx = std::rand() % 2;
-        int rd_value = std::rand() % 10000;
-
-        x0[rd_idx] = rd_value;
     }
+
+    // Clear solution vectors
+    delete[] xOpt; delete[] yOpt;
 }
 
 int main(int argc, char* argv[])
