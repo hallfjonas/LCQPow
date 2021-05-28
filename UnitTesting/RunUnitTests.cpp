@@ -221,24 +221,6 @@ TEST(UtilitiesTest, MaxAbs) {
     ASSERT_EQ(ret, 4);
 }
 
-// Testing read from file functionality
-TEST(UtilitiesTest, ReadFromFile) {
-    const char* fpath = "../examples/example_data/one_ivocp_example/lbA.txt";
-
-    // Read first four values from lbA (0, 1, 0, 1)
-    double* lbA = new double[4];
-    LCQPanther::ReturnValue ret = LCQPanther::Utilities::readFromFile(lbA, 4, fpath);
-
-    // Assert that reading file went ok
-    ASSERT_EQ(ret, LCQPanther::ReturnValue::SUCCESSFUL_RETURN);
-
-    // Assert that values have been read correctly
-    ASSERT_EQ(lbA[0], 0);
-    ASSERT_EQ(lbA[1], 1);
-    ASSERT_EQ(lbA[2], 0);
-    ASSERT_EQ(lbA[3], 1);
-}
-
 // Testing Options constructors, default settings, consistency
 TEST(UtilitiesTest, Options) {
     LCQPanther::Options opts;
