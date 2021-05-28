@@ -77,12 +77,23 @@ if (NOT EXISTS "${PROJECT_SOURCE_DIR}/external/qpOASES/CMakeLists.txt")
     )
 endif()
 
+
+if (NOT EXISTS "${PROJECT_SOURCE_DIR}/external/googletest/CMakeLists.txt")
+    message(
+        FATAL_ERROR
+        "The submodule googletest does not exist. GIT_SUBMODULE was turned off or failed."
+    )
+endif()
+
 ## ADD ALL SUBMODULES -------------------------------------------------------------------
 # OSQP
 add_subdirectory(external/osqp)
 
 # qpOASES
 add_subdirectory(external/qpOASES)
+
+# qpOASES
+add_subdirectory(external/googletest)
 
 # Add include directories of dependencies: qpOASES, OSQP
 include_directories(${PROJECT_NAME}
@@ -97,7 +108,7 @@ link_directories(${PROJECT_NAME}
 )
 
 ## CREATE LCQPanther libraries ----------------------------------------------------------
-# Include headers
+# Include project headers
 include_directories(${PROJECT_NAME} PUBLIC include)
 
 # create static lib
@@ -109,11 +120,8 @@ add_library(${PROJECT_NAME}-shared SHARED ${SRC_FILES})
 set_target_properties(${PROJECT_NAME}-shared PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
 
 ## Build unit tests ---------------------------------------------------------------------
-# add googletest subdirectory
-add_subdirectory(UnitTesting/googletest)
-
 # Add Unit testing source file
-add_executable(RunUnitTests UnitTesting/RunUnitTests.cpp)
+add_executable(RunUnitTests test/RunUnitTests.cpp)
 
 # Add libraries: gtest, qpOASES, OSQP
-target_link_libraries(RunUnitTests PRIVATE gtest ${PROJECT_NAME}-shared qpOASES osqp)
+target_link_libraries(RunUnitTests PRIVATE ${PROJECT_NAME}-shared qpOASES osqp gtest)
