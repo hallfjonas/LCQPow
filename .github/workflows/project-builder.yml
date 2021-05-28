@@ -5,7 +5,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: git submodule update --init --recursive
+        with:
+          submodules: recursive
       - run: make dependencies
       - run: make
       - run: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/lib; echo $LD_LIBRARY_PATH; bin/warm_up
@@ -14,6 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - with:
-        submodules: recursive
+        with:
+          submodules: recursive
       - run: ./buildAndRunTests
