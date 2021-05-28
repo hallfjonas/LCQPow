@@ -1,3 +1,6 @@
 #!/bin/bash
 
-cmake -DDLONG=OFF -S . -B build
+mkdir -p build
+cd build
+cmake -DDLONG=OFF ..
+cd ..
