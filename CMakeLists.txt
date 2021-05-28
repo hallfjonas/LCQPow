@@ -26,19 +26,31 @@ cmake_minimum_required(VERSION 3.10.2)
 project(lcqpanther)
 
 # Save auxiliar source files to variable
-AUX_SOURCE_DIRECTORY(src SRC_FILES)
+aux_source_directory(src SRC_FILES)
 
-# Add compile options
-add_compile_options(
-    -Wall
-    -pedantic
-    -Wshadow
-    -Wfloat-equal
-    -O3
-    -Wconversion
-    -Wsign-conversion
-    -fPIC
-    -DLINUX
+## Options ------------------------------------------------------------------------------
+option(
+    BUILD_EXAMPLES
+    "Option to build examples."
+    ON
+)
+
+option(
+    BUILD_DEBUG
+    "Option to compile with the -g flag."
+    OFF
+)
+
+option(
+    RUN_GPROF_ANALYSIS
+    "Option to compile with the -pg flag and run an analysis on all examples."
+    OFF
+)
+
+option(
+    RUN_VALGRIND_ANALYSIS
+    "Option to compile with the -g flag and run a valgrind analysis on all examples."
+    OFF
 )
 
 ## DOWNLOAD AND CHECK ALL SUBMODULES ---- from Code, Tech, and Tutorials ----------------
@@ -105,6 +117,19 @@ include_directories(${PROJECT_NAME}
 # Include project headers
 include_directories(${PROJECT_NAME} PUBLIC include)
 
+# Add compile options
+add_compile_options(
+    -Wall
+    -pedantic
+    -Wshadow
+    -Wfloat-equal
+    -O3
+    -Wconversion
+    -Wsign-conversion
+    -fPIC
+    -DLINUX
+)
+
 # create static lib
 add_library(${PROJECT_NAME}-static STATIC ${SRC_FILES})
 set_target_properties(${PROJECT_NAME}-static PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
@@ -113,9 +138,40 @@ set_target_properties(${PROJECT_NAME}-static PROPERTIES OUTPUT_NAME ${PROJECT_NA
 add_library(${PROJECT_NAME}-shared SHARED ${SRC_FILES})
 set_target_properties(${PROJECT_NAME}-shared PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
 
+## Build debug --------------------------------------------------------------------------
+if (${BUILD_DEBUG} OR ${RUN_VALGRIND_ANALYSIS} OR ${RUN_GPROF_ANALYSIS})
+    add_compile_options(-g)
+endif()
+
+## Build gprof --------------------------------------------------------------------------
+if (${RUN_GPROF_ANALYSIS})
+    add_compile_options(-pg)
+endif()
+
+## Build examples -----------------------------------------------------------------------
+if (${BUILD_EXAMPLES})
+    aux_source_directory(examples EXAMPLE_FILES)
+
+    FOREACH(ELEMENT ${EXAMPLE_FILES})
+        get_filename_component(EXAMPLE_NAME ${ELEMENT} NAME_WE)
+        add_executable(${EXAMPLE_NAME} ${ELEMENT})
+        target_link_libraries(
+            ${EXAMPLE_NAME}
+            PUBLIC ${PROJECT_NAME}-shared
+            PRIVATE qpOASES osqp gtest
+        )
+    endforeach()
+endif()
+
 ## Build unit tests ---------------------------------------------------------------------
 # Add Unit testing source file
 add_executable(RunUnitTests test/RunUnitTests.cpp)
 
 # Add libraries: gtest, qpOASES, OSQP
-target_link_libraries(RunUnitTests PRIVATE ${PROJECT_NAME}-shared qpOASES osqp gtest)
+target_link_libraries(
+    RunUnitTests
+    PUBLIC ${PROJECT_NAME}-shared
+    PRIVATE qpOASES osqp gtest
+)
+
+## End of cmake file --------------------------------------------------------------------
