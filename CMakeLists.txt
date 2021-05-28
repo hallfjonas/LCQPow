@@ -101,12 +101,6 @@ include_directories(${PROJECT_NAME}
     PRIVATE external/qpOASES/include
 )
 
-# Target link directories
-link_directories(${PROJECT_NAME}
-    PRIVATE external/osqp/out
-    PRIVATE external/qpOASES/bin
-)
-
 ## CREATE LCQPanther libraries ----------------------------------------------------------
 # Include project headers
 include_directories(${PROJECT_NAME} PUBLIC include)
