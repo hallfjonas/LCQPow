@@ -1,21 +1,22 @@
 name: CI build and run
 on: [push]
 jobs:
-  build-and-run:
+  configure:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - run: make dependencies
-      - run: make
-      - run: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/lib; echo $LD_LIBRARY_PATH; bin/warm_up
+      - run: ./configure.sh
 
-  test:
-    needs: build-and-run
+  build:
+    needs: configure
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - run: ./configure.sh; ./build.sh; ./run.sh;
+      - run: ./configure.sh; ./build.sh
+
+  run:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: ./configure.sh; ./build.sh; ./run.sh
