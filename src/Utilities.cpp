@@ -497,7 +497,6 @@ namespace LCQPanther {
         /* 1) Open file. */
         if ( ( datafile = fopen( datafilename, "r" ) ) == 0 )
         {
-            fclose( datafile );
             return UNABLE_TO_READ_FILE;
         }
 
