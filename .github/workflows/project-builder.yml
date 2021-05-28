@@ -1,7 +1,7 @@
 name: CI build and run
 on: [push]
 jobs:
-  build-run-test:
+  build-and-run:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -9,4 +9,11 @@ jobs:
       - run: make dependencies
       - run: make
       - run: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/lib; echo $LD_LIBRARY_PATH; bin/warm_up
-    
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - with:
+        submodules: recursive
+      - run: ./buildAndRunTests
