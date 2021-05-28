@@ -19,18 +19,101 @@
 ##	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ##
 
-cmake_minimum_required(VERSION 3.0) # version can be different
+# cmake minimum required version
+cmake_minimum_required(VERSION 3.10.2)
 
-project(LCQPanther) #name of your project
+# Project name
+project(lcqpanther)
 
-add_subdirectory(UnitTesting/googletest) # add googletest subdirectory
-
+# Save auxiliar source files to variable
 AUX_SOURCE_DIRECTORY(src SRC_FILES)
 
-add_compile_options(-Wall -pedantic -Wshadow -Wfloat-equal -O3 -Wconversion -Wsign-conversion -fPIC -DLINUX)
+# Add compile options
+add_compile_options(
+    -Wall
+    -pedantic
+    -Wshadow
+    -Wfloat-equal
+    -O3
+    -Wconversion
+    -Wsign-conversion
+    -fPIC
+    -DLINUX
+)
 
-include_directories(SYSTEM external/osqp/include include external/qpOASES/include) # this is so we can #include <gtest/gtest.h>
+## DOWNLOAD AND CHECK ALL SUBMODULES ---- from Code, Tech, and Tutorials ----------------
+find_package(Git QUIET)
+if (GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+# Update submodules as needed
+    option(GIT_SUBMODULE "Check submodules during build" ON)
+    if (GIT_SUBMODULE)
+        message(STATUS "Submodule update")
+        execute_process(
+            COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            RESULT_VARIABLE GIT_SUBMOD_RESULT
+        )
 
-add_executable(RunUnitTests UnitTesting/RunUnitTests.cpp ${SRC_FILES}) # add this executable
+        if (NOT GIT_SUBMOD_RESULT EQUAL "0")
+            message(
+                FATAL_ERROR
+                "git submodule update --init --recursive failed with ${GIT_SUBMOD_RESULT}."
+            )
+        endif()
+    endif()
+endif()
 
-target_link_libraries(RunUnitTests PRIVATE gtest qpOASES osqp) # link google test to this executable
+if (NOT EXISTS "${PROJECT_SOURCE_DIR}/external/osqp/CMakeLists.txt")
+    message(
+        FATAL_ERROR
+        "The submodule OSQP does not exist. GIT_SUBMODULE was turned off or failed."
+    )
+endif()
+
+if (NOT EXISTS "${PROJECT_SOURCE_DIR}/external/qpOASES/CMakeLists.txt")
+    message(
+        FATAL_ERROR
+        "The submodule qpOASES does not exist. GIT_SUBMODULE was turned off or failed."
+    )
+endif()
+
+## ADD ALL SUBMODULES -------------------------------------------------------------------
+# OSQP
+add_subdirectory(external/osqp)
+
+# qpOASES
+add_subdirectory(external/qpOASES)
+
+# Add include directories of dependencies: qpOASES, OSQP
+include_directories(${PROJECT_NAME}
+    PRIVATE external/osqp/include
+    PRIVATE external/qpOASES/include
+)
+
+# Target link directories
+link_directories(${PROJECT_NAME}
+    PRIVATE external/osqp/out
+    PRIVATE external/qpOASES/bin
+)
+
+## CREATE LCQPanther libraries ----------------------------------------------------------
+# Include headers
+include_directories(${PROJECT_NAME} PUBLIC include)
+
+# create static lib
+add_library(${PROJECT_NAME}-static STATIC ${SRC_FILES})
+set_target_properties(${PROJECT_NAME}-static PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+
+# create shared lib
+add_library(${PROJECT_NAME}-shared SHARED ${SRC_FILES})
+set_target_properties(${PROJECT_NAME}-shared PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+
+## Build unit tests ---------------------------------------------------------------------
+# add googletest subdirectory
+add_subdirectory(UnitTesting/googletest)
+
+# Add Unit testing source file
+add_executable(RunUnitTests UnitTesting/RunUnitTests.cpp)
+
+# Add libraries: gtest, qpOASES, OSQP
+target_link_libraries(RunUnitTests PRIVATE gtest ${PROJECT_NAME}-shared qpOASES osqp)
