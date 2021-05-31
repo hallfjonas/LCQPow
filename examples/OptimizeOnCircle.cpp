@@ -132,7 +132,7 @@ int main() {
             stats.getIterTotal(), stats.getIterOuter(), stats.getRhoOpt(), stats.getSubproblemIter() );
 
     // Print a reference to the global and local solutions
-    printf("For reference: Global solution is at:  [ %g, %g ]\n", -0.1811,  0.9835);
+    printf("For reference: Global solution is at:  [ %g, %g ]\n", 0.1811, -0.9835);
     printf("               Another local solution: [ %g, %g ]\n",  0.9764, -0.2183);
 
     // Clean Up
