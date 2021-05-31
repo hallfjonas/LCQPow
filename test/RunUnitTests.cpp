@@ -351,6 +351,40 @@ TEST(UtilitiesTest, SparseDenseBackAndForth) {
     }
 }
 
+TEST(UtilitesTest, CSCtoTriangular) {
+    double M_data[4] = { 2.0, 3.0, 3.0, 2.0 };
+    int M_i[4] = {0, 1, 0, 1};
+    int M_p[3] = {0, 2, 4};
+
+    csc* M = (csc*) malloc(sizeof(csc));
+
+    M->m = 2;
+    M->n = 2;
+    M->i = M_i;
+    M->p = M_p;
+    M->x = M_data;
+    M->nzmax = 4;
+    M->nz = -1;
+
+    csc* M_triag = LCQPanther::Utilities::copyCSC(M, true);
+
+    ASSERT_TRUE(M_triag != 0);
+
+    ASSERT_DOUBLE_EQ(M_triag->p[0], 0);
+    ASSERT_DOUBLE_EQ(M_triag->p[1], 1);
+    ASSERT_DOUBLE_EQ(M_triag->p[2], 3);
+    ASSERT_DOUBLE_EQ(M_triag->i[0], 0);
+    ASSERT_DOUBLE_EQ(M_triag->i[1], 0);
+    ASSERT_DOUBLE_EQ(M_triag->i[2], 1);
+    ASSERT_DOUBLE_EQ(M_triag->x[0], 2);
+    ASSERT_DOUBLE_EQ(M_triag->x[1], 3);
+    ASSERT_DOUBLE_EQ(M_triag->x[2], 2);
+    ASSERT_DOUBLE_EQ(M_triag->m, 2);
+    ASSERT_DOUBLE_EQ(M_triag->n, 2);
+    ASSERT_DOUBLE_EQ(M_triag->nz, -1);
+    ASSERT_DOUBLE_EQ(M_triag->nzmax, 3);
+}
+
 // Testing LCQPanther solver set up
 TEST(SolverTest, RunWarmUp) {
     double H[2*2] = { 2.0, 0.0, 0.0, 2.0 };

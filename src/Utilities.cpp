@@ -503,9 +503,11 @@ namespace LCQPanther {
             p[0] = 0;
 
             for (int j = 0; j < _M->n+1; j++) {
+                p[j+1] = p[j];
+
                 for (int i = _M->p[j]; i < _M->p[j+1]; i++) {
                     // Ignore entries below diagonal
-                    if (_M->i[i] < j)
+                    if (_M->i[i] > j)
                         continue;
 
                     // Push back elements on or above diagonal
