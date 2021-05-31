@@ -114,24 +114,48 @@ add_compile_options(
 
 # create static lib
 add_library(${PROJECT_NAME}-static STATIC ${SRC_FILES})
-set_target_properties(${PROJECT_NAME}-static PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+set_target_properties(
+    ${PROJECT_NAME}-static
+    PROPERTIES
+    OUTPUT_NAME ${PROJECT_NAME}
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+)
+
 
 # create shared lib
 add_library(${PROJECT_NAME}-shared SHARED ${SRC_FILES})
-set_target_properties(${PROJECT_NAME}-shared PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
-
+set_target_properties(
+    ${PROJECT_NAME}-shared
+    PROPERTIES
+    OUTPUT_NAME ${PROJECT_NAME}
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+)
 
 ## Build examples -----------------------------------------------------------------------
 if (${BUILD_EXAMPLES})
     aux_source_directory(examples EXAMPLE_FILES)
 
     FOREACH(ELEMENT ${EXAMPLE_FILES})
+        # get filename w/o dir and extension
         get_filename_component(EXAMPLE_NAME ${ELEMENT} NAME_WE)
+
+        # generate executable target
         add_executable(${EXAMPLE_NAME} ${ELEMENT})
+
+        # link libraries
         target_link_libraries(
             ${EXAMPLE_NAME}
             PUBLIC ${PROJECT_NAME}-shared
             PRIVATE qpOASES osqp gtest
+        )
+
+        # specify output directory
+        set_target_properties(
+            ${EXAMPLE_NAME}
+            PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/examples"
         )
     endforeach()
 endif()
@@ -139,6 +163,11 @@ endif()
 ## Build unit tests ---------------------------------------------------------------------
 # Add Unit testing source file
 add_executable(RunUnitTests test/RunUnitTests.cpp)
+set_target_properties(
+    RunUnitTests
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
+)
 
 # Add libraries: gtest, qpOASES, OSQP
 target_link_libraries(

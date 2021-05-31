@@ -1,3 +1,3 @@
 #!/bin/bash
 
-build/RunUnitTests
+build/bin/tests/RunUnitTests
