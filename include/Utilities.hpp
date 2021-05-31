@@ -176,7 +176,7 @@ namespace LCQPanther {
             static csc* copyCSC(int m, int n, int nnz, double* x, int* i, int* p);
 
             // Copy a csc matrix (override of copyCSC)
-            static csc* copyCSC(const csc* const M);
+            static csc* copyCSC(const csc* const M, bool toUpperTriangular = false);
 
             /** Transform a csc matrix to dense.
              *

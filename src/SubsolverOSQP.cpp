@@ -48,8 +48,8 @@ namespace LCQPanther {
         data = (OSQPData *)c_malloc(sizeof(OSQPData));
 
         // Copy matrices
-        H = copy_csc_mat(_H);
-        A = copy_csc_mat(_A);
+        H = Utilities::copyCSC(_H, true);
+        A = Utilities::copyCSC(_A);
         g = new c_float[nVars];
         l = new c_float[nDuals];
         u = new c_float[nDuals];

@@ -488,30 +488,69 @@ namespace LCQPanther {
     }
 
 
-    csc* Utilities::copyCSC(const csc* const _M)
+    csc* Utilities::copyCSC(const csc* const _M, bool toUpperTriangular)
     {
         csc* M = (csc *)malloc(sizeof(csc));
 
         if (M == 0) return 0;
 
-        // Allocate space
-		int* rows = (int*) malloc((size_t)_M->nzmax*sizeof(int));
-		double* data = (double*) malloc((size_t)_M->nzmax*sizeof(double));
-		int* cols = (int*) malloc((size_t)(_M->n+1)*sizeof(int));
+        if (toUpperTriangular) {
+            // Allocate space
+            std::vector<int> rows;
+            std::vector<double> data;
+            int* p = (int*) malloc((size_t)(_M->n+1)*sizeof(int));
 
-        // Copy sparse matrix data
-        memcpy(rows, _M->i, (size_t)_M->nzmax*sizeof(int));
-        memcpy(data, _M->x, (size_t)_M->nzmax*sizeof(double));
-        memcpy(cols, _M->p, (size_t)(_M->n+1)*sizeof(int));
+            p[0] = 0;
 
-        // Assign copied data
-		M->m = _M->m;
-		M->n = _M->n;
-		M->p = cols;
-		M->i = rows;
-		M->x = data;
-		M->nz = -1;
-		M->nzmax = _M->nzmax;
+            for (int j = 0; j < _M->n+1; j++) {
+                for (int i = _M->p[j]; i < _M->p[j+1]; i++) {
+                    // Ignore entries below diagonal
+                    if (_M->i[i] < j)
+                        continue;
+
+                    // Push back elements on or above diagonal
+                    rows.push_back(_M->i[i]);
+                    data.push_back(_M->x[i]);
+                    p[j+1]++;
+                }
+            }
+
+            // copy std vector to arrays
+            int* i = new int[p[_M->n]];
+            double* x = new double[p[_M->n]];
+            for (size_t k = 0; k < p[_M->n]; k++) {
+                i[k] = rows[k];
+                x[k] = data[k];
+            }
+
+            // Assign copied data
+            M->m = _M->m;
+            M->n = _M->n;
+            M->p = p;
+            M->i = i;
+            M->x = x;
+            M->nz = -1;
+            M->nzmax = p[_M->n];
+        } else {
+            // Allocate space
+            int* rows = (int*) malloc((size_t)_M->nzmax*sizeof(int));
+            double* data = (double*) malloc((size_t)_M->nzmax*sizeof(double));
+            int* cols = (int*) malloc((size_t)(_M->n+1)*sizeof(int));
+
+            // Copy sparse matrix data
+            memcpy(rows, _M->i, (size_t)_M->nzmax*sizeof(int));
+            memcpy(data, _M->x, (size_t)_M->nzmax*sizeof(double));
+            memcpy(cols, _M->p, (size_t)(_M->n+1)*sizeof(int));
+
+            // Assign copied data
+            M->m = _M->m;
+            M->n = _M->n;
+            M->p = cols;
+            M->i = rows;
+            M->x = data;
+            M->nz = -1;
+            M->nzmax = _M->nzmax;
+        }
 
         return M;
     }
