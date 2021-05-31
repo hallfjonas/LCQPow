@@ -60,17 +60,19 @@ function [] = make( varargin )
     
     %% define compiler settings
     LCQPanther_IFLAG = '-I../../include ';
-    QPOASES_IFLAG = '-I/home/syscop/qpOASES/include ';
-    OSQP_IFLAG = '-I/home/syscop/osqp/include ';
-    
-    DEBUGFLAGS = ' ';
-    %DEBUGFLAGS = ' -v -g CXXDEBUGFLAGS=''$CXXDEBUGFLAGS -Wall -pedantic -Wshadow'' ';
-
+    QPOASES_IFLAG = '-I../../external/qpOASES/include ';
+    OSQP_IFLAG = '-I../../external/osqp/include ';
     IFLAGS = [ '-I. ', LCQPanther_IFLAG, QPOASES_IFLAG, OSQP_IFLAG];
-    CPPFLAGS = [ IFLAGS, DEBUGFLAGS, '-largeArrayDims -D__cpluplus -D__MATLAB__',' ' ];
+    
+    LCQPanther_LFLAG = '-L/home/syscop/LCQPanther/build/lib -llcqpanther ';
+    QPOASES_IFLAG = '-L/home/syscop/LCQPanther/build/external/qpOASES/libs -lqpOASES ';
+    OSQP_IFLAG = '-L/home/syscop/LCQPanther/build/external/osqp/out -losqp ';
+    LFLAGS = [ LCQPanther_LFLAG, QPOASES_IFLAG, OSQP_IFLAG ];
+    
+    CPPFLAGS = [ IFLAGS, '-largeArrayDims -D__cpluplus -D__MATLAB__',' ' ];
     defaultFlags = '-O -D__NO_COPYRIGHT__ '; %% -D__SUPPRESSANYOUTPUT__
 
-    CPPFLAGS = [ CPPFLAGS, '-DLINUX -lLCQPanther -lqpOASES -losqp',' ' ];
+    CPPFLAGS = [ CPPFLAGS, '-DLINUX ', LFLAGS, ' ' ];
 
     if ( isempty(userFlags) > 0 )
         CPPFLAGS = [ CPPFLAGS, defaultFlags,' ' ];
