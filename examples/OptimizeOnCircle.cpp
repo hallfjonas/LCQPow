@@ -61,11 +61,6 @@ int main() {
     H[0] = 17; H[1*nV + 1] = 17;
     H[0*nV + 1] = -15;
 
-    // OSQP want triangular matrices
-    if (options.getQPSolver() != QPSolver::OSQP_SPARSE){
-        H[1*nV + 0] = -15;
-    }
-
     // Regularization on H
     for (int i = 2; i < nV; i++)
         H[i*nV + i] = 5e-12;
