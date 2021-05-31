@@ -21,6 +21,7 @@
 
 
 #include "Utilities.hpp"
+#include "Options.hpp"
 #include "LCQProblem.hpp"
 
 #include <gtest/gtest.h>

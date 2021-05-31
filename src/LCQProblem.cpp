@@ -22,6 +22,7 @@
 
 #include "LCQProblem.hpp"
 #include "Utilities.hpp"
+#include "MessageHandler.hpp"
 #include "SubsolverQPOASES.hpp"
 #include "SubsolverOSQP.hpp"
 

@@ -25,6 +25,8 @@
 
 #include "Utilities.hpp"
 #include "Subsolver.hpp"
+#include "OutputStatistics.hpp"
+#include "Options.hpp"
 
 #include <qpOASES.hpp>
 #include <vector>
