@@ -26,7 +26,7 @@
 using namespace LCQPanther;
 
 int main() {
-    std::cout << "Preparing warm up problem...\n";
+    std::cout << "Preparing unit circle optimization problem...\n";
 
     // Set dimensions
     int N = 100;
