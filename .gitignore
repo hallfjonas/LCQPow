@@ -402,4 +402,7 @@ codegen/
 # Octave session info
 octave-workspace
 
+# A debug configuration script
+dbg_configure.sh
+
 # End of https://www.gitignore.io/api/c,git,latex,matlab
