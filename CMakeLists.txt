@@ -35,24 +35,6 @@ option(
     ON
 )
 
-option(
-    BUILD_DEBUG
-    "Option to compile with the -g flag."
-    OFF
-)
-
-option(
-    RUN_GPROF_ANALYSIS
-    "Option to compile with the -pg flag and run an analysis on all examples."
-    OFF
-)
-
-option(
-    RUN_VALGRIND_ANALYSIS
-    "Option to compile with the -g flag and run a valgrind analysis on all examples."
-    OFF
-)
-
 ## DOWNLOAD AND CHECK ALL SUBMODULES ---- from Code, Tech, and Tutorials ----------------
 find_package(Git QUIET)
 if (GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
@@ -138,15 +120,6 @@ set_target_properties(${PROJECT_NAME}-static PROPERTIES OUTPUT_NAME ${PROJECT_NA
 add_library(${PROJECT_NAME}-shared SHARED ${SRC_FILES})
 set_target_properties(${PROJECT_NAME}-shared PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
 
-## Build debug --------------------------------------------------------------------------
-if (${BUILD_DEBUG} OR ${RUN_VALGRIND_ANALYSIS} OR ${RUN_GPROF_ANALYSIS})
-    add_compile_options(-g)
-endif()
-
-## Build gprof --------------------------------------------------------------------------
-if (${RUN_GPROF_ANALYSIS})
-    add_compile_options(-pg)
-endif()
 
 ## Build examples -----------------------------------------------------------------------
 if (${BUILD_EXAMPLES})
