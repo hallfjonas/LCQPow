@@ -520,7 +520,7 @@ namespace LCQPanther {
             // copy std vector to arrays
             int* i = new int[p[_M->n]];
             double* x = new double[p[_M->n]];
-            for (size_t k = 0; k < p[_M->n]; k++) {
+            for (size_t k = 0; k < (size_t)p[_M->n]; k++) {
                 i[k] = rows[k];
                 x[k] = data[k];
             }
