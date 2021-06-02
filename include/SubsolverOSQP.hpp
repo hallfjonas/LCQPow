@@ -36,10 +36,7 @@ namespace LCQPanther {
 			SubsolverOSQP( );
 
             SubsolverOSQP(  const csc* const _H,
-                            const csc* const _A,
-                            const double* const g,
-                            const double* const lbA,
-                            const double* const ubA
+                            const csc* const _A
                             );
 
             /** Copy constructor. */

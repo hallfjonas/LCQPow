@@ -20,6 +20,7 @@
  */
 
 #include "Subsolver.hpp"
+#include "MessageHandler.hpp"
 #include <cstring>
 
 namespace LCQPanther {
@@ -39,25 +40,23 @@ namespace LCQPanther {
 
 
     Subsolver::Subsolver(   int nV, int nC,
-                            csc* H, csc* A )
-    {
-        qpSolver = QPSolver::QPOASES_SPARSE;
-
-        SubsolverQPOASES tmp(nV, nC, H, A );
-        solverQPOASES = tmp;
-    }
-
-
-    Subsolver::Subsolver(   int nV, int nC,
                             csc* H, csc* A,
-                            const double* g,
-                            const double* l,
-                            const double* u )
+                            QPSolver _qpSolver )
     {
-        qpSolver = QPSolver::OSQP_SPARSE;
+        qpSolver = _qpSolver;
 
-        SubsolverOSQP tmp(H, A, g, l, u);
-        solverOSQP = tmp;
+        if (qpSolver == QPSolver::OSQP_SPARSE) {
+            SubsolverOSQP tmp(H, A);
+            solverOSQP = tmp;
+        } else {
+            if (QPSolver::QPOASES_DENSE <= qpSolver || qpSolver > QPSolver::QPOASES_SPARSE) {
+                MessageHandler::PrintMessage( ReturnValue::INVALID_QPSOLVER );
+            }
+
+            // Use qpOASES per default (or if qpOASES sparse was passed).
+            SubsolverQPOASES tmp(nV, nC, H, A );
+            solverQPOASES = tmp;
+        }
     }
 
 

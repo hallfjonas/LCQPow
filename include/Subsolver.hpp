@@ -32,26 +32,31 @@ namespace LCQPanther {
 			/** Default constructor. */
 			Subsolver( );
 
-            /** Constructor for dense matrices (qpOASES). */
+            /** Constructor for dense matrices (qpOASES).
+             *
+             * @param nV The number of optimization variables.
+             * @param nC The number of linear constraints (should include the complementarity pairs).
+             * @param H The Hessian matrix in dense format.
+             * @param A The linear constraint matrix (should include the rows of the complementarity selector matrices).
+            */
             Subsolver(  int nV,
                         int nC,
                         double* H,
                         double* A );
 
-            /** Constructor for sparse matrices (qpOASES). */
-            Subsolver(  int nV,
-                        int nC,
-                        csc* H,
-                        csc* A);
-
-            /** Constructor for sparse matrices (OSQP). */
+            /** Constructor for sparse matrices (qpOASES/OSQP).
+             *
+             * @param nV The number of optimization variables.
+             * @param nC The number of linear constraints (should include the complementarity pairs).
+             * @param H The Hessian matrix in sparse csc format.
+             * @param A The linear constraint matrix in sparse csc format (should include the rows of the complementarity selector matrices).
+             * @param qpSolver The QP subproblem solver to be used.
+            */
             Subsolver(  int nV,
                         int nC,
                         csc* H,
                         csc* A,
-                        const double* g,
-                        const double* l,
-                        const double* u);
+                        QPSolver qpSolver);
 
             /** Copy constructor. */
             Subsolver(const Subsolver& rhs);

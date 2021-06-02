@@ -34,10 +34,7 @@ namespace LCQPanther {
      }
 
 
-    SubsolverOSQP::SubsolverOSQP(   const csc* const _H, const csc* const _A,
-                                    const double* const _g,
-                                    const double* const _l,
-                                    const double* const _u)
+    SubsolverOSQP::SubsolverOSQP(   const csc* const _H, const csc* const _A)
     {
         // Store dimensions
         nVars = _H->n;
@@ -53,23 +50,18 @@ namespace LCQPanther {
         g = new c_float[nVars];
         l = new c_float[nDuals];
         u = new c_float[nDuals];
-        memcpy(g, _g, (size_t)nVars*sizeof(c_float));
-        memcpy(l, _l, (size_t)nDuals*sizeof(c_float));
-        memcpy(u, _u, (size_t)nDuals*sizeof(c_float));
 
         // Fill data
         data->n = nVars;
         data->m = nDuals;
         data->P = H;
         data->A = A;
-        data->q = g;
-        data->l = l;
-        data->u = u;
 
         // Define solver settings
         osqp_set_default_settings(settings);
         settings->eps_prim_inf = Utilities::ZERO;
         settings->verbose = false;
+        settings->polish = true;
 
         // Setup workspace
         osqp_setup(&work, data, settings);
