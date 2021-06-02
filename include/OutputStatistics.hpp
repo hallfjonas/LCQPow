@@ -88,11 +88,11 @@ namespace LCQPanther {
             AlgorithmStatus getSolutionStatus( ) const;
 
         private:
-            int iter_total = 0;
-            int iter_outer = 0;
-            int subproblem_iter = 0;
-            double rho_opt = 0.0;
-            AlgorithmStatus status = PROBLEM_NOT_SOLVED;
+            int iter_total = 0;                                 /**< Total number of iterations, i.e., total number of inner iterations. */
+            int iter_outer = 0;                                 /**< Total number of outer iterations, i.e., number of penalty updates. */
+            int subproblem_iter = 0;                            /**< Total number of subsolver iterations (qpOASES: active set changes, OSQP: ??). */
+            double rho_opt = 0.0;                               /**< Value of penalty parameter at the final iterate. */
+            AlgorithmStatus status = PROBLEM_NOT_SOLVED;        /**< Status of the solver. This is set to the solution type on success. */
     };
 }
 
