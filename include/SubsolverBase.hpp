@@ -27,14 +27,29 @@
 namespace LCQPanther {
     class SubsolverBase {
         public:
-			/** Write solution to x. */
+			/** Get the primal and dual solution.
+             *
+             * @param x Pointer to the (assumed to be allocated) primal solution vector.
+             * @param y Pointer to the (assumed to be allocated) dual solution vector.
+            */
             virtual void getSolution( double* x, double* y ) = 0;
 
-            /** Abstract method for solving the QP. */
+            /** Abstract method for solving the QP.
+             *
+             * @param initialSolver A flag indicating whether the call should initialize the sequence.
+             * @param iterations A reference to write the number of subsolver iterates to.
+             * @param _g The (potentially) updated objective linear component.
+             * @param _lbA The (potentially) updated lower bounds of the linear constraints.
+             * @param _ubA The (potentially) updated upper bounds of the linear constraints.
+             * @param _lb The (potentially) updated lower box constraints. NULL pointer can be passed.
+             * @param _ub The (potentially) updated upper box constraints. NULL pointer can be passed.
+             * @param _x0 The primal initial guess. NULL pointer can be passed.
+             * @param _y0 The dual initial guess. NULL pointer can be passed.
+            */
             virtual ReturnValue solve(  bool initialSolve, int& iterations,
                                         const double* const _g,
-                                        const double* const _lb, const double* const _ub,
                                         const double* const _lbA, const double* const _ubA,
+                                        const double* const _lb = 0, const double* const _ub = 0,
                                         const double* const x0 = 0, const double* const y0 = 0) = 0;
 
     };
