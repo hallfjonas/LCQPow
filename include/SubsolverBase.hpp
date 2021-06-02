@@ -41,16 +41,16 @@ namespace LCQPanther {
              * @param _g The (potentially) updated objective linear component.
              * @param _lbA The (potentially) updated lower bounds of the linear constraints.
              * @param _ubA The (potentially) updated upper bounds of the linear constraints.
-             * @param _lb The (potentially) updated lower box constraints. NULL pointer can be passed.
-             * @param _ub The (potentially) updated upper box constraints. NULL pointer can be passed.
              * @param _x0 The primal initial guess. NULL pointer can be passed.
              * @param _y0 The dual initial guess. NULL pointer can be passed.
+             * @param _lb The (potentially) updated lower box constraints. NULL pointer can be passed.
+             * @param _ub The (potentially) updated upper box constraints. NULL pointer can be passed.
             */
             virtual ReturnValue solve(  bool initialSolve, int& iterations,
                                         const double* const _g,
                                         const double* const _lbA, const double* const _ubA,
-                                        const double* const _lb = 0, const double* const _ub = 0,
-                                        const double* const x0 = 0, const double* const y0 = 0) = 0;
+                                        const double* const x0 = 0, const double* const y0 = 0,
+                                        const double* const _lb = 0, const double* const _ub = 0) = 0;
 
     };
 }
