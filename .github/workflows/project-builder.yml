@@ -11,10 +11,10 @@ jobs:
         run: sudo apt-get install doxygen
 
       - name: configure
-        run: ./configure;
+        run: ./configure.sh;
 
       - name: build
-        run: ./configure; ./build.sh
+        run: ./configure.sh; ./build.sh
 
       - name: run
-        run: ./configure; ./build.sh; ./run.sh
+        run: ./configure.sh; ./build.sh; ./run.sh
