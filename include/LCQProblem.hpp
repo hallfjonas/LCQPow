@@ -269,13 +269,6 @@ namespace LCQPanther {
 			void clear( );
 
 
-			/** Copies all properties from rhs to this.
-			 *
-			 * @param rhs The LCQProblem to be copied.
-			 */
-			ReturnValue copy( const LCQProblem& rhs );
-
-
 			/** Prints concise information on the current iteration. */
 			void printIteration( );
 
