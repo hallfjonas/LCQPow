@@ -9,10 +9,11 @@ jobs:
 
       - name: chaching
         uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
+          path: ~/.cache-module
+          key: ${{ runner.os }}-build-test-${{ env.cache-name }}
 
       - name: configure
         run: ./configure.sh
