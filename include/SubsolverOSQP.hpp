@@ -62,7 +62,7 @@ namespace LCQPanther {
             /** Set print level. */
             void setPrintlevl( bool verbose );
 
-            /** Abstract method for solving the QP.
+            /** Implementation for applying the subsolver to solve the QP.
              *
              * @param initialSolver A flag indicating whether the call should initialize the sequence.
              * @param iterations A reference to write the number of subsolver iterates to.
@@ -99,7 +99,7 @@ namespace LCQPanther {
             OSQPSettings *settings = NULL;          /**< OSQP settings. */
             OSQPData *data = NULL;                  /**< OSQP data. */
 
-            csc* H = NULL;                          /**< Hessian matrix in csc format. */
+            csc* H = NULL;                          /**< Hessian matrix in csc format (must be upper triagonal). */
             csc* A = NULL;                          /**< Constraint matrix in csc format (should contain rows of compl. sel. matrices). */
             c_float* g = NULL;                      /**< Objectives linear component in dense format. */
             c_float* l = NULL;                      /**< Lower bounds on A (should contain the bounds of the complementarity pairs). */
