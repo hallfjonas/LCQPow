@@ -12,4 +12,4 @@ build/bin/examples/warm_up_sparse
 build/bin/examples/warm_up_w_A
 build/bin/examples/OptimizeOnCircle
 
-doxygen build/Doxyfile.doxyfile
+doxygen build/Doxyfile.doxy
