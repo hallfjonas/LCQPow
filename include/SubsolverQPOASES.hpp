@@ -31,31 +31,61 @@ namespace LCQPanther {
 			/** Default constructor. */
 			SubsolverQPOASES( );
 
-            /** Constructor. */
+
+            /** Constructor for dense matrices.
+             *
+             * @param nV Number of optimization variables.
+             * @param nC Number of linear constraints (should include complementarity pairs).
+             * @param H The Hessian matrix in dense format.
+             * @param A The linear constraint matrix in dense format (should include the rows of the complementarity selector matrices).
+            */
             SubsolverQPOASES(   int nV,
                                 int nC,
                                 double* H,
                                 double* A);
 
-            /** Constructor. */
+
+            /** Constructor for sparse matrices.
+             *
+             * @param nV Number of optimization variables.
+             * @param nC Number of linear constraints (should include complementarity pairs).
+             * @param H The Hessian matrix in sparse csc format.
+             * @param A The linear constraint matrix in sparse csc format (should include the rows of the complementarity selector matrices).
+            */
             SubsolverQPOASES(   int nV,
                                 int nC,
                                 csc* H,
                                 csc* A);
 
+
             /** Copy constructor. */
             SubsolverQPOASES(const SubsolverQPOASES& rhs);
+
 
             /** Destructor. */
             ~SubsolverQPOASES();
 
+
             /** Assignment operator (deep copy). */
             virtual SubsolverQPOASES& operator=(const SubsolverQPOASES& rhs);
+
 
             /** Setting the user options. */
             void setOptions( qpOASES::Options options );
 
-            /** Run qpOASES solver. */
+
+            /** Implementation for applying the subsolver to solve the QP.
+             *
+             * @param initialSolver A flag indicating whether the call should initialize the sequence.
+             * @param iterations A reference to write the number of subsolver iterates to.
+             * @param _g The (potentially) updated objective linear component.
+             * @param _lbA The (potentially) updated lower bounds of the linear constraints.
+             * @param _ubA The (potentially) updated upper bounds of the linear constraints.
+             * @param _x0 The primal initial guess. NULL pointer can be passed.
+             * @param _y0 The dual initial guess. NULL pointer can be passed.
+             * @param _lb The (potentially) updated lower box constraints. NULL pointer can be passed.
+             * @param _ub The (potentially) updated upper box constraints. NULL pointer can be passed.
+            */
             ReturnValue solve(  bool initialSolve, int& iterations,
                                 const double* const _g,
                                 const double* const _lbA,
@@ -65,7 +95,12 @@ namespace LCQPanther {
                                 const double* const _lb = 0,
                                 const double* const _ub = 0 );
 
-            /** Write solution to x. */
+
+			/** Get the primal and dual solution.
+             *
+             * @param x Pointer to the (assumed to be allocated) primal solution vector.
+             * @param y Pointer to the (assumed to be allocated) dual solution vector.
+            */
             void getSolution( double* x, double* y );
 
         protected:
@@ -73,28 +108,26 @@ namespace LCQPanther {
             void copy(const SubsolverQPOASES& rhs);
 
         private:
-            int nV;
-            int nC;
+            int nV;                                     /**< Number of optimization variables. */
+            int nC;                                     /**< Total number of dual variables. */
 
-            // Dense types
-            double* H = NULL;
-            double* A = NULL;
+            bool isSparse = false;                      /**< A flag storing whether data is given in sparse or dense format. */
 
-            bool isSparse = false;
+            double* H = NULL;                           /**< Hessian matrix in dense format. */
+            double* A = NULL;                           /**< Constraint matrix in dense format (should contain rows of compl. sel. matrices). */
 
-            // Sparse types (must be of generic types for duplicate method)
-            qpOASES::SymSparseMat* H_sparse = NULL;
-            qpOASES::SparseMatrix* A_sparse = NULL;
+            qpOASES::SymSparseMat* H_sparse = NULL;     /**< Hessian matrix as qpOASES symmetric sparse matrix. */
+            qpOASES::SparseMatrix* A_sparse = NULL;     /**< Constraint matrix as qpOASES sparse matrix (should contain rows of compl. sel. matrices). */
 
-            double* H_x = NULL;
-            int* H_i = NULL;
-            int* H_p = NULL;
+            double* H_x = NULL;                         /**< Hessian matrix sparse data (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
+            int* H_i = NULL;                            /**< Hessian matrix sparse rows (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
+            int* H_p = NULL;                            /**< Hessian matrix sparse col pointers (required because one cannot copy a symmetric(sprase) qpOASES mat                           rix). */
 
-            double* A_x = NULL;
-            int* A_i = NULL;
-            int* A_p = NULL;
+            double* A_x = NULL;                         /**< Constraint matrix sparse data (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
+            int* A_i = NULL;                            /**< Constraint matrix sparse rows (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
+            int* A_p = NULL;                            /**< Constraint matrix sparse col pointers (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
 
-            qpOASES::QProblem qp;
+            qpOASES::QProblem qp;                       /**< Store a QP class and call it sequentially (using its hotstart functionality). */
     };
 }
 
