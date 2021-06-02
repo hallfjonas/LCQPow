@@ -176,6 +176,7 @@ namespace LCQPanther {
         // Solve Problem
         exitflag = osqp_solve(work);
 
+        // Get number of iterations
         iterations = work->info->iter;
 
         // Either pass error
