@@ -35,6 +35,18 @@ option(
     ON
 )
 
+option(
+    BUILD_DOCUMENTATION
+    "Option to build documentation."
+    ON
+)
+
+option(
+    UNIT_TESTS
+    "Option to build and run unit tests."
+    ON
+)
+
 ## DOWNLOAD AND CHECK ALL SUBMODULES ---- from Code, Tech, and Tutorials ----------------
 find_package(Git QUIET)
 if (GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
@@ -161,19 +173,53 @@ if (${BUILD_EXAMPLES})
 endif()
 
 ## Build unit tests ---------------------------------------------------------------------
-# Add Unit testing source file
-add_executable(RunUnitTests test/RunUnitTests.cpp)
-set_target_properties(
-    RunUnitTests
-    PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
-)
+if (${UNIT_TESTS})
+    # Add Unit testing source file
+    add_executable(RunUnitTests test/RunUnitTests.cpp)
+    set_target_properties(
+        RunUnitTests
+        PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
+    )
 
-# Add libraries: gtest, qpOASES, OSQP
-target_link_libraries(
-    RunUnitTests
-    PUBLIC ${PROJECT_NAME}-shared
-    PRIVATE qpOASES osqp gtest
-)
+    # Add libraries: gtest, qpOASES, OSQP
+    target_link_libraries(
+        RunUnitTests
+        PUBLIC ${PROJECT_NAME}-shared
+        PRIVATE qpOASES osqp gtest
+    )
+endif()
+
+## Build documentation
+if (${BUILD_DOCUMENTATION})
+    find_package(
+        Doxygen
+        REQUIRED dot
+    )
+
+    if (DOXYGEN_FOUND)
+        message(
+            STATUS
+            "Found doxygen: Building documentation."
+        )
+
+        doxygen_add_docs(
+            doxy
+            "include"
+        )
+
+        set(DOXYGEN_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../docs")
+
+        set(DOXYGEN_GENERATE_HTML YES)
+        set(DOXYGEN_GENERATE_MAN YES)
+
+        set(DOXYGEN_PROJECT_BRIEF "LCQPanther -- A Linear Complementarity Quadratic Programming Solver")
+    else()
+        message(
+            WARNING
+            "Could not find doxygen: Not building documentation."
+        )
+    endif()
+endif()
 
 ## End of cmake file --------------------------------------------------------------------
