@@ -84,10 +84,10 @@ namespace LCQPanther {
 
         private:
             // The solver type
-            QPSolver qpSolver;        	/**< Inidicating which qpSolver to use. */
+            QPSolver qpSolver;                      /**< Inidicating which qpSolver to use. */
 
             // The different solvers
-        	SubsolverQPOASES solverQPOASES;			/**< When using qpOASES. */
+        	SubsolverQPOASES solverQPOASES;         /**< When using qpOASES. */
 			SubsolverOSQP solverOSQP;				/**< When using OSQP. */
 
             // Options and settings
