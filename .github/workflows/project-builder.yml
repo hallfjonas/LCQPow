@@ -15,10 +15,12 @@ jobs:
 
       - name: configure
         if : steps.cache-path.outputs.cache-hit != 'true'
-        run: /configure.sh
+        run: ./configure.sh
 
       - name: build
-        run: /build.sh
+        if : steps.cache-path.outputs.cache-hit != 'true'
+        run: ./build.sh
 
       - name: run
-        run: /run.sh
+        if : steps.cache-path.outputs.cache-hit != 'true'
+        run: ./run.sh
