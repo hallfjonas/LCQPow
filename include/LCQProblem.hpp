@@ -219,8 +219,12 @@ namespace LCQPanther {
 				const char* const y0_file = 0
 			);
 
-			/** After problem is set up, call this function and solve LCQP. */
+
+			/** After problem is set up, call this function and solve the LCQP.
+			 *
+			 * @returns SUCCESSFUL_RETURN if a solution is found. Otherwise the return value will indicate an occured error. */
 			ReturnValue runSolver( );
+
 
 			/** Writes the primal solution vector.
 			 *
