@@ -10,11 +10,15 @@ jobs:
       - name: install-depends
         run: sudo apt-get install doxygen graphviz
 
-      - name: configure
-        run: ./configure.sh;
-
       - name: build
-        run: ./configure.sh; ./build.sh
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-dir
+          path: build
+        run: ./build.sh;
 
       - name: run
-        run: ./configure.sh; ./build.sh; ./run.sh
+        uses: actions/download-artifact@v2
+        with:
+          name: build-dir
+        run: ./run.sh
