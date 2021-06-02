@@ -9,13 +9,9 @@ jobs:
 
       - name: chaching
         uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
         with:
-          path: ~/.npm
-          key: ${{ runner.OS }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.OS }}-npm-cache-
+          path: cache-path
+          key: ${{ runner.os }}-cache
 
       - name: configure
         run: ./configure.sh
