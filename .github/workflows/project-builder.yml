@@ -11,14 +11,7 @@ jobs:
         run: sudo apt-get install doxygen graphviz
 
       - name: build
-        uses: actions/upload-artifact@v2
-        with:
-          name: build-dir
-          path: build
         run: ./build.sh;
 
       - name: run
-        uses: actions/download-artifact@v2
-        with:
-          name: build-dir
-        run: ./run.sh
+        run: ./build.sh; ./run.sh
