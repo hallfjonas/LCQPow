@@ -1,26 +1,22 @@
 name: CI build and run
 on: [push]
 jobs:
-  config-build-test:
+  configure:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+      - run: ./configure.sh
 
-      - name: chaching
-        uses: actions/cache@v2
-        with:
-          path: cache-path
-          key: ${{ runner.os }}-cache
+  build:
+    needs: configure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: ./configure.sh; ./build.sh
 
-      - name: configure
-        if : steps.cache-path.outputs.cache-hit != 'true'
-        run: ./configure.sh
-
-      - name: build
-        if : steps.cache-path.outputs.cache-hit != 'true'
-        run: ./build.sh
-
-      - name: run
-        if : steps.cache-path.outputs.cache-hit != 'true'
-        run: ./run.sh
+  run:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: ./configure.sh; ./build.sh; ./run.sh
