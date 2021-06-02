@@ -1,22 +1,17 @@
 name: CI build and run
 on: [push]
 jobs:
-  configure:
+  config-build-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - run: ./configure.sh
+      - name: checkout
+        uses: actions/checkout@v2
 
-  build:
-    needs: configure
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - run: ./configure.sh; ./build.sh
+      - name: configure
+        run: ./configure.sh
 
-  run:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - run: ./configure.sh; ./build.sh; ./run.sh
+      - name: build
+        run: ./build.sh
+
+      - name: run
+        run: ./run.sh
