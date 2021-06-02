@@ -976,7 +976,6 @@ namespace LCQPanther {
 
 			// Add some +/- EPS to each coordinate
 			perturbGradient();
-			// perturbStep();
 		}
 
 		// Update Qk = H + rho*C (only required on first inner iteration)
