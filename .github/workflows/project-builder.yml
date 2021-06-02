@@ -14,10 +14,11 @@ jobs:
           key: ${{ runner.os }}-cache
 
       - name: configure
-        run: ./configure.sh
+        if : steps.cache-path.outputs.cache-hit != 'true'
+        run: /configure.sh
 
       - name: build
-        run: ./build.sh
+        run: /build.sh
 
       - name: run
-        run: ./run.sh
+        run: /run.sh
