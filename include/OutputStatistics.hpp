@@ -32,8 +32,14 @@ namespace LCQPanther {
             /** Default constructor. */
             OutputStatistics( );
 
+            /** Assignment operator.
+             *
+             * @param rhs The obejct from which to assign.
+            */
             OutputStatistics& operator=( const OutputStatistics& rhs );
 
+
+            /** Resets the statistics. */
             void reset( );
 
             /** Update total iteration counter.

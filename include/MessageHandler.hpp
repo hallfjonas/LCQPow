@@ -30,10 +30,23 @@ namespace LCQPanther {
     class MessageHandler {
 
         public:
+            /** Print a message.
+             *
+             * @param ret A return value which will impact the print message.
+             *
+             * @returns Simply passes the return value that was given. */
             static ReturnValue PrintMessage( ReturnValue ret );
 
+
+            /** Print a solution status.
+             *
+             * @param algoStat The status to be printed.
+             *
+             * @returns Simply passes the algorithm status that was given. */
             static AlgorithmStatus PrintSolution( AlgorithmStatus algoStat );
 
+
+            /** Prints a solution tag. */
             static void PrintSolutionLine( );
     };
 }

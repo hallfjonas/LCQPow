@@ -22,9 +22,8 @@
 #include <cstring>
 
 namespace LCQPanther {
-	/*
-	*	s e t H
-	*/
+
+
 	inline ReturnValue LCQProblem::setH( const double* const H_new )
 	{
 		if (nV <= 0)
@@ -37,9 +36,6 @@ namespace LCQPanther {
 	}
 
 
-	/*
-	*	s e t G
-	*/
 	inline ReturnValue LCQProblem::setG( const double* const g_new )
 	{
 		if ( nV == 0 )
@@ -55,9 +51,6 @@ namespace LCQPanther {
 	}
 
 
-	/*
-	*	s e t L B
-	*/
 	inline ReturnValue LCQProblem::setLB( const double* const lb_new )
 	{
 		if ( nV == 0 )
@@ -80,9 +73,6 @@ namespace LCQPanther {
 	}
 
 
-	/*
-	*	s e t L B
-	*/
 	inline ReturnValue LCQProblem::setLB( int number, double value )
 	{
 		if ( nV == 0 )
@@ -100,9 +90,6 @@ namespace LCQPanther {
 	}
 
 
-	/*
-	*	s e t U B
-	*/
 	inline ReturnValue LCQProblem::setUB( const double* const ub_new )
 	{
 		if ( nV == 0 )
@@ -125,9 +112,6 @@ namespace LCQPanther {
 	}
 
 
-	/*
-	*	s e t U B
-	*/
 	inline ReturnValue LCQProblem::setUB( int number, double value )
 	{
 		if ( nV == 0 )
@@ -145,9 +129,7 @@ namespace LCQPanther {
 		}
 	}
 
-	/*
-	 *	 s e t I n i t i a l G u e s s
-	 */
+
 	inline ReturnValue LCQProblem::setInitialGuess( const double* const _x0, const double* const _y0 )
 	{
 		if ( nV == 0 || nComp == 0)
@@ -169,15 +151,9 @@ namespace LCQPanther {
 		return SUCCESSFUL_RETURN;
 	}
 
-	/*
-	 *	s e t O p t i o n s
-	 */
+
 	inline void LCQProblem::setOptions( const Options& _options )
 	{
 		options = _options;
 	}
 }
-
-/*
- *	end of file
- */

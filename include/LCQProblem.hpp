@@ -36,9 +36,7 @@ using qpOASES::QProblem;
 namespace LCQPanther {
 	class LCQProblem
 	{
-		/*
-		*	PUBLIC MEMBER FUNCTIONS
-		*/
+
 		public:
 
 			/** Default constructor. */
@@ -578,8 +576,3 @@ namespace LCQPanther {
 #include "LCQProblem.ipp"
 
 #endif	/* LCQPanther_LCQPROBLEM_HPP */
-
-
-/*
- *	end of file
- */
