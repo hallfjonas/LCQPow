@@ -12,8 +12,10 @@ jobs:
         env:
           cache-name: cache-node-modules
         with:
-          path: ~/.cache-module
-          key: ${{ runner.os }}-build-test-${{ env.cache-name }}
+          path: ~/.npm
+          key: ${{ runner.OS }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-npm-cache-
 
       - name: configure
         run: ./configure.sh
