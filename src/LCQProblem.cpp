@@ -780,7 +780,7 @@ namespace LCQPanther {
 			Subsolver tmp(nV, nDuals, H_sparse, A_sparse, options.getQPSolver());
 			subsolver = tmp;
 		} else {
-			return ReturnValue::INVALID_QPSOLVER;
+			return ReturnValue::NOT_YET_IMPLEMENTED;
 		}
 
 		// Initialize variables and counters
