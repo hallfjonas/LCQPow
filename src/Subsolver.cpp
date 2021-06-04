@@ -45,17 +45,14 @@ namespace LCQPanther {
     {
         qpSolver = _qpSolver;
 
-        if (qpSolver == QPSolver::OSQP_SPARSE) {
+        if (qpSolver == QPSolver::QPOASES_SPARSE) {
+            SubsolverQPOASES tmp(nV, nC, H, A );
+            solverQPOASES = tmp;
+        } else if (qpSolver == QPSolver::OSQP_SPARSE) {
             SubsolverOSQP tmp(H, A);
             solverOSQP = tmp;
         } else {
-            if (QPSolver::QPOASES_DENSE <= qpSolver || qpSolver > QPSolver::QPOASES_SPARSE) {
-                MessageHandler::PrintMessage( ReturnValue::INVALID_QPSOLVER );
-            }
-
-            // Use qpOASES per default (or if qpOASES sparse was passed).
-            SubsolverQPOASES tmp(nV, nC, H, A );
-            solverQPOASES = tmp;
+            MessageHandler::PrintMessage( ReturnValue::INVALID_QPSOLVER );
         }
     }
 
