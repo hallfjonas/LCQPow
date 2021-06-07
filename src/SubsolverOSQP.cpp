@@ -37,34 +37,21 @@ namespace LCQPanther {
     SubsolverOSQP::SubsolverOSQP(   const csc* const _H, const csc* const _A)
     {
         // Store dimensions
-        nVars = _H->n;
-        nDuals = _A->m;
+        nV = _H->n;
+        nC = _A->m;
 
-        // Allocate memory
+        // Allocate memory for settings
         settings = (OSQPSettings *)c_malloc(sizeof(OSQPSettings));
-        data = (OSQPData *)c_malloc(sizeof(OSQPData));
 
         // Copy matrices
         H = Utilities::copyCSC(_H, true);
         A = Utilities::copyCSC(_A);
-        g = new c_float[nVars];
-        l = new c_float[nDuals];
-        u = new c_float[nDuals];
-
-        // Fill data
-        data->n = nVars;
-        data->m = nDuals;
-        data->P = H;
-        data->A = A;
 
         // Define solver settings
         osqp_set_default_settings(settings);
         settings->eps_prim_inf = Utilities::ZERO;
         settings->verbose = false;
         settings->polish = true;
-
-        // Setup workspace
-        osqp_setup(&work, data, settings);
     }
 
 
@@ -95,28 +82,13 @@ namespace LCQPanther {
         }
 
         if (H != 0) {
-            csc_spfree(H);
+            Utilities::ClearSparseMat(H);
             H = NULL;
         }
 
         if (A != 0) {
-            csc_spfree(A);
+            Utilities::ClearSparseMat(A);
             A = NULL;
-        }
-
-        if (g != 0) {
-            delete[] g;
-            g = NULL;
-        }
-
-        if (l != 0) {
-            delete[] l;
-            l = NULL;
-        }
-
-        if (u != 0) {
-            delete[] u;
-            u = NULL;
         }
     }
 
@@ -155,18 +127,37 @@ namespace LCQPanther {
             return ReturnValue::INVALID_OSQP_BOX_CONSTRAINTS;
         }
 
+        // Setup workspace on initial solve
+        if (initialSolve) {
+
+            double* l = (double*)malloc((size_t)nC*sizeof(double));
+            double* u = (double*)malloc((size_t)nC*sizeof(double));
+            double* g = (double*)malloc((size_t)nV*sizeof(double));
+            memcpy(l, _lb, (size_t)nC*sizeof(double));
+            memcpy(u, _ub, (size_t)nC*sizeof(double));
+            memcpy(g, _g, (size_t)nV*sizeof(c_float));
+
+            data = (OSQPData *)c_malloc(sizeof(OSQPData));
+            data->n = nV;
+            data->m = nC;
+            data->P = H;
+            data->A = A;
+            data->q = g;
+            data->l = l;
+            data->u = u;
+            osqp_setup(&work, data, settings);
+        } else {
+            // Update linear cost and bounds
+            osqp_update_lin_cost(work, _g);
+            osqp_update_bounds(work, _lbA, _ubA);
+        }
+
         if (work == 0) {
             return ReturnValue::OSQP_WORKSPACE_NOT_SET_UP;
         }
 
-        // Update linear cost and bounds
-        osqp_update_lin_cost(work, _g);
-        osqp_update_bounds(work, _lbA, _ubA);
-
-        int exitflag;
-
         // Solve Problem
-        exitflag = osqp_solve(work);
+        int exitflag = osqp_solve(work);
 
         // Get number of iterations
         iterations = work->info->iter;
@@ -185,11 +176,11 @@ namespace LCQPanther {
         OSQPSolution *sol(work->solution);
 
         if (sol->x != 0) {
-            memcpy(x, sol->x, (size_t)nVars*(sizeof(double)));
+            memcpy(x, sol->x, (size_t)nV*(sizeof(double)));
         }
 
         // Copy duals with negative sign
-        for (int i = 0; i < nDuals; i++) {
+        for (int i = 0; i < nC; i++) {
             y[i] = -sol->y[i];
         }
     }
@@ -199,32 +190,34 @@ namespace LCQPanther {
     {
         clear();
 
-        nVars = rhs.nVars;
-        nDuals = rhs.nDuals;
+        nV = rhs.nV;
+        nC = rhs.nC;
 
         H = copy_csc_mat(rhs.H);
         A = copy_csc_mat(rhs.A);
-        g = new c_float[nVars];
-        l = new c_float[nDuals];
-        u = new c_float[nDuals];
-        memcpy(g, rhs.g, (size_t)nVars*sizeof(c_float));
-        memcpy(l, rhs.l, (size_t)nDuals*sizeof(c_float));
-        memcpy(u, rhs.u, (size_t)nDuals*sizeof(c_float));
 
-        // Copy data
-        data = (OSQPData *)c_malloc(sizeof(OSQPData));
-        data->n = rhs.data->n;
-        data->m = rhs.data->m;
-        data->P = H;
-        data->A = A;
-        data->q = g;
-        data->l = l;
-        data->u = u;
+        if (rhs.settings != 0) {
+            settings = copy_settings(rhs.settings);
+        }
 
-        // Copy settings
-        settings = copy_settings(rhs.settings);
+        if (rhs.data != 0) {
+            double* l = (double*)malloc((size_t)nC*sizeof(double));
+            double* u = (double*)malloc((size_t)nC*sizeof(double));
+            double* g = (double*)malloc((size_t)nV*sizeof(double));
+            memcpy(l, rhs.data->l, (size_t)nC*sizeof(double));
+            memcpy(u, rhs.data->u, (size_t)nC*sizeof(double));
+            memcpy(g, rhs.data->q, (size_t)nV*sizeof(c_float));
 
-        // Setup workspace
-        osqp_setup(&work, data, settings);
+            data = (OSQPData *)c_malloc(sizeof(OSQPData));
+            data->n = nV;
+            data->m = nC;
+            data->P = H;
+            data->A = A;
+            data->q = g;
+            data->l = l;
+            data->u = u;
+
+            osqp_setup(&work, data, settings);
+        }
     }
 }

@@ -92,8 +92,8 @@ namespace LCQPanther {
             void copy(const SubsolverOSQP& rhs);
 
         private:
-            int nVars;                              /**< Number of optimization variables. */
-            int nDuals;                             /**< Total number of dual variables. */
+            int nV;                                 /**< Number of optimization variables. */
+            int nC;                                 /**< Number of constraints. */
 
             OSQPWorkspace *work = NULL;             /**< OSQP workspace. */
             OSQPSettings *settings = NULL;          /**< OSQP settings. */
@@ -101,9 +101,6 @@ namespace LCQPanther {
 
             csc* H = NULL;                          /**< Hessian matrix in csc format (must be upper triagonal). */
             csc* A = NULL;                          /**< Constraint matrix in csc format (should contain rows of compl. sel. matrices). */
-            c_float* g = NULL;                      /**< Objectives linear component in dense format. */
-            c_float* l = NULL;                      /**< Lower bounds on A (should contain the bounds of the complementarity pairs). */
-            c_float* u = NULL;                      /**< Upper bounds on A (should contain the bounds of the complementarity pairs). */
     };
 }
 
