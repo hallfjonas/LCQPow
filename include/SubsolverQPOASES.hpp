@@ -112,6 +112,7 @@ namespace LCQPanther {
             int nC;                                     /**< Total number of dual variables. */
 
             bool isSparse = false;                      /**< A flag storing whether data is given in sparse or dense format. */
+            bool useSchur = false;                      /**< A flag indicating whether to use the Shur Complement method. */
 
             double* H = NULL;                           /**< Hessian matrix in dense format. */
             double* A = NULL;                           /**< Constraint matrix in dense format (should contain rows of compl. sel. matrices). */
@@ -128,6 +129,8 @@ namespace LCQPanther {
             int* A_p = NULL;                            /**< Constraint matrix sparse col pointers (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
 
             qpOASES::QProblem qp;                       /**< Store a QP class and call it sequentially (using its hotstart functionality). */
+            qpOASES::SQProblemSchur qpSchur;            /**< Store a Schur Complement QP class and call it sequentially (using its hotstart functionality). */
+
     };
 }
 
