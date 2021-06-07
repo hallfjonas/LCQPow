@@ -19,20 +19,16 @@
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <SubsolverQPOASES.hpp>
+#include "SubsolverQPOASES.hpp"
+
 #include <qpOASES.hpp>
 
 namespace LCQPanther {
 
-    /*
-     *   S u b s o l v e r O S Q P
-     */
+
     SubsolverQPOASES::SubsolverQPOASES( ) { }
 
 
-    /*
-     *   S u b s o l v e r Q P O A S E S
-     */
     SubsolverQPOASES::SubsolverQPOASES( int _nV, int _nC,
                                         double* _H, double* _A)
     {
@@ -102,17 +98,13 @@ namespace LCQPanther {
         A_sparse->createDiagInfo();
     }
 
-    /*
-     *   S u b s o l v e r O  S Q P
-     */
+
     SubsolverQPOASES::SubsolverQPOASES(const SubsolverQPOASES& rhs)
     {
         copy( rhs );
     }
 
-    /*
-     *   ~ S u b s o l v e r Q P O A S E S
-     */
+
     SubsolverQPOASES::~SubsolverQPOASES()
     {
         if (H != 0) {
@@ -160,9 +152,7 @@ namespace LCQPanther {
         }
     }
 
-    /*
-     *   o p e r a t o r =
-     */
+
     SubsolverQPOASES& SubsolverQPOASES::operator=(const SubsolverQPOASES& rhs)
     {
         if (this != &rhs) {
@@ -173,9 +163,6 @@ namespace LCQPanther {
     }
 
 
-    /*
-     *   s e t O p t i o n s
-     */
     void SubsolverQPOASES::setOptions( qpOASES::Options options )
     {
         if (useSchur) {
@@ -186,9 +173,6 @@ namespace LCQPanther {
     }
 
 
-    /*
-     *   s o l v e
-     */
     ReturnValue SubsolverQPOASES::solve(    bool initialSolve, int& iterations,
                                             const double* const g,
                                             const double* const lbA, const double* const ubA,
@@ -226,9 +210,6 @@ namespace LCQPanther {
     }
 
 
-    /*
-     *   g e t P r i m a l S o l u t i o n
-     */
     void SubsolverQPOASES::getSolution( double* x, double* y )
     {
         if (useSchur) {
@@ -241,9 +222,6 @@ namespace LCQPanther {
     }
 
 
-    /*
-     *   c o p y
-     */
     void SubsolverQPOASES::copy(const SubsolverQPOASES& rhs)
     {
         nV = rhs.nV;
