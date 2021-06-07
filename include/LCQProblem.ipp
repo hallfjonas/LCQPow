@@ -1,30 +1,29 @@
 /*
- *	This file is part of lcqpOASES.
+ *	This file is part of LCQPanther.
  *
- *	lcqpOASES -- A Solver for Quadratic Programs with Commplementarity Constraints.
+ *	LCQPanther -- A Solver for Quadratic Programs with Commplementarity Constraints.
  *	Copyright (C) 2020 - 2021 by Jonas Hall et al.
  *
- *	lcqpOASES is free software; you can redistribute it and/or
+ *	LCQPanther is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
  *	License as published by the Free Software Foundation; either
  *	version 2.1 of the License, or (at your option) any later version.
  *
- *	lcqpOASES is distributed in the hope that it will be useful,
+ *	LCQPanther is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
- *	License along with lcqpOASES; if not, write to the Free Software
+ *	License along with LCQPanther; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 #include <cstring>
 
-namespace lcqpOASES {
-	/*
-	*	s e t H
-	*/
+namespace LCQPanther {
+
+
 	inline ReturnValue LCQProblem::setH( const double* const H_new )
 	{
 		if (nV <= 0)
@@ -37,9 +36,6 @@ namespace lcqpOASES {
 	}
 
 
-	/*
-	*	s e t G
-	*/
 	inline ReturnValue LCQProblem::setG( const double* const g_new )
 	{
 		if ( nV == 0 )
@@ -55,9 +51,6 @@ namespace lcqpOASES {
 	}
 
 
-	/*
-	*	s e t L B
-	*/
 	inline ReturnValue LCQProblem::setLB( const double* const lb_new )
 	{
 		if ( nV == 0 )
@@ -80,9 +73,6 @@ namespace lcqpOASES {
 	}
 
 
-	/*
-	*	s e t L B
-	*/
 	inline ReturnValue LCQProblem::setLB( int number, double value )
 	{
 		if ( nV == 0 )
@@ -100,9 +90,6 @@ namespace lcqpOASES {
 	}
 
 
-	/*
-	*	s e t U B
-	*/
 	inline ReturnValue LCQProblem::setUB( const double* const ub_new )
 	{
 		if ( nV == 0 )
@@ -125,9 +112,6 @@ namespace lcqpOASES {
 	}
 
 
-	/*
-	*	s e t U B
-	*/
 	inline ReturnValue LCQProblem::setUB( int number, double value )
 	{
 		if ( nV == 0 )
@@ -145,9 +129,7 @@ namespace lcqpOASES {
 		}
 	}
 
-	/*
-	 *	 s e t I n i t i a l G u e s s
-	 */
+
 	inline ReturnValue LCQProblem::setInitialGuess( const double* const _x0, const double* const _y0 )
 	{
 		if ( nV == 0 || nComp == 0)
@@ -169,15 +151,9 @@ namespace lcqpOASES {
 		return SUCCESSFUL_RETURN;
 	}
 
-	/*
-	 *	s e t O p t i o n s
-	 */
+
 	inline void LCQProblem::setOptions( const Options& _options )
 	{
 		options = _options;
 	}
 }
-
-/*
- *	end of file
- */

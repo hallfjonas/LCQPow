@@ -1,21 +1,21 @@
 /*
- *	This file is part of lcqpOASES.
+ *	This file is part of LCQPanther.
  *
- *	lcqpOASES -- A Solver for Quadratic Programs with Commplementarity Constraints.
+ *	LCQPanther -- A Solver for Quadratic Programs with Commplementarity Constraints.
  *	Copyright (C) 2020 - 2021 by Jonas Hall et al.
  *
- *	lcqpOASES is free software; you can redistribute it and/or
+ *	LCQPanther is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
  *	License as published by the Free Software Foundation; either
  *	version 2.1 of the License, or (at your option) any later version.
  *
- *	lcqpOASES is distributed in the hope that it will be useful,
+ *	LCQPanther is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
- *	License along with lcqpOASES; if not, write to the Free Software
+ *	License along with LCQPanther; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
@@ -128,17 +128,17 @@ int main(int argc, char **argv) {
         y0f = &y0f[0];
     }
 
-    lcqpOASES::LCQProblem lcqp( nV, nC, nComp );
+    LCQPanther::LCQProblem lcqp( nV, nC, nComp );
 
-    lcqpOASES::Options opts;
-    opts.setPrintLevel( lcqpOASES::PrintLevel::INNER_LOOP_ITERATES );
-    opts.setQPSolver( lcqpOASES::QPSolver::QPOASES_SPARSE_SCHUR);
+    LCQPanther::Options opts;
+    opts.setPrintLevel( LCQPanther::PrintLevel::INNER_LOOP_ITERATES );
+    opts.setQPSolver( LCQPanther::QPSolver::QPOASES_SPARSE);
     lcqp.setOptions( opts );
 
     // Run solver
-	lcqpOASES::ReturnValue ret = lcqp.loadLCQP( &H_file[0], &g_file[0], &S1_file[0], &S2_file[0], Af, lbAf, ubAf, &lb_file[0], &ub_file[0], x0f, y0f );
+	LCQPanther::ReturnValue ret = lcqp.loadLCQP( &H_file[0], &g_file[0], &S1_file[0], &S2_file[0], Af, lbAf, ubAf, &lb_file[0], &ub_file[0], x0f, y0f );
 
-    if (ret != lcqpOASES::SUCCESSFUL_RETURN)
+    if (ret != LCQPanther::SUCCESSFUL_RETURN)
     {
         printf("Failed to load LCQP.\n");
         return 1;
@@ -146,7 +146,7 @@ int main(int argc, char **argv) {
 
     ret = lcqp.runSolver();
 
-    if (ret != lcqpOASES::SUCCESSFUL_RETURN)
+    if (ret != LCQPanther::SUCCESSFUL_RETURN)
     {
         printf("Failed to solve LCQP.\n");
         return 1;

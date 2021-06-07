@@ -1,58 +1,62 @@
 /*
- *	This file is part of lcqpOASES.
+ *	This file is part of LCQPanther.
  *
- *	lcqpOASES -- A Solver for Quadratic Programs with Commplementarity Constraints.
+ *	LCQPanther -- A Solver for Quadratic Programs with Commplementarity Constraints.
  *	Copyright (C) 2020 - 2021 by Jonas Hall et al.
  *
- *	lcqpOASES is free software; you can redistribute it and/or
+ *	LCQPanther is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
  *	License as published by the Free Software Foundation; either
  *	version 2.1 of the License, or (at your option) any later version.
  *
- *	lcqpOASES is distributed in the hope that it will be useful,
+ *	LCQPanther is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
- *	License along with lcqpOASES; if not, write to the Free Software
+ *	License along with LCQPanther; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef LCQPOASES_SUBSOLVER_HPP
-#define LCQPOASES_SUBSOLVER_HPP
+#ifndef LCQPanther_SUBSOLVER_HPP
+#define LCQPanther_SUBSOLVER_HPP
 
 #include "SubsolverQPOASES.hpp"
 #include "SubsolverOSQP.hpp"
 
-namespace lcqpOASES {
+namespace LCQPanther {
 
     class Subsolver {
         public:
 			/** Default constructor. */
 			Subsolver( );
 
-            /** Constructor for dense matrices (qpOASES). */
+            /** Constructor for dense matrices (qpOASES).
+             *
+             * @param nV The number of optimization variables.
+             * @param nC The number of linear constraints (should include the complementarity pairs).
+             * @param H The Hessian matrix in dense format.
+             * @param A The linear constraint matrix (should include the rows of the complementarity selector matrices).
+            */
             Subsolver(  int nV,
                         int nC,
                         double* H,
                         double* A );
 
-            /** Constructor for sparse matrices (qpOASES). */
+            /** Constructor for sparse matrices (qpOASES/OSQP).
+             *
+             * @param nV The number of optimization variables.
+             * @param nC The number of linear constraints (should include the complementarity pairs).
+             * @param H The Hessian matrix in sparse csc format.
+             * @param A The linear constraint matrix in sparse csc format (should include the rows of the complementarity selector matrices).
+             * @param qpSolver The QP subproblem solver to be used.
+            */
             Subsolver(  int nV,
                         int nC,
                         csc* H,
                         csc* A,
-                        bool useSchur);
-
-            /** Constructor for sparse matrices (OSQP). */
-            Subsolver(  int nV,
-                        int nC,
-                        csc* H,
-                        csc* A,
-                        const double* g,
-                        const double* l,
-                        const double* u);
+                        QPSolver qpSolver);
 
             /** Copy constructor. */
             Subsolver(const Subsolver& rhs);
@@ -80,10 +84,10 @@ namespace lcqpOASES {
 
         private:
             // The solver type
-            QPSolver qpSolver;        	/**< Inidicating which qpSolver to use. */
+            QPSolver qpSolver;                      /**< Inidicating which qpSolver to use. */
 
             // The different solvers
-        	SubsolverQPOASES solverQPOASES;			/**< When using qpOASES. */
+        	SubsolverQPOASES solverQPOASES;         /**< When using qpOASES. */
 			SubsolverOSQP solverOSQP;				/**< When using OSQP. */
 
             // Options and settings
@@ -91,4 +95,4 @@ namespace lcqpOASES {
     };
 }
 
-#endif  // LCQPOASES_SUBSOLVER_HPP
+#endif  // LCQPanther_SUBSOLVER_HPP

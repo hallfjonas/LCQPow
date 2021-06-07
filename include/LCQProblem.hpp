@@ -1,42 +1,42 @@
 /*
- *	This file is part of lcqpOASES.
+ *	This file is part of LCQPanther.
  *
- *	lcqpOASES -- A Solver for Quadratic Programs with Commplementarity Constraints.
+ *	LCQPanther -- A Solver for Quadratic Programs with Commplementarity Constraints.
  *	Copyright (C) 2020 - 2021 by Jonas Hall et al.
  *
- *	lcqpOASES is free software; you can redistribute it and/or
+ *	LCQPanther is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
  *	License as published by the Free Software Foundation; either
  *	version 2.1 of the License, or (at your option) any later version.
  *
- *	lcqpOASES is distributed in the hope that it will be useful,
+ *	LCQPanther is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
- *	License along with lcqpOASES; if not, write to the Free Software
+ *	License along with LCQPanther; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 
-#ifndef LCQPOASES_LCQPROBLEM_HPP
-#define LCQPOASES_LCQPROBLEM_HPP
+#ifndef LCQPanther_LCQPROBLEM_HPP
+#define LCQPanther_LCQPROBLEM_HPP
 
 #include "Utilities.hpp"
 #include "Subsolver.hpp"
+#include "OutputStatistics.hpp"
+#include "Options.hpp"
 
 #include <qpOASES.hpp>
 #include <vector>
 
 using qpOASES::QProblem;
 
-namespace lcqpOASES {
+namespace LCQPanther {
 	class LCQProblem
 	{
-		/*
-		*	PUBLIC MEMBER FUNCTIONS
-		*/
+
 		public:
 
 			/** Default constructor. */
@@ -217,8 +217,12 @@ namespace lcqpOASES {
 				const char* const y0_file = 0
 			);
 
-			/** After problem is set up, call this function and solve LCQP. */
+
+			/** After problem is set up, call this function and solve the LCQP.
+			 *
+			 * @returns SUCCESSFUL_RETURN if a solution is found. Otherwise the return value will indicate an occured error. */
 			ReturnValue runSolver( );
+
 
 			/** Writes the primal solution vector.
 			 *
@@ -265,13 +269,6 @@ namespace lcqpOASES {
 		protected:
 			/** Clears all memory. */
 			void clear( );
-
-
-			/** Copies all properties from rhs to this.
-			 *
-			 * @param rhs The LCQProblem to be copied.
-			 */
-			ReturnValue copy( const LCQProblem& rhs );
 
 
 			/** Prints concise information on the current iteration. */
@@ -578,9 +575,4 @@ namespace lcqpOASES {
 
 #include "LCQProblem.ipp"
 
-#endif	/* LCQPOASES_LCQPROBLEM_HPP */
-
-
-/*
- *	end of file
- */
+#endif	/* LCQPanther_LCQPROBLEM_HPP */

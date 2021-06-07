@@ -1,0 +1,17 @@
+name: CI build and run
+on: [push]
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: install-depends
+        run: sudo apt-get install doxygen graphviz
+
+      - name: build
+        run: ./build.sh;
+
+      - name: run
+        run: ./build.sh; ./run.sh

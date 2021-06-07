@@ -1,31 +1,33 @@
 /*
- *	This file is part of lcqpOASES.
+ *	This file is part of LCQPanther.
  *
- *	lcqpOASES -- A Solver for Quadratic Programs with Commplementarity Constraints.
+ *	LCQPanther -- A Solver for Quadratic Programs with Commplementarity Constraints.
  *	Copyright (C) 2020 - 2021 by Jonas Hall et al.
  *
- *	lcqpOASES is free software; you can redistribute it and/or
+ *	LCQPanther is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
  *	License as published by the Free Software Foundation; either
  *	version 2.1 of the License, or (at your option) any later version.
  *
- *	lcqpOASES is distributed in the hope that it will be useful,
+ *	LCQPanther is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
- *	License along with lcqpOASES; if not, write to the Free Software
+ *	License along with LCQPanther; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 
-#ifndef LCQPOASES_UTILITIES_HPP
-#define LCQPOASES_UTILITIES_HPP
+#ifndef LCQPanther_UTILITIES_HPP
+#define LCQPanther_UTILITIES_HPP
 
-#include <osqp.h>
+extern "C" {
+    #include <osqp.h>
+}
 
-namespace lcqpOASES {
+namespace LCQPanther {
 
     enum ReturnValue {
         // Special values
@@ -60,6 +62,7 @@ namespace lcqpOASES {
         FAILED_SYM_COMPLEMENTARITY_MATRIX = 204,        /**< Failed to compute the symmetric complementarity matrix C. */
         FAILED_SWITCH_TO_SPARSE = 205,                  /**< Failed to switch to sparse mode (a to be created sparse matrix was nullpointer). */
         FAILED_SWITCH_TO_DENSE = 206,                   /**< Failed to switch to dense mode (an array to be created was nullpointer). */
+        OSQP_WORKSPACE_NOT_SET_UP = 207,                /**< OSQP Workspace is not set up. */
 
         // Generic errors
         LCQPOBJECT_NOT_SETUP = 300,                     /**< Constructor has not been called. */
@@ -91,107 +94,6 @@ namespace lcqpOASES {
         QPOASES_SPARSE = 1,                             /**< QP solver qpOASES in sparse mode. */
         QPOASES_SPARSE_SCHUR = 2,                             /**< QP solver qpOASES Schur Complement Method. */
         OSQP_SPARSE = 3                                 /**< QP solver OSQP. */
-    };
-
-
-    class Options {
-
-        public:
-
-            /** Default constructor. */
-            Options( );
-
-
-            /** Copy constructor (deep copy).
-             *
-             * @param rhs The object to be copied.
-            */
-            Options( const Options& rhs );
-
-
-            /** Destructor. */
-            ~Options( );
-
-
-            /** Assignment operator.
-             *
-             * @param rhs The obejct from which to assign.
-            */
-            Options& operator=( const Options& rhs );
-
-
-            /** Sets all options to default values. */
-            void setToDefault( );
-
-            /** Get stationarity tolerance. */
-            double getStationarityTolerance( );
-
-            /** Set stationarity tolerance. */
-            ReturnValue setStationarityTolerance( double val );
-
-            /** Get complementarity tolerance. */
-            double getComplementarityTolerance( );
-
-            /** Set complementarity tolerance. */
-            ReturnValue setComplementarityTolerance( double val );
-
-            /** Get initial penalty parameter. */
-            double getInitialPenaltyParameter( );
-
-            /** Set complementarity tolerance. */
-            ReturnValue setInitialPenaltyParameter( double val );
-
-            /** Get penalty parameter update factor. */
-            double getPenaltyUpdateFactor( );
-
-            /** Set penalty parameter update factor. */
-            ReturnValue setPenaltyUpdateFactor( double val );
-
-            /** Get whether to solve for (complement.) unconstrained global minumum first. */
-            bool getSolveZeroPenaltyFirst( );
-
-            /** Set whether to solve for (complement.) unconstrained global minumum first. */
-            ReturnValue setSolveZeroPenaltyFirst( bool val );
-
-            /** Get maximum number of iterations. */
-            int getMaxIterations( );
-
-            /** Set maximum number of iterations. */
-            ReturnValue setMaxIterations( int val );
-
-            /** Get print level. */
-            PrintLevel getPrintLevel( );
-
-            /** Set print level. */
-            ReturnValue setPrintLevel( PrintLevel val );
-
-            /** Set print level (using an integer). */
-            ReturnValue setPrintLevel( int val );
-
-            /** Get QP solver. */
-            QPSolver getQPSolver( );
-
-            /** Set print level. */
-            ReturnValue setQPSolver( QPSolver val );
-
-            /** Set print level (using an integer). */
-            ReturnValue setQPSolver( int val );
-
-        protected:
-            void copy( const Options& rhs );            /**< Copy each property. */
-
-            double stationarityTolerance;               /**< Tolerance for 1-Norm of stationarity violation. */
-            double complementarityTolerance;		    /**< Complementarity tolerance. */
-            double initialPenaltyParameter;	            /**< Start value for complementarity penalty term. */
-            double penaltyUpdateFactor;	                /**< Factor for updating penaltised complementarity term. */
-
-            bool solveZeroPenaltyFirst;                 /**< Flag indicating whether first QP should ignore penalization. */
-
-            int maxIterations;                          /**< Maximum number of iterations to be performed. */
-
-            PrintLevel printLevel;                      /**< Print level. */
-
-            QPSolver qpSolver;                          /**< The QP solver to be used. */
     };
 
     class Utilities {
@@ -275,7 +177,7 @@ namespace lcqpOASES {
             static csc* copyCSC(int m, int n, int nnz, double* x, int* i, int* p);
 
             // Copy a csc matrix (override of copyCSC)
-            static csc* copyCSC(const csc* const M);
+            static csc* copyCSC(const csc* const M, bool toUpperTriangular = false);
 
             /** Transform a csc matrix to dense.
              *
@@ -355,77 +257,6 @@ namespace lcqpOASES {
         private:
             static int getIndexOfIn(int val, int* sorted_lst, int beg, int end);
     };
-
-    class OutputStatistics {
-        public:
-            /** Default constructor. */
-            OutputStatistics( );
-
-            OutputStatistics& operator=( const OutputStatistics& rhs );
-
-            void reset( );
-
-            /** Update total iteration counter.
-             *
-             * @return Success or specifies the invalid argument.
-            */
-            ReturnValue updateIterTotal( int delta_iter );
-
-            /** Update total outer iteration counter.
-             *
-             * @return Success or specifies the invalid argument.
-            */
-            ReturnValue updateIterOuter( int delta_iter );
-
-            /** Update total number of working set changes counter.
-             *
-             * @return Success or specifies the invalid argument.
-            */
-            ReturnValue updateSubproblemIter( int delta_iter );
-
-            /** Update rho at solution.
-             *
-             * @return Success or specifies the invalid argument.
-            */
-            ReturnValue updateRhoOpt( double _rho );
-
-            /** Update the solution status.
-             *
-             * @return Success or specifies the invalid argument.
-            */
-            ReturnValue updateSolutionStatus( AlgorithmStatus _status );
-
-            /** Get the total number of iterations. */
-            int getIterTotal( ) const;
-
-            /** Get the total number of outer iterations. */
-            int getIterOuter( ) const;
-
-            /** Get the total number of subproblem iterations. */
-            int getSubproblemIter( ) const;
-
-            /** Get the penalty parameter at the optimal solution (if found). */
-            double getRhoOpt( ) const;
-
-            /** Get the solution status (if solved it will return the stationarity type). */
-            AlgorithmStatus getSolutionStatus( ) const;
-
-        private:
-            int iter_total = 0;
-            int iter_outer = 0;
-            int subproblem_iter = 0;
-            double rho_opt = 0.0;
-            AlgorithmStatus status = PROBLEM_NOT_SOLVED;
-    };
-
-    class MessageHandler {
-        public:
-            static ReturnValue PrintMessage( ReturnValue ret );
-
-            static AlgorithmStatus PrintSolution( AlgorithmStatus algoStat );
-
-            static void PrintSolutionLine( );
-    };
 }
 
-#endif  // LCQPOASES_UTILITIES_HPP
+#endif  // LCQPanther_UTILITIES_HPP

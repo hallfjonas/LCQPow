@@ -30,9 +30,6 @@ ubA = lbA;
 L = zeros(N, nz);
 R = zeros(N, nz);
 
-lb = zeros(nz,1); lb(1:2) = -inf(2,1);
-ub = inf(nz,1);
-
 for i = 1:N
     % Equality constraint ([cos sin]'*x + lambda = 1)
     A(i, 1:2) = [cos(2*pi*i/N) sin(2*pi*i/N)];
@@ -70,7 +67,7 @@ set(groot,'defaultLegendInterpreter','latex');
 %% Performance test
 % Call solver for various rho init values
 rho0 = [10e-8];
-while(rho0(end) < 10^2)
+while(rho0(end) < 10^1)
     rho0 = [rho0, rho0(end)*1.5];
 end
 
@@ -89,7 +86,7 @@ for i = 1:length(rho0)
 
     % Run c solver
     tic;
-    [xOpt,~,stats] = LCQPanther(Q, g, L, R, A, lbA, ubA, lb, ub, params);
+    [xOpt,~,stats] = LCQPanther(Q, g, L, R, A, lbA, ubA, params);
 
     % Evaluation
     c_solver.time_vals(i) = toc;

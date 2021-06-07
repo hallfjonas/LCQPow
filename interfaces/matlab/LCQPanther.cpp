@@ -1,35 +1,39 @@
 /*
- *	This file is part of lcqpOASES.
+ *	This file is part of LCQPanther.
  *
- *	lcqpOASES -- A Solver for Quadratic Programs with Commplementarity Constraints.
+ *	LCQPanther -- A Solver for Quadratic Programs with Commplementarity Constraints.
  *	Copyright (C) 2020 - 2021 by Jonas Hall et al.
  *
- *	lcqpOASES is free software; you can redistribute it and/or
+ *	LCQPanther is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
  *	License as published by the Free Software Foundation; either
  *	version 2.1 of the License, or (at your option) any later version.
  *
- *	lcqpOASES is distributed in the hope that it will be useful,
+ *	LCQPanther is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
- *	License along with lcqpOASES; if not, write to the Free Software
+ *	License along with LCQPanther; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 #include "LCQProblem.hpp"
-using lcqpOASES::LCQProblem;
-using lcqpOASES::Options;
+using LCQPanther::LCQProblem;
+using LCQPanther::Options;
 
 #include <mex.h>
 #include <chrono>
 
 LCQProblem lcqp;
 
-bool checkDimensionAndTypeDouble(const mxArray* arr, size_t m, size_t n, const char* name)
+bool checkDimensionAndTypeDouble(const mxArray* arr, size_t m, size_t n, const char* name, bool allowEmpty = false)
 {
+    if (allowEmpty && mxIsEmpty(arr)) {
+        return true;
+    }
+
     if (!mxIsDouble(arr)) {
         char* errorMsg = (char*)malloc(100*sizeof(char));
         sprintf(errorMsg, "Invalid type: %s must be of type double.\n", name);
@@ -176,7 +180,7 @@ int LCQPSparse(LCQProblem& lcqp, int nV, int nComp, int nC, int nlhs, mxArray* p
     readVectors(prhs, nrhs, nC, &g, &lbA, &ubA, &lb, &ub);
 
     // Load data into LCQP object
-    lcqpOASES::ReturnValue ret = lcqp.loadLCQP(
+    LCQPanther::ReturnValue ret = lcqp.loadLCQP(
         H_data, H_i, H_p, g,
         S1_data, S1_i, S1_p, S2_data, S2_i, S2_p,
         A_data, A_i, A_p, lbA, ubA, lb, ub, x0, y0
@@ -243,7 +247,7 @@ int LCQPDense(LCQProblem& lcqp, int nV, int nComp, int nC, int nlhs, mxArray* pl
     }
 
     // Load data into LCQP object
-    lcqpOASES::ReturnValue ret = lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub, x0);
+    LCQPanther::ReturnValue ret = lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub, x0);
 
     // Clear A, S1, S2
     if (A != 0)
@@ -255,7 +259,7 @@ int LCQPDense(LCQProblem& lcqp, int nV, int nComp, int nC, int nlhs, mxArray* pl
     if (S2 != 0)
         delete[] S2;
 
-    if (ret != lcqpOASES::ReturnValue::SUCCESSFUL_RETURN) {
+    if (ret != LCQPanther::ReturnValue::SUCCESSFUL_RETURN) {
         mexPrintf("Failed to load LCQP.\n");
         return 1;
     }
@@ -314,9 +318,11 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
     // Get number of linear constraints
     if (nrhs > 7 || ( nrhs == 7 && !mxIsStruct(prhs[6]))) {
-        if (mxIsEmpty(prhs[4]) || !mxIsDouble(prhs[4])) {
+        if (mxIsEmpty(prhs[4])) {
+            nC = 0;
+        } else if (!mxIsDouble(prhs[4])) {
             char *errorMsg = (char*)malloc(100*sizeof(char));
-            sprintf(errorMsg, "Invalid input argument: A must be a non-empty double matrix.\n");
+            sprintf(errorMsg, "Invalid input argument: A must be a double matrix.\n");
             mexErrMsgTxt(errorMsg);
             free(errorMsg);
             return;
@@ -331,22 +337,22 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     if (!checkDimensionAndTypeDouble(prhs[2], nComp, nV, "S1")) return;
     if (!checkDimensionAndTypeDouble(prhs[3], nComp, nV, "S2")) return;
 
-    if (nrhs == 6 && !checkDimensionAndTypeDouble(prhs[4], nV, 1, "lb")) return;
-    if (nrhs == 6 && !checkDimensionAndTypeDouble(prhs[5], nV, 1, "ub")) return;
+    if (nrhs == 6 && !checkDimensionAndTypeDouble(prhs[4], nV, 1, "lb", true)) return;
+    if (nrhs == 6 && !checkDimensionAndTypeDouble(prhs[5], nV, 1, "ub", true)) return;
 
-    if (nrhs == 7 && mxIsStruct(prhs[6]) && !checkDimensionAndTypeDouble(prhs[4], nV, 1, "lb")) return;
-    if (nrhs == 7 && mxIsStruct(prhs[6]) && !checkDimensionAndTypeDouble(prhs[5], nV, 1, "ub")) return;
+    if (nrhs == 7 && mxIsStruct(prhs[6]) && !checkDimensionAndTypeDouble(prhs[4], nV, 1, "lb", true)) return;
+    if (nrhs == 7 && mxIsStruct(prhs[6]) && !checkDimensionAndTypeDouble(prhs[5], nV, 1, "ub", true)) return;
 
-    if (nrhs == 7 && !mxIsStruct(prhs[6]) && !checkDimensionAndTypeDouble(prhs[4], nC, nV, "A")) return;
-    if (nrhs == 7 && !mxIsStruct(prhs[6]) && !checkDimensionAndTypeDouble(prhs[5], nC, 1, "lbA")) return;
-    if (nrhs == 7 && !mxIsStruct(prhs[6]) && !checkDimensionAndTypeDouble(prhs[6], nC, 1, "ubA")) return;
+    if (nrhs == 7 && !mxIsStruct(prhs[6]) && !checkDimensionAndTypeDouble(prhs[4], nC, nV, "A", true)) return;
+    if (nrhs == 7 && !mxIsStruct(prhs[6]) && !checkDimensionAndTypeDouble(prhs[5], nC, 1, "lbA", true)) return;
+    if (nrhs == 7 && !mxIsStruct(prhs[6]) && !checkDimensionAndTypeDouble(prhs[6], nC, 1, "ubA", true)) return;
 
-    if ((nrhs == 8 || nrhs == 9) && !checkDimensionAndTypeDouble(prhs[4], nC, nV, "A")) return;
-    if ((nrhs == 8 || nrhs == 9) && !checkDimensionAndTypeDouble(prhs[5], nC, 1, "lbA")) return;
-    if ((nrhs == 8 || nrhs == 9) && !checkDimensionAndTypeDouble(prhs[6], nC, 1, "ubA")) return;
+    if ((nrhs == 8 || nrhs == 9) && !checkDimensionAndTypeDouble(prhs[4], nC, nV, "A", true)) return;
+    if ((nrhs == 8 || nrhs == 9) && !checkDimensionAndTypeDouble(prhs[5], nC, 1, "lbA", true)) return;
+    if ((nrhs == 8 || nrhs == 9) && !checkDimensionAndTypeDouble(prhs[6], nC, 1, "ubA", true)) return;
 
-    if ((nrhs == 9 || nrhs == 10) && !checkDimensionAndTypeDouble(prhs[7], nV, 1, "lb")) return;
-    if ((nrhs == 9 || nrhs == 10) && !checkDimensionAndTypeDouble(prhs[8], nV, 1, "ub")) return;
+    if ((nrhs == 9 || nrhs == 10) && !checkDimensionAndTypeDouble(prhs[7], nV, 1, "lb", true)) return;
+    if ((nrhs == 9 || nrhs == 10) && !checkDimensionAndTypeDouble(prhs[8], nV, 1, "ub", true)) return;
 
     // Check structs
     if (nrhs == 5 && !checkTypeStruct(prhs[4], "params")) return;
@@ -503,7 +509,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
     double elapsed_secs = (end - begin).count()/1000.0/1000.0/1000.0;
 
-    if (ret != lcqpOASES::SUCCESSFUL_RETURN) {
+    if (ret != LCQPanther::SUCCESSFUL_RETURN) {
         mexPrintf("Failed to solve LCQP (error code: %d).\n", ret);
     }
 
@@ -542,9 +548,9 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     // 3) Output statistics
     if (nlhs > 2) {
         // assign fieldnames
-        int numberStatOutputs = 5;
+        int numberStatOutputs = 6;
 
-        const char* fieldnames[] = {"iters_total", "iters_outer", "iters_subproblem", "rho_opt", "elapsed_time"};
+        const char* fieldnames[] = {"iters_total", "iters_outer", "iters_subproblem", "rho_opt", "elapsed_time", "exit_flag"};
 
         // Allocate memory
         plhs[2] = mxCreateStructMatrix(1,1,numberStatOutputs, fieldnames);
@@ -556,7 +562,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         }
 
         // Get the statistics
-        lcqpOASES::OutputStatistics stats;
+        LCQPanther::OutputStatistics stats;
         lcqp.getOutputStatistics(stats);
 
         mxArray* iterTotal = mxCreateDoubleMatrix(1, 1, mxREAL);
@@ -564,18 +570,21 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         mxArray* iterSubpr = mxCreateDoubleMatrix(1, 1, mxREAL);
         mxArray* rhoOpt = mxCreateDoubleMatrix(1, 1, mxREAL);
         mxArray* elapsed_time = mxCreateDoubleMatrix(1, 1, mxREAL);
+        mxArray* exit_flag = mxCreateDoubleMatrix(1,1, mxREAL);
 
         double* itrTot = mxGetPr(iterTotal);
         double* itrOutr = mxGetPr(iterOuter);
         double* itrSubp = mxGetPr(iterSubpr);
         double* rOpt = mxGetPr(rhoOpt);
         double* elapsed = mxGetPr(elapsed_time);
+        double* ex_flag = mxGetPr(exit_flag);
 
         itrTot[0] = stats.getIterTotal();
         itrOutr[0] = stats.getIterOuter();
         itrSubp[0] = stats.getSubproblemIter();
         rOpt[0] = stats.getRhoOpt();
         elapsed[0] = elapsed_secs;
+        ex_flag[0] = ret;
 
         // assign values to struct
         mxSetFieldByNumber(plhs[2], 0, 0, iterTotal);
@@ -583,6 +592,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         mxSetFieldByNumber(plhs[2], 0, 2, iterSubpr);
         mxSetFieldByNumber(plhs[2], 0, 3, rhoOpt);
         mxSetFieldByNumber(plhs[2], 0, 4, elapsed_time);
+        mxSetFieldByNumber(plhs[2], 0, 5, exit_flag);
     }
 
     return;

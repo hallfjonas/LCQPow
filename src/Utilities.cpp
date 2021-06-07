@@ -1,209 +1,37 @@
 /*
- *	This file is part of lcqpOASES.
+ *	This file is part of LCQPanther.
  *
- *	lcqpOASES -- A Solver for Quadratic Programs with Commplementarity Constraints.
+ *	LCQPanther -- A Solver for Quadratic Programs with Commplementarity Constraints.
  *	Copyright (C) 2020 - 2021 by Jonas Hall et al.
  *
- *	lcqpOASES is free software; you can redistribute it and/or
+ *	LCQPanther is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
  *	License as published by the Free Software Foundation; either
  *	version 2.1 of the License, or (at your option) any later version.
  *
- *	lcqpOASES is distributed in the hope that it will be useful,
+ *	LCQPanther is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
- *	License along with lcqpOASES; if not, write to the Free Software
+ *	License along with LCQPanther; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 
 #include "Utilities.hpp"
+#include "MessageHandler.hpp"
+
 #include <iostream>
 #include <vector>
-#include <osqp.h>
 
-namespace lcqpOASES {
-
-
-    Options::Options( )
-    {
-        setToDefault( );
-    }
+extern "C" {
+    #include <osqp.h>
+}
 
 
-    Options::Options( const Options& rhs)
-    {
-        copy( rhs );
-    }
-
-
-    Options::~Options( )
-    { }
-
-
-    Options& Options::operator=( const Options& rhs )
-    {
-        if ( this != &rhs )
-        {
-            copy( rhs );
-        }
-
-        return *this;
-    }
-
-
-    void Options::copy( const Options& rhs ) {
-        stationarityTolerance = rhs.stationarityTolerance;
-        complementarityTolerance = rhs.complementarityTolerance;
-        initialPenaltyParameter = rhs.initialPenaltyParameter;
-        penaltyUpdateFactor = rhs.penaltyUpdateFactor;
-        solveZeroPenaltyFirst = rhs.solveZeroPenaltyFirst;
-        maxIterations = rhs.maxIterations;
-        printLevel = rhs.printLevel;
-        qpSolver = rhs.qpSolver;
-    }
-
-
-    double Options::getStationarityTolerance( ) {
-        return stationarityTolerance;
-    }
-
-
-    ReturnValue Options::setStationarityTolerance( double val ) {
-        if (val <= Utilities::EPS)
-            return (MessageHandler::PrintMessage(INVALID_STATIONARITY_TOLERANCE) );
-
-        stationarityTolerance = val;
-        return ReturnValue::SUCCESSFUL_RETURN;
-    }
-
-
-    double Options::getComplementarityTolerance( ) {
-        return complementarityTolerance;
-    }
-
-
-    ReturnValue Options::setComplementarityTolerance( double val ) {
-        if (val <= Utilities::EPS)
-            return (MessageHandler::PrintMessage(INVALID_COMPLEMENTARITY_TOLERANCE) ) ;
-
-        complementarityTolerance = val;
-        return ReturnValue::SUCCESSFUL_RETURN;
-    }
-
-
-    double Options::getInitialPenaltyParameter( ) {
-        return initialPenaltyParameter;
-    }
-
-
-    ReturnValue Options::setInitialPenaltyParameter( double val ) {
-        if (val <= Utilities::ZERO)
-            return (MessageHandler::PrintMessage(INVALID_INITIAL_PENALTY_VALUE) );
-
-        initialPenaltyParameter = val;
-        return ReturnValue::SUCCESSFUL_RETURN;
-    }
-
-
-    double Options::getPenaltyUpdateFactor( ) {
-        return penaltyUpdateFactor;
-    }
-
-
-    ReturnValue Options::setPenaltyUpdateFactor( double val ) {
-        if (val <= 1)
-            return (MessageHandler::PrintMessage(INVALID_PENALTY_UPDATE_VALUE) ) ;
-
-        penaltyUpdateFactor = val;
-        return ReturnValue::SUCCESSFUL_RETURN;
-    }
-
-
-    bool Options::getSolveZeroPenaltyFirst( ) {
-        return solveZeroPenaltyFirst;
-    }
-
-
-    ReturnValue Options::setSolveZeroPenaltyFirst( bool val ) {
-        solveZeroPenaltyFirst = val;
-        return ReturnValue::SUCCESSFUL_RETURN;
-    }
-
-
-    int Options::getMaxIterations( ) {
-        return maxIterations;
-    }
-
-
-    ReturnValue Options::setMaxIterations( int val ) {
-        if (val <= 0)
-            return (MessageHandler::PrintMessage(INVALID_MAX_ITERATIONS_VALUE) );
-
-        maxIterations = val;
-        return ReturnValue::SUCCESSFUL_RETURN;
-    }
-
-
-    PrintLevel Options::getPrintLevel( ) {
-        return printLevel;
-    }
-
-
-    ReturnValue Options::setPrintLevel( PrintLevel val ) {
-        printLevel = val;
-        return ReturnValue::SUCCESSFUL_RETURN;
-    }
-
-
-    ReturnValue Options::setPrintLevel( int val ) {
-
-        if (val < PrintLevel::NONE || val > PrintLevel::SUBPROBLEM_SOLVER_ITERATES)
-            return (MessageHandler::PrintMessage(INVALID_PRINT_LEVEL_VALUE) );
-
-        printLevel = (PrintLevel)val;
-        return ReturnValue::SUCCESSFUL_RETURN;
-    }
-
-
-    QPSolver Options::getQPSolver( ) {
-        return qpSolver;
-    }
-
-
-    ReturnValue Options::setQPSolver( QPSolver val ) {
-        qpSolver = val;
-        return SUCCESSFUL_RETURN;
-    }
-
-
-    ReturnValue Options::setQPSolver( int val ) {
-        if (val < QPSolver::QPOASES_DENSE || val > QPSolver::OSQP_SPARSE)
-            return (MessageHandler::PrintMessage(INVALID_QPSOLVER));
-
-        qpSolver = (QPSolver) val;
-        return SUCCESSFUL_RETURN;
-    }
-
-
-    void Options::setToDefault( ) {
-        complementarityTolerance = 1.0e3 * Utilities::EPS;
-        stationarityTolerance  = 1.0e3 * Utilities::EPS*1000;
-        initialPenaltyParameter = 0.01;
-    	penaltyUpdateFactor  = 2.0;
-
-        solveZeroPenaltyFirst = true;
-
-        maxIterations = 1000;
-
-        printLevel = PrintLevel::INNER_LOOP_ITERATES;
-
-        qpSolver = QPSolver::QPOASES_DENSE;
-    }
-
+namespace LCQPanther {
 
     void Utilities::MatrixMultiplication(const double* const A, const double* const B, double* C, int m, int n, int p) {
         for (int i = 0; i < m; i++) {
@@ -493,7 +321,6 @@ namespace lcqpOASES {
         /* 1) Open file. */
         if ( ( datafile = fopen( datafilename, "r" ) ) == 0 )
         {
-            fclose( datafile );
             return UNABLE_TO_READ_FILE;
         }
 
@@ -661,30 +488,71 @@ namespace lcqpOASES {
     }
 
 
-    csc* Utilities::copyCSC(const csc* const _M)
+    csc* Utilities::copyCSC(const csc* const _M, bool toUpperTriangular)
     {
         csc* M = (csc *)malloc(sizeof(csc));
 
         if (M == 0) return 0;
 
-        // Allocate space
-		int* rows = (int*) malloc((size_t)_M->nzmax*sizeof(int));
-		double* data = (double*) malloc((size_t)_M->nzmax*sizeof(double));
-		int* cols = (int*) malloc((size_t)(_M->n+1)*sizeof(int));
+        if (toUpperTriangular) {
+            // Allocate space
+            std::vector<int> rows;
+            std::vector<double> data;
+            int* p = (int*) malloc((size_t)(_M->n+1)*sizeof(int));
 
-        // Copy sparse matrix data
-        memcpy(rows, _M->i, (size_t)_M->nzmax*sizeof(int));
-        memcpy(data, _M->x, (size_t)_M->nzmax*sizeof(double));
-        memcpy(cols, _M->p, (size_t)(_M->n+1)*sizeof(int));
+            p[0] = 0;
 
-        // Assign copied data
-		M->m = _M->m;
-		M->n = _M->n;
-		M->p = cols;
-		M->i = rows;
-		M->x = data;
-		M->nz = -1;
-		M->nzmax = _M->nzmax;
+            for (int j = 0; j < _M->n+1; j++) {
+                p[j+1] = p[j];
+
+                for (int i = _M->p[j]; i < _M->p[j+1]; i++) {
+                    // Ignore entries below diagonal
+                    if (_M->i[i] > j)
+                        continue;
+
+                    // Push back elements on or above diagonal
+                    rows.push_back(_M->i[i]);
+                    data.push_back(_M->x[i]);
+                    p[j+1]++;
+                }
+            }
+
+            // copy std vector to arrays
+            int* i = new int[p[_M->n]];
+            double* x = new double[p[_M->n]];
+            for (size_t k = 0; k < (size_t)p[_M->n]; k++) {
+                i[k] = rows[k];
+                x[k] = data[k];
+            }
+
+            // Assign copied data
+            M->m = _M->m;
+            M->n = _M->n;
+            M->p = p;
+            M->i = i;
+            M->x = x;
+            M->nz = -1;
+            M->nzmax = p[_M->n];
+        } else {
+            // Allocate space
+            int* rows = (int*) malloc((size_t)_M->nzmax*sizeof(int));
+            double* data = (double*) malloc((size_t)_M->nzmax*sizeof(double));
+            int* cols = (int*) malloc((size_t)(_M->n+1)*sizeof(int));
+
+            // Copy sparse matrix data
+            memcpy(rows, _M->i, (size_t)_M->nzmax*sizeof(int));
+            memcpy(data, _M->x, (size_t)_M->nzmax*sizeof(double));
+            memcpy(cols, _M->p, (size_t)(_M->n+1)*sizeof(int));
+
+            // Assign copied data
+            M->m = _M->m;
+            M->n = _M->n;
+            M->p = cols;
+            M->i = rows;
+            M->x = data;
+            M->nz = -1;
+            M->nzmax = _M->nzmax;
+        }
 
         return M;
     }
@@ -833,274 +701,6 @@ namespace lcqpOASES {
         }
 
         return -1;
-    }
-
-    OutputStatistics::OutputStatistics( ) { }
-
-
-    OutputStatistics& OutputStatistics::operator=( const OutputStatistics& rhs )
-    {
-        iter_total = rhs.iter_total;
-        iter_outer = rhs.iter_outer;
-        subproblem_iter = rhs.subproblem_iter;
-        rho_opt = rhs.rho_opt;
-        status = rhs.status;
-
-        return *this;
-    }
-
-
-    void OutputStatistics::reset( )
-    {
-        iter_total = 0;
-        iter_outer = 0;
-        subproblem_iter = 0;
-        rho_opt = 0.0;
-        status = PROBLEM_NOT_SOLVED;
-    }
-
-
-    ReturnValue OutputStatistics::updateIterTotal( int delta_iter )
-    {
-        if (delta_iter < 0) return INVALID_TOTAL_ITER_COUNT;
-
-        iter_total += delta_iter;
-        return SUCCESSFUL_RETURN;
-    }
-
-
-    ReturnValue OutputStatistics::updateIterOuter( int delta_iter )
-    {
-        if (delta_iter < 0) return INVALID_TOTAL_OUTER_ITER;
-
-        iter_outer += delta_iter;
-        return SUCCESSFUL_RETURN;
-    }
-
-
-    ReturnValue OutputStatistics::updateSubproblemIter( int delta_iter )
-    {
-        if (delta_iter < 0) return IVALID_SUBPROBLEM_ITER;
-
-        subproblem_iter += delta_iter;
-        return SUCCESSFUL_RETURN;
-    }
-
-
-    ReturnValue OutputStatistics::updateRhoOpt( double _rho )
-    {
-        if (_rho <= 0) return INVALID_RHO_OPT;
-
-        rho_opt = _rho;
-        return SUCCESSFUL_RETURN;
-    }
-
-
-    ReturnValue OutputStatistics::updateSolutionStatus( AlgorithmStatus _status )
-    {
-        status = _status;
-        return SUCCESSFUL_RETURN;
-    }
-
-
-    int OutputStatistics::getIterTotal( ) const
-    {
-        return iter_total;
-    }
-
-
-    int OutputStatistics::getIterOuter( ) const
-    {
-        return iter_outer;
-    }
-
-
-    int OutputStatistics::getSubproblemIter( ) const
-    {
-        return subproblem_iter;
-    }
-
-
-    double OutputStatistics::getRhoOpt( ) const
-    {
-        return rho_opt;
-    }
-
-
-    AlgorithmStatus OutputStatistics::getSolutionStatus( ) const
-    {
-        return status;
-    }
-
-
-    ReturnValue MessageHandler::PrintMessage( ReturnValue ret) {
-
-        switch (ret) {
-            case SUCCESSFUL_RETURN:
-                break;
-
-            case NOT_YET_IMPLEMENTED:
-                printf("This method has not yet been implemented.\n");
-                break;
-
-            case LCQPOBJECT_NOT_SETUP:
-                printf("ERROR: The LCQP object has not been set up correctly.\n");
-                break;
-
-            case INDEX_OUT_OF_BOUNDS:
-                printf("ERROR: Index out of bounds.\n");
-                break;
-
-            case SUBPROBLEM_SOLVER_ERROR:
-                printf("ERROR: The subproblem solver produced an error.\n");
-                break;
-
-            case UNABLE_TO_READ_FILE:
-                printf("ERROR: Unable to read file.\n");
-                break;
-
-            case MAX_ITERATIONS_REACHED:
-                printf("ERROR: Maximum number of iterations reached.\n");
-                break;
-
-            case INITIAL_SUBPROBLEM_FAILED:
-                printf("ERROR: Failed to solve initial QP.\n");
-                break;
-
-            case INVALID_ARGUMENT:
-                printf("ERROR: Invalid argument passed.\n");
-                break;
-
-            case INVALID_NUMBER_OF_OPTIM_VARS:
-                printf("ERROR: Invalid optimization variable dimension passed (required to be > 0).\n");
-                break;
-
-            case INVALID_NUMBER_OF_COMP_VARS:
-                printf("ERROR: Invalid complementarity dimension passed (required to be > 0).\n");
-                break;
-
-            case INVALID_NUMBER_OF_CONSTRAINT_VARS:
-                printf("ERROR: Invalid number of optimization variables passed (required to be >= 0).\n");
-                break;
-
-            case INVALID_QPSOLVER:
-                printf("ERROR: Invalid QPSolver passed.\n");
-                break;
-
-            case INVALID_COMPLEMENTARITY_TOLERANCE:
-                printf("WARNING: Ignoring invalid complementarity tolerance.\n");
-                break;
-
-            case INVALID_INITIAL_PENALTY_VALUE:
-                printf("WARNING: Invalid argument passed (initial penalty value).\n");
-                break;
-
-            case INVALID_PENALTY_UPDATE_VALUE:
-                printf("WARNING: Ignoring invalid penalty update value.\n");
-                break;
-
-            case INVALID_MAX_ITERATIONS_VALUE:
-                printf("WARNING: Ignoring invalid number of maximum iterations.\n");
-                break;
-
-            case INVALID_STATIONARITY_TOLERANCE:
-                printf("WARNING: Ignoring invalid stationarity tolerance.\n");
-                break;
-
-            case INVALID_INDEX_POINTER:
-                printf("ERROR: Invalid index pointer passed in csc format.\n");
-                break;
-
-            case INVALID_INDEX_ARRAY:
-                printf("ERROR: Invalid index array passed in csc format.\n");
-                break;
-
-            case INVALID_OSQP_BOX_CONSTRAINTS:
-                printf("ERROR: Invalid constraints passed to OSQP solver: This solver does not handle box constraints, please pass them through linear constraints.\n");
-                break;
-
-            case INVALID_TOTAL_ITER_COUNT:
-                printf("ERROR: Invalid total number of iterations delta passed to output statistics (must be non-negative integer).\n");
-                break;
-
-            case INVALID_TOTAL_OUTER_ITER:
-                printf("ERROR: Invalid total number of outer iterations delta passed to output statistics (must be non-negative integer).\n");
-                break;
-
-            case IVALID_SUBPROBLEM_ITER:
-                printf("ERROR: Invalid total number of subproblem solver iterates delta passed to output statistics (must be non-negative integer).\n");
-                break;
-
-            case INVALID_RHO_OPT:
-                printf("ERROR: Invalid rho value at solution passed to output statistics (must be positive double).\n");
-                break;
-
-            case INVALID_PRINT_LEVEL_VALUE:
-                printf("WARNING: Ignoring invalid integer to be parsed to print level passed (must be in range of enum).\n");
-                break;
-
-            case INVALID_OBJECTIVE_LINEAR_TERM:
-                printf("ERROR: Invalid objective linear term passed (must be a double array of length n).\n");
-                break;
-
-            case INVALID_CONSTRAINT_MATRIX:
-                printf("ERROR: Invalid constraint matrix passed (matrix was null pointer but number of constraints is positive).\n");
-                break;
-
-            case INVALID_COMPLEMENTARITY_MATRIX:
-                printf("ERROR: Invalid complementarity matrix passed (can not be null pointer).\n");
-                break;
-
-            case FAILED_SYM_COMPLEMENTARITY_MATRIX:
-                printf("Failed to compute the symmetric complementarity matrix C.\n");
-                break;
-
-            case FAILED_SWITCH_TO_SPARSE:
-                printf("Failed to switch to sparse mode (a to be created sparse matrix was nullpointer).\n");
-                break;
-
-            case FAILED_SWITCH_TO_DENSE:
-                printf("Failed to switch to dense mode (an array to be created was nullpointer).\n");
-                break;
-        }
-
-        fflush(stdout);
-
-        return ret;
-    }
-
-
-    AlgorithmStatus MessageHandler::PrintSolution( AlgorithmStatus algoStat ) {
-
-        if ( algoStat != PROBLEM_NOT_SOLVED)
-            printf("\n\n#################################\n");
-
-        switch (algoStat) {
-            case PROBLEM_NOT_SOLVED:
-                printf("The LCQP has not been solved.\n");
-                break;
-
-            case W_STATIONARY_SOLUTION:
-                printf("## W-Stationary solution found ##\n");
-                break;
-
-            case C_STATIONARY_SOLUTION:
-                printf("## C-Stationary solution found ##\n");
-                break;
-
-            case M_STATIONARY_SOLUTION:
-                printf("## M-Stationary solution found ##\n");
-                break;
-
-            case S_STATIONARY_SOLUTION:
-                printf("## S-Stationary solution found ##\n");
-                break;
-        }
-
-        if ( algoStat != PROBLEM_NOT_SOLVED)
-            printf("#################################\n\n");
-
-        return algoStat;
     }
 }
 

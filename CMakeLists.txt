@@ -1,36 +1,225 @@
 ##
-##	This file is part of lcqpOASES.
+##	This file is part of LCQPanther.
 ##
-##	lcqpOASES -- A Solver for Quadratic Programs with Commplementarity Constraints.
+##	LCQPanther -- A Solver for Quadratic Programs with Commplementarity Constraints.
 ##	Copyright (C) 2020 - 2021 by Jonas Hall et al.
 ##
-##	lcqpOASES is free software; you can redistribute it and/or
+##	LCQPanther is free software; you can redistribute it and/or
 ##	modify it under the terms of the GNU Lesser General Public
 ##	License as published by the Free Software Foundation; either
 ##	version 2.1 of the License, or (at your option) any later version.
 ##
-##	lcqpOASES is distributed in the hope that it will be useful,
+##	LCQPanther is distributed in the hope that it will be useful,
 ##	but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ##	See the GNU Lesser General Public License for more details.
 ##
 ##	You should have received a copy of the GNU Lesser General Public
-##	License along with lcqpOASES; if not, write to the Free Software
+##	License along with LCQPanther; if not, write to the Free Software
 ##	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ##
 
-cmake_minimum_required(VERSION 3.0) # version can be different
+# cmake minimum required version
+cmake_minimum_required(VERSION 3.10.2)
 
-project(lcqpOASES) #name of your project
+# Project name
+project(lcqpanther)
 
-add_subdirectory(UnitTesting/googletest) # add googletest subdirectory
+# Save auxiliar source files to variable
+aux_source_directory(src SRC_FILES)
 
-AUX_SOURCE_DIRECTORY(src SRC_FILES)
+## Options ------------------------------------------------------------------------------
+option(
+    BUILD_EXAMPLES
+    "Option to build examples."
+    ON
+)
 
-add_compile_options(-Wall -pedantic -Wshadow -Wfloat-equal -O3 -Wconversion -Wsign-conversion -fPIC -DLINUX -D__USE_LONG_INTEGERS__ -D__USE_LONG_FINTS__)
+option(
+    BUILD_DOCUMENTATION
+    "Option to build documentation."
+    ON
+)
 
-include_directories(SYSTEM /usr/local/include/osqp include /usr/local/qpOASES/include /usr/local/matplotlib-cpp /usr/include/python3.6m) # this is so we can #include <gtest/gtest.h>
+option(
+    UNIT_TESTS
+    "Option to build and run unit tests."
+    ON
+)
 
-add_executable(TestUtils UnitTesting/TestUtils.cpp ${SRC_FILES}) # add this executable
+## DOWNLOAD AND CHECK ALL SUBMODULES ---- from Code, Tech, and Tutorials ----------------
+find_package(Git QUIET)
+if (GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+# Update submodules as needed
+    option(GIT_SUBMODULE "Check submodules during build" ON)
+    if (GIT_SUBMODULE)
+        message(STATUS "Submodule update")
+        execute_process(
+            COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            RESULT_VARIABLE GIT_SUBMOD_RESULT
+        )
 
-target_link_libraries(TestUtils PRIVATE gtest qpOASES osqp python3.6m) # link google test to this executable
+        if (NOT GIT_SUBMOD_RESULT EQUAL "0")
+            message(
+                FATAL_ERROR
+                "git submodule update --init --recursive failed with ${GIT_SUBMOD_RESULT}."
+            )
+        endif()
+    endif()
+endif()
+
+if (NOT EXISTS "${PROJECT_SOURCE_DIR}/external/osqp/CMakeLists.txt")
+    message(
+        FATAL_ERROR
+        "The submodule OSQP does not exist. GIT_SUBMODULE was turned off or failed."
+    )
+endif()
+
+if (NOT EXISTS "${PROJECT_SOURCE_DIR}/external/qpOASES/CMakeLists.txt")
+    message(
+        FATAL_ERROR
+        "The submodule qpOASES does not exist. GIT_SUBMODULE was turned off or failed."
+    )
+endif()
+
+
+if (NOT EXISTS "${PROJECT_SOURCE_DIR}/external/googletest/CMakeLists.txt")
+    message(
+        FATAL_ERROR
+        "The submodule googletest does not exist. GIT_SUBMODULE was turned off or failed."
+    )
+endif()
+
+## ADD ALL SUBMODULES -------------------------------------------------------------------
+# OSQP
+add_subdirectory(external/osqp)
+
+# qpOASES
+add_subdirectory(external/qpOASES)
+
+# qpOASES
+add_subdirectory(external/googletest)
+
+# Add include directories of dependencies: qpOASES, OSQP
+include_directories(${PROJECT_NAME}
+    PRIVATE external/osqp/include
+    PRIVATE external/qpOASES/include
+)
+
+## CREATE LCQPanther libraries ----------------------------------------------------------
+# Include project headers
+include_directories(${PROJECT_NAME} PUBLIC include)
+
+# Add compile options
+add_compile_options(
+    -Wall
+    -pedantic
+    -Wshadow
+    -Wfloat-equal
+    -O3
+    -Wconversion
+    -Wsign-conversion
+    -fPIC
+    -DLINUX
+)
+
+# create static lib
+add_library(${PROJECT_NAME}-static STATIC ${SRC_FILES})
+set_target_properties(
+    ${PROJECT_NAME}-static
+    PROPERTIES
+    OUTPUT_NAME ${PROJECT_NAME}
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+)
+
+
+# create shared lib
+add_library(${PROJECT_NAME}-shared SHARED ${SRC_FILES})
+set_target_properties(
+    ${PROJECT_NAME}-shared
+    PROPERTIES
+    OUTPUT_NAME ${PROJECT_NAME}
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+)
+
+## Build examples -----------------------------------------------------------------------
+if (${BUILD_EXAMPLES})
+    aux_source_directory(examples EXAMPLE_FILES)
+
+    FOREACH(ELEMENT ${EXAMPLE_FILES})
+        # get filename w/o dir and extension
+        get_filename_component(EXAMPLE_NAME ${ELEMENT} NAME_WE)
+
+        # generate executable target
+        add_executable(${EXAMPLE_NAME} ${ELEMENT})
+
+        # link libraries
+        target_link_libraries(
+            ${EXAMPLE_NAME}
+            PUBLIC ${PROJECT_NAME}-shared
+            PRIVATE qpOASES osqp gtest
+        )
+
+        # specify output directory
+        set_target_properties(
+            ${EXAMPLE_NAME}
+            PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/examples"
+        )
+    endforeach()
+endif()
+
+## Build unit tests ---------------------------------------------------------------------
+if (${UNIT_TESTS})
+    # Add Unit testing source file
+    add_executable(RunUnitTests test/RunUnitTests.cpp)
+    set_target_properties(
+        RunUnitTests
+        PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
+    )
+
+    # Add libraries: gtest, qpOASES, OSQP
+    target_link_libraries(
+        RunUnitTests
+        PUBLIC ${PROJECT_NAME}-shared
+        PRIVATE qpOASES osqp gtest
+    )
+endif()
+
+## Build documentation
+if (${BUILD_DOCUMENTATION})
+    find_package(
+        Doxygen
+        REQUIRED dot
+    )
+
+    if (DOXYGEN_FOUND)
+        message(
+            STATUS
+            "Found doxygen: Building documentation."
+        )
+
+        doxygen_add_docs(
+            doxy
+            "include"
+        )
+
+        set(DOXYGEN_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../docs")
+
+        set(DOXYGEN_GENERATE_HTML YES)
+        set(DOXYGEN_GENERATE_MAN YES)
+
+        set(DOXYGEN_PROJECT_BRIEF "LCQPanther -- A Linear Complementarity Quadratic Programming Solver")
+    else()
+        message(
+            WARNING
+            "Could not find doxygen: Not building documentation."
+        )
+    endif()
+endif()
+
+## End of cmake file --------------------------------------------------------------------

@@ -1,27 +1,28 @@
 /*
- *	This file is part of lcqpOASES.
+ *	This file is part of LCQPanther.
  *
- *	lcqpOASES -- A Solver for Quadratic Programs with Commplementarity Constraints.
+ *	LCQPanther -- A Solver for Quadratic Programs with Commplementarity Constraints.
  *	Copyright (C) 2020 - 2021 by Jonas Hall et al.
  *
- *	lcqpOASES is free software; you can redistribute it and/or
+ *	LCQPanther is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
  *	License as published by the Free Software Foundation; either
  *	version 2.1 of the License, or (at your option) any later version.
  *
- *	lcqpOASES is distributed in the hope that it will be useful,
+ *	LCQPanther is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
- *	License along with lcqpOASES; if not, write to the Free Software
+ *	License along with LCQPanther; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 
 #include "LCQProblem.hpp"
 #include "Utilities.hpp"
+#include "MessageHandler.hpp"
 #include "SubsolverQPOASES.hpp"
 #include "SubsolverOSQP.hpp"
 
@@ -32,7 +33,7 @@
 
 using qpOASES::QProblem;
 
-namespace lcqpOASES {
+namespace LCQPanther {
 
 	LCQProblem::LCQProblem( ) { }
 
@@ -103,12 +104,17 @@ namespace lcqpOASES {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
-		ret = setLB( _lb );
+		// Only copy lb and ub to temporary variables
+		// Build them once we know what solver is used
+		if (_lb != 0) {
+			lb_tmp = new double[nV];
+			memcpy(lb_tmp, _lb, (size_t) nV*sizeof(double));
+		}
 
-		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
-
-		ret = setUB( _ub );
+		if (_ub != 0) {
+			ub_tmp = new double[nV];
+			memcpy(ub_tmp, _ub, (size_t) nV*sizeof(double));
+		}
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
@@ -249,16 +255,19 @@ namespace lcqpOASES {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
-		ret = setLB( _lb );
-		if (_lb != 0)
+		// Only copy lb and ub to temporary variables
+		// Build them once we know what solver is used
+		if (_lb != 0) {
+			lb_tmp = new double[nV];
+			memcpy(lb_tmp, _lb, (size_t) nV*sizeof(double));
 			delete[] _lb;
+		}
 
-		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
-
-		ret = setUB( _ub );
-		if (_ub != 0)
+		if (_ub != 0) {
+			ub_tmp = new double[nV];
+			memcpy(ub_tmp, _ub, (size_t) nV*sizeof(double));
 			delete[] _ub;
+		}
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
@@ -327,7 +336,6 @@ namespace lcqpOASES {
 
 		// Only copy lb and ub to temporary variables
 		// Build them once we know what solver is used
-
 		if (_lb != 0) {
 			lb_tmp = new double[nV];
 			memcpy(lb_tmp, _lb, (size_t) nV*sizeof(double));
@@ -727,8 +735,7 @@ namespace lcqpOASES {
 
 			Subsolver tmp(nV, nC + 2*nComp, H, A);
 			subsolver = tmp;
-		} else if (options.getQPSolver() == QPSolver::QPOASES_SPARSE_SCHUR ||
-		           options.getQPSolver() == QPSolver::QPOASES_SPARSE) {
+		} else if (options.getQPSolver() == QPSolver::QPOASES_SPARSE) {
 			nDuals = nV + nC + 2*nComp;
 			boxDualOffset = nV;
 
@@ -737,6 +744,8 @@ namespace lcqpOASES {
 				if (ret != SUCCESSFUL_RETURN)
 					return ret;
 			}
+
+			Subsolver tmp(nV, nC + 2*nComp, H_sparse, A_sparse, options.getQPSolver());
 
 			ret = setLB( lb_tmp );
 
@@ -748,9 +757,7 @@ namespace lcqpOASES {
 			if (ret != SUCCESSFUL_RETURN)
 				return ret;
 
-			bool schurFlag = options.getQPSolver() == QPSolver::QPOASES_SPARSE_SCHUR;
 
-			Subsolver tmp(nV, nC + 2*nComp, H_sparse, A_sparse, schurFlag);
 			subsolver = tmp;
 		} else if (options.getQPSolver() == QPSolver::OSQP_SPARSE) {
 			if (lb != 0 || ub != 0) {
@@ -770,10 +777,10 @@ namespace lcqpOASES {
 				return ReturnValue::INVALID_OSQP_BOX_CONSTRAINTS;
 			}
 
-			Subsolver tmp(nV, nDuals, H_sparse, A_sparse, g, lbA, ubA);
+			Subsolver tmp(nV, nDuals, H_sparse, A_sparse, options.getQPSolver());
 			subsolver = tmp;
 		} else {
-			return ReturnValue::INVALID_QPSOLVER;
+			return ReturnValue::NOT_YET_IMPLEMENTED;
 		}
 
 		// Initialize variables and counters
@@ -970,7 +977,6 @@ namespace lcqpOASES {
 
 			// Add some +/- EPS to each coordinate
 			perturbGradient();
-			// perturbStep();
 		}
 
 		// Update Qk = H + rho*C (only required on first inner iteration)
