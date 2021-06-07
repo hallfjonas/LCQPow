@@ -72,13 +72,23 @@ namespace LCQPanther {
         osqp_cleanup(work);
 
         if (data != 0) {
+            if (data->l != 0) {
+                free(data->l);
+                data->l = NULL;
+            }
+
+            if (data->u != 0) {
+                free(data->u);
+                data->u = NULL;
+            }
+
+            if (data->q != 0) {
+                free(data->q);
+                data->q = NULL;
+            }
+
             c_free(data);
             data = NULL;
-        }
-
-        if (settings != 0) {
-            c_free(settings);
-            settings = NULL;
         }
 
         if (H != 0) {
@@ -89,6 +99,11 @@ namespace LCQPanther {
         if (A != 0) {
             Utilities::ClearSparseMat(A);
             A = NULL;
+        }
+
+        if (settings != 0) {
+            c_free(settings);
+            settings = NULL;
         }
     }
 
@@ -133,8 +148,8 @@ namespace LCQPanther {
             double* l = (double*)malloc((size_t)nC*sizeof(double));
             double* u = (double*)malloc((size_t)nC*sizeof(double));
             double* g = (double*)malloc((size_t)nV*sizeof(double));
-            memcpy(l, _lb, (size_t)nC*sizeof(double));
-            memcpy(u, _ub, (size_t)nC*sizeof(double));
+            memcpy(l, _lbA, (size_t)nC*sizeof(double));
+            memcpy(u, _ubA, (size_t)nC*sizeof(double));
             memcpy(g, _g, (size_t)nV*sizeof(c_float));
 
             data = (OSQPData *)c_malloc(sizeof(OSQPData));
