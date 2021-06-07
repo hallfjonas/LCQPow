@@ -518,8 +518,8 @@ namespace LCQPanther {
             }
 
             // copy std vector to arrays
-            int* i = new int[p[_M->n]];
-            double* x = new double[p[_M->n]];
+            int* i = (int*) malloc((size_t)p[_M->n]*sizeof(int));
+            double* x = (double*) malloc((size_t)p[_M->n]*sizeof(double));
             for (size_t k = 0; k < (size_t)p[_M->n]; k++) {
                 i[k] = rows[k];
                 x[k] = data[k];
