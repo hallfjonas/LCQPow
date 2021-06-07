@@ -83,7 +83,6 @@ if (NOT EXISTS "${PROJECT_SOURCE_DIR}/external/qpOASES/CMakeLists.txt")
     )
 endif()
 
-
 if (NOT EXISTS "${PROJECT_SOURCE_DIR}/external/googletest/CMakeLists.txt")
     message(
         FATAL_ERROR
@@ -96,9 +95,12 @@ endif()
 add_subdirectory(external/osqp)
 
 # qpOASES
-add_subdirectory(external/qpOASES)
+# add_subdirectory(external/qpOASES)
+#add_custom_target(qpoases_depends COMMAND make
+#                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/qpOASES
+#)
 
-# qpOASES
+# googletest
 add_subdirectory(external/googletest)
 
 # Add include directories of dependencies: qpOASES, OSQP
