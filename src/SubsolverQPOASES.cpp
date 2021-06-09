@@ -85,10 +85,10 @@ namespace LCQPanther {
         A_x = new double[_A->p[_nV]];
         A_p = new int[_nV+1];
 
-        memcpy(H_p, _H->p, (size_t)nV+1*sizeof(int));
+        memcpy(H_p, _H->p, (size_t)(nV+1)*sizeof(int));
         memcpy(H_i, _H->i, (size_t)_H->p[nV]*sizeof(int));
         memcpy(H_x, _H->x, (size_t)_H->p[nV]*sizeof(double));
-        memcpy(A_p, _A->p, (size_t)nV+1*sizeof(int));
+        memcpy(A_p, _A->p, (size_t)(nV+1)*sizeof(int));
         memcpy(A_i, _A->i, (size_t)_A->p[nV]*sizeof(int));
         memcpy(A_x, _A->x, (size_t)_A->p[nV]*sizeof(double));
 
@@ -241,7 +241,6 @@ namespace LCQPanther {
             A_i = new int[rhs.A_p[nV]];
             A_x = new double[rhs.A_p[nV]];
             A_p = new int[nV+1];
-
 
             memcpy(H_p, rhs.H_p, (size_t)(nV+1)*sizeof(int));
             memcpy(H_i, rhs.H_i, (size_t)(rhs.H_p[nV])*sizeof(int));
