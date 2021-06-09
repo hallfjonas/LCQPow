@@ -60,14 +60,15 @@ function [] = make( varargin )
     
     %% define compiler settings
     LCQPanther_IFLAG = '-I../../include ';
-    QPOASES_IFLAG = '-I../../external/qpOASES/include ';
-    OSQP_IFLAG = '-I../../external/osqp/include ';
+    QPOASES_IFLAG = '-I../../build/external/src/qpOASES/include ';
+    OSQP_IFLAG = '-I../../build/external/src/osqp/include ';
     IFLAGS = [ '-I. ', LCQPanther_IFLAG, QPOASES_IFLAG, OSQP_IFLAG];
     
-    LCQPanther_LFLAG = '-L/home/syscop/LCQPanther/build/lib -llcqpanther ';
-    QPOASES_IFLAG = '-L/home/syscop/LCQPanther/build/external/qpOASES/libs -lqpOASES ';
-    OSQP_IFLAG = '-L/home/syscop/LCQPanther/build/external/osqp/out -losqp ';
-    LFLAGS = [ LCQPanther_LFLAG, QPOASES_IFLAG, OSQP_IFLAG ];
+    LIBDIRLINK = ['-L', pwd , '/../../build/lib'];
+    LCQPanther_LFLAG = [LIBDIRLINK, ' -llcqpanther '];
+    QPOASES_IFLAG = [LIBDIRLINK, ' -lqpOASES '];
+    OSQP_IFLAG = [LIBDIRLINK, ' -losqp '];
+    LFLAGS = [LCQPanther_LFLAG, QPOASES_IFLAG, OSQP_IFLAG];
     
     CPPFLAGS = [ IFLAGS, '-largeArrayDims -D__cpluplus -D__MATLAB__',' ' ];
     defaultFlags = '-O -D__NO_COPYRIGHT__ '; %% -D__SUPPRESSANYOUTPUT__
