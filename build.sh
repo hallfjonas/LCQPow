@@ -2,6 +2,6 @@
 
 mkdir -p build
 cd build
-cmake ..
+cmake -DCMAKE_BUILD_TYPE=$1 -DQPOASES_SCHUR_COMPLEMENT=$2 ..
 make
 cd ..
