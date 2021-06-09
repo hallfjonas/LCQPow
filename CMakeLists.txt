@@ -20,94 +20,93 @@
 ##
 
 # cmake minimum required version
-cmake_minimum_required(VERSION 3.10.2)
+cmake_minimum_required(VERSION 3.20.3)
 
 # Project name
 project(lcqpanther)
 
-# Save auxiliar source files to variable
-aux_source_directory(src SRC_FILES)
-
 ## Options ------------------------------------------------------------------------------
 option(
     BUILD_EXAMPLES
-    "Option to build examples."
+    "Option to build examples"
     ON
 )
 
 option(
     BUILD_DOCUMENTATION
-    "Option to build documentation."
+    "Option to build documentation"
     ON
 )
 
 option(
     UNIT_TESTS
-    "Option to build and run unit tests."
+    "Option to build and run unit tests"
     ON
 )
 
-## DOWNLOAD AND CHECK ALL SUBMODULES ---- from Code, Tech, and Tutorials ----------------
-find_package(Git QUIET)
-if (GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
-# Update submodules as needed
-    option(GIT_SUBMODULE "Check submodules during build" ON)
-    if (GIT_SUBMODULE)
-        message(STATUS "Submodule update")
-        execute_process(
-            COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            RESULT_VARIABLE GIT_SUBMOD_RESULT
-        )
+option(
+    __USE_LONG_INTEGERS__
+    "Use long integers"
+    ON
+)
 
-        if (NOT GIT_SUBMOD_RESULT EQUAL "0")
-            message(
-                FATAL_ERROR
-                "git submodule update --init --recursive failed with ${GIT_SUBMOD_RESULT}."
-            )
-        endif()
-    endif()
-endif()
+option(
+    __USE_LONG_FINTS__
+    "Use long fortran ints"
+    ON
+)
 
-if (NOT EXISTS "${PROJECT_SOURCE_DIR}/external/osqp/CMakeLists.txt")
-    message(
-        FATAL_ERROR
-        "The submodule OSQP does not exist. GIT_SUBMODULE was turned off or failed."
-    )
-endif()
+## Paths --------------------------------------------------------------------------------
+set(
+    CMAKE_INSTALL_PREFIX
+    "${CMAKE_BINARY_DIR}"
+)
 
-if (NOT EXISTS "${PROJECT_SOURCE_DIR}/external/qpOASES/CMakeLists.txt")
-    message(
-        FATAL_ERROR
-        "The submodule qpOASES does not exist. GIT_SUBMODULE was turned off or failed."
-    )
-endif()
+## ADD ALL EXTERNAL PROJECTS ------------------------------------------------------------
 
-if (NOT EXISTS "${PROJECT_SOURCE_DIR}/external/googletest/CMakeLists.txt")
-    message(
-        FATAL_ERROR
-        "The submodule googletest does not exist. GIT_SUBMODULE was turned off or failed."
-    )
-endif()
-
-## ADD ALL SUBMODULES -------------------------------------------------------------------
-# OSQP
-add_subdirectory(external/osqp)
+# external modules
+include(ExternalProject)
 
 # qpOASES
-# add_subdirectory(external/qpOASES)
-#add_custom_target(qpoases_depends COMMAND make
-#                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/qpOASES
-#)
+ExternalProject_Add(
+    qpoases
+    GIT_REPOSITORY "https://github.com/hallfjonas/qpOASES.git"
+    PREFIX external
+    CONFIGURE_COMMAND ""
+    BUILD_IN_SOURCE ON
+    BUILD_COMMAND make src;
+    INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+    INSTALL_COMMAND cp ${CMAKE_BINARY_DIR}/external/src/qpoases/bin/libqpOASES.so ${CMAKE_INSTALL_PREFIX}/lib/libqpOASES.so
+)
+
+set(qpoases_lib "-L${CMAKE_BINARY_DIR}/lib -lqpOASES")
+set(qpoases_include "${CMAKE_BINARY_DIR}/external/src/qpoases/include")
+
+# OSQP
+ExternalProject_Add(
+    osqp
+    GIT_REPOSITORY "https://github.com/hallfjonas/osqp.git"
+    PREFIX external
+    CMAKE_ARGS
+        -DDLONG=OFF
+        -DBUILD_SHARED_LIBS=ON
+    BUILD_COMMAND cmake --build .
+    INSTALL_COMMAND cp ${CMAKE_BINARY_DIR}/external/src/osqp-build/out/libosqp.so ${CMAKE_INSTALL_PREFIX}/lib/libosqp.so
+)
+
+set(osqp_lib "-L${CMAKE_BINARY_DIR}/lib -losqp")
+set(osqp_include "${CMAKE_BINARY_DIR}/external/src/osqp/include")
 
 # googletest
-add_subdirectory(external/googletest)
-
-# Add include directories of dependencies: qpOASES, OSQP
-include_directories(${PROJECT_NAME}
-    PRIVATE external/osqp/include
-    PRIVATE external/qpOASES/include
+ExternalProject_Add(
+    gtest
+    GIT_REPOSITORY "https://github.com/google/googletest.git"
+    PREFIX external
+    INSTALL_COMMAND cp ${CMAKE_BINARY_DIR}/external/src/gtest-build/lib/libgtest.a ${CMAKE_INSTALL_PREFIX}/lib/
 )
+
+set(gtest_lib "-L${CMAKE_BINARY_DIR}/external/src/gtest-build/out -lgtest")
+set(gtest_include "${CMAKE_BINARY_DIR}/external/src/gtest/googletest/include")
 
 ## CREATE LCQPanther libraries ----------------------------------------------------------
 # Include project headers
@@ -129,6 +128,9 @@ add_compile_options(
     -DSOLVER_MA57
 )
 
+# Save auxiliar source files to variable
+aux_source_directory(src SRC_FILES)
+
 # create static lib
 add_library(${PROJECT_NAME}-static STATIC ${SRC_FILES})
 set_target_properties(
@@ -139,6 +141,18 @@ set_target_properties(
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 )
 
+# Add the external projects as depenedncies for our project
+add_dependencies(
+    ${PROJECT_NAME}-static
+    qpoases
+    osqp
+)
+
+# Add include directories of dependencies: qpOASES, OSQP
+include_directories(${PROJECT_NAME}
+    PRIVATE ${qpoases_include}
+    PRIVATE ${osqp_include}
+)
 
 # create shared lib
 add_library(${PROJECT_NAME}-shared SHARED ${SRC_FILES})
@@ -148,6 +162,13 @@ set_target_properties(
     OUTPUT_NAME ${PROJECT_NAME}
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+)
+
+# Add the external projects as depenedncies for our project
+add_dependencies(
+    ${PROJECT_NAME}-shared
+    qpoases
+    osqp
 )
 
 ## Build examples -----------------------------------------------------------------------
@@ -165,7 +186,7 @@ if (${BUILD_EXAMPLES})
         target_link_libraries(
             ${EXAMPLE_NAME}
             PUBLIC ${PROJECT_NAME}-shared
-            PRIVATE qpOASES osqp gtest
+            PRIVATE ${qpoases_lib} ${osqp_lib}
         )
 
         # specify output directory
@@ -177,54 +198,69 @@ if (${BUILD_EXAMPLES})
     endforeach()
 endif()
 
-## Build unit tests ---------------------------------------------------------------------
-if (${UNIT_TESTS})
-    # Add Unit testing source file
-    add_executable(RunUnitTests test/RunUnitTests.cpp)
-    set_target_properties(
-        RunUnitTests
-        PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
-    )
+# ## Build unit tests ---------------------------------------------------------------------
+# if (${UNIT_TESTS})
+#     # Add include directories of dependencies: qpOASES, OSQP
+#     include_directories(${PROJECT_NAME}
+#         PRIVATE ${gtest_include}
+#         PRIVATE ${qpoases_include}
+#         PRIVATE ${osqp_include}
+#     )
 
-    # Add libraries: gtest, qpOASES, OSQP
-    target_link_libraries(
-        RunUnitTests
-        PUBLIC ${PROJECT_NAME}-shared
-        PRIVATE qpOASES osqp gtest
-    )
-endif()
+#     # Add Unit testing source file
+#     add_executable(RunUnitTests test/RunUnitTests.cpp)
 
-## Build documentation
-if (${BUILD_DOCUMENTATION})
-    find_package(
-        Doxygen
-        REQUIRED dot
-    )
+#     add_dependencies(
+#         RunUnitTests
+#         qpoases
+#         osqp
+#         gtest
+#     )
 
-    if (DOXYGEN_FOUND)
-        message(
-            STATUS
-            "Found doxygen: Building documentation."
-        )
+#     set_target_properties(
+#         RunUnitTests
+#         PROPERTIES
+#         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
+#     )
 
-        doxygen_add_docs(
-            doxy
-            "include"
-        )
+#     # Add libraries: gtest, qpOASES, OSQP
+#     target_link_libraries(
+#         RunUnitTests
+#         PUBLIC ${PROJECT_NAME}-shared
+#         PRIVATE ${qpoases_lib} ${osqp_lib} ${gtest_lib}
+#     )
+# endif()
 
-        set(DOXYGEN_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../docs")
+# ## Build documentation
+# if (${BUILD_DOCUMENTATION})
+#     find_package(
+#         Doxygen
+#         REQUIRED dot
+#     )
 
-        set(DOXYGEN_GENERATE_HTML YES)
-        set(DOXYGEN_GENERATE_MAN YES)
+#     if (DOXYGEN_FOUND)
+#         message(
+#             STATUS
+#             "Found doxygen: Building documentation."
+#         )
 
-        set(DOXYGEN_PROJECT_BRIEF "LCQPanther -- A Linear Complementarity Quadratic Programming Solver")
-    else()
-        message(
-            WARNING
-            "Could not find doxygen: Not building documentation."
-        )
-    endif()
-endif()
+#         doxygen_add_docs(
+#             doxy
+#             "include"
+#         )
+
+#         set(DOXYGEN_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../docs")
+
+#         set(DOXYGEN_GENERATE_HTML YES)
+#         set(DOXYGEN_GENERATE_MAN YES)
+
+#         set(DOXYGEN_PROJECT_BRIEF "LCQPanther -- A Linear Complementarity Quadratic Programming Solver")
+#     else()
+#         message(
+#             WARNING
+#             "Could not find doxygen: Not building documentation."
+#         )
+#     endif()
+# endif()
 
 ## End of cmake file --------------------------------------------------------------------
