@@ -72,7 +72,7 @@ include(ExternalProject)
 
 # qpOASES
 ExternalProject_Add(
-    qpoases
+    qpOASES
     GIT_REPOSITORY "https://github.com/hallfjonas/qpOASES.git"
     GIT_TAG ${QPOASES_BRANCH}
     PREFIX external
@@ -80,11 +80,11 @@ ExternalProject_Add(
     BUILD_IN_SOURCE ON
     BUILD_COMMAND make src;
     INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
-    INSTALL_COMMAND cp ${CMAKE_BINARY_DIR}/external/src/qpoases/bin/libqpOASES.so ${CMAKE_INSTALL_PREFIX}/lib/libqpOASES.so
+    INSTALL_COMMAND cp ${CMAKE_BINARY_DIR}/external/src/qpOASES/bin/libqpOASES.so ${CMAKE_INSTALL_PREFIX}/lib/libqpOASES.so
 )
 
-set(qpoases_lib "-L${CMAKE_BINARY_DIR}/lib -lqpOASES")
-set(qpoases_include "${CMAKE_BINARY_DIR}/external/src/qpoases/include")
+set(qpOASES_lib "-L${CMAKE_BINARY_DIR}/lib -lqpOASES")
+set(qpOASES_include "${CMAKE_BINARY_DIR}/external/src/qpOASES/include")
 
 # OSQP
 ExternalProject_Add(
@@ -146,13 +146,13 @@ set_target_properties(
 # Add the external projects as depenedncies for our project
 add_dependencies(
     ${PROJECT_NAME}-static
-    qpoases
+    qpOASES
     osqp
 )
 
 # Add include directories of dependencies: qpOASES, OSQP
 include_directories(${PROJECT_NAME}
-    PRIVATE ${qpoases_include}
+    PRIVATE ${qpOASES_include}
     PRIVATE ${osqp_include}
 )
 
@@ -169,7 +169,7 @@ set_target_properties(
 # Add the external projects as depenedncies for our project
 add_dependencies(
     ${PROJECT_NAME}-shared
-    qpoases
+    qpOASES
     osqp
 )
 
@@ -188,7 +188,7 @@ if (${BUILD_EXAMPLES})
         target_link_libraries(
             ${EXAMPLE_NAME}
             PUBLIC ${PROJECT_NAME}-shared
-            PRIVATE ${qpoases_lib} ${osqp_lib}
+            PRIVATE ${qpOASES_lib} ${osqp_lib}
         )
 
         # specify output directory
@@ -205,7 +205,7 @@ endif()
 #     # Add include directories of dependencies: qpOASES, OSQP
 #     include_directories(${PROJECT_NAME}
 #         PRIVATE ${gtest_include}
-#         PRIVATE ${qpoases_include}
+#         PRIVATE ${qpOASES_include}
 #         PRIVATE ${osqp_include}
 #     )
 
@@ -214,7 +214,7 @@ endif()
 
 #     add_dependencies(
 #         RunUnitTests
-#         qpoases
+#         qpOASES
 #         osqp
 #         gtest
 #     )
@@ -229,7 +229,7 @@ endif()
 #     target_link_libraries(
 #         RunUnitTests
 #         PUBLIC ${PROJECT_NAME}-shared
-#         PRIVATE ${qpoases_lib} ${osqp_lib} ${gtest_lib}
+#         PRIVATE ${qpOASES_lib} ${osqp_lib} ${gtest_lib}
 #     )
 # endif()
 
