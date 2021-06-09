@@ -26,6 +26,10 @@
 #include <iostream>
 #include <vector>
 
+#include <qpOASES.hpp>
+
+using qpOASES::int_t;
+
 extern "C" {
     #include <osqp.h>
 }
@@ -555,6 +559,13 @@ namespace LCQPanther {
         }
 
         return M;
+    }
+
+
+    void Utilities::copyIntToIntT(int_t* dest, const int* const src, int n)
+    {
+        for (int i = 0; i < n; i++)
+            dest[i] = (int_t) src[i];
     }
 
 
