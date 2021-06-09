@@ -745,8 +745,6 @@ namespace LCQPanther {
 					return ret;
 			}
 
-			Subsolver tmp(nV, nC + 2*nComp, H_sparse, A_sparse, options.getQPSolver());
-
 			ret = setLB( lb_tmp );
 
 			if (ret != SUCCESSFUL_RETURN)
@@ -757,8 +755,9 @@ namespace LCQPanther {
 			if (ret != SUCCESSFUL_RETURN)
 				return ret;
 
-
+			Subsolver tmp(nV, nC + 2*nComp, H_sparse, A_sparse, options.getQPSolver());
 			subsolver = tmp;
+
 		} else if (options.getQPSolver() == QPSolver::OSQP_SPARSE) {
 			if (lb != 0 || ub != 0) {
 				return INVALID_OSQP_BOX_CONSTRAINTS;
