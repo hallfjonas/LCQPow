@@ -7,11 +7,5 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
 
-      - name: install-depends
-        run: sudo apt-get install doxygen graphviz
-
-      - name: build
-        run: ./build.sh;
-
       - name: run
         run: ./build.sh; ./run.sh
