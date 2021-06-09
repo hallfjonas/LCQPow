@@ -2,7 +2,7 @@
 % Clean up and load libraries
 clear all; clc; close all;
 
-% Path to mex function (c++ solver)
+%% Path to mex function (c++ solver)
 addpath(fullfile(pwd, ".."));
 
 % Simple QP
@@ -15,7 +15,7 @@ R = [0 1];
 params.x0 = [1; 1];
 params.initialPenaltyParameter = 0.01;
 params.penaltyUpdateFactor = 2;
-params.qpSolver = 2;
+params.qpSolver = 1;
 
 % Run solver
 [x, y] = LCQPanther(Q, g, L, R, params);
