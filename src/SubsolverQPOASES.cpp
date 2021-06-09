@@ -23,8 +23,6 @@
 
 #include <qpOASES.hpp>
 
-using qpOASES::int_t;
-
 namespace LCQPanther {
 
 
@@ -34,8 +32,8 @@ namespace LCQPanther {
     SubsolverQPOASES::SubsolverQPOASES( int _nV, int _nC,
                                         double* _H, double* _A)
     {
-        nV = (int_t)_nV;
-        nC = (int_t)_nC;
+        nV = _nV;
+        nC = _nC;
 
         isSparse = false;
         qp = qpOASES::QProblem(nV, nC);
@@ -51,8 +49,8 @@ namespace LCQPanther {
     SubsolverQPOASES::SubsolverQPOASES( int _nV, int _nC,
                                         csc* _H, csc* _A)
     {
-        nV = (int_t)_nV;
-        nC = (int_t)_nC;
+        nV = _nV;
+        nC = _nC;
 
         isSparse = true;
 
@@ -79,20 +77,19 @@ namespace LCQPanther {
             A_sparse = NULL;
         }
 
-        H_i = new int_t[_H->p[_nV]];
+        H_i = new int[_H->p[_nV]];
         H_x = new double[_H->p[_nV]];
-        H_p = new int_t[_nV+1];
+        H_p = new int[_nV+1];
 
-        A_i = new int_t[_A->p[_nV]];
+        A_i = new int[_A->p[_nV]];
         A_x = new double[_A->p[_nV]];
-        A_p = new int_t[_nV+1];
+        A_p = new int[_nV+1];
 
-        Utilities::copyIntToIntT(H_p, _H->p, nV+1);
-        Utilities::copyIntToIntT(H_i, _H->i, _H->p[nV]);
-        Utilities::copyIntToIntT(A_p, _A->p, nV+1);
-        Utilities::copyIntToIntT(A_i, _A->i, _A->p[nV]);
-
+        memcpy(H_p, _H->p, (size_t)nV+1*sizeof(int));
+        memcpy(H_i, _H->i, (size_t)_H->p[nV]*sizeof(int));
         memcpy(H_x, _H->x, (size_t)_H->p[nV]*sizeof(double));
+        memcpy(A_p, _A->p, (size_t)nV+1*sizeof(int));
+        memcpy(A_i, _A->i, (size_t)_A->p[nV]*sizeof(int));
         memcpy(A_x, _A->x, (size_t)_A->p[nV]*sizeof(double));
 
         H_sparse = new qpOASES::SymSparseMat(nV, nV, H_i, H_p, H_x);
@@ -187,7 +184,7 @@ namespace LCQPanther {
     {
         qpOASES::returnValue ret;
 
-        qpOASES::int_t nwsr = 1000000;
+        int nwsr = 1000000;
 
         if (initialSolve) {
             if (isSparse) {
@@ -237,20 +234,20 @@ namespace LCQPanther {
         useSchur = rhs.useSchur;
 
         if (isSparse) {
-            H_i = new int_t[rhs.H_p[nV]];
+            H_i = new int[rhs.H_p[nV]];
             H_x = new double[rhs.H_p[nV]];
-            H_p = new int_t[nV+1];
+            H_p = new int[nV+1];
 
-            A_i = new int_t[rhs.A_p[nV]];
+            A_i = new int[rhs.A_p[nV]];
             A_x = new double[rhs.A_p[nV]];
-            A_p = new int_t[nV+1];
+            A_p = new int[nV+1];
 
 
-            memcpy(H_p, rhs.H_p, (size_t)(nV+1)*sizeof(int_t));
-            memcpy(H_i, rhs.H_i, (size_t)(rhs.H_p[nV])*sizeof(int_t));
+            memcpy(H_p, rhs.H_p, (size_t)(nV+1)*sizeof(int));
+            memcpy(H_i, rhs.H_i, (size_t)(rhs.H_p[nV])*sizeof(int));
             memcpy(H_x, rhs.H_x, (size_t)(rhs.H_p[nV])*sizeof(double));
-            memcpy(A_p, rhs.A_p, (size_t)(nV+1)*sizeof(int_t));
-            memcpy(A_i, rhs.A_i, (size_t)(rhs.A_p[nV])*sizeof(int_t));
+            memcpy(A_p, rhs.A_p, (size_t)(nV+1)*sizeof(int));
+            memcpy(A_i, rhs.A_i, (size_t)(rhs.A_p[nV])*sizeof(int));
             memcpy(A_x, rhs.A_x, (size_t)(rhs.A_p[nV])*sizeof(double));
 
             H_sparse = new qpOASES::SymSparseMat(nV, nV, H_i, H_p, H_x);

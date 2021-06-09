@@ -29,8 +29,6 @@ extern "C" {
 
 #include <qpOASES.hpp>
 
-using qpOASES::int_t;
-
 namespace LCQPanther {
 
     enum ReturnValue {
@@ -181,8 +179,6 @@ namespace LCQPanther {
 
             // Copy a csc matrix (override of copyCSC)
             static csc* copyCSC(const csc* const M, bool toUpperTriangular = false);
-
-            static void copyIntToIntT(int_t* dest, const int* const src, int n);
 
             /** Transform a csc matrix to dense.
              *
