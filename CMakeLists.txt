@@ -124,6 +124,9 @@ add_compile_options(
     -Wsign-conversion
     -fPIC
     -DLINUX
+    -D__USE_LONG_INTEGERS__
+    -D__USE_LONG_FINTS__
+    -DSOLVER_MA57
 )
 
 # create static lib

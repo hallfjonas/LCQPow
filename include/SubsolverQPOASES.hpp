@@ -25,6 +25,8 @@
 #include "SubsolverBase.hpp"
 #include <qpOASES.hpp>
 
+using qpOASES::int_t;
+
 namespace LCQPanther {
     class SubsolverQPOASES : public SubsolverBase {
         public:
@@ -108,8 +110,8 @@ namespace LCQPanther {
             void copy(const SubsolverQPOASES& rhs);
 
         private:
-            int nV;                                     /**< Number of optimization variables. */
-            int nC;                                     /**< Total number of dual variables. */
+            int_t nV;                                   /**< Number of optimization variables. */
+            int_t nC;                                   /**< Total number of dual variables. */
 
             bool isSparse = false;                      /**< A flag storing whether data is given in sparse or dense format. */
             bool useSchur = false;                      /**< A flag indicating whether to use the Shur Complement method. */
@@ -121,12 +123,12 @@ namespace LCQPanther {
             qpOASES::SparseMatrix* A_sparse = NULL;     /**< Constraint matrix as qpOASES sparse matrix (should contain rows of compl. sel. matrices). */
 
             double* H_x = NULL;                         /**< Hessian matrix sparse data (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
-            int* H_i = NULL;                            /**< Hessian matrix sparse rows (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
-            int* H_p = NULL;                            /**< Hessian matrix sparse col pointers (required because one cannot copy a symmetric(sprase) qpOASES mat                           rix). */
+            int_t* H_i = NULL;                          /**< Hessian matrix sparse rows (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
+            int_t* H_p = NULL;                          /**< Hessian matrix sparse col pointers (required because one cannot copy a symmetric(sprase) qpOASES mat                           rix). */
 
             double* A_x = NULL;                         /**< Constraint matrix sparse data (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
-            int* A_i = NULL;                            /**< Constraint matrix sparse rows (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
-            int* A_p = NULL;                            /**< Constraint matrix sparse col pointers (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
+            int_t* A_i = NULL;                          /**< Constraint matrix sparse rows (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
+            int_t* A_p = NULL;                          /**< Constraint matrix sparse col pointers (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
 
             qpOASES::QProblem qp;                       /**< Store a QP class and call it sequentially (using its hotstart functionality). */
             qpOASES::SQProblemSchur qpSchur;            /**< Store a Schur Complement QP class and call it sequentially (using its hotstart functionality). */
