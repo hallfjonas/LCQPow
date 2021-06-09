@@ -45,22 +45,25 @@ option(
 )
 
 option(
-    __USE_LONG_INTEGERS__
-    "Use long integers"
-    ON
+    QPOASES_SCHUR_COMPLEMENT
+    "Whether to enable the qpOASES Schur Complement method (sparse solver must be available, e.g. through MATLAB)"
+    OFF
 )
 
-option(
-    __USE_LONG_FINTS__
-    "Use long fortran ints"
-    ON
-)
-
-## Paths --------------------------------------------------------------------------------
+## Paths and option dependent settings --------------------------------------------------
 set(
     CMAKE_INSTALL_PREFIX
     "${CMAKE_BINARY_DIR}"
 )
+
+if (${QPOASES_SCHUR_COMPLEMENT})
+    add_compile_options(-DSOLVER_MA57)
+
+    message("WARNING: This method requires the availability of MA57.")
+    set(QPOASES_BRANCH "Schur")
+else()
+    set(QPOASES_BRANCH "standalone")
+endif()
 
 ## ADD ALL EXTERNAL PROJECTS ------------------------------------------------------------
 
@@ -71,6 +74,7 @@ include(ExternalProject)
 ExternalProject_Add(
     qpoases
     GIT_REPOSITORY "https://github.com/hallfjonas/qpOASES.git"
+    GIT_TAG ${QPOASES_BRANCH}
     PREFIX external
     CONFIGURE_COMMAND ""
     BUILD_IN_SOURCE ON
@@ -125,7 +129,6 @@ add_compile_options(
     -DLINUX
     -D__USE_LONG_INTEGERS__
     -D__USE_LONG_FINTS__
-    -DSOLVER_MA57
 )
 
 # Save auxiliar source files to variable
