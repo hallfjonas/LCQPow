@@ -1331,6 +1331,7 @@ namespace LCQPanther {
 	/// Clear allocated memory
 	void LCQProblem::clear( )
 	{
+		printf("ENTERING DESTRUCTOR LCQProblem\n");
 		if (H != 0) {
 			delete[] H;
 			H = NULL;
@@ -1452,6 +1453,8 @@ namespace LCQPanther {
 		Utilities::ClearSparseMat(&Qk_sparse);
 		Utilities::ClearSparseMat(&S1_sparse);
 		Utilities::ClearSparseMat(&S2_sparse);
+
+		printf("LEAVING DESTRUCTOR LCQProblem\n");
 	}
 }
 
