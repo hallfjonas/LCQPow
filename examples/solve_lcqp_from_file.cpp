@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
 
     std::cout << "Preparing optimization problem loaded from file...\n";
 
-    std::string inputdir = "../examples/example_data/one_ivocp_example";
+    std::string inputdir = "examples/example_data/one_ivocp_example";
 
     if (!PathExists(inputdir)) {
         printf("Input directory does not exist.");
@@ -129,7 +129,7 @@ int main(int argc, char **argv) {
 
     LCQPanther::Options opts;
     opts.setPrintLevel( LCQPanther::PrintLevel::INNER_LOOP_ITERATES );
-    opts.setQPSolver( LCQPanther::QPSolver::QPOASES_SPARSE_SCHUR);
+    opts.setQPSolver( LCQPanther::QPSolver::QPOASES_SPARSE);
     lcqp.setOptions( opts );
 
     // Run solver

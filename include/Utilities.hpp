@@ -96,8 +96,7 @@ namespace LCQPanther {
     enum QPSolver {
         QPOASES_DENSE = 0,                              /**< QP solver qpOASES in dense mode. */
         QPOASES_SPARSE = 1,                             /**< QP solver qpOASES in sparse mode. */
-        QPOASES_SPARSE_SCHUR = 2,                             /**< QP solver qpOASES Schur Complement Method. */
-        OSQP_SPARSE = 3                                 /**< QP solver OSQP. */
+        OSQP_SPARSE = 2                                 /**< QP solver OSQP. */
     };
 
     class Utilities {
