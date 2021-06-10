@@ -71,6 +71,7 @@ function [] = make( varargin )
     LFLAGS = [LCQPanther_LFLAG, QPOASES_IFLAG, OSQP_IFLAG];
     
     CPPFLAGS = [ IFLAGS, '-largeArrayDims -D__cpluplus -D__MATLAB__',' ' ];
+    CPPFLAGS = [ IFLAGS, '-largeArrayDims -D__cpluplus -D__MATLAB__ -D__AVOID_LA_NAMING_CONFLICTS__ -D__USE_LONG_INTEGERS__ -D__USE_LONG_FINTS__ ',' ' ];
     defaultFlags = '-O -D__NO_COPYRIGHT__ '; %% -D__SUPPRESSANYOUTPUT__
 
     CPPFLAGS = [ CPPFLAGS, '-DLINUX ', LFLAGS, ' ' ];
