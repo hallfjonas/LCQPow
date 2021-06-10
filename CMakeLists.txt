@@ -44,73 +44,33 @@ option(
     ON
 )
 
+# qpOASES with or without Schur Complement method
 option(
     QPOASES_SCHUR_COMPLEMENT
     "Whether to enable the qpOASES Schur Complement method (sparse solver must be available, e.g. through MATLAB)"
     OFF
 )
-
-## Paths and option dependent settings --------------------------------------------------
-set(
-    CMAKE_INSTALL_PREFIX
-    "${CMAKE_BINARY_DIR}"
-)
-
 if (${QPOASES_SCHUR_COMPLEMENT})
     add_compile_options(-DSOLVER_MA57)
-
     message("WARNING: This method requires the availability of MA57.")
-    set(QPOASES_BRANCH "Schur")
-else()
-    set(QPOASES_BRANCH "standalone")
 endif()
 
-## ADD ALL EXTERNAL PROJECTS ------------------------------------------------------------
-
-# external modules
-include(ExternalProject)
-
-# qpOASES
-ExternalProject_Add(
-    qpOASES
-    GIT_REPOSITORY "https://github.com/hallfjonas/qpOASES.git"
-    GIT_TAG ${QPOASES_BRANCH}
-    PREFIX external
-    CONFIGURE_COMMAND ""
-    BUILD_IN_SOURCE ON
-    BUILD_COMMAND make src;
-    INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
-    INSTALL_COMMAND cp ${CMAKE_BINARY_DIR}/external/src/qpOASES/bin/libqpOASES.so ${CMAKE_INSTALL_PREFIX}/lib/libqpOASES.so
+set(
+    qpOASES_library_link
+    "-L/usr/local/lib -lqpOASES"
 )
 
-set(qpOASES_lib "-L${CMAKE_BINARY_DIR}/lib -lqpOASES")
-set(qpOASES_include "${CMAKE_BINARY_DIR}/external/src/qpOASES/include")
-
-# OSQP
-ExternalProject_Add(
-    osqp
-    GIT_REPOSITORY "https://github.com/hallfjonas/osqp.git"
-    PREFIX external
-    CMAKE_ARGS
-        -DDLONG=OFF
-        -DBUILD_SHARED_LIBS=ON
-    BUILD_COMMAND cmake --build .
-    INSTALL_COMMAND cp ${CMAKE_BINARY_DIR}/external/src/osqp-build/out/libosqp.so ${CMAKE_INSTALL_PREFIX}/lib/libosqp.so
+set(
+    osqp_library_link
+    "-L/usr/local/lib -losqp"
 )
 
-set(osqp_lib "-L${CMAKE_BINARY_DIR}/lib -losqp")
-set(osqp_include "${CMAKE_BINARY_DIR}/external/src/osqp/include")
-
-# googletest
-ExternalProject_Add(
-    gtest
-    GIT_REPOSITORY "https://github.com/google/googletest.git"
-    PREFIX external
-    INSTALL_COMMAND cp ${CMAKE_BINARY_DIR}/external/src/gtest-build/lib/libgtest.a ${CMAKE_INSTALL_PREFIX}/lib/
+set(
+    CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES
+    "/usr/local/include/qpOASES"
+    "/usr/local/include/osqp"
 )
 
-set(gtest_lib "-L${CMAKE_BINARY_DIR}/external/src/gtest-build/out -lgtest")
-set(gtest_include "${CMAKE_BINARY_DIR}/external/src/gtest/googletest/include")
 
 ## CREATE LCQPanther libraries ----------------------------------------------------------
 # Include project headers
@@ -129,6 +89,7 @@ add_compile_options(
     -DLINUX
     -D__USE_LONG_INTEGERS__
     -D__USE_LONG_FINTS__
+    -D__AVOID_LA_NAMING_CONFLICTS__
 )
 
 # Save auxiliar source files to variable
@@ -142,13 +103,6 @@ set_target_properties(
     OUTPUT_NAME ${PROJECT_NAME}
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-)
-
-# Add the external projects as depenedncies for our project
-add_dependencies(
-    ${PROJECT_NAME}-static
-    qpOASES
-    osqp
 )
 
 # Add include directories of dependencies: qpOASES, OSQP
@@ -167,13 +121,6 @@ set_target_properties(
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 )
 
-# Add the external projects as depenedncies for our project
-add_dependencies(
-    ${PROJECT_NAME}-shared
-    qpOASES
-    osqp
-)
-
 ## Build examples -----------------------------------------------------------------------
 if (${BUILD_EXAMPLES})
     aux_source_directory(examples EXAMPLE_FILES)
@@ -189,7 +136,7 @@ if (${BUILD_EXAMPLES})
         target_link_libraries(
             ${EXAMPLE_NAME}
             PUBLIC ${PROJECT_NAME}-shared
-            PRIVATE ${qpOASES_lib} ${osqp_lib}
+            PRIVATE ${qpOASES_library_link} ${osqp_library_link}
         )
 
         # specify output directory

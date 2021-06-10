@@ -1,14 +1,14 @@
 function [] = make( varargin )
 %MAKE Compiles the Matlab interface of qpOASES.
 %
-%Type  make            to compile all interfaces that 
+%Type  make            to compile all interfaces that
 %                      have been modified,
 %type  make clean      to delete all compiled interfaces,
-%type  make clean all  to first delete and then compile 
+%type  make clean all  to first delete and then compile
 %                      all interfaces,
 %type  make 'name'     to compile only the interface with
 %                      the given name (if it has been modified),
-%type  make 'opt'      to compile all interfaces using the 
+%type  make 'opt'      to compile all interfaces using the
 %                      given compiler options.
 %
 %Copyright (C) 2013-2017 by Hans Joachim Ferreau, Andreas Potschka,
@@ -43,7 +43,7 @@ function [] = make( varargin )
 %%	Date:      2007-2017
 %%
 
-       
+
     %% consistency check
     if ( exist( [pwd, '/make.m'],'file' ) == 0 )
         error( ['ERROR (',mfilename '.m): Run this make script directly within the directory ', ...
@@ -57,24 +57,26 @@ function [] = make( varargin )
         [ doClean,fcnNames,userFlags ] = analyseMakeArguments( nargin,varargin );
     end
 
-    
+
     %% define compiler settings
     LCQPanther_IFLAG = '-I../../include ';
-    QPOASES_IFLAG = '-I../../build/external/src/qpOASES/include ';
-    OSQP_IFLAG = '-I../../build/external/src/osqp/include ';
+    QPOASES_IFLAG = ' -I/usr/local/include/qpOASES ';
+    OSQP_IFLAG = ' -I/usr/local/include/osqp ';
     IFLAGS = [ '-I. ', LCQPanther_IFLAG, QPOASES_IFLAG, OSQP_IFLAG];
-    
+
     LIBDIRLINK = ['-L', pwd , '/../../build/lib'];
     LCQPanther_LFLAG = [LIBDIRLINK, ' -llcqpanther '];
-    QPOASES_IFLAG = [LIBDIRLINK, ' -lqpOASES '];
-    OSQP_IFLAG = [LIBDIRLINK, ' -losqp '];
-    LFLAGS = [LCQPanther_LFLAG, QPOASES_IFLAG, OSQP_IFLAG];
-    
-    CPPFLAGS = [ IFLAGS, '-largeArrayDims -D__cpluplus -D__MATLAB__',' ' ];
+    QPOASES_LFLAG = ' -lqpOASES ';
+    OSQP_LFLAG = ' -losqp ';
+    LFLAGS = [LCQPanther_LFLAG, QPOASES_LFLAG, OSQP_LFLAG];
+
+    %DEBUGFLAGS = ' ';
+    DEBUGFLAGS = ' -v -g CXXDEBUGFLAGS=''$CXXDEBUGFLAGS -Wall -pedantic -Wshadow'' ';
+
     CPPFLAGS = [ IFLAGS, '-largeArrayDims -D__cpluplus -D__MATLAB__ -D__AVOID_LA_NAMING_CONFLICTS__ -D__USE_LONG_INTEGERS__ -D__USE_LONG_FINTS__ ',' ' ];
     defaultFlags = '-O -D__NO_COPYRIGHT__ '; %% -D__SUPPRESSANYOUTPUT__
 
-    CPPFLAGS = [ CPPFLAGS, '-DLINUX ', LFLAGS, ' ' ];
+    CPPFLAGS = [ CPPFLAGS, DEBUGFLAGS, '-DLINUX ', LFLAGS, ' ' ];
 
     if ( isempty(userFlags) > 0 )
         CPPFLAGS = [ CPPFLAGS, defaultFlags,' ' ];
@@ -82,59 +84,59 @@ function [] = make( varargin )
         CPPFLAGS = [ CPPFLAGS, userFlags,' ' ];
     end
 
-	mexExt = eval('mexext');   
-    
+	mexExt = eval('mexext');
+
     %% clean if desired
     if ( doClean > 0 )
         eval( 'delete *.o;' );
         eval( ['delete *.',mexExt,'*;'] );
         disp( [ 'INFO (',mfilename '.m): Cleaned all compiled files.'] );
         pause( 0.2 );
-        
+
     end
-    
+
     if ( ~isempty(userFlags) )
         disp( [ 'INFO (',mfilename '.m): Compiling all files with user-defined compiler flags (''',userFlags,''')...'] );
     end
-    
+
 
     %% call mex compiler
     for ii=1:length(fcnNames)
-        
+
         cmd = [ 'mex -output ', fcnNames{ii}, ' ', CPPFLAGS, [fcnNames{ii},'.cpp'] ];
-        
+
         if ( exist( [fcnNames{ii},'.',mexExt],'file' ) == 0 )
             disp( ['Evaluating ', cmd] );
             eval( cmd );
             disp( [ 'INFO (',mfilename '.m): ', fcnNames{ii},'.',mexExt, ' successfully created.'] );
-            
+
         else
-            
+
             % check modification time of source/Make files and compiled mex file
             cppFile = dir( [pwd,'/',fcnNames{ii},'.cpp'] );
             cppFileTimestamp = getTimestamp( cppFile );
-            
+
             makeFile = dir( [pwd,'/make.m'] );
             makeFileTimestamp = getTimestamp( makeFile );
-            
+
             mexFile = dir( [pwd,'/',fcnNames{ii},'.',mexExt] );
             if ( isempty(mexFile) == 0 )
                 mexFileTimestamp = getTimestamp( mexFile );
             else
                 mexFileTimestamp = 0;
             end
-            
+
             if ( ( cppFileTimestamp   >= mexFileTimestamp ) || ...
                  ( makeFileTimestamp  >= mexFileTimestamp ) )
                 disp( ['Evaluating ', cmd] );
                 eval( cmd );
                 disp( [ 'INFO (',mfilename '.m): ', fcnNames{ii},'.',mexExt, ' successfully created.'] );
-            else            
+            else
                 disp( [ 'INFO (',mfilename '.m): ', fcnNames{ii},'.',mexExt, ' already exists.'] );
             end
-            
+
         end
-        
+
     end
 
     %% add qpOASES directory to path
@@ -150,7 +152,7 @@ function [ doClean,fcnNames,userIFlags ] = analyseMakeArguments( nArgs,args )
     userIFlags = [];
 
     switch ( nArgs )
-        
+
         case 1
             if ( strcmp( args{1},'all' ) > 0 )
                 fcnNames = { 'LCQPanther' };
@@ -173,7 +175,7 @@ function [ doClean,fcnNames,userIFlags ] = analyseMakeArguments( nArgs,args )
             else
                 error( ['ERROR (',mfilename '.m): First argument must be ''clean'' if two arguments are provided!'] );
             end
-            
+
             if ( strcmp( args{2},'all' ) > 0 )
                 fcnNames = { 'LCQPanther' };
             elseif ( strcmp( args{2},'LCQPanther' ) > 0 )
@@ -181,18 +183,18 @@ function [ doClean,fcnNames,userIFlags ] = analyseMakeArguments( nArgs,args )
             else
                 error( ['ERROR (',mfilename '.m): Invalid second argument (''',args{2},''')!'] );
             end
-            
+
         otherwise
             fcnNames = { 'LCQPanther' };
-            
+
     end
-    
+
 end
 
 
 function [ timestamp ] = getTimestamp( dateString )
 
-    try 
+    try
         timestamp = dateString.datenum;
     catch
         timestamp = Inf;
