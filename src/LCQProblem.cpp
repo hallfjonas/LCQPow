@@ -29,6 +29,7 @@
 #include <iostream>
 #include <string>
 #include <math.h>
+#include <stdlib.h>
 #include <qpOASES.hpp>
 
 using qpOASES::QProblem;
