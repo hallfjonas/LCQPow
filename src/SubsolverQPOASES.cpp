@@ -110,7 +110,6 @@ namespace LCQPanther {
 
     SubsolverQPOASES::~SubsolverQPOASES()
     {
-		printf("ENTERING DESTRUCTOR SubsolverQPOASES\n");
         if (H != 0) {
             delete[] H;
             H = NULL;
@@ -154,8 +153,6 @@ namespace LCQPanther {
             delete A_sparse;
             A_sparse = 0;
         }
-
-		printf("LEAVING DESTRUCTOR SubsolverQPOASES\n");
     }
 
 
