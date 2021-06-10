@@ -26,8 +26,6 @@ using LCQPanther::Options;
 #include <mex.h>
 #include <chrono>
 
-LCQProblem lcqp;
-
 bool checkDimensionAndTypeDouble(const mxArray* arr, size_t m, size_t n, const char* name, bool allowEmpty = false)
 {
     if (allowEmpty && mxIsEmpty(arr)) {
@@ -364,9 +362,6 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     double* x0 = NULL;
     double* y0 = NULL;
 
-    // TODO: This needs to be adjusted in OSQP case (increase flexibility)
-    int nDuals = nV + nC + 2*nComp;
-
     // Create LCQP and options objects
     LCQProblem lcqp((int)nV, (int)nC, (int)nComp);
 
@@ -396,12 +391,11 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         for (auto name : params_fieldnames) {
             mxArray* field = mxGetField(prhs[structIdx], 0, name);
             double* fld_ptr;
-            bool* fld_ptr_bool;
 
             if (field == NULL)
                 continue;
 
-            if ( name == "stationarityTolerance") {
+            if ( strcmp(name, "stationarityTolerance") == 0 ) {
                 if (!checkDimensionAndTypeDouble(field, 1, 1, "params.stationarityTolerance")) return;
 
                 fld_ptr = (double*) mxGetPr(field);
@@ -409,7 +403,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 continue;
             }
 
-            if ( name == "complementarityTolerance") {
+            if ( strcmp(name, "complementarityTolerance") == 0 ) {
                 if (!checkDimensionAndTypeDouble(field, 1, 1, "params.complementarityTolerance")) return;
 
                 fld_ptr = (double*) mxGetPr(field);
@@ -417,7 +411,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 continue;
             }
 
-            if ( name == "initialPenaltyParameter") {
+            if ( strcmp(name, "initialPenaltyParameter") == 0 ) {
                 if (!checkDimensionAndTypeDouble(field, 1, 1, "params.initialPenaltyParameter")) return;
 
                 fld_ptr = (double*) mxGetPr(field);
@@ -425,7 +419,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 continue;
             }
 
-            if ( name == "penaltyUpdateFactor") {
+            if ( strcmp(name, "penaltyUpdateFactor") == 0 ) {
                 if (!checkDimensionAndTypeDouble(field, 1, 1, "params.penaltyUpdateFactor")) return;
 
                 fld_ptr = (double*) mxGetPr(field);
@@ -433,15 +427,15 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 continue;
             }
 
-            if ( name == "solveZeroPenaltyFirst") {
+            if ( strcmp(name, "solveZeroPenaltyFirst") == 0 ) {
                 if (!checkDimensionAndTypeBool(field, 1, 1, "params.solveZeroPenaltyFirst")) return;
 
-                fld_ptr_bool = (bool*) mxGetPr(field);
-                options.setSolveZeroPenaltyFirst( fld_ptr[0] );
+                bool* fld_ptr_bool = (bool*) mxGetPr(field);
+                options.setSolveZeroPenaltyFirst( fld_ptr_bool[0] );
                 continue;
             }
 
-            if ( name == "maxIterations") {
+            if ( strcmp(name, "maxIterations") == 0 ) {
                 if (!checkDimensionAndTypeDouble(field, 1, 1, "params.maxIterations")) return;
 
                 fld_ptr = (double*) mxGetPr(field);
@@ -449,7 +443,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 continue;
             }
 
-            if ( name == "printLevel") {
+            if ( strcmp(name, "printLevel") == 0 ) {
                 if (!checkDimensionAndTypeDouble(field, 1, 1, "params.printLevel")) return;
 
                 fld_ptr = (double*) mxGetPr(field);
@@ -457,7 +451,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 continue;
             }
 
-            if ( name == "qpSolver") {
+            if ( strcmp(name, "qpSolver") == 0 ) {
                 if (!checkDimensionAndTypeDouble(field, 1, 1, "params.qpSolver")) return;
 
                 fld_ptr = (double*) mxGetPr(field);
@@ -465,15 +459,19 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 continue;
             }
 
-            if ( name == "x0") {
+            if ( strcmp(name, "x0") == 0 ) {
                 if (!checkDimensionAndTypeDouble(field, nV, 1, "params.x0")) return;
 
                 x0 = (double*) mxGetPr(field);
                 continue;
             }
 
-            if ( name == "y0") {
-                if (!checkDimensionAndTypeDouble(field, nDuals, 1, "params.y0")) return;
+            if ( strcmp(name, "y0") == 0 ) {
+                // TODO: This is just a heuristic right now (OSQP does not take box constraints, but we don't know th QP solver yet...)
+                int nDualsIn1 = nV + nC + 2*nComp;
+                int nDualsIn2 = nC + 2*nComp;
+
+                if (!checkDimensionAndTypeDouble(field, nDualsIn1, 1, "params.y0") && !checkDimensionAndTypeDouble(field, nDualsIn2, 1, "params.y0")) return;
 
                 y0 = (double*) mxGetPr(field);
                 continue;
@@ -527,14 +525,14 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
     // 2) Dual solution vector
     if (nlhs > 1) {
-        int nDuals = lcqp.getNumerOfDuals();
+        int nDualsOut = lcqp.getNumerOfDuals();
 
-        if (nDuals <= 0) {
+        if (nDualsOut <= 0) {
             mexPrintf("Failed to receive number of dual variables.\n");
             return;
         }
 
-        plhs[1] = mxCreateDoubleMatrix(nDuals, 1, mxREAL);
+        plhs[1] = mxCreateDoubleMatrix(nDualsOut, 1, mxREAL);
         if (plhs[1] == NULL) {
             mexPrintf("Failed to allocate output of dual solution vector.\n");
             return;
