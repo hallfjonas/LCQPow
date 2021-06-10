@@ -42,6 +42,7 @@ int main() {
 
 	Options options;
     options.setPrintLevel(PrintLevel::INNER_LOOP_ITERATES);
+    options.setQPSolver(QPSolver::QPOASES_DENSE);
 	lcqp.setOptions( options );
 
     // Solve first LCQP
