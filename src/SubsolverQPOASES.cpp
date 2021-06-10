@@ -22,6 +22,7 @@
 #include "SubsolverQPOASES.hpp"
 
 #include <qpOASES.hpp>
+#include <exception>
 
 namespace LCQPanther {
 
@@ -56,8 +57,10 @@ namespace LCQPanther {
 
         // Use this qpOASES flag to identify a sparse solver
         #ifdef SOLVER_MA57
+            printf("USING MA57 SOLVER.\n");
             useSchur = true;
         #else
+            printf("USING DENSE SOLVER.\n");
             useSchur = false;
         #endif
 
@@ -189,7 +192,29 @@ namespace LCQPanther {
         if (initialSolve) {
             if (isSparse) {
                 if (useSchur) {
-                    ret = qpSchur.init(H_sparse, g, A_sparse, lb, ub, lbA, ubA, nwsr, (double*)0, x0, y0);
+
+                    H_sparse->print();
+                    A_sparse->print();
+                    Utilities::printMatrix(lb,1,nV, "lb");
+                    Utilities::printMatrix(ub,1,nV, "ub");
+                    Utilities::printMatrix(lbA,1,nC, "lbA");
+                    Utilities::printMatrix(ubA,1,nC, "ubA");
+
+                    printf("QPSchur initilaized with \n");
+                    printf("  nV = %d\n", qpSchur.getNV());
+                    printf("  nC = %d\n", qpSchur.getNC());
+
+                    try
+                    {
+                        printf("TRYING TO CALL INITIAL QPSCHUR SOLVE\n");
+                        ret = qpSchur.init(H_sparse, g, A_sparse, lb, ub, lbA, ubA, nwsr, (double*)0, x0, y0);
+                    }
+                    catch (std::exception& e)
+                    {
+                        printf("Exception caught : %s\n", e.what());
+                    }
+
+
                 } else {
                     ret = qp.init(H_sparse, g, A_sparse, lb, ub, lbA, ubA, nwsr, (double*)0, x0, y0);
                 }
@@ -198,11 +223,14 @@ namespace LCQPanther {
             }
         } else {
             if (useSchur) {
+                    printf("CALLING QPSCHUR HOTSTART\n");
                 ret = qpSchur.hotstart(g, lb, ub, lbA, ubA, nwsr);
             } else {
                 ret = qp.hotstart(g, lb, ub, lbA, ubA, nwsr);
             }
         }
+
+        printf("ITERATE COMPUTED\n");
 
         iterations = (int)(nwsr);
 
@@ -227,6 +255,8 @@ namespace LCQPanther {
 
     void SubsolverQPOASES::copy(const SubsolverQPOASES& rhs)
     {
+        printf("ENTERING COPY\n");
+
         nV = rhs.nV;
         nC = rhs.nC;
 
@@ -267,5 +297,7 @@ namespace LCQPanther {
         } else {
             qp = rhs.qp;
         }
+
+        printf("LEAVING COPY\n");
     }
 }
