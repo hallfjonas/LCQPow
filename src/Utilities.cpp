@@ -562,9 +562,9 @@ namespace LCQPanther {
     }
 
 
-    void Utilities::copyIntToIntT(int_t* dest, const int* const src, int n)
+    void Utilities::copyIntToIntT(int_t* dest, const int* const src, int_t n)
     {
-        for (int i = 0; i < n; i++)
+        for (int_t i = 0; i < n; i++)
             dest[i] = (int_t) src[i];
     }
 

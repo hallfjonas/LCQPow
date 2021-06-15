@@ -736,7 +736,7 @@ namespace LCQPanther {
 
 			Subsolver tmp(nV, nC + 2*nComp, H, A);
 			subsolver = tmp;
-		} else if (options.getQPSolver() == QPSolver::QPOASES_SPARSE) {
+		} else if (options.getQPSolver() >= QPSolver::QPOASES_SPARSE && options.getQPSolver() <= QPSolver::QPOASES_SPARSE_SCHUR) {
 			nDuals = nV + nC + 2*nComp;
 			boxDualOffset = nV;
 

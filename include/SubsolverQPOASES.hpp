@@ -57,7 +57,8 @@ namespace LCQPanther {
             SubsolverQPOASES(   int nV,
                                 int nC,
                                 csc* H,
-                                csc* A);
+                                csc* A,
+                                bool useSchur);
 
 
             /** Copy constructor. */
@@ -80,13 +81,13 @@ namespace LCQPanther {
              *
              * @param initialSolver A flag indicating whether the call should initialize the sequence.
              * @param iterations A reference to write the number of subsolver iterates to.
-             * @param _g The (potentially) updated objective linear component.
-             * @param _lbA The (potentially) updated lower bounds of the linear constraints.
-             * @param _ubA The (potentially) updated upper bounds of the linear constraints.
+             * @param _g The (potentially updated) objective linear component.
+             * @param _lbA The (potentially updated) lower bounds of the linear constraints.
+             * @param _ubA The (potentially updated) upper bounds of the linear constraints.
              * @param _x0 The primal initial guess. NULL pointer can be passed.
              * @param _y0 The dual initial guess. NULL pointer can be passed.
-             * @param _lb The (potentially) updated lower box constraints. NULL pointer can be passed.
-             * @param _ub The (potentially) updated upper box constraints. NULL pointer can be passed.
+             * @param _lb The (potentially updated) lower box constraints. NULL pointer can be passed.
+             * @param _ub The (potentially updated) upper box constraints. NULL pointer can be passed.
             */
             ReturnValue solve(  bool initialSolve, int& iterations,
                                 const double* const _g,

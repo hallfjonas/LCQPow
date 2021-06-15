@@ -89,7 +89,6 @@ add_compile_options(
     -DLINUX
     -D__USE_LONG_INTEGERS__
     -D__USE_LONG_FINTS__
-    -D__AVOID_LA_NAMING_CONFLICTS__
 )
 
 # Save auxiliar source files to variable

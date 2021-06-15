@@ -45,8 +45,8 @@ namespace LCQPanther {
     {
         qpSolver = _qpSolver;
 
-        if (qpSolver >= QPSolver::QPOASES_SPARSE && qpSolver <= QPSolver::QPOASES_SPARSE) {
-            SubsolverQPOASES tmp(nV, nC, H, A );
+        if (qpSolver >= QPSolver::QPOASES_SPARSE && qpSolver <= QPSolver::QPOASES_SPARSE_SCHUR) {
+            SubsolverQPOASES tmp(nV, nC, H, A, qpSolver == QPSolver::QPOASES_SPARSE_SCHUR );
             solverQPOASES = tmp;
         } else if (qpSolver == QPSolver::OSQP_SPARSE) {
             SubsolverOSQP tmp(H, A);
@@ -76,7 +76,7 @@ namespace LCQPanther {
 
     void Subsolver::getSolution( double* x, double* y )
     {
-        if (qpSolver >= QPSolver::QPOASES_DENSE && qpSolver <= QPSolver::QPOASES_SPARSE) {
+        if (qpSolver >= QPSolver::QPOASES_DENSE && qpSolver <= QPSolver::QPOASES_SPARSE_SCHUR) {
             solverQPOASES.getSolution( x, y );
         } else if (qpSolver == QPSolver::OSQP_SPARSE) {
             solverOSQP.getSolution( x, y );
@@ -86,7 +86,7 @@ namespace LCQPanther {
 
     void Subsolver::setPrintLevel( PrintLevel printLevel )
     {
-        if (qpSolver >= QPSolver::QPOASES_DENSE && qpSolver <= QPSolver::QPOASES_SPARSE) {
+        if (qpSolver >= QPSolver::QPOASES_DENSE && qpSolver <= QPSolver::QPOASES_SPARSE_SCHUR) {
             if (printLevel < PrintLevel::SUBPROBLEM_SOLVER_ITERATES)
                 optionsQPOASES.printLevel =  qpOASES::PrintLevel::PL_NONE;
             else
@@ -106,7 +106,7 @@ namespace LCQPanther {
                                     const double* lb, const double* ub)
     {
         ReturnValue ret = ReturnValue::SUCCESSFUL_RETURN;
-        if (qpSolver >= QPSolver::QPOASES_DENSE && qpSolver <= QPSolver::QPOASES_SPARSE) {
+        if (qpSolver >= QPSolver::QPOASES_DENSE && qpSolver <= QPSolver::QPOASES_SPARSE_SCHUR) {
             ret = solverQPOASES.solve( initialSolve, iterations, g, lbA, ubA, x0, y0, lb, ub );
         } else if (qpSolver == QPSolver::OSQP_SPARSE) {
             ret = solverOSQP.solve( initialSolve, iterations, g, lbA, ubA, x0, y0, lb, ub );
@@ -122,7 +122,7 @@ namespace LCQPanther {
     {
         qpSolver = rhs.qpSolver;
 
-        if (qpSolver >= QPSolver::QPOASES_DENSE && qpSolver <= QPSolver::QPOASES_SPARSE) {
+        if (qpSolver >= QPSolver::QPOASES_DENSE && qpSolver <= QPSolver::QPOASES_SPARSE_SCHUR) {
             SubsolverQPOASES tmp( rhs.solverQPOASES );
             solverQPOASES = tmp;
         } else if (qpSolver == QPSolver::OSQP_SPARSE) {

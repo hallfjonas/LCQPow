@@ -49,19 +49,13 @@ namespace LCQPanther {
 
 
     SubsolverQPOASES::SubsolverQPOASES( int _nV, int _nC,
-                                        csc* _H, csc* _A)
+                                        csc* _H, csc* _A, bool _useSchur)
     {
         nV = (int_t)_nV;
         nC = (int_t)_nC;
 
         isSparse = true;
-
-        // Use this qpOASES flag to identify a sparse solver
-        #ifdef SOLVER_MA57
-            useSchur = true;
-        #else
-            useSchur = false;
-        #endif
+        useSchur = _useSchur;
 
         if (useSchur) {
             qpSchur = qpOASES::SQProblemSchur(nV, nC);

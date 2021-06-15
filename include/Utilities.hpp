@@ -96,7 +96,8 @@ namespace LCQPanther {
     enum QPSolver {
         QPOASES_DENSE = 0,                              /**< QP solver qpOASES in dense mode. */
         QPOASES_SPARSE = 1,                             /**< QP solver qpOASES in sparse mode. */
-        OSQP_SPARSE = 2                                 /**< QP solver OSQP. */
+        QPOASES_SPARSE_SCHUR = 2,                       /**< QP solver qpOASES with Schur Complement mode. */
+        OSQP_SPARSE = 3                                 /**< QP solver OSQP. */
     };
 
     class Utilities {
@@ -182,7 +183,7 @@ namespace LCQPanther {
             // Copy a csc matrix (override of copyCSC)
             static csc* copyCSC(const csc* const M, bool toUpperTriangular = false);
 
-            static void copyIntToIntT(int_t* dest, const int* const src, int n);
+            static void copyIntToIntT(int_t* dest, const int* const src, int_t n);
 
             /** Transform a csc matrix to dense.
              *

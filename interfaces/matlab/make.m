@@ -73,7 +73,9 @@ function [] = make( varargin )
     %DEBUGFLAGS = ' ';
     DEBUGFLAGS = ' -v -g CXXDEBUGFLAGS=''$CXXDEBUGFLAGS -Wall -pedantic -Wshadow'' ';
 
-    CPPFLAGS = [ IFLAGS, '-largeArrayDims -D__cpluplus -D__MATLAB__ -D__AVOID_LA_NAMING_CONFLICTS__ -D__USE_LONG_INTEGERS__ -D__USE_LONG_FINTS__ ',' ' ];
+    SPARSEFLAGS = '-largeArrayDims -D__USE_LONG_INTEGERS__ -D__USE_LONG_FINTS__ -DSOLVER_MA57 -lmwma57 ';
+
+    CPPFLAGS = [ IFLAGS, '-largeArrayDims -D__cpluplus -D__MATLAB__ -lmwblas -lmwlapack ', SPARSEFLAGS, ' ' ];
     defaultFlags = '-O -D__NO_COPYRIGHT__ '; %% -D__SUPPRESSANYOUTPUT__
 
     CPPFLAGS = [ CPPFLAGS, DEBUGFLAGS, '-DLINUX ', LFLAGS, ' ' ];
