@@ -26,7 +26,7 @@
 using namespace LCQPanther;
 
 int main() {
-    std::cout << "Preparing warm up problem...\n";
+    std::cout << "Preparing dense warm up problem...\n";
 
     /* Setup data of first QP. */
     double H[2*2] = { 2.0, 0.0, 0.0, 2.0 };

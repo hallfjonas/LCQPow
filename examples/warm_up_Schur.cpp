@@ -26,13 +26,22 @@
 using namespace LCQPanther;
 
 int main() {
-    std::cout << "Preparing warm up problem...\n";
+    std::cout << "Preparing SCHUR warm up problem...\n";
 
     /* Setup data of first QP. */
-    double H[2*2] = { 2.0, 0.0, 0.0, 2.0 };
+    double H_data[2] = { 2.0, 2.0 };
+    int H_i[2] = {0, 1};
+    int H_p[3] = {0, 1, 2};
+
     double g[2] = { -2.0, -2.0 };
-    double S1[1*2] = {1.0, 0.0};
-    double S2[1*2] = {0.0, 1.0};
+
+    double S1_data[1] = { 1.0 };
+    int S1_i[1] = {0};
+    int S1_p[3] = {0, 1, 1};
+
+    double S2_data[1] = { 1.0 };
+    int S2_i[1] = {0};
+    int S2_p[3] = {0, 0, 1};
 
     int nV = 2;
     int nC = 0;
@@ -42,11 +51,11 @@ int main() {
 
 	Options options;
     options.setPrintLevel(PrintLevel::INNER_LOOP_ITERATES);
-    options.setQPSolver(QPSolver::QPOASES_SPARSE);
+    options.setQPSolver(QPSolver::QPOASES_SPARSE_SCHUR);
 	lcqp.setOptions( options );
 
     // Solve first LCQP
-	ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2 );
+	ReturnValue retVal = lcqp.loadLCQP( H_data, H_i, H_p, g, S1_data, S1_i, S1_p, S2_data, S2_i, S2_p);
 
     if (retVal != SUCCESSFUL_RETURN)
     {
@@ -62,18 +71,22 @@ int main() {
         return 1;
     }
 
+    int nDuals = lcqp.getNumerOfDuals();
+
     // Get solutions
     double* xOpt = new double[2];
-	double* yOpt = new double[nV + nC + 2*nComp];
-    LCQPanther::OutputStatistics stats;
+	double* yOpt = new double[nDuals];
 	lcqp.getPrimalSolution( xOpt );
 	lcqp.getDualSolution( yOpt );
-    lcqp.getOutputStatistics( stats );
-	printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g, %g, %g ]; i = %d; k = %d; rho = %g; WSR = %d \n\n",
-			xOpt[0],xOpt[1],yOpt[0],yOpt[1],yOpt[2],yOpt[3],
-            stats.getIterTotal(), stats.getIterOuter(), stats.getRhoOpt(), stats.getSubproblemIter() );
 
-    // Clean Up
+    if (nDuals == 2) {
+        printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g ]; \n\n",
+			xOpt[0],xOpt[1],yOpt[0],yOpt[1]);
+    } else if (nDuals == 4) {
+        printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g, %g, %g ]; \n\n",
+			xOpt[0],xOpt[1],yOpt[0],yOpt[1],yOpt[2],yOpt[3]);
+    }
+
     delete[] xOpt; delete[] yOpt;
 
     return 0;
