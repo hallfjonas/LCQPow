@@ -345,9 +345,9 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     if (nrhs == 7 && !mxIsStruct(prhs[6]) && !checkDimensionAndTypeDouble(prhs[5], nC, 1, "lbA", true)) return;
     if (nrhs == 7 && !mxIsStruct(prhs[6]) && !checkDimensionAndTypeDouble(prhs[6], nC, 1, "ubA", true)) return;
 
-    if ((nrhs == 8 || nrhs == 9) && !checkDimensionAndTypeDouble(prhs[4], nC, nV, "A", true)) return;
-    if ((nrhs == 8 || nrhs == 9) && !checkDimensionAndTypeDouble(prhs[5], nC, 1, "lbA", true)) return;
-    if ((nrhs == 8 || nrhs == 9) && !checkDimensionAndTypeDouble(prhs[6], nC, 1, "ubA", true)) return;
+    if (nrhs >= 8 && !checkDimensionAndTypeDouble(prhs[4], nC, nV, "A", true)) return;
+    if (nrhs >= 8 && !checkDimensionAndTypeDouble(prhs[5], nC, 1, "lbA", true)) return;
+    if (nrhs >= 8 && !checkDimensionAndTypeDouble(prhs[6], nC, 1, "ubA", true)) return;
 
     if ((nrhs == 9 || nrhs == 10) && !checkDimensionAndTypeDouble(prhs[7], nV, 1, "lb", true)) return;
     if ((nrhs == 9 || nrhs == 10) && !checkDimensionAndTypeDouble(prhs[8], nV, 1, "ub", true)) return;
