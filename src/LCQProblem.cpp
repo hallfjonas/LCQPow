@@ -1170,7 +1170,7 @@ namespace LCQPanther {
 
 	AlgorithmStatus LCQProblem::getPrimalSolution( double* const xOpt ) const
 	{
-		if (xk != 0) {
+		if (xOpt != 0 && xk != 0) {
 			for (int i = 0; i < nV; i++)
 				xOpt[i] = xk[i];
 		}
@@ -1181,7 +1181,7 @@ namespace LCQPanther {
 
 	AlgorithmStatus LCQProblem::getDualSolution( double* const yOpt ) const
 	{
-		if (yk != 0) {
+		if (yOpt != 0 && yk != 0) {
 			for (int i = 0; i < nDuals; i++)
 				yOpt[i] = yk[i];
 		}
