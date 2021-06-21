@@ -303,19 +303,16 @@ namespace LCQPow {
 	}
 
 
-
-
-	ReturnValue LCQProblem::loadLCQP(	double* _H_data, int* _H_i, int* _H_p, double* _g,
-										double* _S1_data, int* _S1_i, int* _S1_p,
-										double* _S2_data, int* _S2_i, int* _S2_p,
-										double* _A_data, int* _A_i, int* _A_p,
-										double* _lbA, double* _ubA,	double* _lb, double* _ub,
-										double* _x0, double* _y0
+	ReturnValue LCQProblem::loadLCQP(	const csc* const _H, const double* const _g,
+										const csc* const _S1, const csc* const _S2,
+										const csc* const _A, const double* const _lbA, const double* const _ubA,
+										const double* const _lb, const double* const _ub,
+										const double* const _x0, const double* const _y0
 										)
 	{
 		ReturnValue ret;
 
-		ret = setH( _H_data, _H_i, _H_p );
+		ret = setH( _H );
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
@@ -325,7 +322,7 @@ namespace LCQPow {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
-		ret = setConstraints( _S1_data, _S1_i, _S1_p, _S2_data, _S2_i, _S2_p, _A_data, _A_i, _A_p, _lbA, _ubA );
+		ret = setConstraints( _S1, _S2, _A, _lbA, _ubA );
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
@@ -351,6 +348,7 @@ namespace LCQPow {
 
 		return ReturnValue::SUCCESSFUL_RETURN;
 	}
+
 
 	ReturnValue LCQProblem::runSolver( )
 	{
@@ -513,19 +511,20 @@ namespace LCQPow {
 	}
 
 
-	ReturnValue LCQProblem::setConstraints(	double* S1_data, int* S1_i, int* S1_p,
-											double* S2_data, int* S2_i, int* S2_p,
-											double* A_data, int* A_i, int* A_p,
-											double* lbA_new, double* ubA_new
+	ReturnValue LCQProblem::setConstraints(	const csc* const S1_new, const csc* const S2_new,
+											const csc* const A_new, const double* const lbA_new, const double* const ubA_new
 											)
 	{
 		// Create sparse matrices
-		S1_sparse = Utilities::copyCSC(nComp, nV, S1_p[nV], S1_data, S1_i, S1_p);
-		S2_sparse = Utilities::copyCSC(nComp, nV, S2_p[nV], S2_data, S2_i, S2_p);
+		S1_sparse = Utilities::copyCSC(S1_new);
+		S2_sparse = Utilities::copyCSC(S2_new);
 
 		// Get number of elements
-		int tmpA_nnx = S1_p[nV] + S2_p[nV];
-		tmpA_nnx += A_p != 0 ? A_p[nV] : 0;
+		int tmpA_nnx = S1_sparse->p[nV] + S2_sparse->p[nV];
+
+		if (A_new != 0) {
+			tmpA_nnx += A_new->p != 0 ? A_new->p[nV] : 0;
+		}
 
 		// Data array
 		double* tmpA_data = (double*)malloc((size_t)tmpA_nnx*sizeof(double));
@@ -544,27 +543,27 @@ namespace LCQPow {
 			tmpA_p[i+1] = tmpA_p[i];
 
 			// First handle rows of A
-			if (A_p != 0) {
-				for (int j = A_p[i]; j < A_p[i+1]; j++) {
-					tmpA_data[index_data] = A_data[j];
-					tmpA_i[index_data] = A_i[j];
+			if (A_new != 0) {
+				for (int j = A_new->p[i]; j < A_new->p[i+1]; j++) {
+					tmpA_data[index_data] = A_new->x[j];
+					tmpA_i[index_data] = A_new->i[j];
 					index_data++;
 					tmpA_p[i+1]++;
 				}
 			}
 
 			// Then rows of S1
-			for (int j = S1_p[i]; j < S1_p[i+1]; j++) {
-				tmpA_data[index_data] = S1_data[j];
-				tmpA_i[index_data] = nC + S1_i[j];
+			for (int j = S1_sparse->p[i]; j < S1_sparse->p[i+1]; j++) {
+				tmpA_data[index_data] = S1_sparse->x[j];
+				tmpA_i[index_data] = nC + S1_sparse->i[j];
 				index_data++;
 				tmpA_p[i+1]++;
 			}
 
 			// Then rows of S2
-			for (int j = S2_p[i]; j < S2_p[i+1]; j++) {
-				tmpA_data[index_data] = S2_data[j];
-				tmpA_i[index_data] = nC + nComp + S2_i[j];
+			for (int j = S2_sparse->p[i]; j < S2_sparse->p[i+1]; j++) {
+				tmpA_data[index_data] = S2_sparse->x[j];
+				tmpA_i[index_data] = nC + nComp + S2_sparse->i[j];
 				index_data++;
 				tmpA_p[i+1]++;
 			}
@@ -604,7 +603,7 @@ namespace LCQPow {
 			ubA[i + nC] = INFINITY;
 		}
 
-		C_sparse = Utilities::MatrixSymmetrizationProduct(S1_data, S1_i, S1_p, S2_data, S2_i, S2_p, nComp, nV);
+		C_sparse = Utilities::MatrixSymmetrizationProduct(S1_sparse, S2_sparse);
 
 		if (C_sparse == 0) {
 			return FAILED_SYM_COMPLEMENTARITY_MATRIX;
@@ -614,12 +613,12 @@ namespace LCQPow {
 	}
 
 
-	ReturnValue LCQProblem::setH( double* H_data, int* H_i, int* H_p )
+	ReturnValue LCQProblem::setH( const csc* const H_new )
 	{
 		if (nV <= 0)
 			return LCQPOBJECT_NOT_SETUP;
 
-		H_sparse = Utilities::copyCSC(nV, nV, H_p[nV], H_data, H_i, H_p);
+		H_sparse = Utilities::copyCSC(H_new);
 
 		return ReturnValue::SUCCESSFUL_RETURN;
 	}

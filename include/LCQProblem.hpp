@@ -125,19 +125,11 @@ namespace LCQPow {
 
 			/** Run solver passing the desired LCQP in sparse format (OSQP is used on subsolver level).
 			 *
-			 * @param _H_data Non-zero Hessian matrix values.
-			 * @param _H_i Row indicies of non-zero values.
-			 * @param _H_p Pointer to column starts.
+			 * @param _H Hessian matrix in csc sparse format.
 			 * @param _g The objective's linear term.
-			 * @param _S1_data Non-zero values of LHS of complementarity product.
-			 * @param _S1_i Row indicies of non-zero values of S1.
-			 * @param _S1_p Pointer to column starts of S1.
-			 * @param _S2_data Non-zero values of RHS of complementarity product.
-			 * @param _S1_i Row indicies of non-zero values of S2.
-			 * @param _S1_p Pointer to column starts of S2.
-			 * @param _A_data Non-zero values of constraint matrix.
-			 * @param _A_i Row indicies of non-zero values of A.
-			 * @param _A_p Pointer to column starts of A.
+			 * @param _S1 LHS of complementarity product in csc sparse format.
+			 * @param _S2 RHS of complementarity product in csc sparse format.
+			 * @param _A Constraint matrix in csc sparse format.
 			 * @param _lbA The constraints lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
 			 * @param _ubA The constraints upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
 			 * @param _lb The box constraints lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
@@ -148,73 +140,17 @@ namespace LCQPow {
 			 * @returns SUCCESSFUL_RETURN if a solution is found. Otherwise the return value will indicate an occured error.
 			*/
 			ReturnValue loadLCQP(
-				double* _H_data,
-				int* _H_i,
-				int* _H_p,
-				double* _g,
-				double* _S1_data,
-				int* _S1_i,
-				int* _S1_p,
-				double* _S2_data,
-				int* _S2_i,
-				int* _S2_p,
-				double* _A_data = 0,
-				int* _A_i = 0,
-				int* _A_p = 0,
-				double* _lbA = 0,
-				double* _ubA = 0,
-				double* _lb = 0,
-				double* _ub = 0,
-				double* _x0 = 0,
-				double* _y0 = 0
-			);
-
-
-			/** Run solver passing the desired LCQP in (file) sparse format (OSQP is used on subsolver level).
-			 *
-			 * @param _H_data_file Non-zero Hessian matrix values.
-			 * @param _H_nnx_file Number of non-zero values of Hessian.
-			 * @param _H_i_file Row indicies of non-zero values.
-			 * @param _H_p_file Pointer to column starts.
-			 * @param _g_file The objective's linear term.
-			 * @param _lb_file The box constraint's lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
-			 * @param _ub_file The box constraint's upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
-			 * @param _S1_data_file Non-zero values of LHS of complementarity product.
-			 * @param _S1_i_file Row indicies of non-zero values of S1.
-			 * @param _S1_p_file Pointer to column starts of S1.
-			 * @param _S2_data_file Non-zero values of RHS of complementarity product.
-			 * @param _S1_i_file Row indicies of non-zero values of S2.
-			 * @param _S1_p_file Pointer to column starts of S2.
-			 * @param _A_data_file Non-zero values of constraint matrix.
-			 * @param _A_i_file Row indicies of non-zero values of A.
-			 * @param _A_p_file Pointer to column starts of A.
-			 * @param _lbA_file The constraint's lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
-			 * @param _ubA_file The constraint's upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
-			 * @param _x0_file The initial guess for the optimal primal solution vector. If a `NULL` pointer is passed the zero vector is used.
-			 * @param _y0 _fileThe initial guess for the optimal dual solution vector. If a `NULL` pointer is passed, then the initialization depends on the subsolver and its options.
-			 *
-			 * @returns SUCCESSFUL_RETURN if a solution is found. Otherwise the return value will indicate an occured error.
-			*/
-			ReturnValue loadLCQP(
-				const char* const H_data_file,
-				const char* const H_i_file,
-				const char* const H_p_file,
-				const char* const g_file,
-				const char* const lb_file,
-				const char* const ub_file,
-				const char* const S1_data_file,
-				const char* const S1_i_file,
-				const char* const S1_p_file,
-				const char* const S2_data_file,
-				const char* const S2_i_file,
-				const char* const S2_p_file,
-				const char* const A_data_file = 0,
-				const char* const A_i_file = 0,
-				const char* const A_p_file = 0,
-				const char* const lbA_file = 0,
-				const char* const ubA_file = 0,
-				const char* const x0_file = 0,
-				const char* const y0_file = 0
+				const csc* const _H,
+				const double* const _g,
+				const csc* const _S1,
+				const csc* const _S2,
+				const csc* const _A = 0,
+				const double* const _lbA = 0,
+				const double* const _ubA = 0,
+				const double* const _lb = 0,
+				const double* const _ub = 0,
+				const double* const _x0 = 0,
+				const double* const _y0 = 0
 			);
 
 
@@ -292,15 +228,9 @@ namespace LCQPow {
 
 			/** Store the (sparse) Hessian matrix H internally.
 			 *
-			 * @param _H_data Non-zero Hessian matrix values.
-			 * @param _H_i Row indicies of non-zero values.
-			 * @param _H_p Pointer to column starts.
+			 * @param H_new Hessian matrix in csc sparse format.
 			 */
-			inline ReturnValue setH(
-				double* H_data,
-				int* H_i,
-				int* H_p
-			);
+			inline ReturnValue setH( const csc* const H_new );
 
 
 
@@ -361,30 +291,18 @@ namespace LCQPow {
 
 			/** Set the new linear constraint consisting of (dense) complementarity pairs and regular linear constraints.
 			 *
-			 * @param S1_data Non-zero values of LHS of complementarity product.
-			 * @param S1_i Row indicies of non-zero values of S1.
-			 * @param S1_p Pointer to column starts of S1.
-			 * @param S2_data Non-zero values of RHS of complementarity product.
-			 * @param S1_i Row indicies of non-zero values of S2.
-			 * @param S1_p Pointer to column starts of S2.
-			 * @param A_data Non-zero values of constraint matrix.
-			 * @param A_i Row indicies of non-zero values of A.
-			 * @param A_p Pointer to column starts of A.
+			 * @param S1_new LHS of complementarity product in csc sparse format.
+			 * @param S2_new RHS of complementarity product in csc sparse format.
+			 * @param A_new Constraint matrix in csc sparse format.
 			 * @param lbA The constraint's lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
 			 * @param ubA The constraint's upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
 			 */
 			ReturnValue setConstraints(
-				double* S1_data,
-				int* S1_i,
-				int* S1_p,
-				double* S2_data,
-				int* S2_i,
-				int* S2_p,
-				double* A_data,
-				int* A_i,
-				int* A_p,
-				double* lbA,
-				double* ubA
+				const csc* const S1_new,
+				const csc* const S2_new,
+				const csc* const A_new,
+				const double* const lbA,
+				const double* const ubA
 			);
 
 

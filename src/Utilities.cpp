@@ -152,6 +152,11 @@ namespace LCQPow {
     }
 
 
+    csc* Utilities::MatrixSymmetrizationProduct(csc* S1, csc* S2) {
+        return MatrixSymmetrizationProduct(S1->x, S1->i, S1->p, S2->x, S2->i, S2->p, S1->m, S1->n);
+    }
+
+
     void Utilities::AffineLinearTransformation(const double alpha, const double* const A, const double* const b, const double* const c, double* d, int m, int n) {
         for (int i = 0; i < m; i++) {
 

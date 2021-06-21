@@ -120,6 +120,9 @@ namespace LCQPow {
             // C = A'*B + B'*A
             static csc* MatrixSymmetrizationProduct(double* S1_x, int* S1_i, int* S1_p, double* S2_x, int* S2_i, int* S2_p, int m, int n);
 
+            // C = A'*B + B'*A
+            static csc* MatrixSymmetrizationProduct(csc* S1, csc* S2);
+
             // d = A*b + c
             static void AffineLinearTransformation(const double alpha, const double* const A, const double* const b, const double* const c, double* d, int m, int n);
 

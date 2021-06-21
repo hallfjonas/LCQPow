@@ -47,6 +47,10 @@ int main() {
     int nC = 0;
     int nComp = 1;
 
+    csc* H = LCQPow::Utilities::createCSC(nV, nV, H_p[nV], H_data, H_i, H_p);
+    csc* S1 = LCQPow::Utilities::createCSC(nComp, nV, S1_p[nV], S1_data, S1_i, S1_p);
+    csc* S2 = LCQPow::Utilities::createCSC(nComp, nV, S2_p[nV], S2_data, S2_i, S2_p);
+
     LCQProblem lcqp( nV, nC, nComp );
 
 	Options options;
@@ -55,7 +59,11 @@ int main() {
 	lcqp.setOptions( options );
 
     // Solve first LCQP
-	ReturnValue retVal = lcqp.loadLCQP( H_data, H_i, H_p, g, S1_data, S1_i, S1_p, S2_data, S2_i, S2_p);
+	ReturnValue retVal = lcqp.loadLCQP(H, g, S1, S2);
+
+    free(H); H = NULL;
+    free(S1); S1 = NULL;
+    free(S2); S2 = NULL;
 
     if (retVal != SUCCESSFUL_RETURN)
     {

@@ -103,23 +103,25 @@ void printOptions( Options options ) {
     mexPrintf("          prnt: %d \n\n", options.getPrintLevel());
 }
 
-void readSparseMatrix(const mxArray* mat, double** M_data, int** M_i, int** M_p, int nRow, int nCol)
+csc* readSparseMatrix(const mxArray* mat, int nRow, int nCol)
 {
     mwIndex *mat_ir = mxGetIr( mat );
     mwIndex *mat_jc = mxGetJc( mat );
     double *v = (double*)mxGetPr( mat );
     int M_nnx = mat_jc[nCol];
-    *M_data = new double[M_nnx];
-    *M_i = new int[M_nnx];
-    *M_p = new int[nCol+1];
+    double* M_data = (double*) malloc(M_nnx*sizeof(double));
+    int* M_i = (int*) malloc(M_nnx*sizeof(int));
+    int* M_p = (int*) malloc((nCol+1)*sizeof(int));
     for (int i = 0; i < M_nnx; i++) {
-        (*M_data)[i] = v[i];
-        (*M_i)[i] = (int) mat_ir[i];
+        M_data[i] = v[i];
+        M_i[i] = (int) mat_ir[i];
     }
 
     for (int i = 0; i < nCol+1; i++) {
-        (*M_p)[i] = (int) mat_jc[i];
+        M_p[i] = (int) mat_jc[i];
     }
+
+    return LCQPow::Utilities::createCSC(nRow, nCol, M_p[nCol], M_data, M_i, M_p);
 }
 
 void readVectors(const mxArray** prhs, int nrhs, int nC, double** g, double** lbA, double** ubA, double** lb, double** ub)
@@ -147,56 +149,33 @@ int LCQPSparse(LCQProblem& lcqp, int nV, int nComp, int nC, int nlhs, mxArray* p
         return 1;
     }
 
-    // Vectors for data types
-    double* H_data = NULL;
-    int* H_i = NULL;
-    int* H_p = NULL;
+    // Read sparse matrices
+    csc* H = readSparseMatrix(prhs[0], nV, nV);
+    csc* S1 = readSparseMatrix(prhs[2], nComp, nV);
+    csc* S2 = readSparseMatrix(prhs[3], nComp, nV);
+    csc* A = NULL;
+    if (nC > 0) {
+        A = readSparseMatrix(prhs[4], nC, nV);
+    }
+
+    // Read vectors
     double* g;
-    double* S1_data = NULL;
-    int* S1_i = NULL;
-    int* S1_p = NULL;
-    double* S2_data = NULL;
-    int* S2_i = NULL;
-    int* S2_p = NULL;
-    double* A_data = NULL;
-    int* A_i = NULL;
-    int* A_p = NULL;
     double* lbA = NULL;
     double* ubA = NULL;
     double* lb = NULL;
     double* ub = NULL;
-
-    // Read sparse matrices
-    readSparseMatrix(prhs[0], &H_data, &H_i, &H_p, nV, nV);
-    readSparseMatrix(prhs[2], &S1_data, &S1_i, &S1_p, nComp, nV);
-    readSparseMatrix(prhs[3], &S2_data, &S2_i, &S2_p, nComp, nV);
-    if (nC > 0) {
-        readSparseMatrix(prhs[4], &A_data, &A_i, &A_p, nC, nV);
-    }
-
-    // Read vectors
     readVectors(prhs, nrhs, nC, &g, &lbA, &ubA, &lb, &ub);
 
     // Load data into LCQP object
     LCQPow::ReturnValue ret = lcqp.loadLCQP(
-        H_data, H_i, H_p, g,
-        S1_data, S1_i, S1_p, S2_data, S2_i, S2_p,
-        A_data, A_i, A_p, lbA, ubA, lb, ub, x0, y0
+        H, g, S1, S2, A, lbA, ubA, lb, ub, x0, y0
     );
 
     // Clear sparse specific memory
-    if (H_data != 0) {delete[] H_data; H_data = NULL;}
-    if (H_i != 0) {delete[] H_i; H_i = NULL;}
-    if (H_p != 0) {delete[] H_p; H_p = NULL;}
-    if (S1_data != 0) {delete[] S1_data; S1_data = NULL;}
-    if (S1_i != 0) {delete[] S1_i; S1_i = NULL;}
-    if (S1_p != 0) {delete[] S1_p; S1_p = NULL;}
-    if (S2_data != 0) {delete[] S2_data; S2_data = NULL;}
-    if (S2_i != 0) {delete[] S2_i; S2_i = NULL;}
-    if (S2_p != 0) {delete[] S2_p; S2_p = NULL;}
-    if (A_data != 0) {delete[] A_data; A_data = NULL;}
-    if (A_i != 0) {delete[] A_i; A_i = NULL;}
-    if (A_p != 0) {delete[] A_p; A_p = NULL;}
+    LCQPow::Utilities::ClearSparseMat(H);
+    LCQPow::Utilities::ClearSparseMat(S1);
+    LCQPow::Utilities::ClearSparseMat(S2);
+    if (A != 0) LCQPow::Utilities::ClearSparseMat(A);
 
     return ret;
 }
