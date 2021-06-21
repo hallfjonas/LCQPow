@@ -1,23 +1,23 @@
-% This file is part of LCQPanther.
-% LCQPanther -- A Solver for Quadratic Programs with Commplementarity Constraints.
+% This file is part of LCQPow.
+% LCQPow -- A Solver for Quadratic Programs with Commplementarity Constraints.
 % Copyright (C) 2020 - 2021 by Jonas Hall et al.
 %
-% LCQPanther is free software; you can redistribute it and/or
+% LCQPow is free software; you can redistribute it and/or
 % modify it under the terms of the GNU Lesser General Public
 % License as published by the Free Software Foundation; either
 % version 2.1 of the License, or (at your option) any later version.
-% LCQPanther is distributed in the hope that it will be useful,
+% LCQPow is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 % See the GNU Lesser General Public License for more details.
 %
 % You should have received a copy of the GNU Lesser General Public
-% License along with LCQPanther; if not, write to the Free Software
+% License along with LCQPow; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 %
 %---------------------------------------------------------------------------------
 %
-%LCQPanther is intended for solving quadratic programs with
+%LCQPow is intended for solving quadratic programs with
 %linear complementarity constraints of the form
 %
 %                min   1/2*x'Hx + x'g
@@ -29,13 +29,13 @@
 %
 %I) Call
 %
-%    [x] = LCQPanther( H,g,S1,S2,{params} )
+%    [x] = LCQPow( H,g,S1,S2,{params} )
 %or
-%    [x] = LCQPanther( H,g,S1,S2,lb,ub,{params} )
+%    [x] = LCQPow( H,g,S1,S2,lb,ub,{params} )
 %or
-%    [x] = LCQPanther( H,g,S1,S2,A,lbA,ubA,{params} )
+%    [x] = LCQPow( H,g,S1,S2,A,lbA,ubA,{params} )
 %or
-%    [x] = LCQPanther( H,g,S1,S2,A,lbA,ubA,lb,ub,{params}).
+%    [x] = LCQPow( H,g,S1,S2,A,lbA,ubA,lb,ub,{params}).
 %
 %II) The optional params struct may contain the following fields:
 %

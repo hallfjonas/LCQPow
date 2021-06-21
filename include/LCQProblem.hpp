@@ -1,27 +1,27 @@
 /*
- *	This file is part of LCQPanther.
+ *	This file is part of LCQPow.
  *
- *	LCQPanther -- A Solver for Quadratic Programs with Commplementarity Constraints.
+ *	LCQPow -- A Solver for Quadratic Programs with Commplementarity Constraints.
  *	Copyright (C) 2020 - 2021 by Jonas Hall et al.
  *
- *	LCQPanther is free software; you can redistribute it and/or
+ *	LCQPow is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
  *	License as published by the Free Software Foundation; either
  *	version 2.1 of the License, or (at your option) any later version.
  *
- *	LCQPanther is distributed in the hope that it will be useful,
+ *	LCQPow is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
- *	License along with LCQPanther; if not, write to the Free Software
+ *	License along with LCQPow; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 
-#ifndef LCQPanther_LCQPROBLEM_HPP
-#define LCQPanther_LCQPROBLEM_HPP
+#ifndef LCQPow_LCQPROBLEM_HPP
+#define LCQPow_LCQPROBLEM_HPP
 
 #include "Utilities.hpp"
 #include "Subsolver.hpp"
@@ -33,7 +33,7 @@
 
 using qpOASES::QProblem;
 
-namespace LCQPanther {
+namespace LCQPow {
 	class LCQProblem
 	{
 
@@ -575,4 +575,4 @@ namespace LCQPanther {
 
 #include "LCQProblem.ipp"
 
-#endif	/* LCQPanther_LCQPROBLEM_HPP */
+#endif	/* LCQPow_LCQPROBLEM_HPP */

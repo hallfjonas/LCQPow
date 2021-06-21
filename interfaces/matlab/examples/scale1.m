@@ -21,7 +21,7 @@ params.printLevel = 2;
 nexp = 1;
 for i = 1:nexp
     tic;
-    [xopt, yopt, stats] = LCQPanther(Q, g, L, R, params);
+    [xopt, yopt, stats] = LCQPow(Q, g, L, R, params);
     times_c(i) = toc;
 
     %tic;

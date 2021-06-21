@@ -1,21 +1,21 @@
 ﻿##
-##	This file is part of LCQPanther.
+##	This file is part of LCQPow.
 ##
-##	LCQPanther -- A Solver for Quadratic Programs with Commplementarity Constraints.
+##	LCQPow -- A Solver for Quadratic Programs with Commplementarity Constraints.
 ##	Copyright (C) 2020 - 2021 by Jonas Hall et al.
 ##
-##	LCQPanther is free software; you can redistribute it and/or
+##	LCQPow is free software; you can redistribute it and/or
 ##	modify it under the terms of the GNU Lesser General Public
 ##	License as published by the Free Software Foundation; either
 ##	version 2.1 of the License, or (at your option) any later version.
 ##
-##	LCQPanther is distributed in the hope that it will be useful,
+##	LCQPow is distributed in the hope that it will be useful,
 ##	but WITHOUT ANY WARRANTY; without even the implied warranty of
-##	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+##	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ##	See the GNU Lesser General Public License for more details.
 ##
 ##	You should have received a copy of the GNU Lesser General Public
-##	License along with LCQPanther; if not, write to the Free Software
+##	License along with LCQPow; if not, write to the Free Software
 ##	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ##
 
@@ -24,10 +24,10 @@
 INTRODUCTION
 ============
 
-LCQPanther extends qpOASES with the recently proposed solution strategy for
+LCQPow extends qpOASES with the recently proposed solution strategy for
 Quadratic Programs with Complementarity Constraints. The approach is based on
 a standard penalty homotopy reformulated using sequential convex programming.
-The convex sequence derives from linearizing the (necessarily) nonconvex 
+The convex sequence derives from linearizing the (necessarily) nonconvex
 penalty function. This leads to a constant objective Hessian matrix throughout
 all iterates, and thus enables us to solve the linear complementarity quadratic
 program with a single factorization of the KKT matrix (by using qpOASES).
@@ -38,14 +38,14 @@ GETTING STARTED
 ===============
 
 
-1. The whole software package can be obtained from 
-      https://gitlab.syscop.de/jonas.hall/LCQPanther
+1. The whole software package can be obtained from
+      https://gitlab.syscop.de/jonas.hall/LCQPow
 
-2. We provide a Dockerfile which installing LCQPanther and running a first test example.
+2. We provide a Dockerfile which installing LCQPow and running a first test example.
    For direct installation on your system refer to the steps taken in this Dockerfile.
 
-2. The file LICENSE.txt contains a copy of the GNU Lesser General Public 
-   License (v2.1). Please read it carefully before using LCQPanther!
+2. The file LICENSE.txt contains a copy of the GNU Lesser General Public
+   License (v2.1). Please read it carefully before using LCQPow!
 
 
 
@@ -53,8 +53,8 @@ GETTING STARTED
 CONTACT THE AUTHORS
 ===================
 
-If you have got questions, remarks or comments on LCQPanther, it is strongly 
-encouraged to report them by creating a new ticket at the LCQPanther webpage.
+If you have got questions, remarks or comments on LCQPow, it is strongly
+encouraged to report them by creating a new ticket at the LCQPow webpage.
 
 Finally, you may contact one of the main authors directly:
 

@@ -1,21 +1,21 @@
 ##
-##	This file is part of LCQPanther.
+##	This file is part of LCQPow.
 ##
-##	LCQPanther -- A Solver for Quadratic Programs with Commplementarity Constraints.
+##	LCQPow -- A Solver for Quadratic Programs with Commplementarity Constraints.
 ##	Copyright (C) 2020 - 2021 by Jonas Hall et al.
 ##
-##	LCQPanther is free software; you can redistribute it and/or
+##	LCQPow is free software; you can redistribute it and/or
 ##	modify it under the terms of the GNU Lesser General Public
 ##	License as published by the Free Software Foundation; either
 ##	version 2.1 of the License, or (at your option) any later version.
 ##
-##	LCQPanther is distributed in the hope that it will be useful,
+##	LCQPow is distributed in the hope that it will be useful,
 ##	but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ##	See the GNU Lesser General Public License for more details.
 ##
 ##	You should have received a copy of the GNU Lesser General Public
-##	License along with LCQPanther; if not, write to the Free Software
+##	License along with LCQPow; if not, write to the Free Software
 ##	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ##
 
@@ -23,7 +23,7 @@
 cmake_minimum_required(VERSION 3.20.3)
 
 # Project name
-project(lcqpanther)
+project(lcqpow)
 
 ## Options ------------------------------------------------------------------------------
 option(
@@ -72,7 +72,7 @@ set(
 )
 
 
-## CREATE LCQPanther libraries ----------------------------------------------------------
+## CREATE LCQPow libraries ----------------------------------------------------------
 # Include project headers
 include_directories(${PROJECT_NAME} PUBLIC include)
 
@@ -203,7 +203,7 @@ endif()
 #         set(DOXYGEN_GENERATE_HTML YES)
 #         set(DOXYGEN_GENERATE_MAN YES)
 
-#         set(DOXYGEN_PROJECT_BRIEF "LCQPanther -- A Linear Complementarity Quadratic Programming Solver")
+#         set(DOXYGEN_PROJECT_BRIEF "LCQPow -- A Linear Complementarity Quadratic Programming Solver")
 #     else()
 #         message(
 #             WARNING

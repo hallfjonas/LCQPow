@@ -1,21 +1,21 @@
 /*
- *	This file is part of LCQPanther.
+ *	This file is part of LCQPow.
  *
- *	LCQPanther -- A Solver for Quadratic Programs with Commplementarity Constraints.
+ *	LCQPow -- A Solver for Quadratic Programs with Commplementarity Constraints.
  *	Copyright (C) 2020 - 2021 by Jonas Hall et al.
  *
- *	LCQPanther is free software; you can redistribute it and/or
+ *	LCQPow is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
  *	License as published by the Free Software Foundation; either
  *	version 2.1 of the License, or (at your option) any later version.
  *
- *	LCQPanther is distributed in the hope that it will be useful,
+ *	LCQPow is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
- *	License along with LCQPanther; if not, write to the Free Software
+ *	License along with LCQPow; if not, write to the Free Software
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
@@ -23,7 +23,7 @@
 #include <iostream>
 #include "LCQProblem.hpp"
 
-using namespace LCQPanther;
+using namespace LCQPow;
 
 int main() {
     std::cout << "Preparing unit circle optimization problem...\n";
@@ -69,8 +69,8 @@ int main() {
 
     // Objective linear term
     double Hx[2*2] = {17, -15, -15, 17};
-    LCQPanther::Utilities::MatrixMultiplication(Hx, x_ref, g, 2, 2, 1);
-    LCQPanther::Utilities::WeightedVectorAdd(-1, g, 0, g, g, 2);
+    LCQPow::Utilities::MatrixMultiplication(Hx, x_ref, g, 2, 2, 1);
+    LCQPow::Utilities::WeightedVectorAdd(-1, g, 0, g, g, 2);
 
     // Constraints
     for (int i = 0; i < N; i++) {
@@ -118,7 +118,7 @@ int main() {
     // Get solutions
     double* xOpt = new double[nV];
 	double* yOpt = new double[nV + nC + 2*nComp];
-    LCQPanther::OutputStatistics stats;
+    LCQPow::OutputStatistics stats;
 	lcqp.getPrimalSolution( xOpt );
 	lcqp.getDualSolution( yOpt );
     lcqp.getOutputStatistics( stats );

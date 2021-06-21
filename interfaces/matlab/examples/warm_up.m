@@ -18,7 +18,7 @@ params.penaltyUpdateFactor = 2;
 params.qpSolver = 1;
 
 % Run solver
-[x, y] = LCQPanther(Q, g, L, R, params);
+[x, y] = LCQPow(Q, g, L, R, params);
 
 fprintf("x = [%g, %g]\n", x(1), x(2));
 

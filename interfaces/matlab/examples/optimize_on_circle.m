@@ -86,7 +86,7 @@ for i = 1:length(rho0)
 
     % Run c solver
     tic;
-    [xOpt,~,stats] = LCQPanther(Q, g, L, R, A, lbA, ubA, params);
+    [xOpt,~,stats] = LCQPow(Q, g, L, R, A, lbA, ubA, params);
 
     % Evaluation
     c_solver.time_vals(i) = toc;

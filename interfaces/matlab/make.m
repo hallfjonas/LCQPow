@@ -47,7 +47,7 @@ function [] = make( varargin )
     %% consistency check
     if ( exist( [pwd, '/make.m'],'file' ) == 0 )
         error( ['ERROR (',mfilename '.m): Run this make script directly within the directory ', ...
-                '<LCQPanther-inst-dir>/interfaces/matlab, please.'] );
+                '<LCQPow-inst-dir>/interfaces/matlab, please.'] );
     end
 
 
@@ -59,16 +59,16 @@ function [] = make( varargin )
 
 
     %% define compiler settings
-    LCQPanther_IFLAG = '-I../../include ';
+    LCQPow_IFLAG = '-I../../include ';
     QPOASES_IFLAG = ' -I/usr/local/include/qpOASES ';
     OSQP_IFLAG = ' -I/usr/local/include/osqp ';
-    IFLAGS = [ '-I. ', LCQPanther_IFLAG, QPOASES_IFLAG, OSQP_IFLAG];
+    IFLAGS = [ '-I. ', LCQPow_IFLAG, QPOASES_IFLAG, OSQP_IFLAG];
 
     LIBDIRLINK = ['-L', pwd , '/../../build/lib'];
-    LCQPanther_LFLAG = [LIBDIRLINK, ' -llcqpanther '];
+    LCQPow_LFLAG = [LIBDIRLINK, ' -llcqpow '];
     QPOASES_LFLAG = ' -lqpOASES ';
     OSQP_LFLAG = ' -losqp ';
-    LFLAGS = [LCQPanther_LFLAG, QPOASES_LFLAG, OSQP_LFLAG];
+    LFLAGS = [LCQPow_LFLAG, QPOASES_LFLAG, OSQP_LFLAG];
 
     %DEBUGFLAGS = ' ';
     DEBUGFLAGS = ' -v -g CXXDEBUGFLAGS=''$CXXDEBUGFLAGS -Wall -pedantic -Wshadow'' ';
@@ -157,16 +157,16 @@ function [ doClean,fcnNames,userIFlags ] = analyseMakeArguments( nArgs,args )
 
         case 1
             if ( strcmp( args{1},'all' ) > 0 )
-                fcnNames = { 'LCQPanther' };
-            elseif ( strcmp( args{1},'LCQPanther' ) > 0 )
-                fcnNames = { 'LCQPanther' };
+                fcnNames = { 'LCQPow' };
+            elseif ( strcmp( args{1},'LCQPow' ) > 0 )
+                fcnNames = { 'LCQPow' };
             elseif ( strcmp( args{1},'clean' ) > 0 )
                 doClean = 1;
             elseif ( strcmp( args{1}(1),'-' ) > 0 )
                 % make clean all with user-specified compiler flags
                 userIFlags = args{1};
                 doClean = 1;
-                fcnNames = { 'LCQPanther' };
+                fcnNames = { 'LCQPow' };
             else
                 error( ['ERROR (',mfilename '.m): Invalid first argument (''',args{1},''')!'] );
             end
@@ -179,15 +179,15 @@ function [ doClean,fcnNames,userIFlags ] = analyseMakeArguments( nArgs,args )
             end
 
             if ( strcmp( args{2},'all' ) > 0 )
-                fcnNames = { 'LCQPanther' };
-            elseif ( strcmp( args{2},'LCQPanther' ) > 0 )
-                fcnNames = { 'LCQPanther' };
+                fcnNames = { 'LCQPow' };
+            elseif ( strcmp( args{2},'LCQPow' ) > 0 )
+                fcnNames = { 'LCQPow' };
             else
                 error( ['ERROR (',mfilename '.m): Invalid second argument (''',args{2},''')!'] );
             end
 
         otherwise
-            fcnNames = { 'LCQPanther' };
+            fcnNames = { 'LCQPow' };
 
     end
 
