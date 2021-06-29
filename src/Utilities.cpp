@@ -28,8 +28,6 @@
 
 #include <qpOASES.hpp>
 
-using qpOASES::int_t;
-
 extern "C" {
     #include <osqp.h>
 }
@@ -567,10 +565,10 @@ namespace LCQPow {
     }
 
 
-    void Utilities::copyIntToIntT(int_t* dest, const int* const src, int_t n)
+    void Utilities::copyIntToIntT(int* dest, const int* const src, int n)
     {
-        for (int_t i = 0; i < n; i++)
-            dest[i] = (int_t) src[i];
+        for (int i = 0; i < n; i++)
+            dest[i] = src[i];
     }
 
 

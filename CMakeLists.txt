@@ -44,33 +44,147 @@ option(
     ON
 )
 
-# qpOASES with or without Schur Complement method
 option(
-    QPOASES_SCHUR_COMPLEMENT
-    "Whether to enable the qpOASES Schur Complement method (sparse solver must be available, e.g. through MATLAB)"
+    PROFILING
+    "Option to enable profiling (gprof)."
     OFF
 )
-if (${QPOASES_SCHUR_COMPLEMENT})
-    add_compile_options(-DSOLVER_MA57)
-    message("WARNING: This method requires the availability of MA57.")
+
+option(
+    QPOASES_SCHUR
+    "Use the Schur Complement Method with MA57 Solver"
+    OFF
+)
+
+message(
+    "EXAMPLES        ${BUILD_EXAMPLES}\n"
+    "DOCUMENTATION   ${BUILD_DOCUMENTATION}\n"
+    "UNIT_TESTS      ${UNIT_TESTS}\n"
+    "PROFILING       ${PROFILING}\n"
+    "QPOASES_SCHUR   ${QPOASES_SCHUR}\n"
+)
+
+## Paths --------------------------------------------------------------------------------
+
+# 1) Install Prefix
+set(
+    CMAKE_INSTALL_PREFIX
+    "${CMAKE_BINARY_DIR}"
+)
+
+## ADD ALL EXTERNAL PROJECTS ------------------------------------------------------------
+
+# external modules
+include(ExternalProject)
+
+# 1) qpOASES
+set(
+    DEF_SOLVER
+    "SOLVER_NONE"
+)
+
+if (${QPOASES_SCHUR})
+
+    find_package(Matlab REQUIRED)     
+
+    get_filename_component(
+        MATLAB_LIBDIR
+        ${Matlab_MEX_LIBRARY}
+        DIRECTORY
+    )
+
+    set(
+        LIB_SOLVER
+        "${MATLAB_LIBDIR}/libmwma57.so"
+    )
+
+    set(
+        DEF_SOLVER
+        "SOLVER_MA57"
+    )
+
+    set(
+        USE_SOLVER
+        "MA57"
+    )
+
+    set(
+        LINKHSL
+        "-Wl,-rpath=${MATLAB_LIBDIR}"
+    )
+
+    set(
+        LAPACK_LIB
+        "${MATLAB_LIBDIR}/libmwlapack.so"
+    )
+
+    set(
+        BLAS_LIB
+        "${MATLAB_LIBDIR}/libmwblas.so"
+    )
+
+    set(
+        qpOASES_MAKE_ARGS
+        ${qpOASES_MAKE_ARGS} LIB_SOLVER=${LIB_SOLVER} LIB_BLAS=${BLAS_LIB} LIB_LAPACK=${LAPACK_LIB} LINKHSL=${LINKHSL}
+    )
+
+    message(
+        "Located the following dependencies for Schur Comeplement Method:\n"
+        "MA57   ${LIB_SOLVER}\n"
+        "BLAS   ${BLAS_LIB}\n"
+        "LAPACK ${LAPACK_LIB}"
+    )
 endif()
 
 set(
-    qpOASES_library_link
-    "-L/usr/local/lib -lqpOASES"
+    qpOASES_CPP_FLAGS
+    "-Wall -pedantic -Wshadow -Wfloat-equal -O3 -Wconversion -Wsign-conversion -fPIC -DLINUX -D${DEF_SOLVER} -D__USE_LONG_FINTS__ -D__NO_COPYRIGHT__"
 )
 
 set(
-    osqp_library_link
-    "-L/usr/local/lib -losqp"
+    qpOASES_MAKE_ARGS
+    ${qpOASES_MAKE_ARGS} CPPFLAGS=${qpOASES_CPP_FLAGS}
 )
 
-set(
-    CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES
-    "/usr/local/include/qpOASES"
-    "/usr/local/include/osqp"
+ExternalProject_Add(
+    qpoases
+    GIT_REPOSITORY "git@github.com:coin-or/qpOASES.git"
+    PREFIX external
+    CONFIGURE_COMMAND mkdir -p bin;
+    BUILD_IN_SOURCE ON
+    BUILD_COMMAND make ${qpOASES_MAKE_ARGS} src examples;
+    INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+    INSTALL_COMMAND cp ${CMAKE_BINARY_DIR}/external/src/qpoases/bin/libqpOASES.so ${CMAKE_INSTALL_PREFIX}/lib/libqpOASES.so
 )
 
+set(qpoases_lib "-L${CMAKE_BINARY_DIR}/lib -lqpOASES")
+set(qpoases_include "${CMAKE_BINARY_DIR}/external/src/qpoases/include")
+
+# 2) OSQP
+ExternalProject_Add(
+    osqp
+    GIT_REPOSITORY "git@github.com:osqp/osqp.git"
+    PREFIX external
+    CMAKE_ARGS
+        -DDLONG=OFF
+        -DBUILD_SHARED_LIBS=ON
+    BUILD_COMMAND cmake --build .
+    INSTALL_COMMAND cp ${CMAKE_BINARY_DIR}/external/src/osqp-build/out/libosqp.so ${CMAKE_INSTALL_PREFIX}/lib/libosqp.so
+)
+
+set(osqp_lib "-L${CMAKE_BINARY_DIR}/lib -losqp")
+set(osqp_include "${CMAKE_BINARY_DIR}/external/src/osqp/include")
+
+# 3) googletest
+ExternalProject_Add(
+    gtest
+    GIT_REPOSITORY "https://github.com/google/googletest.git"
+    PREFIX external
+    INSTALL_COMMAND cp ${CMAKE_BINARY_DIR}/external/src/gtest-build/lib/libgtest.a ${CMAKE_INSTALL_PREFIX}/lib/
+)
+
+set(gtest_lib "-L${CMAKE_BINARY_DIR}/external/src/gtest-build/out -lgtest")
+set(gtest_include "${CMAKE_BINARY_DIR}/external/src/gtest/googletest/include")
 
 ## CREATE LCQPow libraries ----------------------------------------------------------
 # Include project headers
@@ -87,9 +201,12 @@ add_compile_options(
     -Wsign-conversion
     -fPIC
     -DLINUX
-    -D__USE_LONG_INTEGERS__
-    -D__USE_LONG_FINTS__
+    -D${DEF_SOLVER}
 )
+
+if (${PROFILING})
+    add_compile_options(-pg)
+endif()
 
 # Save auxiliar source files to variable
 aux_source_directory(src SRC_FILES)
@@ -104,9 +221,16 @@ set_target_properties(
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 )
 
+# Add the external projects as depenedncies for our project
+add_dependencies(
+    ${PROJECT_NAME}-static
+    qpoases
+    osqp
+)
+
 # Add include directories of dependencies: qpOASES, OSQP
 include_directories(${PROJECT_NAME}
-    PRIVATE ${qpOASES_include}
+    PRIVATE ${qpoases_include}
     PRIVATE ${osqp_include}
 )
 
@@ -118,6 +242,13 @@ set_target_properties(
     OUTPUT_NAME ${PROJECT_NAME}
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+)
+
+# Add the external projects as depenedncies for our project
+add_dependencies(
+    ${PROJECT_NAME}-shared
+    qpoases
+    osqp
 )
 
 ## Build examples -----------------------------------------------------------------------
@@ -135,7 +266,7 @@ if (${BUILD_EXAMPLES})
         target_link_libraries(
             ${EXAMPLE_NAME}
             PUBLIC ${PROJECT_NAME}-shared
-            PRIVATE ${qpOASES_library_link} ${osqp_library_link}
+            PRIVATE ${qpoases_lib} ${osqp_lib}
         )
 
         # specify output directory
@@ -152,7 +283,7 @@ endif()
 #     # Add include directories of dependencies: qpOASES, OSQP
 #     include_directories(${PROJECT_NAME}
 #         PRIVATE ${gtest_include}
-#         PRIVATE ${qpOASES_include}
+#         PRIVATE ${qpoases_include}
 #         PRIVATE ${osqp_include}
 #     )
 
@@ -161,7 +292,7 @@ endif()
 
 #     add_dependencies(
 #         RunUnitTests
-#         qpOASES
+#         qpoases
 #         osqp
 #         gtest
 #     )
@@ -176,7 +307,7 @@ endif()
 #     target_link_libraries(
 #         RunUnitTests
 #         PUBLIC ${PROJECT_NAME}-shared
-#         PRIVATE ${qpOASES_lib} ${osqp_lib} ${gtest_lib}
+#         PRIVATE ${qpoases_lib} ${osqp_lib} ${gtest_lib}
 #     )
 # endif()
 

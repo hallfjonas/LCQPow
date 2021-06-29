@@ -29,8 +29,6 @@ extern "C" {
 
 #include <qpOASES.hpp>
 
-using qpOASES::int_t;
-
 namespace LCQPow {
 
     enum ReturnValue {
@@ -96,8 +94,7 @@ namespace LCQPow {
     enum QPSolver {
         QPOASES_DENSE = 0,                              /**< QP solver qpOASES in dense mode. */
         QPOASES_SPARSE = 1,                             /**< QP solver qpOASES in sparse mode. */
-        QPOASES_SPARSE_SCHUR = 2,                       /**< QP solver qpOASES with Schur Complement mode. */
-        OSQP_SPARSE = 3                                 /**< QP solver OSQP. */
+        OSQP_SPARSE = 2                                 /**< QP solver OSQP. */
     };
 
     class Utilities {
@@ -186,7 +183,7 @@ namespace LCQPow {
             // Copy a csc matrix (override of copyCSC)
             static csc* copyCSC(const csc* const M, bool toUpperTriangular = false);
 
-            static void copyIntToIntT(int_t* dest, const int* const src, int_t n);
+            static void copyIntToIntT(int* dest, const int* const src, int n);
 
             /** Transform a csc matrix to dense.
              *

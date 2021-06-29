@@ -735,7 +735,7 @@ namespace LCQPow {
 
 			Subsolver tmp(nV, nC + 2*nComp, H, A);
 			subsolver = tmp;
-		} else if (options.getQPSolver() >= QPSolver::QPOASES_SPARSE && options.getQPSolver() <= QPSolver::QPOASES_SPARSE_SCHUR) {
+		} else if (options.getQPSolver() == QPSolver::QPOASES_SPARSE) {
 			nDuals = nV + nC + 2*nComp;
 			boxDualOffset = nV;
 
