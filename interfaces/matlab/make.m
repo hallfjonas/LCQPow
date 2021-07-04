@@ -60,8 +60,8 @@ function [] = make( varargin )
 
     %% define compiler settings
     LCQPow_IFLAG = '-I../../include ';
-    QPOASES_IFLAG = ' -I/usr/local/include/qpOASES ';
-    OSQP_IFLAG = ' -I/usr/local/include/osqp ';
+    QPOASES_IFLAG = ' -I../../build/external/src/qpoases/include ';
+    OSQP_IFLAG = ' -I../../build/external/src/osqp/include ';
     IFLAGS = [ '-I. ', LCQPow_IFLAG, QPOASES_IFLAG, OSQP_IFLAG];
 
     LIBDIRLINK = ['-L', pwd , '/../../build/lib'];
@@ -70,10 +70,10 @@ function [] = make( varargin )
     OSQP_LFLAG = ' -losqp ';
     LFLAGS = [LCQPow_LFLAG, QPOASES_LFLAG, OSQP_LFLAG];
 
-    %DEBUGFLAGS = ' ';
-    DEBUGFLAGS = ' -v -g CXXDEBUGFLAGS=''$CXXDEBUGFLAGS -Wall -pedantic -Wshadow'' ';
+    DEBUGFLAGS = ' ';
+    %DEBUGFLAGS = ' -v -g CXXDEBUGFLAGS=''$CXXDEBUGFLAGS -Wall -pedantic -Wshadow'' ';
 
-    SPARSEFLAGS = '-largeArrayDims -D__USE_LONG_INTEGERS__ -D__USE_LONG_FINTS__ -DSOLVER_MA57 -lmwma57 ';
+    SPARSEFLAGS = '-largeArrayDims -D__USE_LONG_FINTS__ -DSOLVER_MA57 -lmwma57 ';
 
     CPPFLAGS = [ IFLAGS, '-largeArrayDims -D__cpluplus -D__MATLAB__ -lmwblas -lmwlapack ', SPARSEFLAGS, ' ' ];
     defaultFlags = '-O -D__NO_COPYRIGHT__ '; %% -D__SUPPRESSANYOUTPUT__
