@@ -148,7 +148,7 @@ set(
 
 ExternalProject_Add(
     qpoases
-    GIT_REPOSITORY "git@github.com:coin-or/qpOASES.git"
+    DOWNLOAD_COMMAND cp -a ${CMAKE_SOURCE_DIR}/external/qpOASES/. ${CMAKE_BINARY_DIR}/external/src/qpoases
     PREFIX external
     CONFIGURE_COMMAND mkdir -p bin;
     BUILD_IN_SOURCE ON
@@ -163,7 +163,7 @@ set(qpoases_include "${CMAKE_BINARY_DIR}/external/src/qpoases/include")
 # 2) OSQP
 ExternalProject_Add(
     osqp
-    GIT_REPOSITORY "git@github.com:osqp/osqp.git"
+    DOWNLOAD_COMMAND cp -a ${CMAKE_SOURCE_DIR}/external/osqp/. ${CMAKE_BINARY_DIR}/external/src/osqp
     PREFIX external
     CMAKE_ARGS
         -DDLONG=OFF
@@ -178,7 +178,7 @@ set(osqp_include "${CMAKE_BINARY_DIR}/external/src/osqp/include")
 # 3) googletest
 ExternalProject_Add(
     gtest
-    GIT_REPOSITORY "https://github.com/google/googletest.git"
+    DOWNLOAD_COMMAND cp -a ${CMAKE_SOURCE_DIR}/external/googletest/. ${CMAKE_BINARY_DIR}/external/src/gtest
     PREFIX external
     INSTALL_COMMAND cp ${CMAKE_BINARY_DIR}/external/src/gtest-build/lib/libgtest.a ${CMAKE_INSTALL_PREFIX}/lib/
 )

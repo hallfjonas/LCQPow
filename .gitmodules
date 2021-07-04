@@ -1,9 +1,9 @@
 [submodule "external/qpOASES"]
 	path = external/qpOASES
-	url = https://github.com/hallfjonas/qpOASES.git
+	url = https://github.com/coin-or/qpOASES.git
 [submodule "external/osqp"]
 	path = external/osqp
-	url = https://github.com/hallfjonas/osqp.git
+	url = https://github.com/osqp/osqp.git
 [submodule "external/googletest"]
 	path = external/googletest
 	url = https://github.com/google/googletest.git
