@@ -228,6 +228,14 @@ add_dependencies(
     osqp
 )
 
+if (${QPOASES_SCHUR})
+    target_link_libraries(
+        ${PROJECT_NAME}-static
+        PRIVATE ${Matlab_LIBRARIES}
+    )
+endif()
+
+
 # Add include directories of dependencies: qpOASES, OSQP
 include_directories(${PROJECT_NAME}
     PRIVATE ${qpoases_include}
@@ -251,6 +259,13 @@ add_dependencies(
     osqp
 )
 
+if (${QPOASES_SCHUR})
+    target_link_libraries(
+        ${PROJECT_NAME}-shared
+        PRIVATE ${Matlab_LIBRARIES}
+    )
+endif()
+
 ## Build examples -----------------------------------------------------------------------
 if (${BUILD_EXAMPLES})
     aux_source_directory(examples EXAMPLE_FILES)
@@ -268,6 +283,13 @@ if (${BUILD_EXAMPLES})
             PUBLIC ${PROJECT_NAME}-shared
             PRIVATE ${qpoases_lib} ${osqp_lib}
         )
+
+        if (${QPOASES_SCHUR})
+            target_link_libraries(
+                ${EXAMPLE_NAME}
+                PRIVATE ${Matlab_LIBRARIES}
+            )
+        endif()
 
         # specify output directory
         set_target_properties(
