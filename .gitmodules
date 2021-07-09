@@ -4,3 +4,6 @@
 [submodule "external/qpOASES"]
 	path = external/qpOASES
 	url = git@github.com:coin-or/qpOASES.git
+[submodule "external/googletest"]
+	path = external/googletest
+	url = git@github.com:google/googletest.git
