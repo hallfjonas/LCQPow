@@ -1,3 +1,6 @@
 [submodule "external/osqp"]
 	path = external/osqp
 	url = git@github.com:osqp/osqp.git
+[submodule "external/qpOASES"]
+	path = external/qpOASES
+	url = git@github.com:coin-or/qpOASES.git
