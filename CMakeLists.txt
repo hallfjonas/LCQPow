@@ -33,6 +33,12 @@ option(
 )
 
 option(
+    BUILD_MATLAB_INTERFACE
+    "Option to build the matlab interface"
+    ON
+)
+
+option(
     BUILD_DOCUMENTATION
     "Option to build documentation"
     ON
@@ -57,14 +63,15 @@ option(
 )
 
 message(
-    "EXAMPLES        ${BUILD_EXAMPLES}\n"
-    "DOCUMENTATION   ${BUILD_DOCUMENTATION}\n"
-    "UNIT_TESTS      ${UNIT_TESTS}\n"
-    "PROFILING       ${PROFILING}\n"
-    "QPOASES_SCHUR   ${QPOASES_SCHUR}\n"
+    "EXAMPLES           ${BUILD_EXAMPLES}\n"
+    "MATLAB INTERFACE   ${BUILD_MATLAB_INTERFACE}\n"
+    "DOCUMENTATION      ${BUILD_DOCUMENTATION}\n"
+    "UNIT_TESTS         ${UNIT_TESTS}\n"
+    "PROFILING          ${PROFILING}\n"
+    "QPOASES_SCHUR      ${QPOASES_SCHUR}\n"
 )
 
-## Paths --------------------------------------------------------------------------------
+## Paths & Packages ---------------------------------------------------------------------
 
 # 1) Install Prefix
 set(
@@ -72,8 +79,19 @@ set(
     "${CMAKE_BINARY_DIR}"
 )
 
-## ADD ALL EXTERNAL PROJECTS ------------------------------------------------------------
+# 2) Locate Matlab if required
+if (${BUILD_MATLAB_INTERFACE} OR ${QPOASES_SCHUR})
 
+    find_package(Matlab REQUIRED)
+
+    get_filename_component(
+        MATLAB_LIBDIR
+        ${Matlab_MEX_LIBRARY}
+        DIRECTORY
+    )
+endif()
+
+## ADD ALL EXTERNAL PROJECTS ------------------------------------------------------------
 # external modules
 include(ExternalProject)
 
@@ -84,14 +102,6 @@ set(
 )
 
 if (${QPOASES_SCHUR})
-
-    find_package(Matlab REQUIRED)     
-
-    get_filename_component(
-        MATLAB_LIBDIR
-        ${Matlab_MEX_LIBRARY}
-        DIRECTORY
-    )
 
     set(
         LIB_SOLVER
@@ -299,6 +309,67 @@ if (${BUILD_EXAMPLES})
         )
     endforeach()
 endif()
+
+## Build Matlab interface ---------------------------------------------------------------
+
+if (${BUILD_MATLAB_INTERFACE})
+
+    if (${QPOASES_SCHUR})
+        set(
+            MA57_lib
+            mwma57
+        )
+    endif()
+
+    set(
+        MATLAB_INTERFACE_DIR
+        ${CMAKE_SOURCE_DIR}/interfaces/matlab
+    )
+
+    set(
+        MATLAB_INTERFACE_NAME
+        LCQPow
+    )
+
+    set(
+        MATLAB_INTERFACE_DESTINATION
+        ${CMAKE_BINARY_DIR}/lib
+    )
+
+
+    matlab_add_mex(
+        NAME matlab_interface
+        SRC ${MATLAB_INTERFACE_DIR}/${MATLAB_INTERFACE_NAME}.cpp
+        OUTPUT_NAME ${MATLAB_INTERFACE_DESTINATION}/${MATLAB_INTERFACE_NAME}
+        LINK_TO ${PROJECT_NAME}-shared mwblas mwlapack ${MA57_lib}
+    )
+
+    message(INFO ${DEF_SOLVER})
+
+    target_compile_options(
+        matlab_interface
+        PUBLIC -D${DEF_SOLVER}
+        PUBLIC -D__USE_LONG_FINTS__
+        PUBLIC -D__cpluplus
+        PUBLIC -D__MATLAB__
+        PUBLIC -D__NO_COPYRIGHT__
+        PUBLIC -O
+        PUBLIC -largeArrayDims
+    )
+
+    file(
+        COPY ${MATLAB_INTERFACE_DIR}/${MATLAB_INTERFACE_NAME}.txt
+        DESTINATION ${MATLAB_INTERFACE_DESTINATION}
+    )
+
+    file(
+        RENAME
+        ${MATLAB_INTERFACE_DESTINATION}/${MATLAB_INTERFACE_NAME}.txt
+        ${MATLAB_INTERFACE_DESTINATION}/${MATLAB_INTERFACE_NAME}.m
+    )
+
+endif()
+
 
 # ## Build unit tests ---------------------------------------------------------------------
 # if (${UNIT_TESTS})

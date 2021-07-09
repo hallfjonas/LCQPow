@@ -3,7 +3,7 @@
 clear all; clc; close all;
 
 %% Path to mex function (c++ solver)
-addpath(fullfile(pwd, ".."));
+addpath(fullfile(pwd, "../../../build/lib"));
 
 % Simple QP
 Q = [2 0; 0 2];
