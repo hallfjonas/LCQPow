@@ -33,12 +33,6 @@ option(
 )
 
 option(
-    BUILD_MATLAB_INTERFACE
-    "Option to build the matlab interface"
-    ON
-)
-
-option(
     BUILD_DOCUMENTATION
     "Option to build documentation"
     ON
@@ -62,15 +56,6 @@ option(
     OFF
 )
 
-message(
-    "EXAMPLES           ${BUILD_EXAMPLES}\n"
-    "MATLAB INTERFACE   ${BUILD_MATLAB_INTERFACE}\n"
-    "DOCUMENTATION      ${BUILD_DOCUMENTATION}\n"
-    "UNIT_TESTS         ${UNIT_TESTS}\n"
-    "PROFILING          ${PROFILING}\n"
-    "QPOASES_SCHUR      ${QPOASES_SCHUR}\n"
-)
-
 ## Paths & Packages ---------------------------------------------------------------------
 
 # 1) Install Prefix
@@ -79,17 +64,46 @@ set(
     "${CMAKE_BINARY_DIR}"
 )
 
-# 2) Locate Matlab if required
-if (${BUILD_MATLAB_INTERFACE} OR ${QPOASES_SCHUR})
+# 2) Locate Matlab and modify default values of interface & Schur
+find_package(Matlab REQUIRED)
 
-    find_package(Matlab REQUIRED)
+if (${Matlab_FOUND})
+    set(
+        BUILD_MATLAB_INTERFACE ON
+        CACHE BOOL
+        "Build matlab interface"
+    )
 
     get_filename_component(
         MATLAB_LIBDIR
         ${Matlab_MEX_LIBRARY}
         DIRECTORY
     )
+
+else()
+    set(
+        BUILD_MATLAB_INTERFACE OFF
+        "Build matlab interface"
+    )
+
+    if (${QPOASES_SCHUR})
+        message(
+            FATAL_ERROR
+            "qpOASES with Schur Complement method is currently only supported in combination with matlab, which can not be located."
+        )
+    endif()
 endif()
+
+## Print Options ------------------------------------------------------------------------
+
+message(
+    "EXAMPLES           ${BUILD_EXAMPLES}\n"
+    "MATLAB INTERFACE   ${BUILD_MATLAB_INTERFACE}\n"
+    "DOCUMENTATION      ${BUILD_DOCUMENTATION}\n"
+    "UNIT_TESTS         ${UNIT_TESTS}\n"
+    "PROFILING          ${PROFILING}\n"
+    "QPOASES_SCHUR      ${QPOASES_SCHUR}\n"
+)
 
 ## ADD ALL EXTERNAL PROJECTS ------------------------------------------------------------
 # external modules
