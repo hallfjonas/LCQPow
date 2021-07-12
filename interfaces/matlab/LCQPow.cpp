@@ -23,10 +23,12 @@
 using LCQPow::LCQProblem;
 using LCQPow::Options;
 
+#include "qpOASES.hpp"
+
 #include <mex.h>
 #include <chrono>
 
-bool checkDimensionAndTypeDouble(const mxArray* arr, size_t m, size_t n, const char* name, bool allowEmpty = false)
+bool checkDimensionAndTypeDouble(const mxArray* arr, int m, int n, const char* name, bool allowEmpty = false)
 {
     if (allowEmpty && mxIsEmpty(arr)) {
         return true;
@@ -40,7 +42,7 @@ bool checkDimensionAndTypeDouble(const mxArray* arr, size_t m, size_t n, const c
         return false;
     }
 
-    if (mxGetM(arr) != m || mxGetN(arr) != n) {
+    if (mxGetM(arr) != (size_t)m || mxGetN(arr) != (size_t)n) {
         char* errorMsg = (char*)malloc(100*sizeof(char));
         sprintf(errorMsg, "Invalid dimension: %s (got %d x %d but expected %d x %d).\n", name, (int)mxGetM(arr), (int)mxGetN(arr), (int)m, (int)n);
         mexErrMsgTxt(errorMsg);
@@ -108,11 +110,11 @@ csc* readSparseMatrix(const mxArray* mat, int nRow, int nCol)
     mwIndex *mat_ir = mxGetIr( mat );
     mwIndex *mat_jc = mxGetJc( mat );
     double *v = (double*)mxGetPr( mat );
-    int M_nnx = mat_jc[nCol];
+    size_t M_nnx = mat_jc[(mwIndex)nCol];
     double* M_data = (double*) malloc(M_nnx*sizeof(double));
     int* M_i = (int*) malloc(M_nnx*sizeof(int));
-    int* M_p = (int*) malloc((nCol+1)*sizeof(int));
-    for (int i = 0; i < M_nnx; i++) {
+    int* M_p = (int*) malloc((size_t)(nCol+1)*sizeof(int));
+    for (size_t i = 0; i < M_nnx; i++) {
         M_data[i] = v[i];
         M_i[i] = (int) mat_ir[i];
     }
@@ -267,9 +269,9 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         return;
     }
 
-    size_t nV = 0;
-    size_t nComp = 0;
-    size_t nC = 0;
+    int nV = 0;
+    int nComp = 0;
+    int nC = 0;
 
     // Get number of optimization variables
     if (mxIsEmpty(prhs[0]) || !mxIsDouble(prhs[0])) {
@@ -279,7 +281,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         free(errorMsg);
         return;
     } else {
-        nV = mxGetM(prhs[0]);
+        nV = (int)mxGetM(prhs[0]);
     }
 
     // Get number of complementarity constraints
@@ -290,7 +292,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         free(errorMsg);
         return;
     } else {
-        nComp = mxGetM(prhs[2]);
+        nComp = (int)mxGetM(prhs[2]);
     }
 
     // Get number of linear constraints
@@ -304,7 +306,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             free(errorMsg);
             return;
         } else {
-            nC = mxGetM(prhs[4]);
+            nC = (int)mxGetM(prhs[4]);
         }
     }
 
@@ -484,7 +486,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     ret = lcqp.runSolver();
 
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-    double elapsed_secs = (end - begin).count()/1000.0/1000.0/1000.0;
+    double elapsed_secs = (double)(end - begin).count()/1000.0/1000.0/1000.0;
 
     if (ret != LCQPow::SUCCESSFUL_RETURN) {
         mexPrintf("Failed to solve LCQP (error code: %d).\n", ret);
@@ -492,7 +494,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
     // Succeeded to solve LCQP. Obtaining solution vector
     // 1) Primal solution vector
-    plhs[0] = mxCreateDoubleMatrix(nV, 1, mxREAL);
+    plhs[0] = mxCreateDoubleMatrix((size_t)nV, 1, mxREAL);
     if (plhs[0] == NULL) {
         mexPrintf("Failed to allocate output of primal solution vector.\n");
         return;
@@ -511,7 +513,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             return;
         }
 
-        plhs[1] = mxCreateDoubleMatrix(nDualsOut, 1, mxREAL);
+        plhs[1] = mxCreateDoubleMatrix((size_t)nDualsOut, 1, mxREAL);
         if (plhs[1] == NULL) {
             mexPrintf("Failed to allocate output of dual solution vector.\n");
             return;
