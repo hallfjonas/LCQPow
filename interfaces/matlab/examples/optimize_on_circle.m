@@ -1,9 +1,9 @@
 %% Run an edges problem
-% Clean up and load libraries
+% Clean up and load interface
 clear all; clc; close all;
+addpath(fullfile(pwd, "../../../build/lib"))
 
-addpath(fullfile(pwd, ".."));
-
+%% Build the LCQP
 %
 %   min   (x-xk)'*Q*(x-xk)
 %   s.t.   ||x||^2 = 1
