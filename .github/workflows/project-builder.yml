@@ -6,6 +6,10 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
 
       - name: run
-        run: echo "Not building or running right now..."; #./build.sh release OFF; ./run.sh
+        run: build.sh; run.sh;
+
+

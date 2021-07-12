@@ -1,7 +1,11 @@
 #!/bin/bash
 
+# Break if any command fails
+set -e
+
+# Configure and build
 mkdir -p build
 cd build
-cmake -DCMAKE_BUILD_TYPE=$1 -DQPOASES_SCHUR_COMPLEMENT=$2 ..
+cmake ..
 make
 cd ..
