@@ -1,4 +1,4 @@
-﻿#	LCQPow -- A Solver for Quadratic Programs with Linear Complementarity Constraints
+﻿#	LCQPow - A Solver for Quadratic Programs with Linear Complementarity Constraints
 
 LCQPow is a open-source solver for Quadratic Programs with Complementarity Constraints. The approach is based on a standard penalty homotopy reformulated using sequential convex programming. The convex sequence derives from linearizing the (necessarily) nonconvex penalty function. This leads to a constant objective Hessian matrix throughout all iterates, and thus enables us to solve the linear complementarity quadratic program with a single factorization of the KKT matrix (by using qpOASES).
 
