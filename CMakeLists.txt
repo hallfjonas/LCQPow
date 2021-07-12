@@ -83,6 +83,7 @@ if (${Matlab_FOUND})
 else()
     set(
         BUILD_MATLAB_INTERFACE OFF
+        CACHE BOOL
         "Build matlab interface"
     )
 
