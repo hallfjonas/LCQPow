@@ -65,7 +65,7 @@ set(
 )
 
 # 2) Locate Matlab and modify default values of interface & Schur
-find_package(Matlab REQUIRED)
+find_package(Matlab)
 
 if (${Matlab_FOUND})
     set(
