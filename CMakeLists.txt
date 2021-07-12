@@ -177,7 +177,7 @@ ExternalProject_Add(
     PREFIX external
     CONFIGURE_COMMAND mkdir -p bin;
     BUILD_IN_SOURCE ON
-    BUILD_COMMAND make ${qpOASES_MAKE_ARGS} src examples;
+    BUILD_COMMAND make ${qpOASES_MAKE_ARGS} src;
     INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
     INSTALL_COMMAND cp ${CMAKE_BINARY_DIR}/external/src/qpoases/bin/libqpOASES.so ${CMAKE_INSTALL_PREFIX}/lib/libqpOASES.so
 )
