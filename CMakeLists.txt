@@ -371,38 +371,44 @@ if (${BUILD_MATLAB_INTERFACE})
 endif()
 
 
-# ## Build unit tests ---------------------------------------------------------------------
-# if (${UNIT_TESTS})
-#     # Add include directories of dependencies: qpOASES, OSQP
-#     include_directories(${PROJECT_NAME}
-#         PRIVATE ${gtest_include}
-#         PRIVATE ${qpoases_include}
-#         PRIVATE ${osqp_include}
-#     )
+## Build unit tests ---------------------------------------------------------------------
+if (${UNIT_TESTS})
+    # Add include directories of dependencies: qpOASES, OSQP
+    include_directories(${PROJECT_NAME}
+        PRIVATE ${gtest_include}
+        PRIVATE ${qpoases_include}
+        PRIVATE ${osqp_include}
+    )
 
-#     # Add Unit testing source file
-#     add_executable(RunUnitTests test/RunUnitTests.cpp)
+    # Add Unit testing source file
+    add_executable(RunUnitTests test/RunUnitTests.cpp)
 
-#     add_dependencies(
-#         RunUnitTests
-#         qpoases
-#         osqp
-#         gtest
-#     )
+    add_dependencies(
+        RunUnitTests
+        qpoases
+        osqp
+        gtest
+    )
 
-#     set_target_properties(
-#         RunUnitTests
-#         PROPERTIES
-#         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
-#     )
+    set_target_properties(
+        RunUnitTests
+        PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
+    )
 
-#     # Add libraries: gtest, qpOASES, OSQP
-#     target_link_libraries(
-#         RunUnitTests
-#         PUBLIC ${PROJECT_NAME}-shared
-#         PRIVATE ${qpoases_lib} ${osqp_lib} ${gtest_lib}
-#     )
-# endif()
+    message(
+        INFO
+        ${qpoases_lib} ${osqp_lib} ${gtest_lib}
+    )
+
+    # Add libraries: gtest, qpOASES, OSQP
+    target_link_libraries(
+        RunUnitTests
+        PUBLIC ${PROJECT_NAME}-shared
+        PRIVATE ${qpoases_lib} ${osqp_lib} ${gtest_lib}
+        PRIVATE -lpthread
+    )
+endif()
 
 # ## Build documentation
 # if (${BUILD_DOCUMENTATION})
