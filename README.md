@@ -5,12 +5,14 @@ LCQPow is a open-source solver for Quadratic Programs with Complementarity Const
 The entire strategy is presented in detail in [this paper](https://ieeexplore.ieee.org/abstract/document/9439931).
 
 ## Requirements
-- Build process is currently only tested on Ubuntu 20.04
-- CMake version >= VERSION 3.20.3
-- all library dependencies are linked automatically (qpOASES, OSQP, googletest)
--
+* Build process is currently only tested on Ubuntu 20.04
+* CMake version >= VERSION 3.20.3
+* All dependencies are linked automatically. These are
+   * [qpOASES](https://github.com/coin-or/qpOASES)
+   * [OSQP](https://github.com/osqp/osqp)
+   * [googletest](https://github.com/google/googletest)
 
-## GETTING STARTED
+## GETTING STARTED (#getting-started)
 1. **Clone the repository**, and recursively initialize the submodules
 
 ```
@@ -27,7 +29,30 @@ $ cmake ..
 $ make
 ```
 
-3. The **MATLAB interface** is built automatically if matlab is successfully detected by CMake.
+3. To test the build you can **run the test examples**
+```
+$ bin/examples/warm_up
+$ bin/examples/warm_up_sparse
+$ bin/examples/warm_up_osqp
+$ bin/examples/OptimizeOnCircle
+```
+
+## MATLAB Interface
+The **MATLAB interface** is built automatically if matlab is successfully detected by CMake. Make sure that your **linker can locate the created libraries** by exporting the library path in **the same shell as the one you call matlab in**:
+```
+$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<LCQPow-dir>/build/lib
+$ matlab
+```
+where `<LCQPow-dir>` represents the base directory of your local LCQPow repository.
+
+Whenever **using the MATLAB interface** make sure that you have built the project according to the [getting started section](#getting-started), and further let MATLAB locate the interface by executing
+```
+addpath(<LCQPow-dir>/build/lib)
+```
+
+Navigate your MATLAB editor to the directory `<LCQPow-dir>/interfaces/matlab/examples` and play with any of the provided codes.
+
+Type `help LCQPow` in order to obtain the documentation of our MATLAB interface.
 
 ## License
 The file LICENSE contains a copy of the GNU Lesser General Public License (v2.1). Please read it carefully before using LCQPow!
