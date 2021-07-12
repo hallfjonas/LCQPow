@@ -62,7 +62,7 @@ function [] = make( varargin )
     LCQPow_IFLAG = '-I../../include ';
     QPOASES_IFLAG = ' -I../../build/external/src/qpoases/include ';
     OSQP_IFLAG = ' -I../../build/external/src/osqp/include ';
-    IFLAGS = [ '-I. ', LCQPow_IFLAG, QPOASES_IFLAG, OSQP_IFLAG];
+    IFLAGS = [ LCQPow_IFLAG, QPOASES_IFLAG, OSQP_IFLAG];
 
     LIBDIRLINK = ['-L', pwd , '/../../build/lib'];
     LCQPow_LFLAG = [LIBDIRLINK, ' -llcqpow '];
