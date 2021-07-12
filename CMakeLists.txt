@@ -211,6 +211,7 @@ add_compile_options(
     -Wsign-conversion
     -fPIC
     -DLINUX
+    -D__USE_LONG_FINTS__
     -D${DEF_SOLVER}
 )
 
@@ -317,7 +318,7 @@ if (${BUILD_MATLAB_INTERFACE})
     if (${QPOASES_SCHUR})
         set(
             MA57_lib
-            mwma57
+            -lmwma57
         )
     endif()
 
@@ -341,20 +342,36 @@ if (${BUILD_MATLAB_INTERFACE})
         NAME matlab_interface
         SRC ${MATLAB_INTERFACE_DIR}/${MATLAB_INTERFACE_NAME}.cpp
         OUTPUT_NAME ${MATLAB_INTERFACE_DESTINATION}/${MATLAB_INTERFACE_NAME}
-        LINK_TO ${PROJECT_NAME}-shared mwblas mwlapack ${MA57_lib}
+        LINK_TO "-llcqpow -lqpOASES -losqp -lmwblas -lmwlapack -lmwma57"
     )
 
-    message(INFO ${DEF_SOLVER})
+    target_link_directories(
+        matlab_interface
+        PUBLIC ${CMAKE_BINARY_DIR}/lib
+    )
 
     target_compile_options(
         matlab_interface
         PUBLIC -D${DEF_SOLVER}
         PUBLIC -D__USE_LONG_FINTS__
-        PUBLIC -D__cpluplus
         PUBLIC -D__MATLAB__
         PUBLIC -D__NO_COPYRIGHT__
+        PUBLIC -D__cpluplus
         PUBLIC -O
         PUBLIC -largeArrayDims
+        PUBLIC -lmwblas
+        PUBLIC -lmwlapack
+        PUBLIC -lmwma57
+        PUBLIC -llcqpow
+        PUBLIC -lqpOASES
+        PUBLIC -losqp
+    )
+
+    target_include_directories(
+        matlab_interface
+        PUBLIC include
+        PUBLIC ${osqp_include}
+        PUBLIC ${qpoases_include}
     )
 
     file(
