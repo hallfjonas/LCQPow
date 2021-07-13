@@ -359,23 +359,16 @@ namespace LCQPow {
 
 		// Initialization strategy
 		if (options.getSolveZeroPenaltyFirst()) {
-			memcpy(gk, g, (size_t)nV*sizeof(double));
 
+			// Zero penalty, i.e. pen-linearization = 0, i.e. gk = g
+			memcpy(gk, g, (size_t)nV*sizeof(double));
 			ret = solveQPSubproblem( true );
 			if (ret != SUCCESSFUL_RETURN) {
 				return MessageHandler::PrintMessage(ret);
 			}
-
-			updateLinearization();
-
-			ret = solveQPSubproblem( false );
-			if (ret != SUCCESSFUL_RETURN) {
-				return MessageHandler::PrintMessage(ret);
-			}
-
 		} else {
+			// Linearize penalty function at initial guess
 			updateLinearization();
-
 			ret = solveQPSubproblem( true );
 			if (ret != SUCCESSFUL_RETURN) {
 				return MessageHandler::PrintMessage(ret);
