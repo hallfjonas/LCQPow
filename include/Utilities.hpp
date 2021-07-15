@@ -56,6 +56,7 @@ namespace LCQPow {
         INVALID_OBJECTIVE_LINEAR_TERM = 116,            /**< Invalid objective linear term passed (must be a double array of length n). */
         INVALID_CONSTRAINT_MATRIX = 117,                /**< Invalid constraint matrix passed (matrix was null pointer but number of constraints is positive). */
         INVALID_COMPLEMENTARITY_MATRIX = 118,           /**< Invalid complementarity matrix passed (can not be null pointer). */
+        INVALID_ETA_VALUE = 119,                        /**< Invalid etaComplHist value, which describes the fraction of loss required for complementarity progress (must be in (0,1)). */
 
         // Algorithmic errors
         MAX_ITERATIONS_REACHED = 200,                   /**< Maximum number of iterations reached. */

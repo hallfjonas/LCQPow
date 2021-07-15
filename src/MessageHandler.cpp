@@ -143,6 +143,10 @@ namespace LCQPow {
                 printf("ERROR: Invalid complementarity matrix passed (can not be null pointer).\n");
                 break;
 
+            case INVALID_ETA_VALUE:
+                printf("ERROR: Invalid etaComplHist value, which describes the fraction of loss required for complementarity progress (must be in (0,1)).");
+                break;
+
             case FAILED_SYM_COMPLEMENTARITY_MATRIX:
                 printf("Failed to compute the symmetric complementarity matrix C.\n");
                 break;

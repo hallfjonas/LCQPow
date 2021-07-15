@@ -30,6 +30,7 @@
 
 #include <qpOASES.hpp>
 #include <vector>
+#include <deque>
 
 using qpOASES::QProblem;
 
@@ -406,6 +407,10 @@ namespace LCQPow {
 
 			/** Update gradient of Lagrangian. */
 			void updateStationarity( );
+
+			/** Check the dynamic penalty update strategy by Leyffer. */
+			bool leyfferCheckPositive( );
+
 			/** Update Qk. */
 			void updateQk( );
 
@@ -488,6 +493,8 @@ namespace LCQPow {
 			csc* C_sparse = NULL;					/**< Sparse C. */
 			csc* Qk_sparse = NULL;					/**< Sparse Qk. */
 			std::vector<int> Qk_indices_of_C;		/**< Remember the indices of Qk corresponding to C (for fast Qk update). */
+
+			std::deque<double> complHistory; 		/**< Vector containing the previous complementarity values. */
 
 			Subsolver subsolver;					/**< Subsolver class for solving the QP subproblems. */
 

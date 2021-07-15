@@ -59,6 +59,8 @@ namespace LCQPow {
         penaltyUpdateFactor = rhs.penaltyUpdateFactor;
         solveZeroPenaltyFirst = rhs.solveZeroPenaltyFirst;
         maxIterations = rhs.maxIterations;
+        nComplHist = rhs.nComplHist;
+        etaComplHist = rhs.etaComplHist;
         printLevel = rhs.printLevel;
         qpSolver = rhs.qpSolver;
     }
@@ -145,6 +147,31 @@ namespace LCQPow {
     }
 
 
+    int Options::getNComplHist( ) {
+        return nComplHist;
+    }
+
+
+    ReturnValue Options::setNComplHist( int val ) {
+        nComplHist = val;
+        return ReturnValue::SUCCESSFUL_RETURN;
+    }
+
+
+    double Options::getEtaComplHist( ) {
+        return etaComplHist;
+    }
+
+
+    ReturnValue Options::setEtaComplHist( double val ) {
+        if (val <= Utilities::EPS || val >= 1)
+            return (MessageHandler::PrintMessage(INVALID_ETA_VALUE) );
+
+        etaComplHist = val;
+        return ReturnValue::SUCCESSFUL_RETURN;
+    }
+
+
     PrintLevel Options::getPrintLevel( ) {
         return printLevel;
     }
@@ -195,6 +222,9 @@ namespace LCQPow {
         solveZeroPenaltyFirst = true;
 
         maxIterations = 1000;
+
+        nComplHist = 0;
+        etaComplHist = 0.9;
 
         printLevel = PrintLevel::INNER_LOOP_ITERATES;
 

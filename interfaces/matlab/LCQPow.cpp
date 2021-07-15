@@ -365,6 +365,8 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             "penaltyUpdateFactor",
             "solveZeroPenaltyFirst",
             "maxIterations",
+            "nComplHist",
+            "etaComplHist",
             "printLevel",
             "qpSolver"
         };
@@ -421,6 +423,22 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
                 fld_ptr = (double*) mxGetPr(field);
                 options.setMaxIterations( (int)fld_ptr[0] );
+                continue;
+            }
+
+            if ( strcmp(name, "nComplHist") == 0 ) {
+                if (!checkDimensionAndTypeDouble(field, 1, 1, "params.nComplHist")) return;
+
+                fld_ptr = (double*) mxGetPr(field);
+                options.setNComplHist( (int)fld_ptr[0] );
+                continue;
+            }
+
+            if ( strcmp(name, "etaComplHist") == 0 ) {
+                if (!checkDimensionAndTypeDouble(field, 1, 1, "params.etaComplHist")) return;
+
+                fld_ptr = (double*) mxGetPr(field);
+                options.setEtaComplHist( fld_ptr[0] );
                 continue;
             }
 
