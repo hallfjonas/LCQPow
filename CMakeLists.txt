@@ -422,11 +422,6 @@ if (${UNIT_TESTS})
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
     )
 
-    message(
-        INFO
-        ${qpoases_lib} ${osqp_lib} ${gtest_lib}
-    )
-
     # Add libraries: gtest, qpOASES, OSQP
     target_link_libraries(
         RunUnitTests
