@@ -1039,9 +1039,6 @@ namespace LCQPow {
 			return false;
 		}
 
-		// Debug message
-		printf("Current Compl: %g\n", complCur);
-
 		bool retFlag = true;
 		for (size_t i = 0; i < n; i++) {
 			if (complCur < options.getEtaComplHist()*complHistory[i]) {
