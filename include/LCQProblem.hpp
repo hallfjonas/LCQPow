@@ -392,6 +392,9 @@ namespace LCQPow {
 			/** Check satisfaction of complementarity value. */
 			bool complementarityCheck( );
 
+			/** Evaluate penalty function at current iterate. */
+			double getPhi( );
+
 			/** Perform penalty update. */
 			void updatePenalty( );
 
@@ -401,6 +404,8 @@ namespace LCQPow {
 			/** Update xk and gk. */
 			void updateStep( );
 
+			/** Update gradient of Lagrangian. */
+			void updateStationarity( );
 			/** Update Qk. */
 			void updateQk( );
 

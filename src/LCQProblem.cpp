@@ -375,14 +375,27 @@ namespace LCQPow {
 			}
 		}
 
+		// Initialize Qk = H + rhok*C
+		setQk();
+
 		// Outer and inner loop in one
 		while ( true ) {
 
-			// Update xk, gk, Qk, stationarity
+			// Update xk, Qk, stationarity
 			updateStep( );
+
+			// Update gradient of Lagrangian
+			updateStationarity( );
 
 			// Print iteration
 			printIteration( );
+
+
+			// gk = new linearization + g
+			updateLinearization();
+
+			// Add some +/- EPS to each coordinate
+			perturbGradient();
 
 			// Terminate, update pen, or continue inner loop
 			if (stationarityCheck()) {
@@ -914,12 +927,16 @@ namespace LCQPow {
 
 
 	bool LCQProblem::complementarityCheck( ) {
-		if (sparseSolver) {
-			return Utilities::QuadraticFormProduct(C_sparse, xk, nV) < 2*options.getComplementarityTolerance();
-		} else {
-			return Utilities::QuadraticFormProduct(C, xk, nV) < 2*options.getComplementarityTolerance();
-		}
+		return getPhi() < options.getComplementarityTolerance();
+	}
 
+
+	double LCQProblem::getPhi( ) {
+		if (sparseSolver) {
+			return Utilities::QuadraticFormProduct(C_sparse, xk, nV)/2.0;
+		} else {
+			return Utilities::QuadraticFormProduct(C, xk, nV)/2.0;
+		}
 	}
 
 
@@ -952,31 +969,15 @@ namespace LCQPow {
 
 
 	void LCQProblem::updateStep( ) {
-		// Update penalty on rejected step
-		// Currently doesn't exist
-		if (alphak <= 0) {
-			updatePenalty( );
+		// xk = xk + alphak*pk
+		Utilities::WeightedVectorAdd(1, xk, alphak, pk, xk, nV);
+	}
 
-			// Update iterate counters
-			updateOuterIter();
-			innerIter = 0;
-		} else {
-			// xk = xk + alphak*pk
-			Utilities::WeightedVectorAdd(1, xk, alphak, pk, xk, nV);
 
-			// gk = new linearization + g
-			updateLinearization();
-
-			// Add some +/- EPS to each coordinate
-			perturbGradient();
-		}
-
-		// Update Qk = H + rho*C (only required on first inner iteration)
-		if (innerIter == 0 && outerIter == 0) {
-			setQk();
-		} else if (innerIter == 0) {
+	void LCQProblem::updateStationarity( ) {
+		// Update Qk = Q + rhok C (once per inner loop)
+		if (innerIter == 0 && outerIter > 0)
 			updateQk();
-		}
 
 		// stat = Qk*xk + g - A'*yk_A - yk_x
 		// 1) Objective contribution: Qk*xk + g
