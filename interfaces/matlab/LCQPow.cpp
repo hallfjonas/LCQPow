@@ -366,6 +366,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             "solveZeroPenaltyFirst",
             "maxIterations",
             "printLevel",
+            "storeSteps",
             "qpSolver"
         };
 
@@ -429,6 +430,14 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
                 fld_ptr = (double*) mxGetPr(field);
                 options.setPrintLevel( (int)fld_ptr[0] );
+                continue;
+            }
+
+            if ( strcmp(name, "storeSteps") == 0 ) {
+                if (!checkDimensionAndTypeBool(field, 1, 1, "params.storeSteps")) return;
+
+                bool* fld_ptr_bool = (bool*) mxGetPr(field);
+                options.setStoreSteps( fld_ptr_bool[0] );
                 continue;
             }
 
@@ -572,6 +581,61 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         mxSetFieldByNumber(plhs[2], 0, 3, rhoOpt);
         mxSetFieldByNumber(plhs[2], 0, 4, elapsed_time);
         mxSetFieldByNumber(plhs[2], 0, 5, exit_flag);
+
+        // Tracking values
+        if (options.getStoreSteps()) {
+            mxArray* innerItersArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
+            mxArray* subproblemItersArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
+            mxArray* accuSubproblemItersArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
+            mxArray* stepLengthArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
+            mxArray* stepSizeArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
+            mxArray* statValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
+            mxArray* objValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
+            mxArray* phiValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
+            mxArray* meritValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
+
+            int* innerIters = (int*) mxGetPr(innerItersArr);
+            int* subproblemIters = (int*) mxGetPr(subproblemItersArr);
+            int* accuSubproblemIters = (int*) mxGetPr(accuSubproblemItersArr);
+            double* stepLength = (double*) mxGetPr(stepLengthArr);
+            double* stepSize = (double*) mxGetPr(stepSizeArr);
+            double* statVals = (double*) mxGetPr(statValsArr);
+            double* objVals = (double*) mxGetPr(objValsArr);
+            double* phiVals = (double*) mxGetPr(phiValsArr);
+            double* meritVals = (double*) mxGetPr(meritValsArr);
+
+            int* innerItersTMP = stats.getInnerIters( );
+            int* subproblemItersTMP = stats.getSubproblemIters( );
+            int* accuSubproblemItersTMP = stats.getAccuSubproblemIters( );
+            double* stepLengthTMP = stats.getStepLength( );
+            double* stepSizeTMP = stats.getStepSize( );
+            double* statValsTMP = stats.getStatVals( );
+            double* objValsTMP = stats.getObjVals( );
+            double* phiValsTMP = stats.getPhiVals( );
+            double* meritValsTMP = stats.getMeritVals( );
+
+            for (int i = 0; i < stats.getIterTotal()+1; i++) {
+                innerIters[i] = innerItersTMP[i];
+                subproblemIters[i] = subproblemItersTMP[i];
+                accuSubproblemIters[i] = accuSubproblemItersTMP[i];
+                stepLength[i] = stepLengthTMP[i];
+                stepSize[i] = stepSizeTMP[i];
+                statVals[i] = statValsTMP[i];
+                objVals[i] = objValsTMP[i];
+                phiVals[i] = phiValsTMP[i];
+                meritVals[i] = meritValsTMP[i];
+            }
+
+            delete[] innerItersTMP;
+            delete[] subproblemItersTMP;
+            delete[] accuSubproblemItersTMP;
+            delete[] stepLengthTMP;
+            delete[] stepSizeTMP;
+            delete[] statValsTMP;
+            delete[] objValsTMP;
+            delete[] phiValsTMP;
+            delete[] meritValsTMP;
+        }
     }
 
     return;

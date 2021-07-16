@@ -390,12 +390,15 @@ namespace LCQPow {
 			// Print iteration
 			printIteration( );
 
-
 			// gk = new linearization + g
 			updateLinearization();
 
 			// Add some +/- EPS to each coordinate
 			perturbGradient();
+
+			if (options.getStoreSteps()) {
+				storeSteps( );
+			}
 
 			// Terminate, update pen, or continue inner loop
 			if (stationarityCheck()) {
@@ -931,11 +934,33 @@ namespace LCQPow {
 	}
 
 
+	double LCQProblem::getObj( ) {
+		double lin = Utilities::DotProduct(g, xk, nV);
+
+		if (sparseSolver) {
+			return lin + Utilities::QuadraticFormProduct(H_sparse, xk, nV)/2.0;
+		} else {
+			return lin + Utilities::QuadraticFormProduct(H, xk, nV)/2.0;
+		}
+	}
+
+
 	double LCQProblem::getPhi( ) {
 		if (sparseSolver) {
 			return Utilities::QuadraticFormProduct(C_sparse, xk, nV)/2.0;
 		} else {
 			return Utilities::QuadraticFormProduct(C, xk, nV)/2.0;
+		}
+	}
+
+
+	double LCQProblem::getMerit( ) {
+		double lin = Utilities::DotProduct(g, xk, nV);
+
+		if (sparseSolver) {
+			return lin + Utilities::QuadraticFormProduct(Qk_sparse, xk, nV)/2.0;
+		} else {
+			return lin + Utilities::QuadraticFormProduct(Qk, xk, nV)/2.0;
 		}
 	}
 
@@ -1054,6 +1079,20 @@ namespace LCQPow {
 
 			xk[i] += randNum*Utilities::EPS;
 		}
+	}
+
+
+	void LCQProblem::storeSteps( ) {
+		stats.updateTrackingVectors(
+			innerIter,
+			qpIterk,
+			alphak,
+			Utilities::MaxAbs(pk, nV),
+			Utilities::MaxAbs(statk, nV),
+			getObj(),
+			getPhi(),
+			getMerit()
+		);
 	}
 
 

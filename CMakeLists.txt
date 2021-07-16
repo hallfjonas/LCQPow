@@ -221,11 +221,8 @@ add_compile_options(
     -pedantic
     -Wshadow
     -Wfloat-equal
-    -O3
     -Wconversion
     -Wsign-conversion
-    -fPIC
-    -DLINUX
     -D__USE_LONG_FINTS__
     -D${DEF_SOLVER}
 )

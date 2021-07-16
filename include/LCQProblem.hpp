@@ -392,8 +392,14 @@ namespace LCQPow {
 			/** Check satisfaction of complementarity value. */
 			bool complementarityCheck( );
 
+			/** Evaluate objective function at current iterate. */
+			double getObj( );
+
 			/** Evaluate penalty function at current iterate. */
 			double getPhi( );
+
+			/** Evaluate merit function at current iterate. */
+			double getMerit( );
 
 			/** Perform penalty update. */
 			void updatePenalty( );
@@ -420,6 +426,9 @@ namespace LCQPow {
 
 			/** Step perturbation method. */
 			void perturbStep( );
+
+			/** Store detailed steps to output stats. */
+			void storeSteps( );
 
 			/** Transform the dual variables from penalty form to LCQP form. */
 			void transformDuals( );
