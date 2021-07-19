@@ -538,10 +538,22 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         // assign fieldnames
         int numberStatOutputs = 6;
 
-        const char* fieldnames[] = {"iters_total", "iters_outer", "iters_subproblem", "rho_opt", "elapsed_time", "exit_flag"};
+        if (options.getStoreSteps()) {
+            const char* fieldnames[] = {
+                "iters_total", "iters_outer", "iters_subproblem", "rho_opt", "elapsed_time", "exit_flag",
+                "innerIters", "subproblemIters", "accumulatedSubproblemIters", "stepLength", "stepSize",
+                "statVals", "objVals", "phiVals", "meritVals"
+            };
+            numberStatOutputs += 9;
 
-        // Allocate memory
-        plhs[2] = mxCreateStructMatrix(1,1,numberStatOutputs, fieldnames);
+            // Allocate memory
+            plhs[2] = mxCreateStructMatrix(1,1,numberStatOutputs, fieldnames);
+        } else {
+            const char* fieldnames[] = {"iters_total", "iters_outer", "iters_subproblem", "rho_opt", "elapsed_time", "exit_flag"};
+
+            // Allocate memory
+            plhs[2] = mxCreateStructMatrix(1,1,numberStatOutputs, fieldnames);
+        }
 
         // assert that allocation went ok
         if (plhs[2] == NULL) {
@@ -584,57 +596,70 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
         // Tracking values
         if (options.getStoreSteps()) {
-            mxArray* innerItersArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
-            mxArray* subproblemItersArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
-            mxArray* accuSubproblemItersArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
-            mxArray* stepLengthArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
-            mxArray* stepSizeArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
-            mxArray* statValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
-            mxArray* objValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
-            mxArray* phiValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
-            mxArray* meritValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
 
-            int* innerIters = (int*) mxGetPr(innerItersArr);
-            int* subproblemIters = (int*) mxGetPr(subproblemItersArr);
-            int* accuSubproblemIters = (int*) mxGetPr(accuSubproblemItersArr);
-            double* stepLength = (double*) mxGetPr(stepLengthArr);
-            double* stepSize = (double*) mxGetPr(stepSizeArr);
-            double* statVals = (double*) mxGetPr(statValsArr);
-            double* objVals = (double*) mxGetPr(objValsArr);
-            double* phiVals = (double*) mxGetPr(phiValsArr);
-            double* meritVals = (double*) mxGetPr(meritValsArr);
+            if (stats.getIterTotal() > 0) {
+                mxArray* innerItersArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal()+1, 1, mxREAL);
+                mxArray* subproblemItersArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal()+1, 1, mxREAL);
+                mxArray* accuSubproblemItersArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal()+1, 1, mxREAL);
+                mxArray* stepLengthArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal()+1, 1, mxREAL);
+                mxArray* stepSizeArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal()+1, 1, mxREAL);
+                mxArray* statValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal()+1, 1, mxREAL);
+                mxArray* objValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal()+1, 1, mxREAL);
+                mxArray* phiValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal()+1, 1, mxREAL);
+                mxArray* meritValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal()+1, 1, mxREAL);
 
-            int* innerItersTMP = stats.getInnerIters( );
-            int* subproblemItersTMP = stats.getSubproblemIters( );
-            int* accuSubproblemItersTMP = stats.getAccuSubproblemIters( );
-            double* stepLengthTMP = stats.getStepLength( );
-            double* stepSizeTMP = stats.getStepSize( );
-            double* statValsTMP = stats.getStatVals( );
-            double* objValsTMP = stats.getObjVals( );
-            double* phiValsTMP = stats.getPhiVals( );
-            double* meritValsTMP = stats.getMeritVals( );
+                double* innerIters = (double*) mxGetPr(innerItersArr);
+                double* subproblemIters = (double*) mxGetPr(subproblemItersArr);
+                double* accuSubproblemIters = (double*) mxGetPr(accuSubproblemItersArr);
+                double* stepLength = (double*) mxGetPr(stepLengthArr);
+                double* stepSize = (double*) mxGetPr(stepSizeArr);
+                double* statVals = (double*) mxGetPr(statValsArr);
+                double* objVals = (double*) mxGetPr(objValsArr);
+                double* phiVals = (double*) mxGetPr(phiValsArr);
+                double* meritVals = (double*) mxGetPr(meritValsArr);
 
-            for (int i = 0; i < stats.getIterTotal()+1; i++) {
-                innerIters[i] = innerItersTMP[i];
-                subproblemIters[i] = subproblemItersTMP[i];
-                accuSubproblemIters[i] = accuSubproblemItersTMP[i];
-                stepLength[i] = stepLengthTMP[i];
-                stepSize[i] = stepSizeTMP[i];
-                statVals[i] = statValsTMP[i];
-                objVals[i] = objValsTMP[i];
-                phiVals[i] = phiValsTMP[i];
-                meritVals[i] = meritValsTMP[i];
+                int* innerItersTMP = stats.getInnerIters( );
+                int* subproblemItersTMP = stats.getSubproblemIters( );
+                int* accuSubproblemItersTMP = stats.getAccuSubproblemIters( );
+                double* stepLengthTMP = stats.getStepLength( );
+                double* stepSizeTMP = stats.getStepSize( );
+                double* statValsTMP = stats.getStatVals( );
+                double* objValsTMP = stats.getObjVals( );
+                double* phiValsTMP = stats.getPhiVals( );
+                double* meritValsTMP = stats.getMeritVals( );
+
+                for (int i = 0; i < stats.getIterTotal()+1; i++) {
+                    innerIters[i] = innerItersTMP[i];
+                    subproblemIters[i] = subproblemItersTMP[i];
+                    accuSubproblemIters[i] = accuSubproblemItersTMP[i];
+                    stepLength[i] = stepLengthTMP[i];
+                    stepSize[i] = stepSizeTMP[i];
+                    statVals[i] = statValsTMP[i];
+                    objVals[i] = objValsTMP[i];
+                    phiVals[i] = phiValsTMP[i];
+                    meritVals[i] = meritValsTMP[i];
+                }
+
+                mxSetFieldByNumber(plhs[2], 0, 6, innerItersArr);
+                mxSetFieldByNumber(plhs[2], 0, 7,  subproblemItersArr);
+                mxSetFieldByNumber(plhs[2], 0, 8,  accuSubproblemItersArr);
+                mxSetFieldByNumber(plhs[2], 0, 9,  stepLengthArr);
+                mxSetFieldByNumber(plhs[2], 0, 10, stepSizeArr);
+                mxSetFieldByNumber(plhs[2], 0, 11, statValsArr);
+                mxSetFieldByNumber(plhs[2], 0, 12, objValsArr);
+                mxSetFieldByNumber(plhs[2], 0, 13, phiValsArr);
+                mxSetFieldByNumber(plhs[2], 0, 14, meritValsArr);
+
+                delete[] innerItersTMP;
+                delete[] subproblemItersTMP;
+                delete[] accuSubproblemItersTMP;
+                delete[] stepLengthTMP;
+                delete[] stepSizeTMP;
+                delete[] statValsTMP;
+                delete[] objValsTMP;
+                delete[] phiValsTMP;
+                delete[] meritValsTMP;
             }
-
-            delete[] innerItersTMP;
-            delete[] subproblemItersTMP;
-            delete[] accuSubproblemItersTMP;
-            delete[] stepLengthTMP;
-            delete[] stepSizeTMP;
-            delete[] statValsTMP;
-            delete[] objValsTMP;
-            delete[] phiValsTMP;
-            delete[] meritValsTMP;
         }
     }
 
