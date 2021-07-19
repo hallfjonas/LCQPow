@@ -393,12 +393,13 @@ namespace LCQPow {
 			// gk = new linearization + g
 			updateLinearization();
 
-			// Add some +/- EPS to each coordinate
-			perturbGradient();
-
 			if (options.getStoreSteps()) {
 				storeSteps( );
 			}
+
+			// (Failed) termination condition
+			if ( totalIter > options.getMaxIterations() )
+				return MAX_ITERATIONS_REACHED;
 
 			// Terminate, update pen, or continue inner loop
 			if (stationarityCheck()) {
@@ -433,15 +434,14 @@ namespace LCQPow {
 				return MessageHandler::PrintMessage(ret);
 			}
 
+			// Add some +/- EPS to each coordinate
+			perturbStep();
+
 			// Step length computation
 			getOptimalStepLength( );
 
 			// Update the total iteration counter
 			updateTotalIter();
-
-			// (Failed) termination condition
-			if ( totalIter > options.getMaxIterations() )
-				return MAX_ITERATIONS_REACHED;
 
 			// Update inner iterate counter
 			innerIter++;
