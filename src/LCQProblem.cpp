@@ -819,6 +819,10 @@ namespace LCQPow {
 			ub_tmp = NULL;
 		}
 
+		// Print new line before printing anything else (might not have been printed by other users...)
+		if (options.getPrintLevel() > PrintLevel::NONE)
+			printf("\n");
+
 		return ret;
 	}
 
@@ -1242,7 +1246,7 @@ namespace LCQPow {
 		if (options.getPrintLevel() == PrintLevel::NONE)
 			return;
 
-		if (options.getPrintLevel() == PrintLevel::OUTER_LOOP_ITERATES && innerIter % 10 > 0)
+		if (options.getPrintLevel() == PrintLevel::OUTER_LOOP_ITERATES && innerIter > 0)
 			return;
 
 		// Print header every 10 iters
@@ -1335,12 +1339,6 @@ namespace LCQPow {
 		const char* iSep = "------";
 		const char* dSep = "----------";
 		const char* node = "-+-";
-
-		if (innerIter == 0 && outerIter == 0) {
-			// Print new line at very beginning as there is no guarantee
-			// that whatever was printed before ended with newline.
-			printf("\n");
-		}
 
 		printf("%s", iSep);
 
