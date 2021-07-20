@@ -105,6 +105,7 @@ endif()
 ## Print Options ------------------------------------------------------------------------
 
 message(
+    "BUILD TYPE         ${CMAKE_BUILD_TYPE}\n"
     "EXAMPLES           ${BUILD_EXAMPLES}\n"
     "MATLAB INTERFACE   ${BUILD_MATLAB_INTERFACE}\n"
     "DOCUMENTATION      ${BUILD_DOCUMENTATION}\n"
@@ -170,7 +171,7 @@ endif()
 
 set(
     qpOASES_CPP_FLAGS
-    "-Wall -pedantic -Wshadow -Wfloat-equal -O3 -Wconversion -Wsign-conversion -fPIC -DLINUX -D${DEF_SOLVER} -D__USE_LONG_FINTS__ -D__NO_COPYRIGHT__"
+    "-w -O3 -fPIC -DLINUX -D${DEF_SOLVER} -D__USE_LONG_FINTS__ -D__NO_COPYRIGHT__"
 )
 
 set(
@@ -220,7 +221,7 @@ set(gtest_include "${CMAKE_BINARY_DIR}/external/src/gtest/googletest/include")
 
 ## CREATE LCQPow libraries ----------------------------------------------------------
 # Include project headers
-include_directories(${PROJECT_NAME} PUBLIC include)
+include_directories(${PROJECT_NAME} PRIVATE include)
 
 # Add compile options
 add_compile_options(
@@ -262,8 +263,8 @@ endif()
 
 # Add include directories of dependencies: qpOASES, OSQP
 include_directories(${PROJECT_NAME}
-    PRIVATE ${qpoases_include}
-    PRIVATE ${osqp_include}
+    SYSTEM ${qpoases_include}
+    SYSTEM ${osqp_include}
 )
 
 # create shared lib
@@ -382,9 +383,9 @@ if (${BUILD_MATLAB_INTERFACE})
 
     target_include_directories(
         matlab_interface
-        PUBLIC include
-        PUBLIC ${osqp_include}
-        PUBLIC ${qpoases_include}
+        PRIVATE include
+        SYSTEM ${osqp_include}
+        SYSTEM ${qpoases_include}
     )
 
     file(
@@ -399,9 +400,9 @@ endif()
 if (${UNIT_TESTS})
     # Add include directories of dependencies: qpOASES, OSQP
     include_directories(${PROJECT_NAME}
-        PRIVATE ${gtest_include}
-        PRIVATE ${qpoases_include}
-        PRIVATE ${osqp_include}
+        SYSTEM ${gtest_include}
+        SYSTEM ${qpoases_include}
+        SYSTEM ${osqp_include}
     )
 
     # Add Unit testing source file
