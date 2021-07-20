@@ -402,8 +402,13 @@ namespace LCQPow {
 			// gk = new linearization + g
 			updateLinearization();
 
-			// Add some +/- EPS to each coordinate
-			perturbGradient();
+			if (options.getStoreSteps()) {
+				storeSteps( );
+			}
+
+			// (Failed) termination condition
+			if ( totalIter > options.getMaxIterations() )
+				return MAX_ITERATIONS_REACHED;
 
 			// Terminate, update pen, or continue inner loop
 			if (stationarityCheck()) {
@@ -438,15 +443,14 @@ namespace LCQPow {
 				return MessageHandler::PrintMessage(ret);
 			}
 
+			// Add some +/- EPS to each coordinate
+			perturbStep();
+
 			// Step length computation
 			getOptimalStepLength( );
 
 			// Update the total iteration counter
 			updateTotalIter();
-
-			// (Failed) termination condition
-			if ( totalIter > options.getMaxIterations() )
-				return MAX_ITERATIONS_REACHED;
 
 			// Update inner iterate counter
 			innerIter++;
@@ -824,6 +828,10 @@ namespace LCQPow {
 			ub_tmp = NULL;
 		}
 
+		// Print new line before printing anything else (might not have been printed by other users...)
+		if (options.getPrintLevel() > PrintLevel::NONE)
+			printf("\n");
+
 		return ret;
 	}
 
@@ -939,11 +947,33 @@ namespace LCQPow {
 	}
 
 
+	double LCQProblem::getObj( ) {
+		double lin = Utilities::DotProduct(g, xk, nV);
+
+		if (sparseSolver) {
+			return lin + Utilities::QuadraticFormProduct(H_sparse, xk, nV)/2.0;
+		} else {
+			return lin + Utilities::QuadraticFormProduct(H, xk, nV)/2.0;
+		}
+	}
+
+
 	double LCQProblem::getPhi( ) {
 		if (sparseSolver) {
 			return Utilities::QuadraticFormProduct(C_sparse, xk, nV)/2.0;
 		} else {
 			return Utilities::QuadraticFormProduct(C, xk, nV)/2.0;
+		}
+	}
+
+
+	double LCQProblem::getMerit( ) {
+		double lin = Utilities::DotProduct(g, xk, nV);
+
+		if (sparseSolver) {
+			return lin + Utilities::QuadraticFormProduct(Qk_sparse, xk, nV)/2.0;
+		} else {
+			return lin + Utilities::QuadraticFormProduct(Qk, xk, nV)/2.0;
 		}
 	}
 
@@ -1105,6 +1135,20 @@ namespace LCQPow {
 	}
 
 
+	void LCQProblem::storeSteps( ) {
+		stats.updateTrackingVectors(
+			innerIter,
+			qpIterk,
+			alphak,
+			Utilities::MaxAbs(pk, nV),
+			Utilities::MaxAbs(statk, nV),
+			getObj(),
+			getPhi(),
+			getMerit()
+		);
+	}
+
+
 	void LCQProblem::transformDuals( ) {
 
 		double* tmp = new double[nComp];
@@ -1251,7 +1295,7 @@ namespace LCQPow {
 		if (options.getPrintLevel() == PrintLevel::NONE)
 			return;
 
-		if (options.getPrintLevel() == PrintLevel::OUTER_LOOP_ITERATES && innerIter % 10 > 0)
+		if (options.getPrintLevel() == PrintLevel::OUTER_LOOP_ITERATES && innerIter > 0)
 			return;
 
 		// Print header every 10 iters
@@ -1344,12 +1388,6 @@ namespace LCQPow {
 		const char* iSep = "------";
 		const char* dSep = "----------";
 		const char* node = "-+-";
-
-		if (innerIter == 0 && outerIter == 0) {
-			// Print new line at very beginning as there is no guarantee
-			// that whatever was printed before ended with newline.
-			printf("\n");
-		}
 
 		printf("%s", iSep);
 

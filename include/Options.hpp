@@ -34,24 +34,20 @@ namespace LCQPow {
             /** Default constructor. */
             Options( );
 
-
             /** Copy constructor (deep copy).
              *
              * @param rhs The object to be copied.
             */
             Options( const Options& rhs );
 
-
             /** Destructor. */
             ~Options( );
-
 
             /** Assignment operator.
              *
              * @param rhs The obejct from which to assign.
             */
             Options& operator=( const Options& rhs );
-
 
             /** Sets all options to default values. */
             void setToDefault( );
@@ -113,6 +109,12 @@ namespace LCQPow {
             /** Set print level (using an integer). */
             ReturnValue setPrintLevel( int val );
 
+            /** Get whether to store information per iterate. */
+            bool getStoreSteps( );
+
+            /** Set whether to store information per iterate. */
+            ReturnValue setStoreSteps( bool val );
+
             /** Get QP solver. */
             QPSolver getQPSolver( );
 
@@ -138,6 +140,8 @@ namespace LCQPow {
             double etaComplHist;                          /**< Parameter describing fraction of required complementarity loss. */
 
             PrintLevel printLevel;                      /**< Print level. */
+
+            bool storeSteps;                            /**< Whether to store detailed information for each iterate (time consuming). */
 
             QPSolver qpSolver;                          /**< The QP solver to be used. */
     };

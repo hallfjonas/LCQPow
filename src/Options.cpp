@@ -62,6 +62,7 @@ namespace LCQPow {
         nComplHist = rhs.nComplHist;
         etaComplHist = rhs.etaComplHist;
         printLevel = rhs.printLevel;
+        storeSteps = rhs.storeSteps;
         qpSolver = rhs.qpSolver;
     }
 
@@ -193,6 +194,17 @@ namespace LCQPow {
     }
 
 
+    bool Options::getStoreSteps( ) {
+        return storeSteps;
+    }
+
+
+    ReturnValue Options::setStoreSteps( bool val ) {
+        storeSteps = val;
+        return ReturnValue::SUCCESSFUL_RETURN;
+    }
+
+
     QPSolver Options::getQPSolver( ) {
         return qpSolver;
     }
@@ -227,6 +239,8 @@ namespace LCQPow {
         etaComplHist = 0.9;
 
         printLevel = PrintLevel::INNER_LOOP_ITERATES;
+
+        storeSteps = false;
 
         qpSolver = QPSolver::QPOASES_DENSE;
     }

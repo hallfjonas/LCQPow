@@ -24,6 +24,7 @@
 #define LCQPow_OUTPUTSTATISTICS_HPP
 
 #include "Utilities.hpp"
+#include <vector>
 
 namespace LCQPow {
 
@@ -72,6 +73,21 @@ namespace LCQPow {
             */
             ReturnValue updateSolutionStatus( AlgorithmStatus _status );
 
+            /** Update tracking vectors.
+             *
+             * @return Success or specifies the invalid argument.
+             */
+            ReturnValue updateTrackingVectors(
+                int innerIters,
+                int subproblemIters,
+                double stepLength,
+                double stepSize,
+                double statVals,
+                double objVals,
+                double phiVals,
+                double meritVals
+            );
+
             /** Get the total number of iterations. */
             int getIterTotal( ) const;
 
@@ -87,12 +103,50 @@ namespace LCQPow {
             /** Get the solution status (if solved it will return the stationarity type). */
             AlgorithmStatus getSolutionStatus( ) const;
 
+            /** Get values of inner loop iterates.*/
+            int* getInnerIters( ) const;
+
+            /** Get values of subsolver iterates.*/
+            int* getSubproblemIters( ) const;
+
+            /** Get accumulated number of subsolver iterates.*/
+            int* getAccuSubproblemIters( ) const;
+
+            /** Get values of alpha.*/
+            double* getStepLength( ) const;
+
+            /** Get values of norm of pk.*/
+            double* getStepSize( ) const;
+
+            /** Get Lagrangian's gradient violaton values.*/
+            double* getStatVals( ) const;
+
+            /** Get objective function values.*/
+            double* getObjVals( ) const;
+
+            /** Get penalty function values.*/
+            double* getPhiVals( ) const;
+
+            /** Get merit function values.*/
+            double* getMeritVals( ) const;
+
         private:
-            int iter_total = 0;                                 /**< Total number of iterations, i.e., total number of inner iterations. */
-            int iter_outer = 0;                                 /**< Total number of outer iterations, i.e., number of penalty updates. */
-            int subproblem_iter = 0;                            /**< Total number of subsolver iterations (qpOASES: active set changes, OSQP: ??). */
-            double rho_opt = 0.0;                               /**< Value of penalty parameter at the final iterate. */
+            int iterTotal = 0;                                 /**< Total number of iterations, i.e., total number of inner iterations. */
+            int iterOuter = 0;                                 /**< Total number of outer iterations, i.e., number of penalty updates. */
+            int subproblemIter = 0;                            /**< Total number of subsolver iterations (qpOASES: active set changes, OSQP: ??). */
+            double rhoOpt = 0.0;                               /**< Value of penalty parameter at the final iterate. */
             AlgorithmStatus status = PROBLEM_NOT_SOLVED;        /**< Status of the solver. This is set to the solution type on success. */
+
+            // Tracking vectors
+            std::vector<int>    innerIters;                    /**< Number of inner iterations (accumulated per inner loop). */
+            std::vector<int>    subproblemIters;               /**< Number of subsolver iterations for each inner loop. */
+            std::vector<int>    accuSubproblemIters;          /**< Accumulated number of subsolver iterations (qpOASES: active set changes, OSQP: ??). */
+            std::vector<double> stepLength;                     /**< Track values of alpha. */
+            std::vector<double> stepSize;                       /**< Track norm of pk. */
+            std::vector<double> statVals;                       /**< Track values of Lagrangian's gradient violation. */
+            std::vector<double> objVals;                        /**< Track objective function values. */
+            std::vector<double> phiVals;                        /**< Track values of complementarity penalty function. */
+            std::vector<double> meritVals;                      /**< Track merit function values. */
     };
 }
 
