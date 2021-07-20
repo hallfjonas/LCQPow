@@ -134,7 +134,6 @@ int main() {
 
     int* innerItersTMP = stats.getInnerIters( );
     int* subproblemItersTMP = stats.getSubproblemIters( );
-    int* accuSubproblemItersTMP = stats.getAccuSubproblemIters( );
     double* stepLengthTMP = stats.getStepLength( );
     double* stepSizeTMP = stats.getStepSize( );
     double* statValsTMP = stats.getStatVals( );
@@ -142,9 +141,8 @@ int main() {
     double* phiValsTMP = stats.getPhiVals( );
     double* meritValsTMP = stats.getMeritVals( );
 
-    printf(" %10s |", "innerIters");
-    printf(" %10s |", "subprIters");
-    printf(" %10s |", "accSubprIt");
+    printf(" %6s |", "inner");
+    printf(" %6s |", "subpr.");
     printf(" %10s |", "alpha");
     printf(" %10s |", "norm pk");
     printf(" %10s |", "statVals");
@@ -153,9 +151,8 @@ int main() {
     printf(" %10s\n", "meritVals");
 
     for (int i = 0; i < stats.getIterTotal()+1; i++) {
-        printf(" %10.4g |", (double)innerItersTMP[i]);
-        printf(" %10.4g |", (double)subproblemItersTMP[i]);
-        printf(" %10.4g |", (double)accuSubproblemItersTMP[i]);
+        printf(" %6d |", innerItersTMP[i]);
+        printf(" %6d |", subproblemItersTMP[i]);
         printf(" %10.4g |", stepLengthTMP[i]);
         printf(" %10.4g |", stepSizeTMP[i]);
         printf(" %10.4g |", statValsTMP[i]);
@@ -171,7 +168,6 @@ int main() {
 
     delete[] innerItersTMP;
     delete[] subproblemItersTMP;
-    delete[] accuSubproblemItersTMP;
     delete[] stepLengthTMP;
     delete[] stepSizeTMP;
     delete[] statValsTMP;
