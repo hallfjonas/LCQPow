@@ -979,6 +979,10 @@ namespace LCQPow {
 
 
 	void LCQProblem::updatePenalty( ) {
+		// Clear Leyffer history
+		if (options.getNComplHist() > 0)
+			complHistory.clear();
+
 		rho *= options.getPenaltyUpdateFactor();
 	}
 
