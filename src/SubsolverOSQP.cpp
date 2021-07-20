@@ -144,15 +144,6 @@ namespace LCQPow {
 
         // Setup workspace on initial solve
         if (initialSolve) {
-            if (x0 != NULL)
-                if (osqp_warm_start_x(work, x0) != 0)
-                    return ReturnValue::OSQP_INITIAL_PRIMAL_GUESS_FAILED;
-
-
-            if (y0 != NULL)
-                if (osqp_warm_start_y(work, y0) != 0)
-                    return ReturnValue::OSQP_INITIAL_DUAL_GUESS_FAILED;
-
             double* l = (double*)malloc((size_t)nC*sizeof(double));
             double* u = (double*)malloc((size_t)nC*sizeof(double));
             double* g = (double*)malloc((size_t)nV*sizeof(double));
@@ -169,6 +160,15 @@ namespace LCQPow {
             data->l = l;
             data->u = u;
             osqp_setup(&work, data, settings);
+
+            if (x0 != NULL)
+                if (osqp_warm_start_x(work, x0) != 0)
+                    return ReturnValue::OSQP_INITIAL_PRIMAL_GUESS_FAILED;
+
+
+            if (y0 != NULL)
+                if (osqp_warm_start_y(work, y0) != 0)
+                    return ReturnValue::OSQP_INITIAL_DUAL_GUESS_FAILED;
         } else {
             // Update linear cost and bounds
             osqp_update_lin_cost(work, _g);
