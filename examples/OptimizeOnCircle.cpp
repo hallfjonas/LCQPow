@@ -42,7 +42,7 @@ int main() {
 	Options options;
     options.setPrintLevel(PrintLevel::INNER_LOOP_ITERATES);
     options.setQPSolver(QPSolver::OSQP_SPARSE);
-    options.setStationarityTolerance( 10e-5 );
+    options.setStationarityTolerance( 10e-3 );
     lcqp.setOptions( options );
 
 
