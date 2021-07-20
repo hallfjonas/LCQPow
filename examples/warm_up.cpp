@@ -34,6 +34,9 @@ int main() {
     double S1[1*2] = {1.0, 0.0};
     double S2[1*2] = {0.0, 1.0};
 
+    double x0[2] = {1.0, 1.0};
+    double y0[4] = {0.0, 0.0, 0.0, 0.0};
+
     int nV = 2;
     int nC = 0;
     int nComp = 1;
@@ -46,7 +49,7 @@ int main() {
 	lcqp.setOptions( options );
 
     // Solve first LCQP
-	ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2 );
+	ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2, 0, 0, 0, 0, 0, x0, y0);
 
     if (retVal != SUCCESSFUL_RETURN)
     {

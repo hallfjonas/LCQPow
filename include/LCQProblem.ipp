@@ -142,8 +142,14 @@ namespace LCQPow {
 		}
 
 		if (_y0 != 0) {
-			yk = new double[nV + nC + 2*nComp];
-			memcpy(yk, _y0, (size_t)(nV + nC + 2*nComp)*sizeof(double));
+			// If user passes dual constraints, let us for now assume they have all of the constraint guesses:
+			//    1) box, 2) Linear, 3) Complementarity
+			int dualGuessLength = nV + nC + 2*nComp;
+
+			yk = new double[dualGuessLength];
+			for (int i = 0; i < dualGuessLength; i++)
+				yk[i] = _y0[i];
+
 		} else {
 			yk = (double*)0;
 		}

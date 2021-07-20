@@ -784,6 +784,20 @@ namespace LCQPow {
 			nDuals = nC + 2*nComp;
 			boxDualOffset = 0;
 
+			// If solving with OSQP we ignore the dual guess on the box constraints
+			if (yk != 0) {
+				double* yk_tmp = new double[nDuals];
+
+				// Shift the duals
+				for (int i = 0; i < nDuals; i++)
+					yk_tmp[i] = yk[nV + i];
+
+				delete[] yk;
+				yk = new double[nDuals];
+				memcpy(yk, yk_tmp, (size_t)nDuals);
+				delete[] yk_tmp;
+			}
+
 			if (!sparseSolver) {
 				ret = switchToSparseMode( );
 				if (ret != SUCCESSFUL_RETURN)
