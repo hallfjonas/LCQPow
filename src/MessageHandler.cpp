@@ -147,6 +147,14 @@ namespace LCQPow {
                 printf("ERROR: Invalid etaComplHist value, which describes the fraction of loss required for complementarity progress (must be in (0,1)).");
                 break;
 
+            case OSQP_INITIAL_PRIMAL_GUESS_FAILED:
+                printf("ERROR: OSQP failed to use the primal initial guess.\n");
+                break;
+
+            case OSQP_INITIAL_DUAL_GUESS_FAILED:
+                printf("ERROR: OSQP failed to use the dual initial guess.\n");
+                break;
+
             case FAILED_SYM_COMPLEMENTARITY_MATRIX:
                 printf("Failed to compute the symmetric complementarity matrix C.\n");
                 break;
