@@ -112,13 +112,13 @@ namespace LCQPow {
             static void TransponsedMatrixMultiplication(const double* const A, const double* const B, double* C, int m, int n, int p);
 
             // c = A'*b
-            static void TransponsedMatrixMultiplication(const csc* const A, const double* const b, double* c, int m, int n);
+            static void TransponsedMatrixMultiplication(const csc* const A, const double* const b, double* c);
 
             // C = A'*B + B'*A
             static void MatrixSymmetrizationProduct(const double* const A, const double* const B, double* C, int m, int n);
 
             // C = A'*B + B'*A
-            static csc* MatrixSymmetrizationProduct(double* S1_x, int* S1_i, int* S1_p, double* S2_x, int* S2_i, int* S2_p, int m, int n);
+            static csc* MatrixSymmetrizationProduct(double* S1_x, int* S1_i, int* S1_p, double* S2_x, int* S2_i, int* S2_p, int n);
 
             // C = A'*B + B'*A
             static csc* MatrixSymmetrizationProduct(csc* S1, csc* S2);

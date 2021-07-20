@@ -143,7 +143,7 @@ void readVectors(const mxArray** prhs, int nrhs, int nC, double** g, double** lb
     }
 }
 
-int LCQPSparse(LCQProblem& lcqp, int nV, int nComp, int nC, int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[], double* x0, double* y0) {
+int LCQPSparse(LCQProblem& lcqp, int nV, int nComp, int nC, int nrhs, const mxArray* prhs[], double* x0, double* y0) {
 
     if ( !mxIsSparse(prhs[0]) || !mxIsSparse(prhs[2]) || !mxIsSparse(prhs[3]) || (nC > 0 && !mxIsSparse(prhs[4])) )
 	{
@@ -182,7 +182,7 @@ int LCQPSparse(LCQProblem& lcqp, int nV, int nComp, int nC, int nlhs, mxArray* p
     return ret;
 }
 
-int LCQPDense(LCQProblem& lcqp, int nV, int nComp, int nC, int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[], const double* const x0, const double* const y0)
+int LCQPDense(LCQProblem& lcqp, int nV, int nComp, int nC, int nrhs, const mxArray* prhs[], const double* const x0, const double* const y0)
 {
     // Load data
     double* H = NULL;
@@ -226,7 +226,7 @@ int LCQPDense(LCQProblem& lcqp, int nV, int nComp, int nC, int nlhs, mxArray* pl
     }
 
     // Load data into LCQP object
-    LCQPow::ReturnValue ret = lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub, x0);
+    LCQPow::ReturnValue ret = lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub, x0, y0);
 
     // Clear A, S1, S2
     if (A != 0)
@@ -496,9 +496,9 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     // Sparsity checks
     int ret = 0;
     if (mxIsSparse(prhs[0]) || mxIsSparse(prhs[2]) || mxIsSparse(prhs[3])|| (nC > 0 && mxIsSparse(prhs[4]))) {
-        ret = LCQPSparse(lcqp, nV, nComp, nC, nlhs, plhs, nrhs, prhs, x0, y0);
+        ret = LCQPSparse(lcqp, nV, nComp, nC, nrhs, prhs, x0, y0);
     } else {
-        ret = LCQPDense(lcqp, nV, nComp, nC, nlhs, plhs, nrhs, prhs, x0, y0);
+        ret = LCQPDense(lcqp, nV, nComp, nC, nrhs, prhs, x0, y0);
     }
 
     if (ret != 0) {

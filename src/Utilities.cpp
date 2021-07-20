@@ -73,8 +73,8 @@ namespace LCQPow {
     }
 
 
-    void Utilities::TransponsedMatrixMultiplication(const csc* const A, const double* const b, double* c, int m, int n) {
-        for (int j = 0; j < n; j++) {
+    void Utilities::TransponsedMatrixMultiplication(const csc* const A, const double* const b, double* c) {
+        for (int j = 0; j < A->n; j++) {
             c[j] = 0;
             for (int k = A->p[j]; k < A->p[j+1]; k++) {
                 c[j] += b[A->i[k]]*A->x[k];
@@ -97,7 +97,7 @@ namespace LCQPow {
         }
     }
 
-    csc* Utilities::MatrixSymmetrizationProduct(double* S1_x, int* S1_i, int* S1_p, double* S2_x, int* S2_i, int* S2_p, int m, int n) {
+    csc* Utilities::MatrixSymmetrizationProduct(double* S1_x, int* S1_i, int* S1_p, double* S2_x, int* S2_i, int* S2_p, int n) {
         std::vector<int> C_rows;
         std::vector<double> C_data;
         int* C_p = (int*) malloc((size_t)(n+1)*sizeof(int));
@@ -151,7 +151,7 @@ namespace LCQPow {
 
 
     csc* Utilities::MatrixSymmetrizationProduct(csc* S1, csc* S2) {
-        return MatrixSymmetrizationProduct(S1->x, S1->i, S1->p, S2->x, S2->i, S2->p, S1->m, S1->n);
+        return MatrixSymmetrizationProduct(S1->x, S1->i, S1->p, S2->x, S2->i, S2->p, S1->n);
     }
 
 

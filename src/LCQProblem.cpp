@@ -1028,7 +1028,7 @@ namespace LCQPow {
 		// 2) Constraint contribution: A'*yk
 		// Utilities::TransponsedMatrixMultiplication(A, yk_A, constr_statk, nC + 2*nComp, nV, 1);
 		if (sparseSolver) {
-			Utilities::TransponsedMatrixMultiplication(A_sparse, yk_A, constr_statk, nC + 2*nComp, nV);
+			Utilities::TransponsedMatrixMultiplication(A_sparse, yk_A, constr_statk);
 		} else {
 			Utilities::TransponsedMatrixMultiplication(A, yk_A, constr_statk, nC + 2*nComp, nV, 1);
 		}
