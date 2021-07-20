@@ -56,8 +56,15 @@ option(
     OFF
 )
 
-## Paths & Packages ---------------------------------------------------------------------
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
 
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -pedantic")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
+## Paths & Packages ---------------------------------------------------------------------
 # 1) Install Prefix
 set(
     CMAKE_INSTALL_PREFIX
@@ -217,12 +224,6 @@ include_directories(${PROJECT_NAME} PUBLIC include)
 
 # Add compile options
 add_compile_options(
-    -Wall
-    -pedantic
-    -Wshadow
-    -Wfloat-equal
-    -Wconversion
-    -Wsign-conversion
     -D__USE_LONG_FINTS__
     -D${DEF_SOLVER}
 )
