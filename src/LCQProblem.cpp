@@ -930,6 +930,10 @@ namespace LCQPow {
 			return ReturnValue::NOT_YET_IMPLEMENTED;
 		}
 
+		// Linear objective component
+		g_tilde = new double[nV];
+		memcpy(g_tilde, g, (size_t)nV*sizeof(double));
+
 		// Phi expressions
 		if (lbS1 != 0 && lbS2 != 0)
 			phi_const = Utilities::DotProduct(lbS1, lbS2, nComp);
@@ -953,6 +957,10 @@ namespace LCQPow {
 				else
 					Utilities::AddTransponsedMatrixMultiplication(S1, lbS2, g_phi, nComp, nV, 1);
 			}
+
+			// Sign must be negative (really have 0 <= Lx - lbS1 and 0 <= Rx - lbS2)
+			for (int i = 0; i < nV; i++)
+				g_phi[i] = -g_phi[i];
 		}
 
 		// Initialize variables and counters
@@ -1049,10 +1057,15 @@ namespace LCQPow {
 
 	void LCQProblem::updateLinearization()
 	{
+		// Update g_tilde at beginning of each inner loop (if we have a linear phi term)
+		if (innerIter == 0 && g_phi != 0) {
+			Utilities::WeightedVectorAdd(1.0, g, rho, g_phi, g_tilde, nV);
+		}
+
 		if (sparseSolver) {
-			Utilities::AffineLinearTransformation(rho, C_sparse, xk, g, gk, nV);
+			Utilities::AffineLinearTransformation(rho, C_sparse, xk, g_tilde, gk, nV);
 		} else {
-			Utilities::AffineLinearTransformation(rho, C, xk, g, gk, nV, nV);
+			Utilities::AffineLinearTransformation(rho, C, xk, g_tilde, gk, nV, nV);
 		}
 	}
 
@@ -1122,9 +1135,9 @@ namespace LCQPow {
 
 		// Quadratic term
 		if (sparseSolver) {
-			return phi_const - phi_lin + Utilities::QuadraticFormProduct(C_sparse, xk, nV)/2.0;
+			return phi_const + phi_lin + Utilities::QuadraticFormProduct(C_sparse, xk, nV)/2.0;
 		} else {
-			return phi_const - phi_lin + Utilities::QuadraticFormProduct(C, xk, nV)/2.0;
+			return phi_const + phi_lin + Utilities::QuadraticFormProduct(C, xk, nV)/2.0;
 		}
 	}
 
@@ -1155,10 +1168,10 @@ namespace LCQPow {
 
 		if (sparseSolver) {
 			qk = Utilities::QuadraticFormProduct(Qk_sparse, pk, nV);
-			Utilities::AffineLinearTransformation(1, Qk_sparse, xk, g, lk_tmp, nV);
+			Utilities::AffineLinearTransformation(1, Qk_sparse, xk, g_tilde, lk_tmp, nV);
 		} else {
 			qk = Utilities::QuadraticFormProduct(Qk, pk, nV);
-			Utilities::AffineLinearTransformation(1, Qk, xk, g, lk_tmp, nV, nV);
+			Utilities::AffineLinearTransformation(1, Qk, xk, g_tilde, lk_tmp, nV, nV);
 		}
 
 		double lk = Utilities::DotProduct(pk, lk_tmp, nV);
@@ -1186,9 +1199,9 @@ namespace LCQPow {
 		// stat = Qk*xk + g - A'*yk_A - yk_x
 		// 1) Objective contribution: Qk*xk + g
 		if (sparseSolver) {
-			Utilities::AffineLinearTransformation(1, Qk_sparse, xk, g, statk, nV);
+			Utilities::AffineLinearTransformation(1, Qk_sparse, xk, g_tilde, statk, nV);
 		} else {
-			Utilities::AffineLinearTransformation(1, Qk, xk, g, statk, nV, nV);
+			Utilities::AffineLinearTransformation(1, Qk, xk, g_tilde, statk, nV, nV);
 		}
 
 		// 2) Constraint contribution: A'*yk
@@ -1261,7 +1274,6 @@ namespace LCQPow {
 		} else {
 			Utilities::WeightedMatrixAdd(1, H, rho, C, Qk, nV, nV);
 		}
-
 	}
 
 
@@ -1659,6 +1671,11 @@ namespace LCQPow {
 		if (gk != 0) {
 			delete[] gk;
 			gk = NULL;
+		}
+
+		if (g_tilde != 0) {
+			delete[] g_tilde;
+			g_tilde = NULL;
 		}
 
 		if (xk != 0) {

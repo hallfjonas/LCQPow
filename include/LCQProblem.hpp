@@ -491,7 +491,8 @@ namespace LCQPow {
 
 			double rho; 							/**< Current penalty value. */
 
-			double* gk;								/**< Current objective linear term. */
+			double* g_tilde = NULL;					/**< Current linear terms (g + rhok*g_phi). Updated once per inner loop. */
+			double* gk = NULL;						/**< Current objective linear term. */
 
 			double* xk = NULL;						/**< Current primal iterate. */
 			double* yk = NULL;						/**< Current dual vector. */
