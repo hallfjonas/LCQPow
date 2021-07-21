@@ -60,7 +60,6 @@ namespace LCQPow {
 
 
     void Utilities::TransponsedMatrixMultiplication(const double* const A, const double* const B, double* C, int m, int n, int p) {
-
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < p; j++) {
                 C[i*p + j] = 0;
@@ -82,6 +81,25 @@ namespace LCQPow {
         }
     }
 
+
+    void Utilities::AddTransponsedMatrixMultiplication(const double* const A, const double* const B, double* C, int m, int n, int p) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < p; j++) {
+                for (int k = 0; k < m; k++) {
+                    C[i*p+j] += A[k*n + i]*B[k*p + j];
+                }
+            }
+        }
+    }
+
+
+    void Utilities::AddTransponsedMatrixMultiplication(const csc* const A, const double* const b, double* c) {
+        for (int j = 0; j < A->n; j++) {
+            for (int k = A->p[j]; k < A->p[j+1]; k++) {
+                c[j] += b[A->i[k]]*A->x[k];
+            }
+        }
+    }
 
     void Utilities::MatrixSymmetrizationProduct(const double* const A, const double* const B, double* C, int m, int n) {
         for (int i = 0; i < n; i++) {
