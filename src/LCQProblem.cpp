@@ -454,25 +454,28 @@ namespace LCQPow {
 			// Print iteration
 			printIteration( );
 
+			// Store steps if desired
+			if (options.getStoreSteps()) {
+				storeSteps( );
+			}
+
+			// Update the total iteration counter
+			updateTotalIter();
+
+			// Update inner iterate counter
+			innerIter++;
+
 			// Perform Dynamic Leyffer Strategy
 			if (leyfferCheckPositive( )) {
 				updatePenalty( );
 
 				// Update iterate counters
 				updateOuterIter();
-				innerIter = -1;
+				innerIter = 0;
 			}
 
 			// gk = new linearization + g
 			updateLinearization();
-
-			if (options.getStoreSteps()) {
-				storeSteps( );
-			}
-
-			// (Failed) termination condition
-			if ( totalIter > options.getMaxIterations() )
-				return MAX_ITERATIONS_REACHED;
 
 			// Terminate, update pen, or continue inner loop
 			if (stationarityCheck()) {
@@ -497,9 +500,13 @@ namespace LCQPow {
 
 					// Update iterate counters
 					updateOuterIter();
-					innerIter = -1;
+					innerIter = 0;
 				}
 			}
+
+			// (Failed) termination condition
+			if ( totalIter > options.getMaxIterations() )
+				return MAX_ITERATIONS_REACHED;
 
 			// Step computation
 			ret = solveQPSubproblem( false );
@@ -512,12 +519,6 @@ namespace LCQPow {
 
 			// Step length computation
 			getOptimalStepLength( );
-
-			// Update the total iteration counter
-			updateTotalIter();
-
-			// Update inner iterate counter
-			innerIter++;
 		}
 	}
 
