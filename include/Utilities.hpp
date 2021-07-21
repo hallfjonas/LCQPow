@@ -59,6 +59,7 @@ namespace LCQPow {
         INVALID_ETA_VALUE = 119,                        /**< Invalid etaComplHist value, which describes the fraction of loss required for complementarity progress (must be in (0,1)). */
         OSQP_INITIAL_PRIMAL_GUESS_FAILED = 120,         /**< OSQP failed to use the primal initial guess. */
         OSQP_INITIAL_DUAL_GUESS_FAILED = 121,           /**< OSQP failed to use the dual initial guess. */
+        INVALID_LOWER_COMPLEMENTARITY_BOUND = 122,      /**< Lower complementarity bound must be bounded below. */
 
         // Algorithmic errors
         MAX_ITERATIONS_REACHED = 200,                   /**< Maximum number of iterations reached. */

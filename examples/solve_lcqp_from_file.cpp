@@ -124,7 +124,7 @@ int main() {
     lcqp.setOptions( opts );
 
     // Run solver
-	LCQPow::ReturnValue ret = lcqp.loadLCQP( &H_file[0], &g_file[0], &S1_file[0], &S2_file[0], Af, lbAf, ubAf, &lb_file[0], &ub_file[0], x0f, y0f );
+	LCQPow::ReturnValue ret = lcqp.loadLCQP( &H_file[0], &g_file[0], &S1_file[0], &S2_file[0], 0, 0, 0, 0, Af, lbAf, ubAf, &lb_file[0], &ub_file[0], x0f, y0f );
 
     if (ret != LCQPow::SUCCESSFUL_RETURN)
     {

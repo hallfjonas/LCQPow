@@ -82,6 +82,10 @@ namespace LCQPow {
 				const double* const _g,
 				const double* const _S1,
 				const double* const _S2,
+				const double* const lbS1 = 0,
+				const double* const ubS1 = 0,
+				const double* const lbS2 = 0,
+				const double* const ubS2 = 0,
 				const double* const _A = 0,
 				const double* const _lbA = 0,
 				const double* const _ubA = 0,
@@ -114,6 +118,10 @@ namespace LCQPow {
 				const char* const g_file,
 				const char* const S1_file,
 				const char* const S2_file,
+				const char* const lbS1 = 0,
+				const char* const ubS1 = 0,
+				const char* const lbS2 = 0,
+				const char* const ubS2 = 0,
 				const char* const A_file = 0,
 				const char* const lbA_file = 0,
 				const char* const ubA_file = 0,
@@ -145,6 +153,10 @@ namespace LCQPow {
 				const double* const _g,
 				const csc* const _S1,
 				const csc* const _S2,
+				const double* const lbS1 = 0,
+				const double* const ubS1 = 0,
+				const double* const lbS2 = 0,
+				const double* const ubS2 = 0,
 				const csc* const _A = 0,
 				const double* const _lbA = 0,
 				const double* const _ubA = 0,
@@ -218,6 +230,10 @@ namespace LCQPow {
 
 			/** Print line (mainly for printing header). */
 			void printLine();
+
+
+			/** Set the complementarity bounds. */
+			ReturnValue setComplementarityBounds(const double* const lbS1_new, const double* const ubS1_new, const double* const lbS2_new, const double* const ubS2_new);
 
 
 			/** Store the (dense) Hessian matrix H internally.
@@ -466,6 +482,12 @@ namespace LCQPow {
 			double* S1 = NULL;						/**< LHS of complementarity product. */
 			double* S2 = NULL;						/**< RHS of complementarity product. */
 			double* C = NULL;						/**< Complementarity matrix (S1'*S2 + S2'*S1). */
+			double* lbS1 = NULL;					/**< LHS Complementarity lower bounds. */
+			double* ubS1 = NULL;					/**< LHS Complementarity upper bounds. */
+			double* lbS2 = NULL;					/**< RHS Complementarity lower bounds. */
+			double* ubS2 = NULL;					/**< RHS Complementarity upper bounds. */
+			double* g_phi = NULL;					/**< Linear Term of phi -(l_L'*R + l_R'*L). */
+			double phi_const = 0;					/**< Constant phi expression (l_L'*l_R). */
 
 			double rho; 							/**< Current penalty value. */
 

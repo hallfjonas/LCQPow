@@ -29,13 +29,13 @@
 %
 %I) Call
 %
-%    [x,{y, stats}] = LCQPow( H,g,S1,S2,{params} )
+%    [x,{y, stats}] = LCQPow( H,g,S1,S2,lbS1,ubS1,lbS2,ubS2,{params} )
 %or
-%    [x,{y, stats}] = LCQPow( H,g,S1,S2,lb,ub,{params} )
+%    [x,{y, stats}] = LCQPow( H,g,S1,S2,lbS1,ubS1,lbS2,ubS2,lb,ub,{params} )
 %or
-%    [x,{y, stats}] = LCQPow( H,g,S1,S2,A,lbA,ubA,{params} )
+%    [x,{y, stats}] = LCQPow( H,g,S1,S2,lbS1,ubS1,lbS2,ubS2,A,lbA,ubA,{params} )
 %or
-%    [x,{y, stats}] = LCQPow( H,g,S1,S2,A,lbA,ubA,lb,ub,{params}).
+%    [x,{y, stats}] = LCQPow( H,g,S1,S2,lbS1,ubS1,lbS2,ubS2,A,lbA,ubA,lb,ub,{params}).
 %
 %II) The optional params struct may contain the following fields:
 %

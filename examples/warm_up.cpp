@@ -44,12 +44,12 @@ int main() {
     LCQProblem lcqp( nV, nC, nComp );
 
 	Options options;
-    options.setPrintLevel(PrintLevel::INNER_LOOP_ITERATES);
+    options.setPrintLevel(PrintLevel::SUBPROBLEM_SOLVER_ITERATES);
     options.setQPSolver(QPSolver::QPOASES_DENSE);
 	lcqp.setOptions( options );
 
     // Solve first LCQP
-	ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2, 0, 0, 0, 0, 0, x0, y0);
+	ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2, 0, 0, 0, 0, 0, 0, 0, 0, 0, x0, y0);
 
     if (retVal != SUCCESSFUL_RETURN)
     {

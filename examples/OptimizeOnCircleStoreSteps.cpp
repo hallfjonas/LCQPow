@@ -99,7 +99,7 @@ int main() {
     ubA[N] = 1;
 
     // Solve first LCQP
-	ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2, A, lbA, ubA, 0, 0, x0 );
+	ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2, 0, 0, 0, 0,  A, lbA, ubA, 0, 0, x0 );
 
     if (retVal != SUCCESSFUL_RETURN)
     {

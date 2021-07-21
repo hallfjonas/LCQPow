@@ -155,6 +155,10 @@ namespace LCQPow {
                 printf("ERROR: OSQP failed to use the dual initial guess.\n");
                 break;
 
+            case INVALID_LOWER_COMPLEMENTARITY_BOUND:
+                printf("ERROR: Lower complementarity bound must be bounded below.\n");
+                break;
+
             case FAILED_SYM_COMPLEMENTARITY_MATRIX:
                 printf("Failed to compute the symmetric complementarity matrix C.\n");
                 break;

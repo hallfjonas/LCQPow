@@ -126,26 +126,34 @@ csc* readSparseMatrix(const mxArray* mat, int nRow, int nCol)
     return LCQPow::Utilities::createCSC(nRow, nCol, M_p[nCol], M_data, M_i, M_p);
 }
 
-void readVectors(const mxArray** prhs, int nrhs, int nC, double** g, double** lbA, double** ubA, double** lb, double** ub)
+void readVectors(
+    const mxArray** prhs, int nrhs, int nC, double** g,
+    double** lbS1, double** ubS1, double** lbS2, double** ubS2,
+    double** lbA, double** ubA, double** lb, double** ub)
 {
     *g = (double*) mxGetPr( prhs[1] );
-    if (nrhs == 6 || (nrhs == 7 && nC == 0)) {
-        *lb = (double*) mxGetPr( prhs[4] );
-        *ub = (double*) mxGetPr( prhs[5] );
-    } else if (nrhs >= 7) {
-        *lbA = (double*) mxGetPr( prhs[5] );
-        *ubA = (double*) mxGetPr( prhs[6] );
+    *lbS1 = (double*) mxGetPr( prhs[4] );
+    *ubS1 = (double*) mxGetPr( prhs[5] );
+    *lbS2 = (double*) mxGetPr( prhs[6] );
+    *ubS2 = (double*) mxGetPr( prhs[7] );
 
-        if (nrhs >= 9) {
-            *lb = (double*) mxGetPr( prhs[7] );
-            *ub = (double*) mxGetPr( prhs[8] );
+    if (nrhs == 10 || (nrhs == 11 && nC == 0)) {
+        *lb = (double*) mxGetPr( prhs[8] );
+        *ub = (double*) mxGetPr( prhs[9] );
+    } else if (nrhs >= 11) {
+        *lbA = (double*) mxGetPr( prhs[9] );
+        *ubA = (double*) mxGetPr( prhs[10] );
+
+        if (nrhs >= 13) {
+            *lb = (double*) mxGetPr( prhs[11] );
+            *ub = (double*) mxGetPr( prhs[12] );
         }
     }
 }
 
 int LCQPSparse(LCQProblem& lcqp, int nV, int nComp, int nC, int nrhs, const mxArray* prhs[], double* x0, double* y0) {
 
-    if ( !mxIsSparse(prhs[0]) || !mxIsSparse(prhs[2]) || !mxIsSparse(prhs[3]) || (nC > 0 && !mxIsSparse(prhs[4])) )
+    if ( !mxIsSparse(prhs[0]) || !mxIsSparse(prhs[2]) || !mxIsSparse(prhs[3]) || (nC > 0 && !mxIsSparse(prhs[8])) )
 	{
         mexPrintf("If using the sparse mode, please make sure to provide all matrices in sparse format!\n");
         return 1;
@@ -157,20 +165,26 @@ int LCQPSparse(LCQProblem& lcqp, int nV, int nComp, int nC, int nrhs, const mxAr
     csc* S2 = readSparseMatrix(prhs[3], nComp, nV);
     csc* A = NULL;
     if (nC > 0) {
-        A = readSparseMatrix(prhs[4], nC, nV);
+        A = readSparseMatrix(prhs[8], nC, nV);
     }
 
     // Read vectors
     double* g;
+    double* lbS1 = NULL;
+    double* ubS1 = NULL;
+    double* lbS2 = NULL;
+    double* ubS2 = NULL;
     double* lbA = NULL;
     double* ubA = NULL;
     double* lb = NULL;
     double* ub = NULL;
-    readVectors(prhs, nrhs, nC, &g, &lbA, &ubA, &lb, &ub);
+
+    // Read all vectors
+    readVectors(prhs, nrhs, nC, &g, &lbS1, &ubS1, &lbS2, &ubS2, &lbA, &ubA, &lb, &ub);
 
     // Load data into LCQP object
     LCQPow::ReturnValue ret = lcqp.loadLCQP(
-        H, g, S1, S2, A, lbA, ubA, lb, ub, x0, y0
+        H, g, S1, S2, lbS1, ubS1, lbS2, ubS2, A, lbA, ubA, lb, ub, x0, y0
     );
 
     // Clear sparse specific memory
@@ -189,6 +203,10 @@ int LCQPDense(LCQProblem& lcqp, int nV, int nComp, int nC, int nrhs, const mxArr
     double* g = NULL;
     double* S1 = NULL;
     double* S2 = NULL;
+    double* lbS1 = NULL;
+    double* ubS1 = NULL;
+    double* lbS2 = NULL;
+    double* ubS2 = NULL;
     double* lb = NULL;
     double* ub = NULL;
     double* A = NULL;
@@ -205,11 +223,11 @@ int LCQPDense(LCQProblem& lcqp, int nV, int nComp, int nC, int nrhs, const mxArr
     S2_col = (double*) mxGetPr( prhs[3] );
 
     if (nC > 0) {
-        A_col = (double*) mxGetPr( prhs[4] );
+        A_col = (double*) mxGetPr( prhs[8] );
     }
 
     // Read all vectors
-    readVectors(prhs, nrhs, nC, &g, &lbA, &ubA, &lb, &ub);
+    readVectors(prhs, nrhs, nC, &g, &lbS1, &ubS1, &lbS2, &ubS2, &lbA, &ubA, &lb, &ub);
 
     // MATLAB stores in column major format (switch to row major)
     if (S1_col != NULL && nComp > 0 && nV > 0) {
@@ -226,7 +244,7 @@ int LCQPDense(LCQProblem& lcqp, int nV, int nComp, int nC, int nrhs, const mxArr
     }
 
     // Load data into LCQP object
-    LCQPow::ReturnValue ret = lcqp.loadLCQP(H, g, S1, S2, A, lbA, ubA, lb, ub, x0, y0);
+    LCQPow::ReturnValue ret = lcqp.loadLCQP(H, g, S1, S2, lbS1, ubS1, lbS2, ubS2, A, lbA, ubA, lb, ub, x0, y0);
 
     // Clear A, S1, S2
     if (A != 0)
@@ -260,7 +278,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     }
 
     // Validate number of input arguments
-    int nrhs_min = 1; int nrhs_max = 10;
+    int nrhs_min = 8; int nrhs_max = 14;
     if (nrhs < nrhs_min || nrhs > nrhs_max) {
         char *errorMsg = (char*)malloc(100*sizeof(char));
         sprintf(errorMsg, "Invalid number of input arguments (got %d but expected between %d and %d).\n", nrhs, nrhs_min, nrhs_max);
@@ -296,17 +314,17 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     }
 
     // Get number of linear constraints
-    if (nrhs > 7 || ( nrhs == 7 && !mxIsStruct(prhs[6]))) {
-        if (mxIsEmpty(prhs[4])) {
+    if (nrhs > 11 || ( nrhs == 11 && !mxIsStruct(prhs[10]))) {
+        if (mxIsEmpty(prhs[8])) {
             nC = 0;
-        } else if (!mxIsDouble(prhs[4])) {
+        } else if (!mxIsDouble(prhs[8])) {
             char *errorMsg = (char*)malloc(100*sizeof(char));
             sprintf(errorMsg, "Invalid input argument: A must be a double matrix.\n");
             mexErrMsgTxt(errorMsg);
             free(errorMsg);
             return;
         } else {
-            nC = (int)mxGetM(prhs[4]);
+            nC = (int)mxGetM(prhs[8]);
         }
     }
 
@@ -316,28 +334,28 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     if (!checkDimensionAndTypeDouble(prhs[2], nComp, nV, "S1")) return;
     if (!checkDimensionAndTypeDouble(prhs[3], nComp, nV, "S2")) return;
 
-    if (nrhs == 6 && !checkDimensionAndTypeDouble(prhs[4], nV, 1, "lb", true)) return;
-    if (nrhs == 6 && !checkDimensionAndTypeDouble(prhs[5], nV, 1, "ub", true)) return;
+    if (nrhs == 10 && !checkDimensionAndTypeDouble(prhs[8], nV, 1, "lb", true)) return;
+    if (nrhs == 10 && !checkDimensionAndTypeDouble(prhs[9], nV, 1, "ub", true)) return;
 
-    if (nrhs == 7 && mxIsStruct(prhs[6]) && !checkDimensionAndTypeDouble(prhs[4], nV, 1, "lb", true)) return;
-    if (nrhs == 7 && mxIsStruct(prhs[6]) && !checkDimensionAndTypeDouble(prhs[5], nV, 1, "ub", true)) return;
+    if (nrhs == 11 && mxIsStruct(prhs[10]) && !checkDimensionAndTypeDouble(prhs[8], nV, 1, "lb", true)) return;
+    if (nrhs == 11 && mxIsStruct(prhs[10]) && !checkDimensionAndTypeDouble(prhs[9], nV, 1, "ub", true)) return;
 
-    if (nrhs == 7 && !mxIsStruct(prhs[6]) && !checkDimensionAndTypeDouble(prhs[4], nC, nV, "A", true)) return;
-    if (nrhs == 7 && !mxIsStruct(prhs[6]) && !checkDimensionAndTypeDouble(prhs[5], nC, 1, "lbA", true)) return;
-    if (nrhs == 7 && !mxIsStruct(prhs[6]) && !checkDimensionAndTypeDouble(prhs[6], nC, 1, "ubA", true)) return;
+    if (nrhs == 11 && !mxIsStruct(prhs[10]) && !checkDimensionAndTypeDouble(prhs[8], nC, nV, "A", true)) return;
+    if (nrhs == 11 && !mxIsStruct(prhs[10]) && !checkDimensionAndTypeDouble(prhs[9], nC, 1, "lbA", true)) return;
+    if (nrhs == 11 && !mxIsStruct(prhs[10]) && !checkDimensionAndTypeDouble(prhs[10], nC, 1, "ubA", true)) return;
 
-    if (nrhs >= 8 && !checkDimensionAndTypeDouble(prhs[4], nC, nV, "A", true)) return;
-    if (nrhs >= 8 && !checkDimensionAndTypeDouble(prhs[5], nC, 1, "lbA", true)) return;
-    if (nrhs >= 8 && !checkDimensionAndTypeDouble(prhs[6], nC, 1, "ubA", true)) return;
+    if (nrhs >= 12 && !checkDimensionAndTypeDouble(prhs[8], nC, nV, "A", true)) return;
+    if (nrhs >= 12 && !checkDimensionAndTypeDouble(prhs[9], nC, 1, "lbA", true)) return;
+    if (nrhs >= 12 && !checkDimensionAndTypeDouble(prhs[10], nC, 1, "ubA", true)) return;
 
-    if ((nrhs == 9 || nrhs == 10) && !checkDimensionAndTypeDouble(prhs[7], nV, 1, "lb", true)) return;
-    if ((nrhs == 9 || nrhs == 10) && !checkDimensionAndTypeDouble(prhs[8], nV, 1, "ub", true)) return;
+    if ((nrhs == 13 || nrhs == 14) && !checkDimensionAndTypeDouble(prhs[11], nV, 1, "lb", true)) return;
+    if ((nrhs == 13 || nrhs == 14) && !checkDimensionAndTypeDouble(prhs[12], nV, 1, "ub", true)) return;
 
     // Check structs
-    if (nrhs == 5 && !checkTypeStruct(prhs[4], "params")) return;
-    if (nrhs == 7 && !mxIsDouble(prhs[6]) && !checkTypeStruct(prhs[6], "params")) return;
-    if (nrhs == 8 && !checkTypeStruct(prhs[7], "params")) return;
-    if (nrhs == 10 && !checkTypeStruct(prhs[9], "params")) return;
+    if (nrhs == 9 && !checkTypeStruct(prhs[8], "params")) return;
+    if (nrhs == 11 && !mxIsDouble(prhs[10]) && !checkTypeStruct(prhs[10], "params")) return;
+    if (nrhs == 12 && !checkTypeStruct(prhs[11], "params")) return;
+    if (nrhs == 14 && !checkTypeStruct(prhs[13], "params")) return;
 
     // Initial guess variables
     double* x0 = NULL;
@@ -349,10 +367,10 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     // Load settings
     Options options;
     int structIdx = -1;
-    if (nrhs == 5 && checkTypeStruct(prhs[4], "params")) { structIdx = 4; }
-    if (nrhs == 7 && !mxIsDouble(prhs[6]) && checkTypeStruct(prhs[6], "params"))  { structIdx = 6; }
-    if (nrhs == 8 && checkTypeStruct(prhs[7], "params")) { structIdx = 7; }
-    if (nrhs == 10 && checkTypeStruct(prhs[9], "params")) { structIdx = 9; }
+    if (nrhs == 5 && checkTypeStruct(prhs[8], "params")) { structIdx = 8; }
+    if (nrhs == 7 && !mxIsDouble(prhs[10]) && checkTypeStruct(prhs[10], "params"))  { structIdx = 10; }
+    if (nrhs == 8 && checkTypeStruct(prhs[11], "params")) { structIdx = 11; }
+    if (nrhs == 10 && checkTypeStruct(prhs[13], "params")) { structIdx = 13; }
 
     if (structIdx != -1) {
 
@@ -495,7 +513,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
     // Sparsity checks
     int ret = 0;
-    if (mxIsSparse(prhs[0]) || mxIsSparse(prhs[2]) || mxIsSparse(prhs[3])|| (nC > 0 && mxIsSparse(prhs[4]))) {
+    if (mxIsSparse(prhs[0]) || mxIsSparse(prhs[2]) || mxIsSparse(prhs[3])|| (nC > 0 && mxIsSparse(prhs[8]))) {
         ret = LCQPSparse(lcqp, nV, nComp, nC, nrhs, prhs, x0, y0);
     } else {
         ret = LCQPDense(lcqp, nV, nComp, nC, nrhs, prhs, x0, y0);

@@ -85,6 +85,8 @@ namespace LCQPow {
 
 	ReturnValue LCQProblem::loadLCQP(	const double* const _H, const double* const _g,
 										const double* const _S1, const double* const _S2,
+										const double* const _lbS1, const double* const _ubS1,
+										const double* const _lbS2, const double* const _ubS2,
 										const double* const _A, const double* const _lbA, const double* const _ubA,
 										const double* const _lb, const double* const _ub,
 										const double* const _x0, const double* const _y0
@@ -125,6 +127,11 @@ namespace LCQPow {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
+		ret = setComplementarityBounds( _lbS1, _ubS1, _lbS2, _ubS2 );
+
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
+
 		ret = setInitialGuess( _x0, _y0 );
 
 		if (ret != SUCCESSFUL_RETURN)
@@ -138,6 +145,8 @@ namespace LCQPow {
 
 	ReturnValue LCQProblem::loadLCQP(	const char* const H_file, const char* const g_file,
 										const char* const S1_file, const char* const S2_file,
+										const char* const lbS1_file, const char* const ubS1_file,
+										const char* const lbS2_file, const char* const ubS2_file,
 										const char* const A_file, const char* const lbA_file, const char* const ubA_file,
 										const char* const lb_file, const char* const ub_file,
 										const char* const x0_file, const char* const y0_file
@@ -171,6 +180,49 @@ namespace LCQPow {
 		if ( ret != SUCCESSFUL_RETURN ) {
 			delete[] _S2;
 			return MessageHandler::PrintMessage( ret );
+		}
+
+		double* _lbS1 = NULL;
+		if (lbS1_file != 0) {
+			_lbS1 = new double[nComp];
+			ret = Utilities::readFromFile( _lbS1, nComp, lbS1_file );
+			if ( ret != SUCCESSFUL_RETURN ) {
+				delete[] _lbS1;
+				return MessageHandler::PrintMessage( ret );
+			}
+		}
+
+		double* _ubS1 = NULL;
+		if (ubS1_file != 0) {
+			_ubS1 = new double[nComp];
+
+			ret = Utilities::readFromFile( _ubS1, nComp, ubS1_file );
+			if ( ret != SUCCESSFUL_RETURN ) {
+				delete[] _ubS1;
+				return MessageHandler::PrintMessage( ret );
+			}
+		}
+
+		double* _lbS2 = NULL;
+		if (lbS2_file != 0) {
+			_lbS2 = new double[nComp];
+
+			ret = Utilities::readFromFile( _lbS2, nComp, lbS2_file );
+			if ( ret != SUCCESSFUL_RETURN ) {
+				delete[] _lbS2;
+				return MessageHandler::PrintMessage( ret );
+			}
+		}
+
+		double* _ubS2 = NULL;
+		if (ubS2_file != 0) {
+			_ubS2 = new double[nComp];
+
+			ret = Utilities::readFromFile( _ubS2, nComp, ubS2_file );
+			if ( ret != SUCCESSFUL_RETURN ) {
+				delete[] _ubS2;
+				return MessageHandler::PrintMessage( ret );
+			}
 		}
 
 		double* _A = NULL;
@@ -289,6 +341,11 @@ namespace LCQPow {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
 
+		ret = setComplementarityBounds( _lbS1, _ubS1, _lbS2, _ubS2 );
+
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
+
 		ret = setInitialGuess( _x0, _y0 );
 
 		if (_x0 != 0) delete[] _x0;
@@ -305,6 +362,8 @@ namespace LCQPow {
 
 	ReturnValue LCQProblem::loadLCQP(	const csc* const _H, const double* const _g,
 										const csc* const _S1, const csc* const _S2,
+										const double* const _lbS1, const double* const _ubS1,
+										const double* const _lbS2, const double* const _ubS2,
 										const csc* const _A, const double* const _lbA, const double* const _ubA,
 										const double* const _lb, const double* const _ub,
 										const double* const _x0, const double* const _y0
@@ -323,6 +382,11 @@ namespace LCQPow {
 			return MessageHandler::PrintMessage( ret );
 
 		ret = setConstraints( _S1, _S2, _A, _lbA, _ubA );
+
+		if (ret != SUCCESSFUL_RETURN)
+			return MessageHandler::PrintMessage( ret );
+
+		ret = setComplementarityBounds( _lbS1, _ubS1, _lbS2, _ubS2 );
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret );
@@ -505,11 +569,6 @@ namespace LCQPow {
 				ubA[i] = INFINITY;
 		}
 
-		for (int i = 0; i < 2*nComp; i++) {
-			lbA[i + nC] = 0;
-			ubA[i + nC] = INFINITY;
-		}
-
 		// Set complementarities
 		if ( S1_new == 0 || S2_new == 0 )
 			return INVALID_COMPLEMENTARITY_MATRIX;
@@ -616,15 +675,72 @@ namespace LCQPow {
 				ubA[i] = INFINITY;
 		}
 
-		for (int i = 0; i < 2*nComp; i++) {
-			lbA[i + nC] = 0;
-			ubA[i + nC] = INFINITY;
-		}
-
 		C_sparse = Utilities::MatrixSymmetrizationProduct(S1_sparse, S2_sparse);
 
 		if (C_sparse == 0) {
 			return FAILED_SYM_COMPLEMENTARITY_MATRIX;
+		}
+
+		return SUCCESSFUL_RETURN;
+	}
+
+
+	ReturnValue LCQProblem::setComplementarityBounds(const double* const lbS1_new, const double* const ubS1_new, const double* const lbS2_new, const double* const ubS2_new) {
+
+		if (lbS1_new != 0) {
+			lbS1 = new double[nComp];
+		}
+
+		if (ubS1_new != 0) {
+			ubS1 = new double[nComp];
+		}
+
+		if (lbS2_new != 0) {
+			lbS2 = new double[nComp];
+		}
+
+		if (ubS2_new != 0) {
+			ubS2 = new double[nComp];
+		}
+
+		// Bounds on Lx
+		for (int i = 0; i < nComp; i++) {
+			if (lbS1_new != 0) {
+				if (lbS1_new[i] <= -INFINITY)
+					return INVALID_LOWER_COMPLEMENTARITY_BOUND;
+
+				lbS1[i] = lbS1_new[i];
+				lbA[nC + i] = lbS1_new[i];
+			} else {
+				lbA[nC + i] = 0;
+			}
+
+			if (ubS1_new != 0) {
+				ubS1[i] = ubS1_new[i];
+				ubA[nC + i] = ubS1_new[i];
+			} else {
+				ubA[nC + i] = INFINITY;
+			}
+		}
+
+		// Bounds on Rx
+		for (int i = 0; i < nComp; i++) {
+			if (lbS2_new != 0) {
+				if (lbS2_new[i] <= -INFINITY)
+					return INVALID_LOWER_COMPLEMENTARITY_BOUND;
+
+				lbS2[i] = lbS2_new[i];
+				lbA[nC + nComp + i] = lbS2_new[i];
+			} else {
+				lbA[nC + nComp + i] = 0;
+			}
+
+			if (ubS2_new != 0) {
+				ubS2[i] = ubS2_new[i];
+				ubA[nC + nComp + i] = ubS2_new[i];
+			} else {
+				ubA[nC + nComp + i] = INFINITY;
+			}
 		}
 
 		return SUCCESSFUL_RETURN;
@@ -814,6 +930,31 @@ namespace LCQPow {
 			return ReturnValue::NOT_YET_IMPLEMENTED;
 		}
 
+		// Phi expressions
+		if (lbS1 != 0 && lbS2 != 0)
+			phi_const = Utilities::DotProduct(lbS1, lbS2, nComp);
+
+		// g_phi
+		if (lbS1 != 0 || lbS2 != 0) {
+			g_phi = new double[nV]();
+
+			// (S2'*lb_S1 contribution)
+			if (lbS1 != 0) {
+				if (sparseSolver)
+					Utilities::AddTransponsedMatrixMultiplication(S2_sparse, lbS1, g_phi);
+				else
+					Utilities::AddTransponsedMatrixMultiplication(S2, lbS1, g_phi, nComp, nV, 1);
+			}
+
+			// (S1'*lb_S2 contribution)
+			if (lbS2 != 0) {
+				if (sparseSolver)
+					Utilities::AddTransponsedMatrixMultiplication(S1_sparse, lbS2, g_phi);
+				else
+					Utilities::AddTransponsedMatrixMultiplication(S1, lbS2, g_phi, nComp, nV, 1);
+			}
+		}
+
 		// Initialize variables and counters
 		alphak = 1;
 		rho = options.getInitialPenaltyParameter( );
@@ -973,10 +1114,17 @@ namespace LCQPow {
 
 
 	double LCQProblem::getPhi( ) {
+		double phi_lin = 0;
+
+		// Linear term
+		if (g_phi != 0)
+			phi_lin += Utilities::DotProduct(g_phi, xk, nV);
+
+		// Quadratic term
 		if (sparseSolver) {
-			return Utilities::QuadraticFormProduct(C_sparse, xk, nV)/2.0;
+			return phi_const - phi_lin + Utilities::QuadraticFormProduct(C_sparse, xk, nV)/2.0;
 		} else {
-			return Utilities::QuadraticFormProduct(C, xk, nV)/2.0;
+			return phi_const - phi_lin + Utilities::QuadraticFormProduct(C, xk, nV)/2.0;
 		}
 	}
 
@@ -1337,13 +1485,7 @@ namespace LCQPow {
 		printf("%s%10.3g", sep, tmpdbl);
 
 		// Print complementarity violation
-		if (sparseSolver) {
-			tmpdbl = Utilities::QuadraticFormProduct(C_sparse, xk, nV)/2.0;
-		} else {
-			tmpdbl = Utilities::QuadraticFormProduct(C, xk, nV)/2.0;
-		}
-
-		printf("%s%10.3g", sep, tmpdbl);
+		printf("%s%10.3g", sep, getPhi());
 
 		// Print current penalty parameter
 		printf("%s%10.3g", sep, rho);
@@ -1487,6 +1629,31 @@ namespace LCQPow {
 		if (C != 0) {
 			delete[] C;
 			C = NULL;
+		}
+
+		if (lbS1 != 0) {
+			delete[] lbS1;
+			lbS1 = NULL;
+		}
+
+		if (ubS1 != 0) {
+			delete[] ubS1;
+			ubS1 = NULL;
+		}
+
+		if (lbS2 != 0) {
+			delete[] lbS2;
+			lbS2 = NULL;
+		}
+
+		if (ubS2 != 0) {
+			delete[] ubS2;
+			ubS2 = NULL;
+		}
+
+		if (g_phi != 0) {
+			delete[] g_phi;
+			g_phi = NULL;
 		}
 
 		if (gk != 0) {

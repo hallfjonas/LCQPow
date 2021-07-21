@@ -18,7 +18,7 @@ OSQP = {};
 params.printLevel = 2;
 params.stationarityTolerance = 1e-3;
 
-Nvals = 10:5:200;
+Nvals = 10:20:200;
 for j = 1:length(Nvals)
     % Circle discretization
     N = Nvals(j);
@@ -40,7 +40,7 @@ for j = 1:length(Nvals)
 
     L = zeros(N, nz);
     R = zeros(N, nz);
-   
+
     for i = 1:N
         % Equality constraint ([cos sin]'*x + lambda = 1)
         A(i, 1:2) = [cos(2*pi*i/N) sin(2*pi*i/N)];
@@ -55,31 +55,31 @@ for j = 1:length(Nvals)
     end
 
     % Algorithm parameters
-    params.x0 = ones(nz,1); 
+    params.x0 = ones(nz,1);
     params.x0(1:2) = xk;
 
     % Dense qpOASES
-    params.qpSolver = 0;    
-    [xOpt,~,stats] = LCQPow(Q, g, L, R, A, lbA, ubA, params);
-    QPO_dense.time(j) = stats.elapsed_time; 
-    QPO_dense.exit_flag(j) = stats.exit_flag; 
-    
+    params.qpSolver = 0;
+    [xOpt,~,stats] = LCQPow(Q, g, L, R, [], [], [], [], A, lbA, ubA, params);
+    QPO_dense.time(j) = stats.elapsed_time;
+    QPO_dense.exit_flag(j) = stats.exit_flag;
+
     % Sparse methods:
     Q = sparse(Q);
     L = sparse(L);
     R = sparse(R);
     A = sparse(A);
-    
+
     % Sparse qpOASES
-    params.qpSolver = 1;    
-    [xOpt,~,stats] = LCQPow(Q, g, L, R, A, lbA, ubA, params);
-    QPO_sparse.time(j) = stats.elapsed_time; 
-    QPO_sparse.exit_flag(j) = stats.exit_flag; 
-    
-    params.qpSolver = 2;    
-    [xOpt,~,stats] = LCQPow(Q, g, L, R, A, lbA, ubA, params);
-    OSQP.time(j) = stats.elapsed_time;  
-    OSQP.exit_flag(j) = stats.exit_flag;   
+    params.qpSolver = 1;
+    [xOpt,~,stats] = LCQPow(Q, g, L, R, [], [], [], [], A, lbA, ubA, params);
+    QPO_sparse.time(j) = stats.elapsed_time;
+    QPO_sparse.exit_flag(j) = stats.exit_flag;
+
+    params.qpSolver = 2;
+    [xOpt,~,stats] = LCQPow(Q, g, L, R, [], [], [], [], A, lbA, ubA, params);
+    OSQP.time(j) = stats.elapsed_time;
+    OSQP.exit_flag(j) = stats.exit_flag;
 end
 
 %% Plots

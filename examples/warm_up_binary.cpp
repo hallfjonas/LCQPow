@@ -20,35 +20,40 @@
  */
 
 
-#include "LCQProblem.hpp"
 #include <iostream>
+#include "LCQProblem.hpp"
 
 using namespace LCQPow;
 
 int main() {
-    std::cout << "Preparing warm up problem with a simple inequality constraint...\n";
+    std::cout << "Preparing dense warm up problem...\n";
 
     /* Setup data of first QP. */
     double H[2*2] = { 2.0, 0.0, 0.0, 2.0 };
     double g[2] = { -2.0, -2.0 };
-    double S1[1*2] = {1.0, 0.0};
-    double S2[1*2] = {0.0, 1.0};
-    double A[1*2] = {1.0, -1.0};
-    double lbA[1] = { -0.5 };
-    double ubA[1] = {  INFINITY };
+
+    // 0 <= x _|_ y >= 0
+    // 0 <= x _|_ 0.5 - x >= 0
+    double S1[2*2] = {1.0, 0.0, 1.0, 0.0};
+    double S2[2*2] = {0.0, 1.0, -1.0, 0.0};
+    double lbS1[2] = {0.0, 0.0};
+    double lbS2[2] = {0.0, -0.5};
+
+    double x0[2] = {1.0, 1.0};
 
     int nV = 2;
-    int nC = 1;
-    int nComp = 1;
+    int nC = 0;
+    int nComp = 2;
 
     LCQProblem lcqp( nV, nC, nComp );
 
 	Options options;
     options.setPrintLevel(PrintLevel::INNER_LOOP_ITERATES);
+    options.setQPSolver(QPSolver::QPOASES_DENSE);
 	lcqp.setOptions( options );
 
     // Solve first LCQP
-	ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2, 0, 0, 0, 0, A, lbA, ubA );
+	ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2, lbS1, 0, lbS2, 0, 0, 0, 0, 0, 0, x0);
 
     if (retVal != SUCCESSFUL_RETURN)
     {
@@ -67,11 +72,15 @@ int main() {
     // Get solutions
     double* xOpt = new double[2];
 	double* yOpt = new double[nV + nC + 2*nComp];
+    LCQPow::OutputStatistics stats;
 	lcqp.getPrimalSolution( xOpt );
 	lcqp.getDualSolution( yOpt );
-	printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g, %g, %g, %g ]; \n\n",
-			xOpt[0],xOpt[1],yOpt[0],yOpt[1],yOpt[2],yOpt[3],yOpt[4] );
+    lcqp.getOutputStatistics( stats );
+	printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g, %g, %g ]; i = %d; k = %d; rho = %g; WSR = %d \n\n",
+			xOpt[0],xOpt[1],yOpt[0],yOpt[1],yOpt[2],yOpt[3],
+            stats.getIterTotal(), stats.getIterOuter(), stats.getRhoOpt(), stats.getSubproblemIter() );
 
+    // Clean Up
     delete[] xOpt; delete[] yOpt;
 
     return 0;
