@@ -39,7 +39,7 @@ int main() {
     double lbS1[2] = {0.0, 0.0};
     double lbS2[2] = {0.0, -0.5};
 
-    double x0[2] = {1.0, 1.0};
+    double x0[2] = {0.0, 0.0};
 
     int nV = 2;
     int nC = 0;
@@ -54,6 +54,28 @@ int main() {
 
     // Solve first LCQP
 	ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2, lbS1, 0, lbS2, 0, 0, 0, 0, 0, 0, x0);
+
+    if (retVal != SUCCESSFUL_RETURN)
+    {
+        printf("Failed to load LCQP.\n");
+        return 1;
+    }
+
+    retVal = lcqp.runSolver();
+
+    if (retVal != SUCCESSFUL_RETURN)
+    {
+        printf("Failed to solve LCQP.\n");
+        return 1;
+    }
+
+    // Solve another LCQP
+    x0[0] = 0.0;
+    x0[1] = 3000;
+    options.setSolveZeroPenaltyFirst(false);
+    options.setInitialPenaltyParameter(10.0);
+	lcqp.setOptions( options );
+	retVal = lcqp.loadLCQP( H, g, S1, S2, lbS1, 0, lbS2, 0, 0, 0, 0, 0, 0, x0);
 
     if (retVal != SUCCESSFUL_RETURN)
     {
