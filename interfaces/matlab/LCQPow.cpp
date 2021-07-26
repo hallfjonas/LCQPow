@@ -367,10 +367,10 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     // Load settings
     Options options;
     int structIdx = -1;
-    if (nrhs == 5 && checkTypeStruct(prhs[8], "params")) { structIdx = 8; }
-    if (nrhs == 7 && !mxIsDouble(prhs[10]) && checkTypeStruct(prhs[10], "params"))  { structIdx = 10; }
-    if (nrhs == 8 && checkTypeStruct(prhs[11], "params")) { structIdx = 11; }
-    if (nrhs == 10 && checkTypeStruct(prhs[13], "params")) { structIdx = 13; }
+    if (nrhs == 9 && checkTypeStruct(prhs[8], "params")) { structIdx = 8; }
+    if (nrhs == 11 && !mxIsDouble(prhs[10]) && checkTypeStruct(prhs[10], "params"))  { structIdx = 10; }
+    if (nrhs == 12 && checkTypeStruct(prhs[11], "params")) { structIdx = 11; }
+    if (nrhs == 14 && checkTypeStruct(prhs[13], "params")) { structIdx = 13; }
 
     if (structIdx != -1) {
 
