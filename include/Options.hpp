@@ -136,8 +136,8 @@ namespace LCQPow {
 
             int maxIterations;                          /**< Maximum number of iterations to be performed. */
 
-            int nComplHist;                               /**< Number of previous iterates to compare complementarity loss (only enabled if positive). */
-            double etaComplHist;                          /**< Parameter describing fraction of required complementarity loss. */
+            int nComplHist;                             /**< Number of previous iterates to compare complementarity loss (only enabled if positive). */
+            double etaComplHist;                        /**< Parameter describing fraction of required complementarity loss. */
 
             PrintLevel printLevel;                      /**< Print level. */
 
