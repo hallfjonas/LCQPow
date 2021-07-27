@@ -17,27 +17,27 @@
 %
 %---------------------------------------------------------------------------------
 %
-%LCQPow is intended for solving quadratic programs with
-%linear complementarity constraints of the form
+% LCQPow is intended for solving quadratic programs with
+% linear complementarity constraints of the form
 %
 %                min   1/2*x'Hx + x'g
-%                s.t.    0 <= S1*x
-%                        0 <= S2*x
-%                        0  = x'*S1'*S2*x
-%                       lb <=  x <= ub      {optional}
-%                      lbA <= Ax <= ubA     {optional}
+%                s.t.  lbS1 <= S1*x <= ubS1
+%                      lbS2 <= S2*x <= ubS2
+%                         0  = x'*S1'*S2*x
+%                        lb <=  x <= ub      {optional}
+%                       lbA <= Ax <= ubA     {optional}
 %
-%I) Call
+% I) Call
 %
 %    [x,{y, stats}] = LCQPow( H,g,S1,S2,lbS1,ubS1,lbS2,ubS2,{params} )
-%or
+% or
 %    [x,{y, stats}] = LCQPow( H,g,S1,S2,lbS1,ubS1,lbS2,ubS2,lb,ub,{params} )
-%or
+% or
 %    [x,{y, stats}] = LCQPow( H,g,S1,S2,lbS1,ubS1,lbS2,ubS2,A,lbA,ubA,{params} )
-%or
+% or
 %    [x,{y, stats}] = LCQPow( H,g,S1,S2,lbS1,ubS1,lbS2,ubS2,A,lbA,ubA,lb,ub,{params}).
 %
-%II) The optional params struct may contain the following fields:
+% II) The optional params struct may contain the following fields:
 %
 %                             x0 : Initial primal guess.
 %                             y0 : Initial dual guess.
@@ -49,4 +49,13 @@
 %                  maxIterations : Maximum number of iterations to be performed.
 %                     printLevel : The amount of output to be printed.
 %
+% III) The outputs consist of primal and dual solutions and a statistics struct:
+%                              x : The primal solution (or last iterate on failed call)
+%                              y : The dual solution (or last iterate on failed call)
+%              stats.iters_total : Total number of iterations
+%              stats.iters_outer : Total number of outer iterations
+%         stats.iters_subproblem : Total number of iterations taken by the QP subsolver
+%                  stats.rho_opt : Penalty parameter at solution (or its most recent value on failed call)
+%             stats.elapsed_time : Elapsed solver time (without loading the data)
+%                stats.exit_flag : Exit flag (0 on success, else some error according to the enum ReturnValue within Utilities.hpp)
 %
