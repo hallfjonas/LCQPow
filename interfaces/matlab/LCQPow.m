@@ -20,12 +20,12 @@
 % LCQPow is intended for solving quadratic programs with
 % linear complementarity constraints of the form
 %
-%                min   1/2*x'Hx + x'g
-%                s.t.  lbS1 <= S1*x <= ubS1
-%                      lbS2 <= S2*x <= ubS2
-%                         0  = x'*S1'*S2*x
-%                        lb <=  x <= ub      {optional}
-%                       lbA <= Ax <= ubA     {optional}
+%           minimize   1/2*x'Hx + x'g
+%             s.t.    0  = x'*S1'*S2*x
+%                  lbS1 <= S1*x <= ubS1
+%                  lbS2 <= S2*x <= ubS2
+%                   lbA <=  Ax  <= ubA     {optional}
+%                    lb <=   x  <= ub      {optional}
 %
 % I) Call
 %
