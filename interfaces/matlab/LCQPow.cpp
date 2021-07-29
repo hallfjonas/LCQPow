@@ -634,15 +634,15 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         if (options.getStoreSteps()) {
 
             if (stats.getIterTotal() > 0) {
-                mxArray* innerItersArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal()+1, 1, mxREAL);
-                mxArray* subproblemItersArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal()+1, 1, mxREAL);
-                mxArray* accuSubproblemItersArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal()+1, 1, mxREAL);
-                mxArray* stepLengthArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal()+1, 1, mxREAL);
-                mxArray* stepSizeArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal()+1, 1, mxREAL);
-                mxArray* statValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal()+1, 1, mxREAL);
-                mxArray* objValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal()+1, 1, mxREAL);
-                mxArray* phiValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal()+1, 1, mxREAL);
-                mxArray* meritValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal()+1, 1, mxREAL);
+                mxArray* innerItersArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
+                mxArray* subproblemItersArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
+                mxArray* accuSubproblemItersArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
+                mxArray* stepLengthArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
+                mxArray* stepSizeArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
+                mxArray* statValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
+                mxArray* objValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
+                mxArray* phiValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
+                mxArray* meritValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
 
                 double* innerIters = (double*) mxGetPr(innerItersArr);
                 double* subproblemIters = (double*) mxGetPr(subproblemItersArr);
@@ -664,7 +664,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 double* phiValsTMP = stats.getPhiVals( );
                 double* meritValsTMP = stats.getMeritVals( );
 
-                for (int i = 0; i < stats.getIterTotal()+1; i++) {
+                for (int i = 0; i < stats.getIterTotal(); i++) {
                     innerIters[i] = innerItersTMP[i];
                     subproblemIters[i] = subproblemItersTMP[i];
                     accuSubproblemIters[i] = accuSubproblemItersTMP[i];
