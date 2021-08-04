@@ -430,9 +430,6 @@ namespace LCQPow {
 			/** Update gradient of Lagrangian. */
 			void updateStationarity( );
 
-			/** Check the dynamic penalty update strategy by Leyffer. */
-			bool leyfferCheckPositive( );
-
 			/** Update Qk. */
 			void updateQk( );
 

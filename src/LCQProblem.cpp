@@ -465,18 +465,6 @@ namespace LCQPow {
 			// Update inner iterate counter
 			innerIter++;
 
-			// Perform Dynamic Leyffer Strategy
-			if (leyfferCheckPositive( )) {
-				updatePenalty( );
-
-				// Update iterate counters
-				updateOuterIter();
-				innerIter = 0;
-			}
-
-			// gk = new linearization + g
-			updateLinearization();
-
 			// Terminate, update pen, or continue inner loop
 			if (stationarityCheck()) {
 				if (complementarityCheck()) {
@@ -1155,10 +1143,6 @@ namespace LCQPow {
 
 
 	void LCQProblem::updatePenalty( ) {
-		// Clear Leyffer history
-		if (options.getNComplHist() > 0)
-			complHistory.clear();
-
 		rho *= options.getPenaltyUpdateFactor();
 	}
 
@@ -1222,46 +1206,6 @@ namespace LCQPow {
 
 			Utilities::WeightedVectorAdd(1, statk, -1, box_statk, statk, nV);
 		}
-	}
-
-
-	bool LCQProblem::leyfferCheckPositive( ) {
-
-		size_t n = (size_t)options.getNComplHist();
-
-		// Only perform Leyffer check if desired
-		if (n <= 0)
-			return false;
-
-		// Evaluate current complementarity satisfaction
-		double complCur = getPhi();
-
-		// Don't perform in first getNComplHist steps
-		if (complHistory.size() < n) {
-			complHistory.push_back(complCur);
-			return false;
-		}
-
-		// Don't increase penalty if already at satisfactory level
-		if (complementarityCheck() || innerIter == 0 || qpIterk > 0) {
-			complHistory.pop_front();
-			complHistory.push_back(complCur);
-			return false;
-		}
-
-		bool retFlag = true;
-		for (size_t i = 0; i < n; i++) {
-			if (complCur < options.getEtaComplHist()*complHistory[i]) {
-				// In this case phi(xkj) < eta*max{phi(xkj-1),...,phi(xkj-n)}
-				retFlag = false;
-			}
-		}
-
-		// Update history vector
-		complHistory.pop_front();
-		complHistory.push_back(complCur);
-
-		return retFlag;
 	}
 
 
