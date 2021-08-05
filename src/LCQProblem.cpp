@@ -442,6 +442,9 @@ namespace LCQPow {
 		// Initialize Qk = H + rhok*C
 		setQk();
 
+		// Initialize stats.rho_opt
+		stats.updateRhoOpt( rho );
+
 		// Outer and inner loop in one
 		while ( true ) {
 
@@ -458,6 +461,12 @@ namespace LCQPow {
 			if (options.getStoreSteps()) {
 				storeSteps( );
 			}
+
+			// Update the total iteration counter
+			updateTotalIter();
+
+			// Update inner iterate counter
+			innerIter++;
 
 			// Terminate, update pen, or continue inner loop
 			if (stationarityCheck()) {
@@ -497,12 +506,6 @@ namespace LCQPow {
 			if (ret != SUCCESSFUL_RETURN) {
 				return MessageHandler::PrintMessage(ret);
 			}
-
-			// Update the total iteration counter
-			updateTotalIter();
-
-			// Update inner iterate counter
-			innerIter++;
 
 			// Add some +/- EPS to each coordinate
 			perturbStep();
@@ -1048,11 +1051,6 @@ namespace LCQPow {
 
 	void LCQProblem::updateLinearization()
 	{
-		// Update g_tilde at beginning of each inner loop (if we have a linear phi term)
-		if (innerIter == 0 && g_phi != 0) {
-			Utilities::WeightedVectorAdd(1.0, g, rho, g_phi, g_tilde, nV);
-		}
-
 		if (sparseSolver) {
 			Utilities::AffineLinearTransformation(rho, C_sparse, xk, g_tilde, gk, nV);
 		} else {
@@ -1150,6 +1148,11 @@ namespace LCQPow {
 
 		// On penalty update also update Qk = Q + rhok C
 		updateQk();
+
+		// Update g_tilde = g + rho*g_phi
+		if (g_phi != 0) {
+			Utilities::WeightedVectorAdd(1.0, g, rho, g_phi, g_tilde, nV);
+		}
 	}
 
 
@@ -1190,8 +1193,6 @@ namespace LCQPow {
 		} else {
 			Utilities::AffineLinearTransformation(1, Qk, xk, g_tilde, statk, nV, nV);
 		}
-
-		Utilities::printMatrix(Qk, nV, nV, "Qk");
 
 		// 2) Constraint contribution: A'*yk
 		// Utilities::TransponsedMatrixMultiplication(A, yk_A, constr_statk, nC + 2*nComp, nV, 1);
