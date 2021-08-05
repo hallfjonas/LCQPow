@@ -143,6 +143,10 @@ namespace LCQPow {
                 printf("ERROR: Invalid complementarity matrix passed (can not be null pointer).\n");
                 break;
 
+            case INVALID_ETA_VALUE:
+                printf("ERROR: Invalid etaComplHist value, which describes the fraction of loss required for complementarity progress (must be in (0,1)).");
+                break;
+
             case OSQP_INITIAL_PRIMAL_GUESS_FAILED:
                 printf("ERROR: OSQP failed to use the primal initial guess.\n");
                 break;
