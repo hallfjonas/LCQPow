@@ -1248,7 +1248,7 @@ namespace LCQPow {
 		}
 
 		// Don't increase penalty if already at satisfactory level
-		if (complementarityCheck() || innerIter == 0 || qpIterk > 0) {
+		if (complementarityCheck()) {
 			complHistory.pop_front();
 			complHistory.push_back(complCur);
 			return false;
@@ -1259,6 +1259,7 @@ namespace LCQPow {
 			if (complCur < options.getEtaComplHist()*complHistory[i]) {
 				// In this case phi(xkj) < eta*max{phi(xkj-1),...,phi(xkj-n)}
 				retFlag = false;
+				break;
 			}
 		}
 
