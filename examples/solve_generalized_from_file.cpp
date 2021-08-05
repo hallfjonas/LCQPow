@@ -125,7 +125,6 @@ int main() {
     LCQPow::Options opts;
     opts.setPrintLevel( LCQPow::PrintLevel::INNER_LOOP_ITERATES );
     opts.setQPSolver( LCQPow::QPSolver::QPOASES_SPARSE);
-    opts.setMaxIterations(19);
     lcqp.setOptions( opts );
 
     // Run solver
