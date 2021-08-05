@@ -88,6 +88,12 @@ namespace LCQPow {
             /** Set maximum number of iterations. */
             ReturnValue setMaxIterations( int val );
 
+            /** Get maximum penalty value. */
+            double getMaxRho( );
+
+            /** Set maximum penalty value. */
+            ReturnValue setMaxRho( double val );
+
             /** Get number of previous complementarity values to check against (Leyffer strategy). */
             int getNComplHist( );
 
@@ -135,6 +141,7 @@ namespace LCQPow {
             bool solveZeroPenaltyFirst;                 /**< Flag indicating whether first QP should ignore penalization. */
 
             int maxIterations;                          /**< Maximum number of iterations to be performed. */
+            double maxRho;                              /**< Maximum penalty value. */
 
             int nComplHist;                             /**< Number of previous iterates to compare complementarity loss (only enabled if positive). */
             double etaComplHist;                        /**< Parameter describing fraction of required complementarity loss. */

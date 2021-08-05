@@ -506,9 +506,13 @@ namespace LCQPow {
 				}
 			}
 
-			// (Failed) termination condition
+			// (Failed) termination condition due to number of iterations
 			if ( totalIter > options.getMaxIterations() )
 				return MAX_ITERATIONS_REACHED;
+
+			// (Failed) termination condition due to penalty value
+			if ( rho > options.getMaxRho() )
+				return MAX_PENALTY_REACHED;
 
 			// gk = new linearization + g
 			updateLinearization();

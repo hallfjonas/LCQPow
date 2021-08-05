@@ -60,9 +60,11 @@ namespace LCQPow {
         OSQP_INITIAL_PRIMAL_GUESS_FAILED = 120,         /**< OSQP failed to use the primal initial guess. */
         OSQP_INITIAL_DUAL_GUESS_FAILED = 121,           /**< OSQP failed to use the dual initial guess. */
         INVALID_LOWER_COMPLEMENTARITY_BOUND = 122,      /**< Lower complementarity bound must be bounded below. */
+        INVALID_MAX_RHO_VALUE = 123,                    /**< Invalid maximal penalty value. Must be a positive double. */
 
         // Algorithmic errors
         MAX_ITERATIONS_REACHED = 200,                   /**< Maximum number of iterations reached. */
+        MAX_PENALTY_REACHED = 201,                      /**< Maxium penalty value reached. */
         INITIAL_SUBPROBLEM_FAILED = 202,                /**< Failed to solve the initial QP. */
         SUBPROBLEM_SOLVER_ERROR = 203,                  /**< An error occured in the subproblem solver. */
         FAILED_SYM_COMPLEMENTARITY_MATRIX = 204,        /**< Failed to compute the symmetric complementarity matrix C. */

@@ -55,6 +55,10 @@ namespace LCQPow {
                 printf("ERROR: Maximum number of iterations reached.\n");
                 break;
 
+            case MAX_PENALTY_REACHED:
+                printf("ERROR: Maxium penalty value reached.\n");
+                break;
+
             case INITIAL_SUBPROBLEM_FAILED:
                 printf("ERROR: Failed to solve initial QP.\n");
                 break;
@@ -93,6 +97,10 @@ namespace LCQPow {
 
             case INVALID_MAX_ITERATIONS_VALUE:
                 printf("WARNING: Ignoring invalid number of maximum iterations.\n");
+                break;
+
+            case INVALID_MAX_RHO_VALUE:
+                printf("WARNING: Ignoring invalid number of maximum penalty value.\n");
                 break;
 
             case INVALID_STATIONARITY_TOLERANCE:

@@ -59,6 +59,7 @@ namespace LCQPow {
         penaltyUpdateFactor = rhs.penaltyUpdateFactor;
         solveZeroPenaltyFirst = rhs.solveZeroPenaltyFirst;
         maxIterations = rhs.maxIterations;
+        maxRho = rhs.maxRho;
         nComplHist = rhs.nComplHist;
         etaComplHist = rhs.etaComplHist;
         printLevel = rhs.printLevel;
@@ -148,6 +149,19 @@ namespace LCQPow {
     }
 
 
+    double Options::getMaxRho( ) {
+        return maxRho;
+    }
+
+
+    ReturnValue Options::setMaxRho( double val ) {
+        if (val <= 0)
+            return (MessageHandler::PrintMessage(INVALID_MAX_RHO_VALUE) );
+
+        maxRho = val;
+        return ReturnValue::SUCCESSFUL_RETURN;
+    }
+
     int Options::getNComplHist( ) {
         return nComplHist;
     }
@@ -227,15 +241,16 @@ namespace LCQPow {
 
     void Options::setToDefault( ) {
         complementarityTolerance = 1.0e3 * Utilities::EPS;
-        stationarityTolerance  = 1.0e3 * Utilities::EPS*1000;
+        stationarityTolerance  = 1.0e6 * Utilities::EPS;
         initialPenaltyParameter = 0.01;
     	penaltyUpdateFactor  = 2.0;
 
         solveZeroPenaltyFirst = true;
 
         maxIterations = 1000;
+        maxRho = 10e3;
 
-        nComplHist = 0;
+        nComplHist = 3;
         etaComplHist = 0.9;
 
         printLevel = PrintLevel::INNER_LOOP_ITERATES;

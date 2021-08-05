@@ -383,6 +383,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             "penaltyUpdateFactor",
             "solveZeroPenaltyFirst",
             "maxIterations",
+            "maxRho",
             "nComplHist",
             "etaComplHist",
             "printLevel",
@@ -442,6 +443,14 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
                 fld_ptr = (double*) mxGetPr(field);
                 options.setMaxIterations( (int)fld_ptr[0] );
+                continue;
+            }
+
+            if ( strcmp(name, "maxRho") == 0 ) {
+                if (!checkDimensionAndTypeDouble(field, 1, 1, "params.maxRho")) return;
+
+                fld_ptr = (double*) mxGetPr(field);
+                options.setMaxRho( (int)fld_ptr[0] );
                 continue;
             }
 
