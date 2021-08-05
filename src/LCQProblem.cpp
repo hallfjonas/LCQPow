@@ -459,12 +459,6 @@ namespace LCQPow {
 				storeSteps( );
 			}
 
-			// Update the total iteration counter
-			updateTotalIter();
-
-			// Update inner iterate counter
-			innerIter++;
-
 			// Terminate, update pen, or continue inner loop
 			if (stationarityCheck()) {
 				if (complementarityCheck()) {
@@ -475,7 +469,6 @@ namespace LCQPow {
 					determineStationarityType();
 
 					// Update output statistics
-					stats.updateRhoOpt( rho );
 					stats.updateSolutionStatus( algoStat );
 
 					// Print solution type
@@ -496,11 +489,20 @@ namespace LCQPow {
 			if ( totalIter > options.getMaxIterations() )
 				return MAX_ITERATIONS_REACHED;
 
+			// gk = new linearization + g
+			updateLinearization();
+
 			// Step computation
 			ret = solveQPSubproblem( false );
 			if (ret != SUCCESSFUL_RETURN) {
 				return MessageHandler::PrintMessage(ret);
 			}
+
+			// Update the total iteration counter
+			updateTotalIter();
+
+			// Update inner iterate counter
+			innerIter++;
 
 			// Add some +/- EPS to each coordinate
 			perturbStep();
@@ -1144,6 +1146,10 @@ namespace LCQPow {
 
 	void LCQProblem::updatePenalty( ) {
 		rho *= options.getPenaltyUpdateFactor();
+		stats.updateRhoOpt( rho );
+
+		// On penalty update also update Qk = Q + rhok C
+		updateQk();
 	}
 
 
@@ -1177,10 +1183,6 @@ namespace LCQPow {
 
 
 	void LCQProblem::updateStationarity( ) {
-		// Update Qk = Q + rhok C (once per inner loop)
-		if (innerIter == 0 && outerIter > 0)
-			updateQk();
-
 		// stat = Qk*xk + g - A'*yk_A - yk_x
 		// 1) Objective contribution: Qk*xk + g
 		if (sparseSolver) {
@@ -1188,6 +1190,8 @@ namespace LCQPow {
 		} else {
 			Utilities::AffineLinearTransformation(1, Qk, xk, g_tilde, statk, nV, nV);
 		}
+
+		Utilities::printMatrix(Qk, nV, nV, "Qk");
 
 		// 2) Constraint contribution: A'*yk
 		// Utilities::TransponsedMatrixMultiplication(A, yk_A, constr_statk, nC + 2*nComp, nV, 1);
