@@ -186,7 +186,7 @@ namespace LCQPow {
         iterations = work->info->iter;
 
         // Either pass error
-        if (exitflag != 0)
+        if (exitflag != 0 || work->info->status_val != 1)
             return ReturnValue::SUBPROBLEM_SOLVER_ERROR;
 
         // Or pass successful return
