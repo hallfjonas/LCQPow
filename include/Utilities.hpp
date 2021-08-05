@@ -56,7 +56,6 @@ namespace LCQPow {
         INVALID_OBJECTIVE_LINEAR_TERM = 116,            /**< Invalid objective linear term passed (must be a double array of length n). */
         INVALID_CONSTRAINT_MATRIX = 117,                /**< Invalid constraint matrix passed (matrix was null pointer but number of constraints is positive). */
         INVALID_COMPLEMENTARITY_MATRIX = 118,           /**< Invalid complementarity matrix passed (can not be null pointer). */
-        INVALID_ETA_VALUE = 119,                        /**< Invalid etaComplHist value, which describes the fraction of loss required for complementarity progress (must be in (0,1)). */
         OSQP_INITIAL_PRIMAL_GUESS_FAILED = 120,         /**< OSQP failed to use the primal initial guess. */
         OSQP_INITIAL_DUAL_GUESS_FAILED = 121,           /**< OSQP failed to use the dual initial guess. */
         INVALID_LOWER_COMPLEMENTARITY_BOUND = 122,      /**< Lower complementarity bound must be bounded below. */
