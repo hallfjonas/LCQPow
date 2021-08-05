@@ -48,6 +48,8 @@
 %          solveZeroPenaltyFirst : Flag indicating whether first QP should ignore penalization.
 %                  maxIterations : Maximum number of iterations to be performed.
 %                     printLevel : The amount of output to be printed.
+%                     nComplHist : The number of complementarity values to be compared in Leyffer check.
+%                   etaComplHist : Complementarity reduction factor required in at least one of the lastet nComplHist steps.
 %
 % III) The outputs consist of primal and dual solutions and a statistics struct:
 %                              x : The primal solution (or last iterate on failed call)
