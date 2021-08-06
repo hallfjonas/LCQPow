@@ -616,6 +616,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         mxArray* rhoOpt = mxCreateDoubleMatrix(1, 1, mxREAL);
         mxArray* elapsed_time = mxCreateDoubleMatrix(1, 1, mxREAL);
         mxArray* exit_flag = mxCreateDoubleMatrix(1,1, mxREAL);
+        mxArray* qp_exit_flag = mxCreateDoubleMatrix(1,1, mxREAL);
 
         double* itrTot = mxGetPr(iterTotal);
         double* itrOutr = mxGetPr(iterOuter);
@@ -623,6 +624,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         double* rOpt = mxGetPr(rhoOpt);
         double* elapsed = mxGetPr(elapsed_time);
         double* ex_flag = mxGetPr(exit_flag);
+        double* qp_ex_flag = mxGetPr(qp_exit_flag);
 
         itrTot[0] = stats.getIterTotal();
         itrOutr[0] = stats.getIterOuter();
@@ -630,6 +632,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         rOpt[0] = stats.getRhoOpt();
         elapsed[0] = elapsed_secs;
         ex_flag[0] = ret;
+        qp_ex_flag[0] = stats.getQPSolverExitFlag();
 
         // assign values to struct
         mxSetFieldByNumber(plhs[2], 0, 0, iterTotal);
@@ -638,6 +641,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         mxSetFieldByNumber(plhs[2], 0, 3, rhoOpt);
         mxSetFieldByNumber(plhs[2], 0, 4, elapsed_time);
         mxSetFieldByNumber(plhs[2], 0, 5, exit_flag);
+        mxSetFieldByNumber(plhs[2], 0, 6, qp_exit_flag);
 
         // Tracking values
         if (options.getStoreSteps()) {
@@ -685,15 +689,15 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                     meritVals[i] = meritValsTMP[i];
                 }
 
-                mxSetFieldByNumber(plhs[2], 0, 6, innerItersArr);
-                mxSetFieldByNumber(plhs[2], 0, 7,  subproblemItersArr);
-                mxSetFieldByNumber(plhs[2], 0, 8,  accuSubproblemItersArr);
-                mxSetFieldByNumber(plhs[2], 0, 9,  stepLengthArr);
-                mxSetFieldByNumber(plhs[2], 0, 10, stepSizeArr);
-                mxSetFieldByNumber(plhs[2], 0, 11, statValsArr);
-                mxSetFieldByNumber(plhs[2], 0, 12, objValsArr);
-                mxSetFieldByNumber(plhs[2], 0, 13, phiValsArr);
-                mxSetFieldByNumber(plhs[2], 0, 14, meritValsArr);
+                mxSetFieldByNumber(plhs[2], 0, 7, innerItersArr);
+                mxSetFieldByNumber(plhs[2], 0, 8,  subproblemItersArr);
+                mxSetFieldByNumber(plhs[2], 0, 9,  accuSubproblemItersArr);
+                mxSetFieldByNumber(plhs[2], 0, 10,  stepLengthArr);
+                mxSetFieldByNumber(plhs[2], 0, 11, stepSizeArr);
+                mxSetFieldByNumber(plhs[2], 0, 12, statValsArr);
+                mxSetFieldByNumber(plhs[2], 0, 13, objValsArr);
+                mxSetFieldByNumber(plhs[2], 0, 14, phiValsArr);
+                mxSetFieldByNumber(plhs[2], 0, 15, meritValsArr);
 
                 delete[] innerItersTMP;
                 delete[] subproblemItersTMP;

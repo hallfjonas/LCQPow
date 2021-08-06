@@ -173,7 +173,7 @@ namespace LCQPow {
     }
 
 
-    ReturnValue SubsolverQPOASES::solve(    bool initialSolve, int& iterations,
+    ReturnValue SubsolverQPOASES::solve(    bool initialSolve, int& iterations, int& exit_flag,
                                             const double* const g,
                                             const double* const lbA, const double* const ubA,
                                             const double* const x0, const double* const y0,
@@ -202,6 +202,7 @@ namespace LCQPow {
         }
 
         iterations = (int)(nwsr);
+        exit_flag = (int)(ret);
 
         if (ret != qpOASES::returnValue::SUCCESSFUL_RETURN)
             return ReturnValue::SUBPROBLEM_SOLVER_ERROR;

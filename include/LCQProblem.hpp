@@ -513,7 +513,7 @@ namespace LCQPow {
 			int totalIter;							/**< Total iterate counter. */
 
 			int qpIterk;							/**< Iterations taken by qpSolver to solve subproblem. */
-
+			int qpSolverExitFlag;					/**< Most recent exit flag of QP solver. */
 			AlgorithmStatus algoStat;				/**< Status of algorithm. */
 
 			bool sparseSolver = false;				/**< Whether to use sparse algebra or dense. */

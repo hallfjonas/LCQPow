@@ -99,7 +99,7 @@ namespace LCQPow {
     }
 
 
-    ReturnValue Subsolver::solve(   bool initialSolve, int& iterations,
+    ReturnValue Subsolver::solve(   bool initialSolve, int& iterations, int& exit_flag,
                                     const double* g,
                                     const double* lbA, const double* ubA,
                                     const double* x0, const double* y0,
@@ -107,9 +107,9 @@ namespace LCQPow {
     {
         ReturnValue ret = ReturnValue::SUCCESSFUL_RETURN;
         if (qpSolver == QPSolver::QPOASES_DENSE || qpSolver == QPSolver::QPOASES_SPARSE) {
-            ret = solverQPOASES.solve( initialSolve, iterations, g, lbA, ubA, x0, y0, lb, ub );
+            ret = solverQPOASES.solve( initialSolve, iterations, exit_flag, g, lbA, ubA, x0, y0, lb, ub );
         } else if (qpSolver == QPSolver::OSQP_SPARSE) {
-            ret = solverOSQP.solve( initialSolve, iterations, g, lbA, ubA, x0, y0, lb, ub );
+            ret = solverOSQP.solve( initialSolve, iterations, exit_flag, g, lbA, ubA, x0, y0, lb, ub );
         } else {
             ret = INVALID_QPSOLVER;
         }

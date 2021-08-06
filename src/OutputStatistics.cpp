@@ -113,6 +113,13 @@ namespace LCQPow {
     }
 
 
+    ReturnValue OutputStatistics::updateQPSolverExitFlag( int _flag )
+    {
+        qpSolver_exit_flag = _flag;
+        return SUCCESSFUL_RETURN;
+    }
+
+
     ReturnValue OutputStatistics::updateTrackingVectors(
                 int thisInnerIter,
                 int thisSubproblemIter,
@@ -169,6 +176,12 @@ namespace LCQPow {
     AlgorithmStatus OutputStatistics::getSolutionStatus( ) const
     {
         return status;
+    }
+
+
+    int OutputStatistics::getQPSolverExitFlag( ) const
+    {
+        return qpSolver_exit_flag;
     }
 
 

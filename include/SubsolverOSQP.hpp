@@ -74,7 +74,7 @@ namespace LCQPow {
              * @param _lb This entry is ignored in this solver (only required in declaration due to inflexibility of abstract classes).
              * @param _ub This entry is ignored in this solver (only required in declaration due to inflexibility of abstract classes).
             */
-            ReturnValue solve(  bool initialSolve, int& iterations,
+            ReturnValue solve(  bool initialSolve, int& iterations, int& exit_flag,
                                 const double* const _g,
                                 const double* const _lbA, const double* const _ubA,
                                 const double* const x0 = 0, const double* const y0 = 0,

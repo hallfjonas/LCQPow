@@ -46,7 +46,7 @@ namespace LCQPow {
              * @param _lb The (potentially) updated lower box constraints. NULL pointer can be passed.
              * @param _ub The (potentially) updated upper box constraints. NULL pointer can be passed.
             */
-            virtual ReturnValue solve(  bool initialSolve, int& iterations,
+            virtual ReturnValue solve(  bool initialSolve, int& iterations, int& exit_flag,
                                         const double* const _g,
                                         const double* const _lbA, const double* const _ubA,
                                         const double* const x0 = 0, const double* const y0 = 0,

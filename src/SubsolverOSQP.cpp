@@ -131,7 +131,7 @@ namespace LCQPow {
     }
 
 
-    ReturnValue SubsolverOSQP::solve(   bool initialSolve, int& iterations,
+    ReturnValue SubsolverOSQP::solve(   bool initialSolve, int& iterations, int& exit_flag,
                                         const double* const _g,
                                         const double* const _lbA, const double* const _ubA,
                                         const double* const x0, const double* const y0,
@@ -180,13 +180,14 @@ namespace LCQPow {
         }
 
         // Solve Problem
-        int exitflag = osqp_solve(work);
+        int errorflag = osqp_solve(work);
 
         // Get number of iterations
         iterations = work->info->iter;
+        exit_flag = work->info->status_val;
 
         // Either pass error
-        if (exitflag != 0 || work->info->status_val <= 0)
+        if (errorflag != 0 || exit_flag <= 0)
             return ReturnValue::SUBPROBLEM_SOLVER_ERROR;
 
         // Or pass successful return

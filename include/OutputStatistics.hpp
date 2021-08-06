@@ -73,6 +73,12 @@ namespace LCQPow {
             */
             ReturnValue updateSolutionStatus( AlgorithmStatus _status );
 
+            /** Update the QP solver exit flag.
+             *
+             * @return Success.
+            */
+            ReturnValue updateQPSolverExitFlag( int _flag );
+
             /** Update tracking vectors.
              *
              * @return Success or specifies the invalid argument.
@@ -102,6 +108,9 @@ namespace LCQPow {
 
             /** Get the solution status (if solved it will return the stationarity type). */
             AlgorithmStatus getSolutionStatus( ) const;
+
+            /** Get the most recent exit flag of the QP solver. */
+            int getQPSolverExitFlag( ) const;
 
             /** Get values of inner loop iterates.*/
             int* getInnerIters( ) const;
@@ -133,14 +142,15 @@ namespace LCQPow {
         private:
             int iterTotal = 0;                                 /**< Total number of iterations, i.e., total number of inner iterations. */
             int iterOuter = 0;                                 /**< Total number of outer iterations, i.e., number of penalty updates. */
-            int subproblemIter = 0;                            /**< Total number of subsolver iterations (qpOASES: active set changes, OSQP: ??). */
+            int subproblemIter = 0;                            /**< Total number of subsolver iterations. */
             double rhoOpt = 0.0;                               /**< Value of penalty parameter at the final iterate. */
-            AlgorithmStatus status = PROBLEM_NOT_SOLVED;        /**< Status of the solver. This is set to the solution type on success. */
+            AlgorithmStatus status = PROBLEM_NOT_SOLVED;       /**< Status of the solver. This is set to the solution type on success. */
+            int qpSolver_exit_flag = 0;                        /**< The exit flag of the most recent QP solved (refer to the respective QP solver docs for meanings). */
 
             // Tracking vectors
             std::vector<int>    innerIters;                    /**< Number of inner iterations (accumulated per inner loop). */
             std::vector<int>    subproblemIters;               /**< Number of subsolver iterations for each inner loop. */
-            std::vector<int>    accuSubproblemIters;          /**< Accumulated number of subsolver iterations (qpOASES: active set changes, OSQP: ??). */
+            std::vector<int>    accuSubproblemIters;          /**< Accumulated number of subsolver iterations. */
             std::vector<double> stepLength;                     /**< Track values of alpha. */
             std::vector<double> stepSize;                       /**< Track norm of pk. */
             std::vector<double> statVals;                       /**< Track values of Lagrangian's gradient violation. */

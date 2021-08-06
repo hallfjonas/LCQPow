@@ -71,7 +71,7 @@ namespace LCQPow {
             void setPrintLevel( PrintLevel printLevel );
 
             /** Abstract method for solving the QP. */
-            ReturnValue solve(  bool initialSolve, int& iterations,
+            ReturnValue solve(  bool initialSolve, int& iterations, int& exit_flag,
                                 const double* g,
                                 const double* lbA, const double* ubA,
                                 const double* x0 = 0, const double* y0 = 0,

@@ -1078,10 +1078,11 @@ namespace LCQPow {
 	ReturnValue LCQProblem::solveQPSubproblem(bool initialSolve)
 	{
 		// First solve convex subproblem
-		ReturnValue ret = subsolver.solve( initialSolve, qpIterk, gk, lbA, ubA, xk, yk, lb, ub );
+		ReturnValue ret = subsolver.solve( initialSolve, qpIterk, qpSolverExitFlag, gk, lbA, ubA, xk, yk, lb, ub );
 
 		// Update stats
 		stats.updateSubproblemIter(qpIterk);
+		stats.updateQPSolverExitFlag(qpSolverExitFlag);
 
 		// If no initial guess was passed, then need to allocate memory
 		if (xk == 0) {
