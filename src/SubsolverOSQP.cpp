@@ -49,7 +49,7 @@ namespace LCQPow {
 
         // Define solver settings
         osqp_set_default_settings(settings);
-        settings->eps_prim_inf = Utilities::ZERO;
+        settings->eps_prim_inf = Utilities::EPS;
         settings->verbose = false;
         settings->polish = true;
     }
@@ -186,7 +186,7 @@ namespace LCQPow {
         iterations = work->info->iter;
 
         // Either pass error
-        if (exitflag != 0 || work->info->status_val != 1)
+        if (exitflag != 0 || work->info->status_val <= 0)
             return ReturnValue::SUBPROBLEM_SOLVER_ERROR;
 
         // Or pass successful return
