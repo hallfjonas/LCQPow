@@ -1161,7 +1161,7 @@ namespace LCQPow {
 
 	void LCQProblem::updatePenalty( ) {
 		// Clear Leyffer history
-		if (options.getNComplHist() > 0)
+		if (options.getNDynamicPenalty() > 0)
 			complHistory.clear();
 
 		rho *= options.getPenaltyUpdateFactor();
@@ -1237,7 +1237,7 @@ namespace LCQPow {
 
 	bool LCQProblem::leyfferCheckPositive( ) {
 
-		size_t n = (size_t)options.getNComplHist();
+		size_t n = (size_t)options.getNDynamicPenalty();
 
 		// Only perform Leyffer check if desired
 		if (n <= 0)
@@ -1246,7 +1246,7 @@ namespace LCQPow {
 		// Evaluate current complementarity satisfaction
 		double complCur = getPhi();
 
-		// Don't perform in first getNComplHist steps
+		// Don't perform in first getNDynamicPenalty steps
 		if (complHistory.size() < n) {
 			complHistory.push_back(complCur);
 			return false;
@@ -1261,7 +1261,7 @@ namespace LCQPow {
 
 		bool retFlag = true;
 		for (size_t i = 0; i < n; i++) {
-			if (complCur < options.getEtaComplHist()*complHistory[i]) {
+			if (complCur < options.getEtaDynamicPenalty()*complHistory[i]) {
 				// In this case phi(xkj) < eta*max{phi(xkj-1),...,phi(xkj-n)}
 				retFlag = false;
 				break;

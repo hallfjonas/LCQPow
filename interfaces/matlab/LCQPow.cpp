@@ -384,8 +384,8 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             "solveZeroPenaltyFirst",
             "maxIterations",
             "maxRho",
-            "nComplHist",
-            "etaComplHist",
+            "nDynamicPenalty",
+            "etaDynamicPenalty",
             "printLevel",
             "storeSteps",
             "qpSolver"
@@ -454,19 +454,19 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 continue;
             }
 
-            if ( strcmp(name, "nComplHist") == 0 ) {
-                if (!checkDimensionAndTypeDouble(field, 1, 1, "params.nComplHist")) return;
+            if ( strcmp(name, "nDynamicPenalty") == 0 ) {
+                if (!checkDimensionAndTypeDouble(field, 1, 1, "params.nDynamicPenalty")) return;
 
                 fld_ptr = (double*) mxGetPr(field);
-                options.setNComplHist( (int)fld_ptr[0] );
+                options.setNDynamicPenalty( (int)fld_ptr[0] );
                 continue;
             }
 
-            if ( strcmp(name, "etaComplHist") == 0 ) {
-                if (!checkDimensionAndTypeDouble(field, 1, 1, "params.etaComplHist")) return;
+            if ( strcmp(name, "etaDynamicPenalty") == 0 ) {
+                if (!checkDimensionAndTypeDouble(field, 1, 1, "params.etaDynamicPenalty")) return;
 
                 fld_ptr = (double*) mxGetPr(field);
-                options.setEtaComplHist( fld_ptr[0] );
+                options.setEtaDynamicPenalty( fld_ptr[0] );
                 continue;
             }
 
@@ -690,9 +690,9 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 }
 
                 mxSetFieldByNumber(plhs[2], 0, 7, innerItersArr);
-                mxSetFieldByNumber(plhs[2], 0, 8,  subproblemItersArr);
-                mxSetFieldByNumber(plhs[2], 0, 9,  accuSubproblemItersArr);
-                mxSetFieldByNumber(plhs[2], 0, 10,  stepLengthArr);
+                mxSetFieldByNumber(plhs[2], 0, 8, subproblemItersArr);
+                mxSetFieldByNumber(plhs[2], 0, 9, accuSubproblemItersArr);
+                mxSetFieldByNumber(plhs[2], 0, 10, stepLengthArr);
                 mxSetFieldByNumber(plhs[2], 0, 11, stepSizeArr);
                 mxSetFieldByNumber(plhs[2], 0, 12, statValsArr);
                 mxSetFieldByNumber(plhs[2], 0, 13, objValsArr);

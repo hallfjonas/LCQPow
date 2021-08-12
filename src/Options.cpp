@@ -60,8 +60,8 @@ namespace LCQPow {
         solveZeroPenaltyFirst = rhs.solveZeroPenaltyFirst;
         maxIterations = rhs.maxIterations;
         maxRho = rhs.maxRho;
-        nComplHist = rhs.nComplHist;
-        etaComplHist = rhs.etaComplHist;
+        nDynamicPenalty = rhs.nDynamicPenalty;
+        etaDynamicPenalty = rhs.etaDynamicPenalty;
         printLevel = rhs.printLevel;
         storeSteps = rhs.storeSteps;
         qpSolver = rhs.qpSolver;
@@ -162,27 +162,27 @@ namespace LCQPow {
         return ReturnValue::SUCCESSFUL_RETURN;
     }
 
-    int Options::getNComplHist( ) {
-        return nComplHist;
+    int Options::getNDynamicPenalty( ) {
+        return nDynamicPenalty;
     }
 
 
-    ReturnValue Options::setNComplHist( int val ) {
-        nComplHist = val;
+    ReturnValue Options::setNDynamicPenalty( int val ) {
+        nDynamicPenalty = val;
         return ReturnValue::SUCCESSFUL_RETURN;
     }
 
 
-    double Options::getEtaComplHist( ) {
-        return etaComplHist;
+    double Options::getEtaDynamicPenalty( ) {
+        return etaDynamicPenalty;
     }
 
 
-    ReturnValue Options::setEtaComplHist( double val ) {
+    ReturnValue Options::setEtaDynamicPenalty( double val ) {
         if (val <= Utilities::EPS || val >= 1)
             return (MessageHandler::PrintMessage(INVALID_ETA_VALUE) );
 
-        etaComplHist = val;
+        etaDynamicPenalty = val;
         return ReturnValue::SUCCESSFUL_RETURN;
     }
 
@@ -248,10 +248,10 @@ namespace LCQPow {
         solveZeroPenaltyFirst = true;
 
         maxIterations = 1000;
-        maxRho = 10e3;
+        maxRho = 1e4;
 
-        nComplHist = 3;
-        etaComplHist = 0.9;
+        nDynamicPenalty = 3;
+        etaDynamicPenalty = 0.9;
 
         printLevel = PrintLevel::INNER_LOOP_ITERATES;
 

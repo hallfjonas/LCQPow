@@ -152,7 +152,7 @@ namespace LCQPow {
                 break;
 
             case INVALID_ETA_VALUE:
-                printf("ERROR: Invalid etaComplHist value, which describes the fraction of loss required for complementarity progress (must be in (0,1)).");
+                printf("ERROR: Invalid etaDynamicPenalty value, which describes the fraction of loss required for complementarity progress (must be in (0,1)).");
                 break;
 
             case OSQP_INITIAL_PRIMAL_GUESS_FAILED:

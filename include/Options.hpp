@@ -95,16 +95,16 @@ namespace LCQPow {
             ReturnValue setMaxRho( double val );
 
             /** Get number of previous complementarity values to check against (Leyffer strategy). */
-            int getNComplHist( );
+            int getNDynamicPenalty( );
 
             /** Set number of previous complementarity values to check against (Leyffer strategy). */
-            ReturnValue setNComplHist( int val );
+            ReturnValue setNDynamicPenalty( int val );
 
             /** Get fraction required for complementarity loss (Leyffer strategy). */
-            double getEtaComplHist( );
+            double getEtaDynamicPenalty( );
 
             /** Get fraction required for complementarity loss (Leyffer strategy). */
-            ReturnValue setEtaComplHist( double val );
+            ReturnValue setEtaDynamicPenalty( double val );
 
             /** Get print level. */
             PrintLevel getPrintLevel( );
@@ -143,8 +143,8 @@ namespace LCQPow {
             int maxIterations;                          /**< Maximum number of iterations to be performed. */
             double maxRho;                              /**< Maximum penalty value. */
 
-            int nComplHist;                             /**< Number of previous iterates to compare complementarity loss (only enabled if positive). */
-            double etaComplHist;                        /**< Parameter describing fraction of required complementarity loss. */
+            int nDynamicPenalty;                             /**< Number of previous iterates to compare complementarity loss (only enabled if positive). */
+            double etaDynamicPenalty;                        /**< Parameter describing fraction of required complementarity loss. */
 
             PrintLevel printLevel;                      /**< Print level. */
 
