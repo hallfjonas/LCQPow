@@ -66,12 +66,12 @@ namespace LCQPow {
             qp = qpOASES::QProblem(nV, nC);
         }
 
-        if (H_sparse != NULL) {
+        if (isNotNullPtr(H_sparse)) {
             free(H_sparse);
             H_sparse = NULL;
         }
 
-        if (A_sparse != NULL) {
+        if (isNotNullPtr(A_sparse)) {
             free(A_sparse);
             A_sparse = NULL;
         }
@@ -107,46 +107,46 @@ namespace LCQPow {
 
     SubsolverQPOASES::~SubsolverQPOASES()
     {
-        if (H != 0) {
+        if (isNotNullPtr(H)) {
             delete[] H;
             H = NULL;
         }
 
-        if (A != 0) {
+        if (isNotNullPtr(A)) {
             delete[] A;
             A = NULL;
         }
 
-        if (H_i != 0) {
+        if (isNotNullPtr(H_i)) {
             delete[] H_i;
         }
 
-        if (H_p != 0) {
+        if (isNotNullPtr(H_p)) {
             delete[] H_p;
         }
 
-        if (H_x != 0) {
+        if (isNotNullPtr(H_x)) {
             delete[] H_x;
         }
 
-        if (A_i != 0) {
+        if (isNotNullPtr(A_x)) {
             delete[] A_i;
         }
 
-        if (A_p != 0) {
+        if (isNotNullPtr(A_p)) {
             delete[] A_p;
         }
 
-        if (A_x != 0) {
+        if (isNotNullPtr(A_x)) {
             delete[] A_x;
         }
 
-        if (H_sparse != 0) {
+        if (isNotNullPtr(H_sparse)) {
             delete H_sparse;
             H_sparse = 0;
         }
 
-        if (A_sparse != 0) {
+        if (isNotNullPtr(A_sparse)) {
             delete A_sparse;
             A_sparse = 0;
         }

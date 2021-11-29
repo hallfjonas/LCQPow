@@ -191,6 +191,13 @@ namespace LCQPow {
 			virtual AlgorithmStatus getDualSolution( double* const yOpt ) const;
 
 
+			/** Get the number of primal variables. 
+			 *
+			 * @return Returns the number of primal variables.
+			 */
+			int getNumerOfPrimals( ) const;
+
+
 			/** Get the number of dual variables. This depends on the utilized subproblem solver.
 			 *
 			 * @return Returns the number of dual variables.
@@ -384,6 +391,16 @@ namespace LCQPow {
 			Options options;						/**< Class for algorithmic options. */
 
 		private:
+
+			/** Checks wheather the ptr is null. */
+			template <typename PtrType>
+		    static bool isNullPtr(PtrType ptr) { 
+				return (ptr == 0 || ptr == nullptr);
+			}
+			template <typename PtrType>
+		    static bool isNotNullPtr(PtrType ptr) { 
+				  return (ptr != NULL && ptr != nullptr);
+			}
 
 			/** Called in runSolver to initialize variables. */
 			ReturnValue initializeSolver( );

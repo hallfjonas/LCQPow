@@ -267,16 +267,16 @@ namespace LCQPow {
 
     void Utilities::ClearSparseMat(csc* M)
     {
-        if (M != 0) {
-            if (M->p != 0) {
+        if (isNotNullPtr(M)) {
+            if (isNotNullPtr(M->p)) {
                 free(M->p);
                 M->p = NULL;
             }
-            if (M->i != 0) {
+            if (isNotNullPtr(M->i)) {
                 free(M->i);
                 M->i = NULL;
             }
-            if (M->x != 0) {
+            if (isNotNullPtr(M->x)) {
                 free(M->x);
                 M->x = NULL;
             }
@@ -289,16 +289,16 @@ namespace LCQPow {
 
     void Utilities::ClearSparseMat(csc** M)
     {
-        if (*M != 0) {
-            if ((*M)->p != 0) {
+        if (isNotNullPtr(*M)) {
+            if (isNotNullPtr((*M)->p)) {
                 free((*M)->p);
                 (*M)->p = NULL;
             }
-            if ((*M)->i != 0) {
+            if (isNotNullPtr((*M)->i)) {
                 free((*M)->i);
                 (*M)->i = NULL;
             }
-            if ((*M)->x != 0) {
+            if (isNotNullPtr((*M)->x)) {
                 free((*M)->x);
                 (*M)->x = NULL;
             }
@@ -470,7 +470,7 @@ namespace LCQPow {
     {
         csc* M = (csc *)malloc(sizeof(csc));
 
-        if (M == 0) return 0;
+        if (isNullPtr(M)) return 0;
 
 		M->m = m;
 		M->n = n;
@@ -488,7 +488,7 @@ namespace LCQPow {
     {
         csc* M = (csc *)malloc(sizeof(csc));
 
-        if (M == 0) return 0;
+        if (isNullPtr(M)) return 0;
 
         // Allocate space
 		int* rows = (int*) malloc((size_t)nnx*sizeof(int));
@@ -517,7 +517,7 @@ namespace LCQPow {
     {
         csc* M = (csc *)malloc(sizeof(csc));
 
-        if (M == 0) return 0;
+        if (isNullPtr(M)) return 0;
 
         if (toUpperTriangular) {
             // Allocate space

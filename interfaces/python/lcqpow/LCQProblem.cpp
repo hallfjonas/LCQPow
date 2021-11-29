@@ -13,15 +13,15 @@ namespace python {
 namespace py = pybind11;
 
 
-inline const double* const getRawPtrFromEigenVectorXd(const Eigen::VectorXd& vec) {
+inline const double* getRawPtrFromEigenVectorXd(const Eigen::VectorXd& vec) {
   if (vec.size() > 0) return vec.data();
-  else return static_cast<double*>(0);
+  else return nullptr;
 }
 
 
-inline const double* const getRawPtrFromEigenMatrixXd(const Eigen::MatrixXd& mat) {
+inline const double* getRawPtrFromEigenMatrixXd(const Eigen::MatrixXd& mat) {
   if (mat.cols() > 0 && mat.rows() > 0)  return mat.data();
-  else return static_cast<double*>(0);
+  else return nullptr;
 }
 
 
@@ -78,11 +78,15 @@ PYBIND11_MODULE(LCQProblem, m) {
           py::arg("lb_file")=nullptr, py::arg("ub_file")=nullptr, 
           py::arg("x0_file")=nullptr, py::arg("y0_file")=nullptr) 
     .def("runSolver", &LCQProblem::runSolver)
-    .def("getPrimalSolution", [](const LCQProblem& self, Eigen::VectorXd& xOpt) {
-            return self.getPrimalSolution(xOpt.data());
+    .def("getPrimalSolution", [](const LCQProblem& self) {
+            Eigen::VectorXd xOpt(Eigen::VectorXd::Zero(self.getNumerOfPrimals()));
+            self.getPrimalSolution(xOpt.data());
+            return xOpt;
          })
-    .def("getDualSolution", [](const LCQProblem& self, Eigen::VectorXd& yOpt) {
-            return self.getDualSolution(yOpt.data());
+    .def("getDualSolution", [](const LCQProblem& self) {
+            Eigen::VectorXd yOpt(Eigen::VectorXd::Zero(self.getNumerOfDuals()));
+            self.getDualSolution(yOpt.data());
+            return yOpt;
          })
     .def("getNumerOfDuals", &LCQProblem::getNumerOfDuals)
     .def("getOutputStatistics", &LCQProblem::getOutputStatistics)

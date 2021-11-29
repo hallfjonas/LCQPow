@@ -274,6 +274,16 @@ namespace LCQPow {
 
         private:
             static int getIndexOfIn(int val, int* sorted_lst, int beg, int end);
+
+			/** Checks wheather the ptr is null. */
+			template <typename PtrType>
+		    static bool isNullPtr(PtrType ptr) { 
+				return (ptr == 0 || ptr == nullptr);
+			}
+			template <typename PtrType>
+		    static bool isNotNullPtr(PtrType ptr) { 
+				return (ptr != 0 && ptr != nullptr);
+			}
     };
 }
 

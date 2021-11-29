@@ -71,18 +71,18 @@ namespace LCQPow {
     {
         osqp_cleanup(work);
 
-        if (data != 0) {
-            if (data->l != 0) {
+        if (isNotNullPtr(data)) {
+            if (isNotNullPtr(data->l)) {
                 free(data->l);
                 data->l = NULL;
             }
 
-            if (data->u != 0) {
+            if (isNotNullPtr(data->u)) {
                 free(data->u);
                 data->u = NULL;
             }
 
-            if (data->q != 0) {
+            if (isNotNullPtr(data->q)) {
                 free(data->q);
                 data->q = NULL;
             }
@@ -91,17 +91,17 @@ namespace LCQPow {
             data = NULL;
         }
 
-        if (H != 0) {
+        if (isNotNullPtr(H)) {
             Utilities::ClearSparseMat(H);
             H = NULL;
         }
 
-        if (A != 0) {
+        if (isNotNullPtr(A)) {
             Utilities::ClearSparseMat(A);
             A = NULL;
         }
 
-        if (settings != 0) {
+        if (isNotNullPtr(settings)) {
             c_free(settings);
             settings = NULL;
         }
@@ -126,7 +126,7 @@ namespace LCQPow {
 
     void SubsolverOSQP::setPrintlevl( bool verbose )
     {
-        if (settings != 0)
+        if (isNotNullPtr(settings))
             settings->verbose = verbose;
     }
 
@@ -138,7 +138,7 @@ namespace LCQPow {
                                         const double* const _lb, const double* const _ub )
     {
         // Make sure that lb and ub are null pointers, as OSQP does not handle box constraints
-        if (_lb != 0 || _ub != 0) {
+        if (isNotNullPtr(_lb) || isNotNullPtr(_ub)) {
             return ReturnValue::INVALID_OSQP_BOX_CONSTRAINTS;
         }
 
@@ -161,12 +161,12 @@ namespace LCQPow {
             data->u = u;
             osqp_setup(&work, data, settings);
 
-            if (x0 != NULL)
+            if (isNotNullPtr(x0))
                 if (osqp_warm_start_x(work, x0) != 0)
                     return ReturnValue::OSQP_INITIAL_PRIMAL_GUESS_FAILED;
 
 
-            if (y0 != NULL)
+            if (isNotNullPtr(y0))
                 if (osqp_warm_start_y(work, y0) != 0)
                     return ReturnValue::OSQP_INITIAL_DUAL_GUESS_FAILED;
         } else {
@@ -199,7 +199,7 @@ namespace LCQPow {
     {
         OSQPSolution *sol(work->solution);
 
-        if (sol->x != 0) {
+        if (isNotNullPtr(sol->x)) {
             memcpy(x, sol->x, (size_t)nV*(sizeof(double)));
         }
 
@@ -220,11 +220,11 @@ namespace LCQPow {
         H = copy_csc_mat(rhs.H);
         A = copy_csc_mat(rhs.A);
 
-        if (rhs.settings != 0) {
+        if (isNotNullPtr(rhs.settings)) {
             settings = copy_settings(rhs.settings);
         }
 
-        if (rhs.data != 0) {
+        if (isNotNullPtr(rhs.data)) {
             double* l = (double*)malloc((size_t)nC*sizeof(double));
             double* u = (double*)malloc((size_t)nC*sizeof(double));
             double* g = (double*)malloc((size_t)nV*sizeof(double));

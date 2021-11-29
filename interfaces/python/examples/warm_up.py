@@ -32,11 +32,9 @@ retVal = lcqp.runSolver()
 if retVal is not lcqpow.ReturnValue.SUCCESSFUL_RETURN:
     print("Failed to solve LCQP.")
 
-xOpt = np.zeros(2)
-yOpt = np.zeros(nV+nC+2*nComp) 
 stats = lcqpow.OutputStatistics()
-lcqp.getPrimalSolution(xOpt)
-lcqp.getDualSolution(yOpt)
+xOpt = lcqp.getPrimalSolution()
+yOpt = lcqp.getDualSolution()
 lcqp.getOutputStatistics(stats)
 print("xOpt = ", xOpt)
 print("yOpt = ", yOpt)
