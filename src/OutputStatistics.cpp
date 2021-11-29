@@ -198,6 +198,12 @@ namespace LCQPow {
     }
 
 
+    std::vector<int> OutputStatistics::getInnerItersStdVec( ) const
+    {
+        return innerIters;
+    }
+
+
     int* OutputStatistics::getSubproblemIters( ) const
     {
         if(subproblemIters.size() == 0)
@@ -208,6 +214,11 @@ namespace LCQPow {
             vals[i] = subproblemIters[i];
 
         return vals;
+    }
+
+    std::vector<int> OutputStatistics::getSubproblemItersStdVec( ) const
+    {
+        return subproblemIters;
     }
 
 
@@ -221,6 +232,11 @@ namespace LCQPow {
             vals[i] = accuSubproblemIters[i];
 
         return vals;
+    }
+
+    std::vector<int> OutputStatistics::getAccuSubproblemItersStdVec( ) const
+    {
+        return accuSubproblemIters;
     }
 
 
@@ -237,6 +253,12 @@ namespace LCQPow {
     }
 
 
+    std::vector<double> OutputStatistics::getStepLengthStdVec( ) const
+    {
+        return stepLength;
+    }
+
+
     double* OutputStatistics::getStepSize( ) const
     {
         if(stepSize.size() == 0)
@@ -247,6 +269,12 @@ namespace LCQPow {
             vals[i] = stepSize[i];
 
         return vals;
+    }
+
+
+    std::vector<double> OutputStatistics::getStepSizeStdVec( ) const
+    {
+        return stepSize;
     }
 
 
@@ -263,6 +291,12 @@ namespace LCQPow {
     }
 
 
+    std::vector<double> OutputStatistics::getStatValsStdVec( ) const
+    {
+        return statVals;
+    }
+
+
     double* OutputStatistics::getObjVals( ) const
     {
         if(objVals.size() == 0)
@@ -273,6 +307,12 @@ namespace LCQPow {
             vals[i] = objVals[i];
 
         return vals;
+    }
+
+
+    std::vector<double> OutputStatistics::getObjValsStdVec( ) const
+    {
+        return objVals;
     }
 
 
@@ -289,6 +329,12 @@ namespace LCQPow {
     }
 
 
+    std::vector<double> OutputStatistics::getPhiValsStdVec( ) const
+    {
+        return phiVals;
+    }
+
+
     double* OutputStatistics::getMeritVals( ) const
     {
         if(meritVals.size() == 0)
@@ -299,6 +345,12 @@ namespace LCQPow {
             vals[i] = meritVals[i];
 
         return vals;
+    }
+
+
+    std::vector<double> OutputStatistics::getMeritValsStdVec( ) const
+    {
+        return meritVals;
     }
 
 }

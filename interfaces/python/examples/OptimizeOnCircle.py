@@ -17,7 +17,7 @@ x_ref= np.array([0.5, -0.6])
 lcqp = lcqpow.LCQProblem(nV=nV, nC=nC, nComp=nComp)
 options = lcqpow.Options()
 options.setPrintLevel(lcqpow.PrintLevel.INNER_LOOP_ITERATES)
-options.setQPSolver(lcqpow.QPSolver.QPOASES_SPARSE)
+options.setQPSolver(lcqpow.QPSolver.OSQP_SPARSE)
 options.setStationarityTolerance(10e-3)
 lcqp.setOptions(options)
 
@@ -26,13 +26,10 @@ H = np.zeros([nV, nV])
 g = np.zeros(nV)
 S1 = np.zeros([nComp, nV])
 S2 = np.zeros([nComp, nV])
-print(g)
-print(S1)
-print(S2)
 A = np.zeros([nC, nV])
-lbA = np.zeros([nC])
-ubA = np.zeros([nC])
-x0 = np.zeros([nV])
+lbA = np.zeros(nC)
+ubA = np.zeros(nC)
+x0 = np.zeros(nV)
 
 x0[0] = x_ref[0]
 x0[1] = x_ref[1]
@@ -49,7 +46,7 @@ for i in range(2, nV, 1):
 
 # Objective linear term
 Hx = np.array([[17, -15], [-15, 17]])
-g = - np.dot(Hx, x_ref)
+g[:2] = - np.dot(Hx, x_ref)
 
 # Constraints
 for i in range(N):
@@ -77,7 +74,7 @@ lbA[N] = 1.0
 ubA[N] = 1.0
 
 # Solve first LCQP
-retVal = lcqp.loadLCQP(H=H, g=g, S1=S1, S2=S2, A=A, lbA=lbA, ubA=ubA, x0=x0)
+retVal = lcqp.loadLCQP(H=H, g=g, S1=S1.T, S2=S2.T, A=A.T, lbA=lbA, ubA=ubA, x0=x0)
 if retVal != lcqpow.ReturnValue.SUCCESSFUL_RETURN:
     print("Failed to load LCQP.")
 
@@ -90,8 +87,7 @@ stats = lcqpow.OutputStatistics()
 xOpt = lcqp.getPrimalSolution()
 yOpt = lcqp.getDualSolution()
 lcqp.getOutputStatistics(stats)
-print("xOpt = ", xOpt)
-print("yOpt = ", yOpt)
+print("xOpt = ", xOpt[0:2])
 print("i = ", stats.getIterTotal())
 print("k = ", stats.getIterOuter())
 print("rho = ", stats.getRhoOpt())

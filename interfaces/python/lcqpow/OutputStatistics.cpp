@@ -1,4 +1,7 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+
+#include <vector>
 
 #include "OutputStatistics.hpp"
 
@@ -17,15 +20,15 @@ PYBIND11_MODULE(OutputStatistics, m) {
     .def("getRhoOpt", &OutputStatistics::getRhoOpt)
     .def("getSolutionStatus", &OutputStatistics::getSolutionStatus)
     .def("getQPSolverExitFlag", &OutputStatistics::getQPSolverExitFlag)
-    .def("getInnerIters", &OutputStatistics::getInnerIters)
-    .def("getSubproblemIters", &OutputStatistics::getSubproblemIters)
-    .def("getAccuSubproblemIters", &OutputStatistics::getAccuSubproblemIters)
-    .def("getStepLength", &OutputStatistics::getStepLength)
-    .def("getStepSize", &OutputStatistics::getStepSize)
-    .def("getStatVals", &OutputStatistics::getStatVals)
-    .def("getObjVals", &OutputStatistics::getObjVals)
-    .def("getPhiVals", &OutputStatistics::getPhiVals)
-    .def("getMeritVals", &OutputStatistics::getMeritVals);
+    .def("getInnerIters", &OutputStatistics::getInnerItersStdVec)
+    .def("getSubproblemIters", &OutputStatistics::getSubproblemItersStdVec)
+    .def("getAccuSubproblemIters", &OutputStatistics::getAccuSubproblemItersStdVec)
+    .def("getStepLength", &OutputStatistics::getStepLengthStdVec)
+    .def("getStepSize", &OutputStatistics::getStepSizeStdVec)
+    .def("getStatVals", &OutputStatistics::getStatValsStdVec)
+    .def("getObjVals", &OutputStatistics::getObjValsStdVec)
+    .def("getPhiVals", &OutputStatistics::getPhiValsStdVec)
+    .def("getMeritVals", &OutputStatistics::getMeritValsStdVec);
 }
 
 } // namespace python

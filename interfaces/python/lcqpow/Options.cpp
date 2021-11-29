@@ -35,6 +35,7 @@ PYBIND11_MODULE(Options, m) {
     .def("setPrintLevel", static_cast<ReturnValue (Options::*)(PrintLevel)>(&Options::setPrintLevel))
     .def("setPrintLevel", static_cast<ReturnValue (Options::*)(int)>(&Options::setPrintLevel))
     .def("getStoreSteps", &Options::getStoreSteps)
+    .def("setStoreSteps", &Options::setStoreSteps)
     .def("getQPSolver", &Options::getQPSolver)
     .def("setQPSolver", static_cast<ReturnValue (Options::*)(QPSolver)>(&Options::setQPSolver))
     .def("setQPSolver", static_cast<ReturnValue (Options::*)(int)>(&Options::setQPSolver));

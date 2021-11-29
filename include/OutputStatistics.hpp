@@ -115,29 +115,56 @@ namespace LCQPow {
             /** Get values of inner loop iterates.*/
             int* getInnerIters( ) const;
 
+            /** Get values of inner loop iterates.*/
+            std::vector<int> getInnerItersStdVec( ) const;
+
             /** Get values of subsolver iterates.*/
             int* getSubproblemIters( ) const;
+
+            /** Get values of subsolver iterates.*/
+            std::vector<int> getSubproblemItersStdVec( ) const;
 
             /** Get accumulated number of subsolver iterates.*/
             int* getAccuSubproblemIters( ) const;
 
+            /** Get accumulated number of subsolver iterates.*/
+            std::vector<int> getAccuSubproblemItersStdVec( ) const;
+
             /** Get values of alpha.*/
             double* getStepLength( ) const;
+
+            /** Get values of alpha.*/
+            std::vector<double> getStepLengthStdVec( ) const;
 
             /** Get values of norm of pk.*/
             double* getStepSize( ) const;
 
+            /** Get values of norm of pk.*/
+            std::vector<double> getStepSizeStdVec( ) const;
+
             /** Get Lagrangian's gradient violaton values.*/
             double* getStatVals( ) const;
+
+            /** Get Lagrangian's gradient violaton values.*/
+            std::vector<double> getStatValsStdVec( ) const;
 
             /** Get objective function values.*/
             double* getObjVals( ) const;
 
+            /** Get objective function values.*/
+            std::vector<double> getObjValsStdVec( ) const;
+
             /** Get penalty function values.*/
             double* getPhiVals( ) const;
 
+            /** Get penalty function values.*/
+            std::vector<double> getPhiValsStdVec( ) const;
+
             /** Get merit function values.*/
             double* getMeritVals( ) const;
+
+            /** Get merit function values.*/
+            std::vector<double> getMeritValsStdVec( ) const;
 
         private:
             int iterTotal = 0;                                 /**< Total number of iterations, i.e., total number of inner iterations. */
