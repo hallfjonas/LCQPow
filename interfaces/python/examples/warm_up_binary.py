@@ -10,8 +10,8 @@ g = np.array([-2.0, -2.0])
 
 # 0 <= x _|_ y >= 0
 # 0 <= x _|_ 0.5 - x >= 0
-S1 = np.array([[1.0, 0.0], [1.0, 0.0]])
-S2 = np.array([[0.0, 1.0], [-1.0, 0.0]])
+S1 = np.array([[1.0, 1.0], [0.0, 0.0]])
+S2 = np.array([[0.0, -1.0], [1.0, 0.0]])
 lbS1 = np.array([0.0, 0.0])
 lbS2 = np.array([0.0, -0.5])
 
@@ -45,13 +45,18 @@ options.setSolveZeroPenaltyFirst(False)
 options.setInitialPenaltyParameter(10.0)
 lcqp.setOptions(options)
 retVal = lcqp.loadLCQP(H=H, g=g, S1=S1, S2=S2, lbS1=lbS1, lbS2=lbS2, x0=x0)
+if retVal is not lcqpow.ReturnValue.SUCCESSFUL_RETURN:
+    print("Failed to load LCQP.")
+
+retVal = lcqp.runSolver()
+
+if retVal is not lcqpow.ReturnValue.SUCCESSFUL_RETURN:
+    print("Failed to solve LCQP.")
 
 
-xOpt = np.zeros(2)
-yOpt = np.zeros(nV+nC+2*nComp) 
 stats = lcqpow.OutputStatistics()
-lcqp.getPrimalSolution(xOpt)
-lcqp.getDualSolution(yOpt)
+xOpt = lcqp.getPrimalSolution()
+yOpt = lcqp.getDualSolution()
 lcqp.getOutputStatistics(stats)
 print("xOpt = ", xOpt)
 print("yOpt = ", yOpt)

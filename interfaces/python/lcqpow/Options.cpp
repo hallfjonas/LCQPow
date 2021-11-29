@@ -14,6 +14,7 @@ PYBIND11_MODULE(Options, m) {
     .def(py::init<const Options&>(), py::arg("rhs"))
     .def("setToDefault", &Options::setToDefault)
     .def("getStationarityTolerance", &Options::getStationarityTolerance)
+    .def("setStationarityTolerance", &Options::setStationarityTolerance)
     .def("getComplementarityTolerance", &Options::getComplementarityTolerance)
     .def("setComplementarityTolerance", &Options::setComplementarityTolerance)
     .def("getInitialPenaltyParameter", &Options::getInitialPenaltyParameter)

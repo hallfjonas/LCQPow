@@ -74,7 +74,8 @@ PYBIND11_MODULE(LCQProblem, m) {
           py::arg("S1_file"), py::arg("S2_file"), 
           py::arg("lbS1_file")=nullptr, py::arg("ubS1_file")=nullptr, 
           py::arg("lbS2_file")=nullptr, py::arg("ubS2_file")=nullptr, 
-          py::arg("A_file")=nullptr, py::arg("lbA_file")=nullptr, py::arg("ubA_file")=nullptr, 
+          py::arg("A_file")=nullptr, 
+          py::arg("lbA_file")=nullptr, py::arg("ubA_file")=nullptr, 
           py::arg("lb_file")=nullptr, py::arg("ub_file")=nullptr, 
           py::arg("x0_file")=nullptr, py::arg("y0_file")=nullptr) 
     .def("runSolver", &LCQProblem::runSolver)
