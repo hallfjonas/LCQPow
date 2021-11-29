@@ -12,12 +12,24 @@ namespace python {
 
 namespace py = pybind11;
 
+
+inline const double* const getRawPtrFromEigenVectorXd(const Eigen::VectorXd& vec) {
+  if (vec.size() > 0) return vec.data();
+  else return static_cast<double*>(0);
+}
+
+
+inline const double* const getRawPtrFromEigenMatrixXd(const Eigen::MatrixXd& mat) {
+  if (mat.cols() > 0 && mat.rows() > 0)  return mat.data();
+  else return static_cast<double*>(0);
+}
+
+
 PYBIND11_MODULE(LCQProblem, m) {
   py::class_<LCQProblem>(m, "LCQProblem")
     .def(py::init<>())
     .def(py::init<int, int, int>(), 
-         py::arg("num_opt_vars"), py::arg("num_lin_constr"), 
-         py::arg("num_compl_pairs"))
+         py::arg("nV"), py::arg("nC"), py::arg("nComp"))
     .def("loadLCQP", [](LCQProblem& self, const Eigen::MatrixXd& H, 
                         const Eigen::VectorXd& g,  const Eigen::MatrixXd& S1, 
                         const Eigen::MatrixXd& S2, const Eigen::VectorXd& lbS1, 
@@ -27,14 +39,30 @@ PYBIND11_MODULE(LCQProblem, m) {
                         const Eigen::VectorXd& lb, const Eigen::VectorXd& ub,  
                         const Eigen::VectorXd& x0, const Eigen::VectorXd& y0) {
             return self.loadLCQP(H.data(), g.data(), S1.data(), S2.data(), 
-                                lbS1.data(), ubS1.data(), lbS2.data(), ubS2.data(),
-                                A.data(), lbA.data(), ubA.data(), 
-                                lb.data(), ub.data(), x0.data(), y0.data());
+                                 getRawPtrFromEigenVectorXd(lbS1),
+                                 getRawPtrFromEigenVectorXd(ubS1),
+                                 getRawPtrFromEigenVectorXd(lbS2),
+                                 getRawPtrFromEigenVectorXd(ubS2),
+                                 getRawPtrFromEigenMatrixXd(A),
+                                 getRawPtrFromEigenVectorXd(lbA),
+                                 getRawPtrFromEigenVectorXd(ubA),
+                                 getRawPtrFromEigenVectorXd(lb),
+                                 getRawPtrFromEigenVectorXd(ub),
+                                 getRawPtrFromEigenVectorXd(x0),
+                                 getRawPtrFromEigenVectorXd(y0));
           },
           py::arg("H"), py::arg("g"), py::arg("S1"), py::arg("S2"), 
-          py::arg("lbS1"), py::arg("ubS1"), py::arg("lbS2"), py::arg("ubS2"), 
-          py::arg("A"), py::arg("lbA"), py::arg("ubA"), 
-          py::arg("lb"), py::arg("ub"), py::arg("x0"), py::arg("y0"))
+          py::arg("lbS1")=Eigen::VectorXd::Zero(0), 
+          py::arg("ubS1")=Eigen::VectorXd::Zero(0), 
+          py::arg("lbS2")=Eigen::VectorXd::Zero(0), 
+          py::arg("ubS2")=Eigen::VectorXd::Zero(0), 
+          py::arg("A")=Eigen::MatrixXd::Zero(0, 0), 
+          py::arg("lbA")=Eigen::VectorXd::Zero(0), 
+          py::arg("ubA")=Eigen::VectorXd::Zero(0), 
+          py::arg("lb")=Eigen::VectorXd::Zero(0), 
+          py::arg("ub")=Eigen::VectorXd::Zero(0), 
+          py::arg("x0")=Eigen::VectorXd::Zero(0), 
+          py::arg("y0")=Eigen::VectorXd::Zero(0))
     .def("loadLCQPFromFile", static_cast<ReturnValue (LCQProblem::*)(
           const char* const, const char* const, const char* const, 
           const char* const, const char* const, const char* const, 
@@ -50,8 +78,12 @@ PYBIND11_MODULE(LCQProblem, m) {
           py::arg("lb_file")=nullptr, py::arg("ub_file")=nullptr, 
           py::arg("x0_file")=nullptr, py::arg("y0_file")=nullptr) 
     .def("runSolver", &LCQProblem::runSolver)
-    .def("getPrimalSolution", &LCQProblem::getPrimalSolution)
-    .def("getDualSolution", &LCQProblem::getDualSolution)
+    .def("getPrimalSolution", [](const LCQProblem& self, Eigen::VectorXd& xOpt) {
+            return self.getPrimalSolution(xOpt.data());
+         })
+    .def("getDualSolution", [](const LCQProblem& self, Eigen::VectorXd& yOpt) {
+            return self.getDualSolution(yOpt.data());
+         })
     .def("getNumerOfDuals", &LCQProblem::getNumerOfDuals)
     .def("getOutputStatistics", &LCQProblem::getOutputStatistics)
     .def("setOptions", &LCQProblem::setOptions);
