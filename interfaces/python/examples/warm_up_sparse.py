@@ -2,7 +2,7 @@ import lcqpow
 import numpy as np
 
 
-print("Preparing dense warm up problem...")
+print("Preparing sparse warm up problem...")
 
 # Setup data of first QP.
 H = np.array([[2.0, 0.0], [0.0, 2.0]])
@@ -21,12 +21,12 @@ options.setQPSolver(lcqpow.QPSolver.QPOASES_SPARSE)
 lcqp.setOptions(options)
 
 retVal = lcqp.loadLCQP(H=H, g=g, S1=S1, S2=S2)
-if retVal is not lcqpow.ReturnValue.SUCCESSFUL_RETURN:
+if retVal != lcqpow.ReturnValue.SUCCESSFUL_RETURN:
     print("Failed to load LCQP.")
 
 retVal = lcqp.runSolver()
 
-if retVal is not lcqpow.ReturnValue.SUCCESSFUL_RETURN:
+if retVal != lcqpow.ReturnValue.SUCCESSFUL_RETURN:
     print("Failed to solve LCQP.")
 
 stats = lcqpow.OutputStatistics()

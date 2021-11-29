@@ -26,6 +26,9 @@ H = np.zeros([nV, nV])
 g = np.zeros(nV)
 S1 = np.zeros([nComp, nV])
 S2 = np.zeros([nComp, nV])
+print(g)
+print(S1)
+print(S2)
 A = np.zeros([nC, nV])
 lbA = np.zeros([nC])
 ubA = np.zeros([nC])
@@ -75,12 +78,12 @@ ubA[N] = 1.0
 
 # Solve first LCQP
 retVal = lcqp.loadLCQP(H=H, g=g, S1=S1, S2=S2, A=A, lbA=lbA, ubA=ubA, x0=x0)
-if retVal is not lcqpow.ReturnValue.SUCCESSFUL_RETURN:
+if retVal != lcqpow.ReturnValue.SUCCESSFUL_RETURN:
     print("Failed to load LCQP.")
 
 retVal = lcqp.runSolver()
 
-if retVal is not lcqpow.ReturnValue.SUCCESSFUL_RETURN:
+if retVal != lcqpow.ReturnValue.SUCCESSFUL_RETURN:
     print("Failed to solve LCQP.")
 
 stats = lcqpow.OutputStatistics()

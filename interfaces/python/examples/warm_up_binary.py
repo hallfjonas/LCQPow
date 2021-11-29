@@ -29,12 +29,12 @@ lcqp.setOptions(options)
 
 # Solve first LCQP
 retVal = lcqp.loadLCQP(H=H, g=g, S1=S1, S2=S2, lbS1=lbS1, lbS2=lbS2, x0=x0)
-if retVal is not lcqpow.ReturnValue.SUCCESSFUL_RETURN:
+if retVal != lcqpow.ReturnValue.SUCCESSFUL_RETURN:
     print("Failed to load LCQP.")
 
 retVal = lcqp.runSolver()
 
-if retVal is not lcqpow.ReturnValue.SUCCESSFUL_RETURN:
+if retVal != lcqpow.ReturnValue.SUCCESSFUL_RETURN:
     print("Failed to solve LCQP.")
 
 
@@ -45,12 +45,12 @@ options.setSolveZeroPenaltyFirst(False)
 options.setInitialPenaltyParameter(10.0)
 lcqp.setOptions(options)
 retVal = lcqp.loadLCQP(H=H, g=g, S1=S1, S2=S2, lbS1=lbS1, lbS2=lbS2, x0=x0)
-if retVal is not lcqpow.ReturnValue.SUCCESSFUL_RETURN:
+if retVal != lcqpow.ReturnValue.SUCCESSFUL_RETURN:
     print("Failed to load LCQP.")
 
 retVal = lcqp.runSolver()
 
-if retVal is not lcqpow.ReturnValue.SUCCESSFUL_RETURN:
+if retVal != lcqpow.ReturnValue.SUCCESSFUL_RETURN:
     print("Failed to solve LCQP.")
 
 

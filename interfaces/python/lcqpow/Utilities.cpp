@@ -2,8 +2,6 @@
 
 #include "Utilities.hpp"
 
-#include <iostream>
-
 
 namespace LCQPow {
 namespace python {

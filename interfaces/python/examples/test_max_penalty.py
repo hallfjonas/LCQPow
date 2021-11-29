@@ -25,7 +25,7 @@ options.setMaxRho(1.0)
 lcqp.setOptions(options)
 
 retVal = lcqp.loadLCQP(H=H, g=g, S1=S1, S2=S2, x0=x0, y0=y0)
-if retVal is not lcqpow.ReturnValue.SUCCESSFUL_RETURN:
+if retVal != lcqpow.ReturnValue.SUCCESSFUL_RETURN:
     print("Failed to load LCQP.")
 
 retVal = lcqp.runSolver()

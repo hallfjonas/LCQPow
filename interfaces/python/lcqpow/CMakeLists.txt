@@ -10,6 +10,7 @@ macro(pybind11_add_lcqpow_module MODULE)
     ${MODULE} 
     PRIVATE
     ${EIGEN3_INCLUDE_DIR}
+    ${osqp_include}
   )
   target_link_libraries(
     ${MODULE} 
