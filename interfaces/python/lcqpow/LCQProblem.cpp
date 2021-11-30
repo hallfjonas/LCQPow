@@ -144,7 +144,7 @@ PYBIND11_MODULE(LCQProblem, m) {
           py::arg("ub")=Eigen::VectorXd::Zero(0), 
           py::arg("x0")=Eigen::VectorXd::Zero(0), 
           py::arg("y0")=Eigen::VectorXd::Zero(0))
-    .def("loadLCQPFromFile", static_cast<ReturnValue (LCQProblem::*)(
+    .def("loadLCQP", static_cast<ReturnValue (LCQProblem::*)(
           const char* const, const char* const, const char* const, 
           const char* const, const char* const, const char* const, 
           const char* const, const char* const, const char* const,

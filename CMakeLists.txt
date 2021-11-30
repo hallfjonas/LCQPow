@@ -434,6 +434,11 @@ if (${PYTHON_INTERFACE})
         COPY ${PYTHON_INTERFACE_DIR}/examples/
         DESTINATION ${PYTHON_INTERFACE_DESTINATION}
     )
+
+    file(
+        COPY ${PROJECT_SOURCE_DIR}/examples/example_data
+        DESTINATION ${PYTHON_INTERFACE_DESTINATION}
+    )
 endif()
 
 
