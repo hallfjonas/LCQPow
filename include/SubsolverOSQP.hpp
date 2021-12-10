@@ -92,6 +92,12 @@ namespace LCQPow {
             void copy(const SubsolverOSQP& rhs);
 
         private:
+			/** Checks wheather the ptr is null. */
+			template <typename PtrType>
+		    static bool isNotNullPtr(PtrType ptr) { 
+				  return (ptr != NULL && ptr != nullptr);
+			}
+
             int nV;                                 /**< Number of optimization variables. */
             int nC;                                 /**< Number of constraints. */
 
