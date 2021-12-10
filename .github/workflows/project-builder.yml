@@ -1,15 +1,12 @@
-name: CI build and run
 on: [push]
+
 jobs:
-  configure:
+  hello_world_job:
     runs-on: ubuntu-latest
+    name: A job to say hello
     steps:
-      - name: checkout
-        uses: actions/checkout@v2
-        with:
-          submodules: 'recursive'
-
-      - name: run
-        run: ./build.sh; ./run.sh;
-
-
+      - name: Hello world action step
+        id: hello
+        uses: actions/LCQPow_actions@v1
+      - name: Get the output time
+        run: ./build.sh        
