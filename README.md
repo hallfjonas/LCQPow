@@ -11,6 +11,7 @@ The entire strategy is presented in detail in [this paper](https://ieeexplore.ie
    * [qpOASES](https://github.com/coin-or/qpOASES)
    * [OSQP](https://github.com/osqp/osqp)
    * [googletest](https://github.com/google/googletest)
+   * [pybind11](https://github.com/pybind/pybind11)
 
 ## GETTING STARTED
 1. **Clone the repository**, and recursively initialize the submodules
@@ -35,6 +36,14 @@ $ bin/examples/warm_up
 $ bin/examples/warm_up_sparse
 $ bin/examples/warm_up_osqp
 $ bin/examples/OptimizeOnCircle
+```
+
+## Python Interface
+Thanks to a contribution by [Sotaro Katayama](https://github.com/mayataka) you can call the solver through its python interface. Doing so can be en/disabled by setting the flag **BUILD_PYTHON_INTERFACE=ON/OFF**, respectively. The python interface requires the **Eigen3** package. Make sure this is installed. On Ubuntu this can be achieved by running
+```
+apt install libeigen3-dev
+apt-get install python3-dev
+apt install python3.9-distutils
 ```
 
 ## MATLAB Interface
