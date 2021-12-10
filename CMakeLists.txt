@@ -59,7 +59,7 @@ option(
 )
 
 option(
-    PYTHON_INTERFACE
+    BUILD_PYTHON_INTERFACE
     "Option to build Python interface"
     ON
 )
@@ -116,6 +116,7 @@ message(
     "BUILD TYPE         ${CMAKE_BUILD_TYPE}\n"
     "EXAMPLES           ${BUILD_EXAMPLES}\n"
     "MATLAB INTERFACE   ${BUILD_MATLAB_INTERFACE}\n"
+    "PYTHON INTERFACE   ${BUILD_PYTHON_INTERFACE}\n"
     "DOCUMENTATION      ${BUILD_DOCUMENTATION}\n"
     "UNIT_TESTS         ${UNIT_TESTS}\n"
     "PROFILING          ${PROFILING}\n"
@@ -406,7 +407,7 @@ endif()
 
 ## Build Python interface ---------------------------------------------------------------
 
-if (${PYTHON_INTERFACE})
+if (${BUILD_PYTHON_INTERFACE})
     add_subdirectory(external/pybind11)
     add_subdirectory(interfaces/python/lcqpow)
 
