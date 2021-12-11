@@ -5,9 +5,9 @@ LCQPow is a open-source solver for Quadratic Programs with Complementarity Const
 The entire strategy is presented in detail in [this paper](https://ieeexplore.ieee.org/abstract/document/9439931).
 
 ## Requirements
-* Build process is currently only tested on Ubuntu 20.04
-* CMake version >= 3.20.3
-* All dependencies are linked automatically. These are
+* Build process is currently only tested on Ubuntu >= 18.04
+* CMake version >= 3.13.0
+* This project depends on a few external repos. These are included and linked automatically:
    * [qpOASES](https://github.com/coin-or/qpOASES)
    * [OSQP](https://github.com/osqp/osqp)
    * [googletest](https://github.com/google/googletest)
@@ -29,6 +29,17 @@ $ cd build
 $ cmake ..
 $ make
 ```
+You may specify the following flags (bracket represents default):
+```
+BUILD TYPE         [Release] / Debug
+EXAMPLES           [ON] /  OFF
+MATLAB INTERFACE   [ON] /  OFF
+PYTHON INTERFACE   [ON] /  OFF
+DOCUMENTATION      [ON] /  OFF
+UNIT_TESTS         [ON] /  OFF
+PROFILING           ON  / [OFF]
+QPOASES_SCHUR       ON  / [OFF]
+```
 
 3. To test the build you can **run the test examples**
 ```
@@ -39,11 +50,10 @@ $ bin/examples/OptimizeOnCircle
 ```
 
 ## Python Interface
-Thanks to a contribution by [Sotaro Katayama](https://github.com/mayataka) you can call the solver through its python interface. Doing so can be en/disabled by setting the flag **BUILD_PYTHON_INTERFACE=ON/OFF**, respectively. The python interface requires the **Eigen3** package. Make sure this is installed. On Ubuntu this can be achieved by running
+Thanks to a contribution by [Sotaro Katayama](https://github.com/mayataka) you can call the solver through its python interface. Doing so can be en/disabled by setting the respective cmake flag. The python interface requires the **Python 3 development** package as well as **Eigen3**. Make sure these are installed. On Ubuntu this can be achieved by running
 ```
 apt install libeigen3-dev
 apt-get install python3-dev
-apt install python3.9-distutils
 ```
 
 ## MATLAB Interface
@@ -73,3 +83,6 @@ Finally, you may contact the main author directly:
         Jonas Hall,  hall.f.jonas@gmail.com
 
 Also bug reports, source code enhancements or success stories are most welcome!
+
+## Logo Design
+Thank you Johanna Schmidt for designing this logo!
