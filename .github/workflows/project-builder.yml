@@ -8,5 +8,3 @@ jobs:
       - name: Build action step
         id: build
         uses: hallfjonas/LCQPow_actions@master
-        with:
-          args: --workdir /LCQPow
