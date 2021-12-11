@@ -1,12 +1,12 @@
 [submodule "external/osqp"]
 	path = external/osqp
-	url = git@github.com:osqp/osqp.git
+	url = https://github.com/osqp/osqp.git
 [submodule "external/qpOASES"]
 	path = external/qpOASES
-	url = git@github.com:coin-or/qpOASES.git
+	url = https://github.com/coin-or/qpOASES.git
 [submodule "external/googletest"]
 	path = external/googletest
-	url = git@github.com:google/googletest.git
+	url = https://github.com/google/googletest.git
 [submodule "external/pybind11"]
 	path = external/pybind11
 	url = https://github.com/pybind/pybind11.git
