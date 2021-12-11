@@ -7,4 +7,4 @@ jobs:
     steps:
       - name: Build action step
         id: build
-        uses: hallfjonas/LCQPow_actions@v2.2
+        uses: hallfjonas/LCQPow_actions@v2.3
