@@ -9,4 +9,4 @@ jobs:
         id: build
         uses: hallfjonas/LCQPow_actions@master
         with:
-          cwd: /LCQPow
+          args: --workdir /LCQPow
