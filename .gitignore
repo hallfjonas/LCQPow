@@ -22,12 +22,8 @@
 ### Directories ###
 build
 src/qpOASES
-debug
-examples/example_data/ivocp
-bin
-plots
-doxygen
 .vscode
+.venv
 
 ### C ###
 # Prerequisites
