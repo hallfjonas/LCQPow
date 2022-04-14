@@ -385,6 +385,56 @@ TEST(UtilitesTest, CSCtoTriangular) {
     ASSERT_DOUBLE_EQ(M_triag->nzmax, 3);
 }
 
+
+TEST(LoadDataTest, DenseToSparse) {
+
+    double Q[2*2] = { 2.0, 0.0, 0.0, 2.0 };
+    double g[2] = { -2.0, -2.0 };
+    double L[1*2] = {1.0, 0.0};
+    double R[1*2] = {0.0, 1.0};
+    int nV = 2;
+    int nC = 0;
+    int nComp = 1;
+
+    LCQPow::LCQProblem lcqp( nV, nC, nComp );
+
+	LCQPow::Options options;
+    options.setPrintLevel(LCQPow::PrintLevel::NONE);
+    lcqp.setOptions( options );
+    
+    // Load dense data
+    LCQPow::ReturnValue retVal = lcqp.loadLCQP( Q, g, L, R );
+    ASSERT_EQ(retVal, LCQPow::SUCCESSFUL_RETURN);
+    
+    // Switch to dense (should not do anything)
+    retVal = lcqp.switchToDenseMode( );
+    ASSERT_EQ(retVal, LCQPow::SUCCESSFUL_RETURN);
+
+    // Switch to sparse
+    retVal = lcqp.switchToSparseMode( );
+    ASSERT_EQ(retVal, LCQPow::SUCCESSFUL_RETURN);
+
+    // Switch to sparse (should not do anything)
+    retVal = lcqp.switchToSparseMode( );
+    ASSERT_EQ(retVal, LCQPow::SUCCESSFUL_RETURN);
+
+    // Solve in sparse mode
+    options.setQPSolver(LCQPow::QPOASES_SPARSE);
+    lcqp.setOptions( options );
+    retVal = lcqp.runSolver( );
+    ASSERT_EQ(retVal, LCQPow::SUCCESSFUL_RETURN);
+
+    // Switch back to dense
+    retVal = lcqp.switchToDenseMode( );
+    ASSERT_EQ(retVal, LCQPow::SUCCESSFUL_RETURN);
+
+    // Solve in dense mode
+    options.setQPSolver(LCQPow::QPOASES_DENSE);
+    lcqp.setOptions( options );
+    retVal = lcqp.runSolver( );
+    ASSERT_EQ(retVal, LCQPow::SUCCESSFUL_RETURN);   
+}
+
 // Testing LCQPow solver set up
 TEST(SolverTest, RunWarmUp) {
     double H[2*2] = { 2.0, 0.0, 0.0, 2.0 };
