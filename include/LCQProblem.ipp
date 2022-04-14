@@ -24,13 +24,13 @@
 namespace LCQPow {
 
 
-	inline ReturnValue LCQProblem::setH( const double* const H_new )
+	inline ReturnValue LCQProblem::setQ( const double* const Q_new )
 	{
 		if (nV <= 0)
 			return LCQPOBJECT_NOT_SETUP;
 
-		H = new double[nV*nV];
-		memcpy( H, H_new, (size_t)(nV*nV)*sizeof(double) );
+		Q = new double[nV*nV];
+		memcpy( Q, Q_new, (size_t)(nV*nV)*sizeof(double) );
 
 		return SUCCESSFUL_RETURN;
 	}

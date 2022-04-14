@@ -5,18 +5,18 @@ import numpy as np
 print("Preparing dense warm up problem...")
 
 # Setup data of first QP.
-H = np.array([[2.0, 0.0], 
+Q = np.array([[2.0, 0.0], 
               [0.0, 2.0]])
 g = np.array([-2.0, -2.0])
 
 # 0 <= x _|_ y >= 0
 # 0 <= x _|_ 0.5 - x >= 0
-S1 = np.array([[1.0, 1.0], 
+L = np.array([[1.0, 1.0], 
                [0.0, 0.0]])
-S2 = np.array([[0.0, -1.0], 
+R = np.array([[0.0, -1.0], 
                [1.0, 0.0]])
-lbS1 = np.array([0.0, 0.0])
-lbS2 = np.array([0.0, -0.5])
+lbL = np.array([0.0, 0.0])
+lbR = np.array([0.0, -0.5])
 
 x0 = np.array([0.0, 0.0])
 
@@ -31,7 +31,7 @@ options.setQPSolver(lcqpow.QPSolver.QPOASES_DENSE)
 lcqp.setOptions(options)
 
 # Solve first LCQP
-retVal = lcqp.loadLCQP(H=H, g=g, S1=S1, S2=S2, lbS1=lbS1, lbS2=lbS2, x0=x0)
+retVal = lcqp.loadLCQP(Q=Q, g=g, L=L, R=R, lbL=lbL, lbR=lbR, x0=x0)
 if retVal != lcqpow.ReturnValue.SUCCESSFUL_RETURN:
     print("Failed to load LCQP.")
 
@@ -47,7 +47,7 @@ x0[1] = 3000.0
 options.setSolveZeroPenaltyFirst(False)
 options.setInitialPenaltyParameter(10.0)
 lcqp.setOptions(options)
-retVal = lcqp.loadLCQP(H=H, g=g, S1=S1, S2=S2, lbS1=lbS1, lbS2=lbS2, x0=x0)
+retVal = lcqp.loadLCQP(Q=Q, g=g, L=L, R=R, lbL=lbL, lbR=lbR, x0=x0)
 if retVal != lcqpow.ReturnValue.SUCCESSFUL_RETURN:
     print("Failed to load LCQP.")
 

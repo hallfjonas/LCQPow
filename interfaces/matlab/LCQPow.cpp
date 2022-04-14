@@ -128,14 +128,14 @@ csc* readSparseMatrix(const mxArray* mat, int nRow, int nCol)
 
 void readVectors(
     const mxArray** prhs, int nrhs, int nC, double** g,
-    double** lbS1, double** ubS1, double** lbS2, double** ubS2,
+    double** lbL, double** ubL, double** lbR, double** ubR,
     double** lbA, double** ubA, double** lb, double** ub)
 {
     *g = (double*) mxGetPr( prhs[1] );
-    *lbS1 = (double*) mxGetPr( prhs[4] );
-    *ubS1 = (double*) mxGetPr( prhs[5] );
-    *lbS2 = (double*) mxGetPr( prhs[6] );
-    *ubS2 = (double*) mxGetPr( prhs[7] );
+    *lbL = (double*) mxGetPr( prhs[4] );
+    *ubL = (double*) mxGetPr( prhs[5] );
+    *lbR = (double*) mxGetPr( prhs[6] );
+    *ubR = (double*) mxGetPr( prhs[7] );
 
     if (nrhs == 10 || (nrhs == 11 && nC == 0)) {
         *lb = (double*) mxGetPr( prhs[8] );
@@ -160,9 +160,9 @@ int LCQPSparse(LCQProblem& lcqp, int nV, int nComp, int nC, int nrhs, const mxAr
     }
 
     // Read sparse matrices
-    csc* H = readSparseMatrix(prhs[0], nV, nV);
-    csc* S1 = readSparseMatrix(prhs[2], nComp, nV);
-    csc* S2 = readSparseMatrix(prhs[3], nComp, nV);
+    csc* Q = readSparseMatrix(prhs[0], nV, nV);
+    csc* L = readSparseMatrix(prhs[2], nComp, nV);
+    csc* R = readSparseMatrix(prhs[3], nComp, nV);
     csc* A = NULL;
     if (nC > 0) {
         A = readSparseMatrix(prhs[8], nC, nV);
@@ -170,27 +170,27 @@ int LCQPSparse(LCQProblem& lcqp, int nV, int nComp, int nC, int nrhs, const mxAr
 
     // Read vectors
     double* g;
-    double* lbS1 = NULL;
-    double* ubS1 = NULL;
-    double* lbS2 = NULL;
-    double* ubS2 = NULL;
+    double* lbL = NULL;
+    double* ubL = NULL;
+    double* lbR = NULL;
+    double* ubR = NULL;
     double* lbA = NULL;
     double* ubA = NULL;
     double* lb = NULL;
     double* ub = NULL;
 
     // Read all vectors
-    readVectors(prhs, nrhs, nC, &g, &lbS1, &ubS1, &lbS2, &ubS2, &lbA, &ubA, &lb, &ub);
+    readVectors(prhs, nrhs, nC, &g, &lbL, &ubL, &lbR, &ubR, &lbA, &ubA, &lb, &ub);
 
     // Load data into LCQP object
     LCQPow::ReturnValue ret = lcqp.loadLCQP(
-        H, g, S1, S2, lbS1, ubS1, lbS2, ubS2, A, lbA, ubA, lb, ub, x0, y0
+        Q, g, L, R, lbL, ubL, lbR, ubR, A, lbA, ubA, lb, ub, x0, y0
     );
 
     // Clear sparse specific memory
-    LCQPow::Utilities::ClearSparseMat(H);
-    LCQPow::Utilities::ClearSparseMat(S1);
-    LCQPow::Utilities::ClearSparseMat(S2);
+    LCQPow::Utilities::ClearSparseMat(Q);
+    LCQPow::Utilities::ClearSparseMat(L);
+    LCQPow::Utilities::ClearSparseMat(R);
     if (A != 0) LCQPow::Utilities::ClearSparseMat(A);
 
     return ret;
@@ -199,14 +199,14 @@ int LCQPSparse(LCQProblem& lcqp, int nV, int nComp, int nC, int nrhs, const mxAr
 int LCQPDense(LCQProblem& lcqp, int nV, int nComp, int nC, int nrhs, const mxArray* prhs[], const double* const x0, const double* const y0)
 {
     // Load data
-    double* H = NULL;
+    double* Q = NULL;
     double* g = NULL;
-    double* S1 = NULL;
-    double* S2 = NULL;
-    double* lbS1 = NULL;
-    double* ubS1 = NULL;
-    double* lbS2 = NULL;
-    double* ubS2 = NULL;
+    double* L = NULL;
+    double* R = NULL;
+    double* lbL = NULL;
+    double* ubL = NULL;
+    double* lbR = NULL;
+    double* ubR = NULL;
     double* lb = NULL;
     double* ub = NULL;
     double* A = NULL;
@@ -214,29 +214,29 @@ int LCQPDense(LCQProblem& lcqp, int nV, int nComp, int nC, int nrhs, const mxArr
     double* ubA = NULL;
 
     // Temporary matrices to keep the column major formats
-    double* S1_col = NULL;
-    double* S2_col = NULL;
+    double* L_col = NULL;
+    double* R_col = NULL;
     double* A_col = NULL;
 
-    H = (double*) mxGetPr( prhs[0] );
-    S1_col = (double*) mxGetPr( prhs[2] );
-    S2_col = (double*) mxGetPr( prhs[3] );
+    Q = (double*) mxGetPr( prhs[0] );
+    L_col = (double*) mxGetPr( prhs[2] );
+    R_col = (double*) mxGetPr( prhs[3] );
 
     if (nC > 0) {
         A_col = (double*) mxGetPr( prhs[8] );
     }
 
     // Read all vectors
-    readVectors(prhs, nrhs, nC, &g, &lbS1, &ubS1, &lbS2, &ubS2, &lbA, &ubA, &lb, &ub);
+    readVectors(prhs, nrhs, nC, &g, &lbL, &ubL, &lbR, &ubR, &lbA, &ubA, &lb, &ub);
 
     // MATLAB stores in column major format (switch to row major)
-    if (S1_col != NULL && nComp > 0 && nV > 0) {
-        S1 = new double[nComp*nV];
-        colMajorToRowMajor(S1_col, S1, nComp, nV);
+    if (L_col != NULL && nComp > 0 && nV > 0) {
+        L = new double[nComp*nV];
+        colMajorToRowMajor(L_col, L, nComp, nV);
     }
-    if (S2_col != NULL && nComp > 0 && nV > 0) {
-        S2 = new double[nComp*nV];
-        colMajorToRowMajor(S2_col, S2, nComp, nV);
+    if (R_col != NULL && nComp > 0 && nV > 0) {
+        R = new double[nComp*nV];
+        colMajorToRowMajor(R_col, R, nComp, nV);
     }
     if (A_col != NULL && nC > 0 && nV > 0) {
         A = new double[nC*nV];
@@ -244,17 +244,17 @@ int LCQPDense(LCQProblem& lcqp, int nV, int nComp, int nC, int nrhs, const mxArr
     }
 
     // Load data into LCQP object
-    LCQPow::ReturnValue ret = lcqp.loadLCQP(H, g, S1, S2, lbS1, ubS1, lbS2, ubS2, A, lbA, ubA, lb, ub, x0, y0);
+    LCQPow::ReturnValue ret = lcqp.loadLCQP(Q, g, L, R, lbL, ubL, lbR, ubR, A, lbA, ubA, lb, ub, x0, y0);
 
-    // Clear A, S1, S2
+    // Clear A, L, R
     if (A != 0)
         delete[] A;
 
-    if (S1 != 0)
-        delete[] S1;
+    if (L != 0)
+        delete[] L;
 
-    if (S2 != 0)
-        delete[] S2;
+    if (R != 0)
+        delete[] R;
 
     if (ret != LCQPow::ReturnValue::SUCCESSFUL_RETURN) {
         mexPrintf("Failed to load LCQP.\n");
@@ -305,7 +305,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     // Get number of complementarity constraints
     if (mxIsEmpty(prhs[2]) || !mxIsDouble(prhs[2])) {
         char *errorMsg = (char*)malloc(100*sizeof(char));
-        sprintf(errorMsg, "Invalid input argument: S1 must be a non-empty double matrix.\n");
+        sprintf(errorMsg, "Invalid input argument: L must be a non-empty double matrix.\n");
         mexErrMsgTxt(errorMsg);
         free(errorMsg);
         return;
@@ -329,10 +329,10 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     }
 
     // Check all dimensions (except for params)
-    if (!checkDimensionAndTypeDouble(prhs[0], nV, nV, "H")) return;
+    if (!checkDimensionAndTypeDouble(prhs[0], nV, nV, "Q")) return;
     if (!checkDimensionAndTypeDouble(prhs[1], nV, 1, "g")) return;
-    if (!checkDimensionAndTypeDouble(prhs[2], nComp, nV, "S1")) return;
-    if (!checkDimensionAndTypeDouble(prhs[3], nComp, nV, "S2")) return;
+    if (!checkDimensionAndTypeDouble(prhs[2], nComp, nV, "L")) return;
+    if (!checkDimensionAndTypeDouble(prhs[3], nComp, nV, "R")) return;
 
     if (nrhs == 10 && !checkDimensionAndTypeDouble(prhs[8], nV, 1, "lb", true)) return;
     if (nrhs == 10 && !checkDimensionAndTypeDouble(prhs[9], nV, 1, "ub", true)) return;

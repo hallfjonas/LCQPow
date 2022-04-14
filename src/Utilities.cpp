@@ -115,7 +115,7 @@ namespace LCQPow {
         }
     }
 
-    csc* Utilities::MatrixSymmetrizationProduct(double* S1_x, int* S1_i, int* S1_p, double* S2_x, int* S2_i, int* S2_p, int n) {
+    csc* Utilities::MatrixSymmetrizationProduct(double* L_x, int* L_i, int* L_p, double* R_x, int* R_i, int* R_p, int n) {
         std::vector<int> C_rows;
         std::vector<double> C_data;
         int* C_p = (int*) malloc((size_t)(n+1)*sizeof(int));
@@ -126,20 +126,20 @@ namespace LCQPow {
             for (int i = 0; i < n; i++) {
                 double tmp = 0;
 
-                // (S1'*S2)_ij
-                for (int k = S1_p[i]; k < S1_p[i+1]; k++) {
-                    int ind_s2 = getIndexOfIn(S1_i[k], S2_i, S2_p[j], S2_p[j+1]);
+                // (L'*R)_ij
+                for (int k = L_p[i]; k < L_p[i+1]; k++) {
+                    int ind_s2 = getIndexOfIn(L_i[k], R_i, R_p[j], R_p[j+1]);
                     if (ind_s2 != -1) {
-                        tmp += S1_x[k]*S2_x[ind_s2];
+                        tmp += L_x[k]*R_x[ind_s2];
                     }
                 }
 
-                // (S2'*S1)_ij
-                for (int k = S2_p[i]; k < S2_p[i+1]; k++) {
-                    int ind_s1 = getIndexOfIn(S2_i[k], S1_i, S1_p[j], S1_p[j+1]);
+                // (R'*L)_ij
+                for (int k = R_p[i]; k < R_p[i+1]; k++) {
+                    int ind_s1 = getIndexOfIn(R_i[k], L_i, L_p[j], L_p[j+1]);
 
                     if (ind_s1 != -1) {
-                        tmp += S2_x[k]*S1_x[ind_s1];
+                        tmp += R_x[k]*L_x[ind_s1];
                     }
                 }
 
@@ -168,8 +168,8 @@ namespace LCQPow {
     }
 
 
-    csc* Utilities::MatrixSymmetrizationProduct(csc* S1, csc* S2) {
-        return MatrixSymmetrizationProduct(S1->x, S1->i, S1->p, S2->x, S2->i, S2->p, S1->n);
+    csc* Utilities::MatrixSymmetrizationProduct(csc* L, csc* R) {
+        return MatrixSymmetrizationProduct(L->x, L->i, L->p, R->x, R->i, R->p, L->n);
     }
 
 
@@ -619,33 +619,33 @@ namespace LCQPow {
 
     csc* Utilities::dns_to_csc(const double* const full, int m, int n)
     {
-        std::vector<double> H_data;
-        std::vector<int> H_rows;
-        int* H_p = (int*)malloc((size_t)(n+1)*sizeof(int));
-        H_p[0] = 0;
+        std::vector<double> Q_data;
+        std::vector<int> Q_rows;
+        int* Q_p = (int*)malloc((size_t)(n+1)*sizeof(int));
+        Q_p[0] = 0;
 
         for (int i = 0; i < n; i++) {
             // Begin column pointer with previous value
-            H_p[i+1] = H_p[i];
+            Q_p[i+1] = Q_p[i];
 
             for (int j = 0; j < m; j++) {
                 if (full[j*n + i] > 0 || full[j*n + i] < 0) {
-                    H_data.push_back(full[j*n + i]);
-                    H_rows.push_back(j);
-                    H_p[i+1]++;
+                    Q_data.push_back(full[j*n + i]);
+                    Q_rows.push_back(j);
+                    Q_p[i+1]++;
                 }
             }
         }
 
-        int* H_i = (int*)malloc((size_t)H_p[n] * sizeof(int));
-        double* H_x = (double*)malloc((size_t)H_p[n] * sizeof(double));
+        int* Q_i = (int*)malloc((size_t)Q_p[n] * sizeof(int));
+        double* Q_x = (double*)malloc((size_t)Q_p[n] * sizeof(double));
 
-        for (int i = 0; i < H_p[n]; i++) {
-            H_i[i] = H_rows[(size_t)i];
-            H_x[i] = H_data[(size_t)i];
+        for (int i = 0; i < Q_p[n]; i++) {
+            Q_i[i] = Q_rows[(size_t)i];
+            Q_x[i] = Q_data[(size_t)i];
         }
 
-        csc* sparse = createCSC(m, n, H_p[n], H_x, H_i, H_p);
+        csc* sparse = createCSC(m, n, Q_p[n], Q_x, Q_i, Q_p);
         return sparse;
     }
 

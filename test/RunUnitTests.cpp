@@ -246,43 +246,43 @@ TEST(UtilitiesTest, CSCtoDNS) {
 
     int m = 2;
     int n = 3;
-    int H_nnx = 3;
-    double H_data[3] = { 2.0, 1.0, 2.0 };
-    int H_i[3] = {0, 0, 1};
-    int H_p[4] = {0, 1, 3, 4};
+    int Q_nnx = 3;
+    double Q_data[3] = { 2.0, 1.0, 2.0 };
+    int Q_i[3] = {0, 0, 1};
+    int Q_p[4] = {0, 1, 3, 4};
 
-    csc* H = csc_matrix(m, n, H_nnx, H_data, H_i, H_p);
+    csc* Q = csc_matrix(m, n, Q_nnx, Q_data, Q_i, Q_p);
 
-    double* H_full = LCQPow::Utilities::csc_to_dns(H);
-    ASSERT_TRUE(H_full != 0);
+    double* Q_full = LCQPow::Utilities::csc_to_dns(Q);
+    ASSERT_TRUE(Q_full != 0);
 
-    ASSERT_DOUBLE_EQ(H_full[0], 2);
-    ASSERT_DOUBLE_EQ(H_full[1], 1);
-    ASSERT_DOUBLE_EQ(H_full[2], 0);
-    ASSERT_DOUBLE_EQ(H_full[3], 0);
-    ASSERT_DOUBLE_EQ(H_full[4], 2);
-    ASSERT_DOUBLE_EQ(H_full[5], 0);
-    delete[] H_full;
+    ASSERT_DOUBLE_EQ(Q_full[0], 2);
+    ASSERT_DOUBLE_EQ(Q_full[1], 1);
+    ASSERT_DOUBLE_EQ(Q_full[2], 0);
+    ASSERT_DOUBLE_EQ(Q_full[3], 0);
+    ASSERT_DOUBLE_EQ(Q_full[4], 2);
+    ASSERT_DOUBLE_EQ(Q_full[5], 0);
+    delete[] Q_full;
 
     // Modify some values: Second test matrix
     // | 2 0 0  |
     // | 1 0 10 |
-    H_data[2] = 10;
-    H_p[1] = 2;
-    H_p[2] = 2;
-    H_i[1] = 1;
-    H = csc_matrix(m, n, H_nnx, H_data, H_i, H_p);
+    Q_data[2] = 10;
+    Q_p[1] = 2;
+    Q_p[2] = 2;
+    Q_i[1] = 1;
+    Q = csc_matrix(m, n, Q_nnx, Q_data, Q_i, Q_p);
 
-    H_full = LCQPow::Utilities::csc_to_dns(H);
-    ASSERT_TRUE(H_full != 0);
+    Q_full = LCQPow::Utilities::csc_to_dns(Q);
+    ASSERT_TRUE(Q_full != 0);
 
-    ASSERT_EQ(H_full[0], 2);
-    ASSERT_EQ(H_full[1], 0);
-    ASSERT_EQ(H_full[2], 0);
-    ASSERT_EQ(H_full[3], 1);
-    ASSERT_EQ(H_full[4], 0);
-    ASSERT_EQ(H_full[5], 10);
-    delete[] H_full;
+    ASSERT_EQ(Q_full[0], 2);
+    ASSERT_EQ(Q_full[1], 0);
+    ASSERT_EQ(Q_full[2], 0);
+    ASSERT_EQ(Q_full[3], 1);
+    ASSERT_EQ(Q_full[4], 0);
+    ASSERT_EQ(Q_full[5], 10);
+    delete[] Q_full;
 
     // Transpose: Third test matrix
     // | 2  1 |
@@ -318,7 +318,7 @@ TEST(UtilitiesTest, SparseDenseBackAndForth) {
     srand((unsigned int)time(NULL));
 
     for (int i = 0; i < numExp; i++) {
-        double* H = new double[m*n]();
+        double* Q = new double[m*n]();
 
         // Monitor number of nonzeros
         int nnx = 0;
@@ -331,23 +331,23 @@ TEST(UtilitiesTest, SparseDenseBackAndForth) {
 
             // Only fill even integers (i.e should be rougly 25% filled).
             if (rd % 4 == 0) {
-                H[j] = rd % 9;
+                Q[j] = rd % 9;
                 nnx++;
             }
         }
 
         // Convert to sparse
-        csc* H_sparse = LCQPow::Utilities::dns_to_csc(H, m, n);
+        csc* Q_sparse = LCQPow::Utilities::dns_to_csc(Q, m, n);
 
-        double* H_control = LCQPow::Utilities::csc_to_dns(H_sparse);
+        double* Q_control = LCQPow::Utilities::csc_to_dns(Q_sparse);
 
         for (int j = 0; j < m*n; j++)
-            ASSERT_DOUBLE_EQ(H_control[j], H[j]);
+            ASSERT_DOUBLE_EQ(Q_control[j], Q[j]);
 
         // Clear memory
-        delete[] H;
-        delete[] H_control;
-        c_free(H_sparse);
+        delete[] Q;
+        delete[] Q_control;
+        c_free(Q_sparse);
     }
 }
 
@@ -437,10 +437,10 @@ TEST(LoadDataTest, DenseToSparse) {
 
 // Testing LCQPow solver set up
 TEST(SolverTest, RunWarmUp) {
-    double H[2*2] = { 2.0, 0.0, 0.0, 2.0 };
+    double Q[2*2] = { 2.0, 0.0, 0.0, 2.0 };
     double g[2] = { -2.0, -2.0 };
-    double S1[1*2] = {1.0, 0.0};
-    double S2[1*2] = {0.0, 1.0};
+    double L[1*2] = {1.0, 0.0};
+    double R[1*2] = {0.0, 1.0};
     int nV = 2;
     int nC = 0;
     int nComp = 1;
@@ -459,7 +459,7 @@ TEST(SolverTest, RunWarmUp) {
 
     for (int i = 0; i < numExp; i++) {
 
-        LCQPow::ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2 );
+        LCQPow::ReturnValue retVal = lcqp.loadLCQP( Q, g, L, R );
         ASSERT_EQ(retVal, LCQPow::SUCCESSFUL_RETURN);
 
         retVal = lcqp.runSolver( );

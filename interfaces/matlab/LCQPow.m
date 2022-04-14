@@ -20,22 +20,22 @@
 % LCQPow is intended for solving quadratic programs with
 % linear complementarity constraints of the form
 %
-%           minimize   1/2*x'Hx + x'g
-%             s.t.    0  = x'*S1'*S2*x
-%                  lbS1 <= S1*x <= ubS1
-%                  lbS2 <= S2*x <= ubS2
+%           minimize   1/2*x'Qx + x'g
+%             s.t.    0  = x'*L'*R*x
+%                  lbL <= L*x <= ubL
+%                  lbR <= R*x <= ubR
 %                   lbA <=  Ax  <= ubA     {optional}
 %                    lb <=   x  <= ub      {optional}
 %
 % I) Call
 %
-%    [x,{y, stats}] = LCQPow( H,g,S1,S2,lbS1,ubS1,lbS2,ubS2,{params} )
+%    [x,{y, stats}] = LCQPow( Q,g,L,R,lbL,ubL,lbR,ubR,{params} )
 % or
-%    [x,{y, stats}] = LCQPow( H,g,S1,S2,lbS1,ubS1,lbS2,ubS2,lb,ub,{params} )
+%    [x,{y, stats}] = LCQPow( Q,g,L,R,lbL,ubL,lbR,ubR,lb,ub,{params} )
 % or
-%    [x,{y, stats}] = LCQPow( H,g,S1,S2,lbS1,ubS1,lbS2,ubS2,A,lbA,ubA,{params} )
+%    [x,{y, stats}] = LCQPow( Q,g,L,R,lbL,ubL,lbR,ubR,A,lbA,ubA,{params} )
 % or
-%    [x,{y, stats}] = LCQPow( H,g,S1,S2,lbS1,ubS1,lbS2,ubS2,A,lbA,ubA,lb,ub,{params}).
+%    [x,{y, stats}] = LCQPow( Q,g,L,R,lbL,ubL,lbR,ubR,A,lbA,ubA,lb,ub,{params}).
 %
 % II) The optional params struct may contain the following fields:
 %

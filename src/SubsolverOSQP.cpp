@@ -34,17 +34,17 @@ namespace LCQPow {
      }
 
 
-    SubsolverOSQP::SubsolverOSQP(   const csc* const _H, const csc* const _A)
+    SubsolverOSQP::SubsolverOSQP(   const csc* const _Q, const csc* const _A)
     {
         // Store dimensions
-        nV = _H->n;
+        nV = _Q->n;
         nC = _A->m;
 
         // Allocate memory for settings
         settings = (OSQPSettings *)c_malloc(sizeof(OSQPSettings));
 
         // Copy matrices
-        H = Utilities::copyCSC(_H, true);
+        Q = Utilities::copyCSC(_Q, true);
         A = Utilities::copyCSC(_A);
 
         // Define solver settings
@@ -91,9 +91,9 @@ namespace LCQPow {
             data = NULL;
         }
 
-        if (isNotNullPtr(H)) {
-            Utilities::ClearSparseMat(H);
-            H = NULL;
+        if (isNotNullPtr(Q)) {
+            Utilities::ClearSparseMat(Q);
+            Q = NULL;
         }
 
         if (isNotNullPtr(A)) {
@@ -154,7 +154,7 @@ namespace LCQPow {
             data = (OSQPData *)c_malloc(sizeof(OSQPData));
             data->n = nV;
             data->m = nC;
-            data->P = H;
+            data->P = Q;
             data->A = A;
             data->q = g;
             data->l = l;
@@ -217,7 +217,7 @@ namespace LCQPow {
         nV = rhs.nV;
         nC = rhs.nC;
 
-        H = copy_csc_mat(rhs.H);
+        Q = copy_csc_mat(rhs.Q);
         A = copy_csc_mat(rhs.A);
 
         if (isNotNullPtr(rhs.settings)) {
@@ -235,7 +235,7 @@ namespace LCQPow {
             data = (OSQPData *)c_malloc(sizeof(OSQPData));
             data->n = nV;
             data->m = nC;
-            data->P = H;
+            data->P = Q;
             data->A = A;
             data->q = g;
             data->l = l;

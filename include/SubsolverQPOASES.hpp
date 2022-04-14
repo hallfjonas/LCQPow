@@ -36,12 +36,12 @@ namespace LCQPow {
              *
              * @param nV Number of optimization variables.
              * @param nC Number of linear constraints (should include complementarity pairs).
-             * @param H The Hessian matrix in dense format.
+             * @param Q The Hessian matrix in dense format.
              * @param A The linear constraint matrix in dense format (should include the rows of the complementarity selector matrices).
             */
             SubsolverQPOASES(   int nV,
                                 int nC,
-                                double* H,
+                                double* Q,
                                 double* A);
 
 
@@ -49,12 +49,12 @@ namespace LCQPow {
              *
              * @param nV Number of optimization variables.
              * @param nC Number of linear constraints (should include complementarity pairs).
-             * @param H The Hessian matrix in sparse csc format.
+             * @param Q The Hessian matrix in sparse csc format.
              * @param A The linear constraint matrix in sparse csc format (should include the rows of the complementarity selector matrices).
             */
             SubsolverQPOASES(   int nV,
                                 int nC,
-                                csc* H,
+                                csc* Q,
                                 csc* A);
 
 
@@ -120,15 +120,15 @@ namespace LCQPow {
             bool isSparse = false;                      /**< A flag storing whether data is given in sparse or dense format. */
             bool useSchur = false;                      /**< A flag indicating whether to use the Shur Complement method. */
 
-            double* H = NULL;                           /**< Hessian matrix in dense format. */
+            double* Q = NULL;                           /**< Hessian matrix in dense format. */
             double* A = NULL;                           /**< Constraint matrix in dense format (should contain rows of compl. sel. matrices). */
 
-            qpOASES::SymSparseMat* H_sparse = NULL;     /**< Hessian matrix as qpOASES symmetric sparse matrix. */
+            qpOASES::SymSparseMat* Q_sparse = NULL;     /**< Hessian matrix as qpOASES symmetric sparse matrix. */
             qpOASES::SparseMatrix* A_sparse = NULL;     /**< Constraint matrix as qpOASES sparse matrix (should contain rows of compl. sel. matrices). */
 
-            double* H_x = NULL;                         /**< Hessian matrix sparse data (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
-            int* H_i = NULL;                          /**< Hessian matrix sparse rows (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
-            int* H_p = NULL;                          /**< Hessian matrix sparse col pointers (required because one cannot copy a symmetric(sprase) qpOASES mat                           rix). */
+            double* Q_x = NULL;                         /**< Hessian matrix sparse data (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
+            int* Q_i = NULL;                          /**< Hessian matrix sparse rows (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
+            int* Q_p = NULL;                          /**< Hessian matrix sparse col pointers (required because one cannot copy a symmetric(sprase) qpOASES mat                           rix). */
 
             double* A_x = NULL;                         /**< Constraint matrix sparse data (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
             int* A_i = NULL;                          /**< Constraint matrix sparse rows (required because one cannot copy a symmetric(sprase) qpOASES matrix). */

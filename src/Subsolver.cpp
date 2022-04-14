@@ -30,26 +30,26 @@ namespace LCQPow {
 
 
     Subsolver::Subsolver(   int nV, int nC,
-                            double* H, double* A )
+                            double* Q, double* A )
     {
         qpSolver = QPSolver::QPOASES_DENSE;
 
-        SubsolverQPOASES tmp(nV, nC, H, A);
+        SubsolverQPOASES tmp(nV, nC, Q, A);
         solverQPOASES = tmp;
     }
 
 
     Subsolver::Subsolver(   int nV, int nC,
-                            csc* H, csc* A,
+                            csc* Q, csc* A,
                             QPSolver _qpSolver )
     {
         qpSolver = _qpSolver;
 
         if (qpSolver == QPSolver::QPOASES_SPARSE) {
-            SubsolverQPOASES tmp(nV, nC, H, A);
+            SubsolverQPOASES tmp(nV, nC, Q, A);
             solverQPOASES = tmp;
         } else if (qpSolver == QPSolver::OSQP_SPARSE) {
-            SubsolverOSQP tmp(H, A);
+            SubsolverOSQP tmp(Q, A);
             solverOSQP = tmp;
         } else {
             MessageHandler::PrintMessage( INVALID_QPSOLVER, ERROR );

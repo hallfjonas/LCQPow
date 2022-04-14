@@ -63,10 +63,10 @@ namespace LCQPow {
 
 			/** Run solver passing the desired LCQP in dense format (qpOASES is used on subsolver level).
 			 *
-			 * @param _H The objective's hessian matrix.
+			 * @param _Q The objective's hessian matrix.
 			 * @param _g The obective's linear term.
-			 * @param _S1 The matrix selecting the left hand side of the complementarity pairs.
-			 * @param _S2 The matrix selecting the right hand side of the complementarity pairs.
+			 * @param _L The matrix selecting the left hand side of the complementarity pairs.
+			 * @param _R The matrix selecting the right hand side of the complementarity pairs.
 			 * @param _A The constraint matrix. A `NULL` pointer can be passed if no linear constraints exist.
 			 * @param _lbA The lower bounds associated to the constraint matrix `_A`. A `NULL` pointer can be passed if no lower bounds exist.
 			 * @param _ubA The upper bounds associated to the constraint matrix `_A`. A `NULL` pointer can be passed if no upper bounds exist.
@@ -78,14 +78,14 @@ namespace LCQPow {
 			 * @returns SUCCESSFUL_RETURN if a solution is found. Otherwise the return value will indicate an occured error.
 			*/
 			ReturnValue loadLCQP(
-				const double* const _H,
+				const double* const _Q,
 				const double* const _g,
-				const double* const _S1,
-				const double* const _S2,
-				const double* const lbS1 = 0,
-				const double* const ubS1 = 0,
-				const double* const lbS2 = 0,
-				const double* const ubS2 = 0,
+				const double* const _L,
+				const double* const _R,
+				const double* const lbL = 0,
+				const double* const ubL = 0,
+				const double* const lbR = 0,
+				const double* const ubR = 0,
 				const double* const _A = 0,
 				const double* const _lbA = 0,
 				const double* const _ubA = 0,
@@ -99,10 +99,10 @@ namespace LCQPow {
 			/** Run solver passing the desired LCQP in (file) dense format (qpOASES is used on subsolver level).
 			 *  All matrices are assumed to be stored row-wise.
 			 *
-			 * @param H_file The objective's hessian matrix.
+			 * @param Q_file The objective's hessian matrix.
 			 * @param g_file The obective's linear term.
-			 * @param S1_file The matrix selecting the left hand side of the complementarity pairs.
-			 * @param S2_file The matrix selecting the right hand side of the complementarity pairs.
+			 * @param L_file The matrix selecting the left hand side of the complementarity pairs.
+			 * @param R_file The matrix selecting the right hand side of the complementarity pairs.
 			 * @param A_file The constraint matrix. A `NULL` pointer can be passed if no linear constraints exist.
 			 * @param lbA_file The lower bounds associated to the constraint matrix `_A`. A `NULL` pointer can be passed if no lower bounds exist.
 			 * @param ubA_file The upper bounds associated to the constraint matrix `_A`. A `NULL` pointer can be passed if no upper bounds exist.
@@ -114,14 +114,14 @@ namespace LCQPow {
 			 * @returns SUCCESSFUL_RETURN if a solution is found. Otherwise the return value will indicate an occured error.
 			*/
 			ReturnValue loadLCQP(
-				const char* const H_file,
+				const char* const Q_file,
 				const char* const g_file,
-				const char* const S1_file,
-				const char* const S2_file,
-				const char* const lbS1 = 0,
-				const char* const ubS1 = 0,
-				const char* const lbS2 = 0,
-				const char* const ubS2 = 0,
+				const char* const L_file,
+				const char* const R_file,
+				const char* const lbL = 0,
+				const char* const ubL = 0,
+				const char* const lbR = 0,
+				const char* const ubR = 0,
 				const char* const A_file = 0,
 				const char* const lbA_file = 0,
 				const char* const ubA_file = 0,
@@ -134,10 +134,10 @@ namespace LCQPow {
 
 			/** Run solver passing the desired LCQP in sparse format (OSQP is used on subsolver level).
 			 *
-			 * @param _H Hessian matrix in csc sparse format.
+			 * @param _Q Hessian matrix in csc sparse format.
 			 * @param _g The objective's linear term.
-			 * @param _S1 LHS of complementarity product in csc sparse format.
-			 * @param _S2 RHS of complementarity product in csc sparse format.
+			 * @param _L LHS of complementarity product in csc sparse format.
+			 * @param _R RHS of complementarity product in csc sparse format.
 			 * @param _A Constraint matrix in csc sparse format.
 			 * @param _lbA The constraints lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
 			 * @param _ubA The constraints upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
@@ -149,14 +149,14 @@ namespace LCQPow {
 			 * @returns SUCCESSFUL_RETURN if a solution is found. Otherwise the return value will indicate an occured error.
 			*/
 			ReturnValue loadLCQP(
-				const csc* const _H,
+				const csc* const _Q,
 				const double* const _g,
-				const csc* const _S1,
-				const csc* const _S2,
-				const double* const lbS1 = 0,
-				const double* const ubS1 = 0,
-				const double* const lbS2 = 0,
-				const double* const ubS2 = 0,
+				const csc* const _L,
+				const csc* const _R,
+				const double* const lbL = 0,
+				const double* const ubL = 0,
+				const double* const lbR = 0,
+				const double* const ubR = 0,
 				const csc* const _A = 0,
 				const double* const _lbA = 0,
 				const double* const _ubA = 0,
@@ -173,6 +173,7 @@ namespace LCQPow {
 
 			/** Switch to dense mode (if initialized with sparse data but want to use dense solver). */
 			ReturnValue switchToDenseMode( );
+
 
 			/** After problem is set up, call this function and solve the LCQP.
 			 *
@@ -247,25 +248,29 @@ namespace LCQPow {
 
 
 			/** Set the complementarity bounds. */
-			ReturnValue setComplementarityBounds(const double* const lbS1_new, const double* const ubS1_new, const double* const lbS2_new, const double* const ubS2_new);
+			ReturnValue setComplementarityBounds(const double* const lbL_new, const double* const ubL_new, const double* const lbR_new, const double* const ubR_new);
 
 
-			/** Store the (dense) Hessian matrix H internally.
+			/** Store the (dense) Hessian matrix Q internally.
 			 *
-			 * @param H_new New dense Hessian matrix (with correct dimension!), a shallow copy is made.
+			 * @param Q_new New dense Hessian matrix (with correct dimension!), a shallow copy is made.
 			 */
-			inline ReturnValue setH( const double* const H_new );
+			inline ReturnValue setQ( const double* const Q_new );
 
 
-			/** Store the (sparse) Hessian matrix H internally.
+			/** Store the (sparse) Hessian matrix Q internally.
 			 *
-			 * @param H_new Hessian matrix in csc sparse format.
+			 * @param Q_new Hessian matrix in csc sparse format.
 			 */
-			inline ReturnValue setH( const csc* const H_new );
+			inline ReturnValue setQ( const csc* const Q_new );
 
 
-
+			/** Store the objective linear component internally.
+			 *
+			 * @param g_new Objective linear component.
+			 */
 			inline ReturnValue setG( const double* const g_new );
+
 
 			/** Store the lower (box) bounds internally.
 			 *
@@ -305,15 +310,15 @@ namespace LCQPow {
 
 			/** Set the new linear constraint consisting of (dense) complementarity pairs and regular linear constraints.
 			 *
-			 * @param S1_new New lhs complementarity matrix.
-			 * @param S2_new New rhs complementarity matrix.
+			 * @param L_new New lhs complementarity matrix.
+			 * @param R_new New rhs complementarity matrix.
 			 * @param A_new New constraint matrix.
 			 * @param lbA New lower bounds for A.
 			 * @param ubA New upper bounds for A.
 			 */
 			ReturnValue setConstraints(
-				const double* const S1_new,
-				const double* const S2_new,
+				const double* const L_new,
+				const double* const R_new,
 				const double* const A_new,
 				const double* const lbA,
 				const double* const ubA
@@ -322,23 +327,23 @@ namespace LCQPow {
 
 			/** Set the new linear constraint consisting of (dense) complementarity pairs and regular linear constraints.
 			 *
-			 * @param S1_new LHS of complementarity product in csc sparse format.
-			 * @param S2_new RHS of complementarity product in csc sparse format.
+			 * @param L_new LHS of complementarity product in csc sparse format.
+			 * @param R_new RHS of complementarity product in csc sparse format.
 			 * @param A_new Constraint matrix in csc sparse format.
 			 * @param lbA The constraint's lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
 			 * @param ubA The constraint's upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
 			 */
 			ReturnValue setConstraints(
-				const csc* const S1_new,
-				const csc* const S2_new,
+				const csc* const L_new,
+				const csc* const R_new,
 				const csc* const A_new,
 				const double* const lbA,
 				const double* const ubA
 			);
 
 
-			/** Set the complementarity matrix (requires the constraints to be set) as the symmetrization product of S1 and S2.
-			 *  C = S1'*S2 + S2'*S1
+			/** Set the complementarity matrix (requires the constraints to be set) as the symmetrization product of L and R.
+			 *  C = L'*R + R'*L
 			 */
 			ReturnValue setC( );
 
@@ -351,7 +356,6 @@ namespace LCQPow {
 				const double* const _x0,
 				const double* const _y0
 			);
-
 
 			/** TODO: Write description. */
 			inline ReturnValue setSparseMatrix(
@@ -412,11 +416,10 @@ namespace LCQPow {
 			/** Called in runSolver to initialize variables. */
 			ReturnValue initializeSolver( );
 
-
 			/** Update the penalty linearization. */
 			void updateLinearization( );
 
-			/** Solves the qp subproblem wrt H, gk, A, S1, S2 .
+			/** Solves the qp subproblem wrt Q, gk, A, L, R .
 			 *
 			 * @param initialSolve Pass true on first solve of sequence, false on subsequent calls (initialization vs hotstart).
 			 */
@@ -485,7 +488,7 @@ namespace LCQPow {
 			int nDuals; 							/**< Number of duals variables. */
 			int boxDualOffset;						/**< Offset for linear constraint duals (i.e. 0 if no BC (Box Constraints) exist nV if BC exist). */
 
-			double* H = NULL;						/**< Objective Hessian term. */
+			double* Q = NULL;						/**< Objective Hessian term. */
 
 			double* g = NULL;						/**< Objective linear term. */
 
@@ -498,13 +501,13 @@ namespace LCQPow {
 			double* lbA = NULL;						/**< Lower bound vector (on constraints). */
 			double* ubA = NULL;						/**< Upper bound vector (on constraints). */
 
-			double* S1 = NULL;						/**< LHS of complementarity product. */
-			double* S2 = NULL;						/**< RHS of complementarity product. */
-			double* C = NULL;						/**< Complementarity matrix (S1'*S2 + S2'*S1). */
-			double* lbS1 = NULL;					/**< LHS Complementarity lower bounds. */
-			double* ubS1 = NULL;					/**< LHS Complementarity upper bounds. */
-			double* lbS2 = NULL;					/**< RHS Complementarity lower bounds. */
-			double* ubS2 = NULL;					/**< RHS Complementarity upper bounds. */
+			double* L = NULL;						/**< LHS of complementarity product. */
+			double* R = NULL;						/**< RHS of complementarity product. */
+			double* C = NULL;						/**< Complementarity matrix (L'*R + R'*L). */
+			double* lbL = NULL;					/**< LHS Complementarity lower bounds. */
+			double* ubL = NULL;					/**< LHS Complementarity upper bounds. */
+			double* lbR = NULL;					/**< RHS Complementarity lower bounds. */
+			double* ubR = NULL;					/**< RHS Complementarity upper bounds. */
 			double* g_phi = NULL;					/**< Linear Term of phi -(l_L'*R + l_R'*L). */
 			double phi_const = 0;					/**< Constant phi expression (l_L'*l_R). */
 
@@ -522,7 +525,7 @@ namespace LCQPow {
 			double alphak; 							/**< Optimal step length. */
 			double* lk_tmp = NULL;					/**< An auxiliar vector to help compute lkj. */
 
-			double* Qk = NULL;						/**< H + rho*C, required for stationarity and optimal step length. */
+			double* Qk = NULL;						/**< Q + rho*C, required for stationarity and optimal step length. */
 			double* statk = NULL;					/**< Stationarity of current iterate. */
 			double* constr_statk = NULL;			/**< Constraint contribution to stationarity equation. */
 			double* box_statk = NULL;				/**< Box Constraint contribution to stationarity equation. */
@@ -537,10 +540,10 @@ namespace LCQPow {
 
 			bool sparseSolver = false;				/**< Whether to use sparse algebra or dense. */
 
-			csc* H_sparse = NULL;					/**< Sparse objective Hessian matrix. */
+			csc* Q_sparse = NULL;					/**< Sparse objective Hessian matrix. */
 			csc* A_sparse = NULL;					/**< Sparse constraint matrix. */
-			csc* S1_sparse = NULL;					/**< Sparse S1. */
-			csc* S2_sparse = NULL;					/**< Sparse S2. */
+			csc* L_sparse = NULL;					/**< Sparse L. */
+			csc* R_sparse = NULL;					/**< Sparse R. */
 			csc* C_sparse = NULL;					/**< Sparse C. */
 			csc* Qk_sparse = NULL;					/**< Sparse Qk. */
 			std::vector<int> Qk_indices_of_C;		/**< Remember the indices of Qk corresponding to C (for fast Qk update). */

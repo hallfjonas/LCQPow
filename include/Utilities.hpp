@@ -134,10 +134,10 @@ namespace LCQPow {
             static void MatrixSymmetrizationProduct(const double* const A, const double* const B, double* C, int m, int n);
 
             // C = A'*B + B'*A
-            static csc* MatrixSymmetrizationProduct(double* S1_x, int* S1_i, int* S1_p, double* S2_x, int* S2_i, int* S2_p, int n);
+            static csc* MatrixSymmetrizationProduct(double* L_x, int* L_i, int* L_p, double* R_x, int* R_i, int* R_p, int n);
 
             // C = A'*B + B'*A
-            static csc* MatrixSymmetrizationProduct(csc* S1, csc* S2);
+            static csc* MatrixSymmetrizationProduct(csc* L, csc* R);
 
             // d = A*b + c
             static void AffineLinearTransformation(const double alpha, const double* const A, const double* const b, const double* const c, double* d, int m, int n);
@@ -208,8 +208,8 @@ namespace LCQPow {
              *
              * @param sparse A sparse matrix.
              * @param full A target pointer for the full matrix (expected to have size m*n).
-             * @param m Number of rows of `H_sparse` (in its dense representation).
-             * @param n Number of columns of `H_sparse` (in its dense representation).
+             * @param m Number of rows of `Q_sparse` (in its dense representation).
+             * @param n Number of columns of `Q_sparse` (in its dense representation).
              *
              * @returns An dense array representing sparse (or null pointer if failed).
              */

@@ -83,10 +83,10 @@ namespace LCQPow {
 	}
 
 
-	ReturnValue LCQProblem::loadLCQP(	const double* const _H, const double* const _g,
-										const double* const _S1, const double* const _S2,
-										const double* const _lbS1, const double* const _ubS1,
-										const double* const _lbS2, const double* const _ubS2,
+	ReturnValue LCQProblem::loadLCQP(	const double* const _Q, const double* const _g,
+										const double* const _L, const double* const _R,
+										const double* const _lbL, const double* const _ubL,
+										const double* const _lbR, const double* const _ubR,
 										const double* const _A, const double* const _lbA, const double* const _ubA,
 										const double* const _lb, const double* const _ub,
 										const double* const _x0, const double* const _y0
@@ -97,7 +97,7 @@ namespace LCQPow {
 		if ( nV <= 0 || nComp <= 0 )
             return( MessageHandler::PrintMessage(ReturnValue::LCQPOBJECT_NOT_SETUP, ERROR) );
 
-		ret = setH( _H );
+		ret = setQ( _Q );
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret, ERROR );
@@ -122,12 +122,12 @@ namespace LCQPow {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret, ERROR );
 
-		ret = setConstraints( _S1, _S2, _A, _lbA, _ubA );
+		ret = setConstraints( _L, _R, _A, _lbA, _ubA );
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret, ERROR );
 
-		ret = setComplementarityBounds( _lbS1, _ubS1, _lbS2, _ubS2 );
+		ret = setComplementarityBounds( _lbL, _ubL, _lbR, _ubR );
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret, ERROR );
@@ -143,10 +143,10 @@ namespace LCQPow {
 	}
 
 
-	ReturnValue LCQProblem::loadLCQP(	const char* const H_file, const char* const g_file,
-										const char* const S1_file, const char* const S2_file,
-										const char* const lbS1_file, const char* const ubS1_file,
-										const char* const lbS2_file, const char* const ubS2_file,
+	ReturnValue LCQProblem::loadLCQP(	const char* const Q_file, const char* const g_file,
+										const char* const L_file, const char* const R_file,
+										const char* const lbL_file, const char* const ubL_file,
+										const char* const lbR_file, const char* const ubR_file,
 										const char* const A_file, const char* const lbA_file, const char* const ubA_file,
 										const char* const lb_file, const char* const ub_file,
 										const char* const x0_file, const char* const y0_file
@@ -154,10 +154,10 @@ namespace LCQPow {
 	{
 		ReturnValue ret;
 
-		double* _H = new double[nV*nV];
-		ret = Utilities::readFromFile( _H, nV*nV, H_file );
+		double* _Q = new double[nV*nV];
+		ret = Utilities::readFromFile( _Q, nV*nV, Q_file );
 		if ( ret != SUCCESSFUL_RETURN ) {
-			delete[] _H;
+			delete[] _Q;
 			return MessageHandler::PrintMessage( ret, ERROR );
 		}
 
@@ -168,59 +168,59 @@ namespace LCQPow {
 			return MessageHandler::PrintMessage( ret, ERROR );
 		}
 
-		double* _S1 = new double[nComp*nV];
-		ret = Utilities::readFromFile( _S1, nComp*nV, S1_file );
+		double* _L = new double[nComp*nV];
+		ret = Utilities::readFromFile( _L, nComp*nV, L_file );
 		if ( ret != SUCCESSFUL_RETURN ) {
-			delete[] _S1;
+			delete[] _L;
 			return MessageHandler::PrintMessage( ret, ERROR );
 		}
 
-		double* _S2 = new double[nComp*nV];
-		ret = Utilities::readFromFile( _S2, nComp*nV, S2_file );
+		double* _R = new double[nComp*nV];
+		ret = Utilities::readFromFile( _R, nComp*nV, R_file );
 		if ( ret != SUCCESSFUL_RETURN ) {
-			delete[] _S2;
+			delete[] _R;
 			return MessageHandler::PrintMessage( ret, ERROR );
 		}
 
-		double* _lbS1 = NULL;
-		if (isNotNullPtr(lbS1_file)) {
-			_lbS1 = new double[nComp];
-			ret = Utilities::readFromFile( _lbS1, nComp, lbS1_file );
+		double* _lbL = NULL;
+		if (isNotNullPtr(lbL_file)) {
+			_lbL = new double[nComp];
+			ret = Utilities::readFromFile( _lbL, nComp, lbL_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
-				delete[] _lbS1;
+				delete[] _lbL;
 				return MessageHandler::PrintMessage( ret, ERROR );
 			}
 		}
 
-		double* _ubS1 = NULL;
-		if (isNotNullPtr(ubS1_file)) {
-			_ubS1 = new double[nComp];
+		double* _ubL = NULL;
+		if (isNotNullPtr(ubL_file)) {
+			_ubL = new double[nComp];
 
-			ret = Utilities::readFromFile( _ubS1, nComp, ubS1_file );
+			ret = Utilities::readFromFile( _ubL, nComp, ubL_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
-				delete[] _ubS1;
+				delete[] _ubL;
 				return MessageHandler::PrintMessage( ret, ERROR );
 			}
 		}
 
-		double* _lbS2 = NULL;
-		if (isNotNullPtr(lbS2_file)) {
-			_lbS2 = new double[nComp];
+		double* _lbR = NULL;
+		if (isNotNullPtr(lbR_file)) {
+			_lbR = new double[nComp];
 
-			ret = Utilities::readFromFile( _lbS2, nComp, lbS2_file );
+			ret = Utilities::readFromFile( _lbR, nComp, lbR_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
-				delete[] _lbS2;
+				delete[] _lbR;
 				return MessageHandler::PrintMessage( ret, ERROR );
 			}
 		}
 
-		double* _ubS2 = NULL;
-		if (isNotNullPtr(ubS2_file)) {
-			_ubS2 = new double[nComp];
+		double* _ubR = NULL;
+		if (isNotNullPtr(ubR_file)) {
+			_ubR = new double[nComp];
 
-			ret = Utilities::readFromFile( _ubS2, nComp, ubS2_file );
+			ret = Utilities::readFromFile( _ubR, nComp, ubR_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
-				delete[] _ubS2;
+				delete[] _ubR;
 				return MessageHandler::PrintMessage( ret, ERROR );
 			}
 		}
@@ -296,8 +296,8 @@ namespace LCQPow {
 		}
 
 		// Fill vaues
-		ret = setH( _H );
-		delete[] _H;
+		ret = setQ( _Q );
+		delete[] _Q;
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret, ERROR );
@@ -325,9 +325,9 @@ namespace LCQPow {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret, ERROR);
 
-		ret = setConstraints( _S1, _S2, _A, _lbA, _ubA );
+		ret = setConstraints( _L, _R, _A, _lbA, _ubA );
 
-		delete[] _S1; delete[] _S2;
+		delete[] _L; delete[] _R;
 
 		if (isNotNullPtr(_A)) 
 			delete[] _A;
@@ -341,7 +341,7 @@ namespace LCQPow {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret, ERROR );
 
-		ret = setComplementarityBounds( _lbS1, _ubS1, _lbS2, _ubS2 );
+		ret = setComplementarityBounds( _lbL, _ubL, _lbR, _ubR );
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret, ERROR );
@@ -360,10 +360,10 @@ namespace LCQPow {
 	}
 
 
-	ReturnValue LCQProblem::loadLCQP(	const csc* const _H, const double* const _g,
-										const csc* const _S1, const csc* const _S2,
-										const double* const _lbS1, const double* const _ubS1,
-										const double* const _lbS2, const double* const _ubS2,
+	ReturnValue LCQProblem::loadLCQP(	const csc* const _Q, const double* const _g,
+										const csc* const _L, const csc* const _R,
+										const double* const _lbL, const double* const _ubL,
+										const double* const _lbR, const double* const _ubR,
 										const csc* const _A, const double* const _lbA, const double* const _ubA,
 										const double* const _lb, const double* const _ub,
 										const double* const _x0, const double* const _y0
@@ -371,7 +371,7 @@ namespace LCQPow {
 	{
 		ReturnValue ret;
 
-		ret = setH( _H );
+		ret = setQ( _Q );
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret, ERROR );
@@ -381,12 +381,12 @@ namespace LCQPow {
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret, ERROR );
 
-		ret = setConstraints( _S1, _S2, _A, _lbA, _ubA );
+		ret = setConstraints( _L, _R, _A, _lbA, _ubA );
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret, ERROR );
 
-		ret = setComplementarityBounds( _lbS1, _ubS1, _lbS2, _ubS2 );
+		ret = setComplementarityBounds( _lbL, _ubL, _lbR, _ubR );
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret, ERROR );
@@ -439,7 +439,7 @@ namespace LCQPow {
 			}
 		}
 
-		// Initialize Qk = H + rhok*C
+		// Initialize Qk = Q + rhok*C
 		setQk();
 
 		// Initialize stats.rho_opt
@@ -532,7 +532,7 @@ namespace LCQPow {
 	}
 
 
-	ReturnValue LCQProblem::setConstraints( 	const double* const S1_new, const double* const S2_new,
+	ReturnValue LCQProblem::setConstraints( 	const double* const L_new, const double* const R_new,
 												const double* const A_new, const double* const lbA_new, const double* const ubA_new )
 	{
 		if ( nV == 0 || nComp == 0 )
@@ -548,10 +548,10 @@ namespace LCQPow {
 			A[i] = A_new[i];
 
 		for (int i = 0; i < nComp*nV; i++)
-			A[i + nC*nV] = S1_new[i];
+			A[i + nC*nV] = L_new[i];
 
 		for (int i = 0; i < nComp*nV; i++)
-			A[i + nC*nV + nComp*nV] = S2_new[i];
+			A[i + nC*nV + nComp*nV] = R_new[i];
 
 		// Set up new constraint bounds (lbA; 0; 0) & (ubA; INFINITY; INFINITY)
 		lbA = new double[nC + 2*nComp];
@@ -580,34 +580,34 @@ namespace LCQPow {
 		}
 
 		// Set complementarities
-		if ( isNullPtr(S1_new) || isNullPtr(S2_new) )
+		if ( isNullPtr(L_new) || isNullPtr(R_new) )
 			return INVALID_COMPLEMENTARITY_MATRIX;
 
-		S1 = new double[nComp*nV];
-		S2 = new double[nComp*nV];
+		L = new double[nComp*nV];
+		R = new double[nComp*nV];
 
 		for (int i = 0; i < nComp*nV; i++) {
-			S1[i] = S1_new[i];
-			S2[i] = S2_new[i];
+			L[i] = L_new[i];
+			R[i] = R_new[i];
 		}
 
 		C = new double[nV*nV];
-		Utilities::MatrixSymmetrizationProduct(S1, S2, C, nComp, nV);
+		Utilities::MatrixSymmetrizationProduct(L, R, C, nComp, nV);
 
 		return SUCCESSFUL_RETURN;
 	}
 
 
-	ReturnValue LCQProblem::setConstraints(	const csc* const S1_new, const csc* const S2_new,
+	ReturnValue LCQProblem::setConstraints(	const csc* const L_new, const csc* const R_new,
 											const csc* const A_new, const double* const lbA_new, const double* const ubA_new
 											)
 	{
 		// Create sparse matrices
-		S1_sparse = Utilities::copyCSC(S1_new);
-		S2_sparse = Utilities::copyCSC(S2_new);
+		L_sparse = Utilities::copyCSC(L_new);
+		R_sparse = Utilities::copyCSC(R_new);
 
 		// Get number of elements
-		int tmpA_nnx = S1_sparse->p[nV] + S2_sparse->p[nV];
+		int tmpA_nnx = L_sparse->p[nV] + R_sparse->p[nV];
 
 		if (isNotNullPtr(A_new)) {
 			tmpA_nnx += isNotNullPtr(A_new->p) ? A_new->p[nV] : 0;
@@ -639,18 +639,18 @@ namespace LCQPow {
 				}
 			}
 
-			// Then rows of S1
-			for (int j = S1_sparse->p[i]; j < S1_sparse->p[i+1]; j++) {
-				tmpA_data[index_data] = S1_sparse->x[j];
-				tmpA_i[index_data] = nC + S1_sparse->i[j];
+			// Then rows of L
+			for (int j = L_sparse->p[i]; j < L_sparse->p[i+1]; j++) {
+				tmpA_data[index_data] = L_sparse->x[j];
+				tmpA_i[index_data] = nC + L_sparse->i[j];
 				index_data++;
 				tmpA_p[i+1]++;
 			}
 
-			// Then rows of S2
-			for (int j = S2_sparse->p[i]; j < S2_sparse->p[i+1]; j++) {
-				tmpA_data[index_data] = S2_sparse->x[j];
-				tmpA_i[index_data] = nC + nComp + S2_sparse->i[j];
+			// Then rows of R
+			for (int j = R_sparse->p[i]; j < R_sparse->p[i+1]; j++) {
+				tmpA_data[index_data] = R_sparse->x[j];
+				tmpA_i[index_data] = nC + nComp + R_sparse->i[j];
 				index_data++;
 				tmpA_p[i+1]++;
 			}
@@ -685,7 +685,7 @@ namespace LCQPow {
 				ubA[i] = INFINITY;
 		}
 
-		C_sparse = Utilities::MatrixSymmetrizationProduct(S1_sparse, S2_sparse);
+		C_sparse = Utilities::MatrixSymmetrizationProduct(L_sparse, R_sparse);
 
 		if (isNullPtr(C_sparse)) {
 			return FAILED_SYM_COMPLEMENTARITY_MATRIX;
@@ -695,39 +695,39 @@ namespace LCQPow {
 	}
 
 
-	ReturnValue LCQProblem::setComplementarityBounds(const double* const lbS1_new, const double* const ubS1_new, const double* const lbS2_new, const double* const ubS2_new) {
+	ReturnValue LCQProblem::setComplementarityBounds(const double* const lbL_new, const double* const ubL_new, const double* const lbR_new, const double* const ubR_new) {
 
-		if (isNotNullPtr(lbS1_new )) {
-			lbS1 = new double[nComp];
+		if (isNotNullPtr(lbL_new )) {
+			lbL = new double[nComp];
 		}
 
-		if (isNotNullPtr(ubS1_new )) {
-			ubS1 = new double[nComp];
+		if (isNotNullPtr(ubL_new )) {
+			ubL = new double[nComp];
 		}
 
-		if (isNotNullPtr(lbS2_new )) {
-			lbS2 = new double[nComp];
+		if (isNotNullPtr(lbR_new )) {
+			lbR = new double[nComp];
 		}
 
-		if (isNotNullPtr(ubS2_new )) {
-			ubS2 = new double[nComp];
+		if (isNotNullPtr(ubR_new )) {
+			ubR = new double[nComp];
 		}
 
 		// Bounds on Lx
 		for (int i = 0; i < nComp; i++) {
-			if (isNotNullPtr(lbS1_new )) { 
-				if (lbS1_new[i] <= -INFINITY)
+			if (isNotNullPtr(lbL_new )) { 
+				if (lbL_new[i] <= -INFINITY)
 					return INVALID_LOWER_COMPLEMENTARITY_BOUND;
 
-				lbS1[i] = lbS1_new[i];
-				lbA[nC + i] = lbS1_new[i];
+				lbL[i] = lbL_new[i];
+				lbA[nC + i] = lbL_new[i];
 			} else {
 				lbA[nC + i] = 0;
 			}
 
-			if (isNotNullPtr(ubS1_new )) { 
-				ubS1[i] = ubS1_new[i];
-				ubA[nC + i] = ubS1_new[i];
+			if (isNotNullPtr(ubL_new )) { 
+				ubL[i] = ubL_new[i];
+				ubA[nC + i] = ubL_new[i];
 			} else {
 				ubA[nC + i] = INFINITY;
 			}
@@ -735,19 +735,19 @@ namespace LCQPow {
 
 		// Bounds on Rx
 		for (int i = 0; i < nComp; i++) {
-			if (isNotNullPtr(lbS2_new )) { 
-				if (lbS2_new[i] <= -INFINITY)
+			if (isNotNullPtr(lbR_new )) { 
+				if (lbR_new[i] <= -INFINITY)
 					return INVALID_LOWER_COMPLEMENTARITY_BOUND;
 
-				lbS2[i] = lbS2_new[i];
-				lbA[nC + nComp + i] = lbS2_new[i];
+				lbR[i] = lbR_new[i];
+				lbA[nC + nComp + i] = lbR_new[i];
 			} else {
 				lbA[nC + nComp + i] = 0;
 			}
 
-			if (isNotNullPtr(ubS2_new )) { 
-				ubS2[i] = ubS2_new[i];
-				ubA[nC + nComp + i] = ubS2_new[i];
+			if (isNotNullPtr(ubR_new )) { 
+				ubR[i] = ubR_new[i];
+				ubA[nC + nComp + i] = ubR_new[i];
 			} else {
 				ubA[nC + nComp + i] = INFINITY;
 			}
@@ -757,12 +757,12 @@ namespace LCQPow {
 	}
 
 
-	ReturnValue LCQProblem::setH( const csc* const H_new )
+	ReturnValue LCQProblem::setQ( const csc* const Q_new )
 	{
 		if (nV <= 0)
 			return LCQPOBJECT_NOT_SETUP;
 
-		H_sparse = Utilities::copyCSC(H_new);
+		Q_sparse = Utilities::copyCSC(Q_new);
 
 		return ReturnValue::SUCCESSFUL_RETURN;
 	}
@@ -780,20 +780,20 @@ namespace LCQPow {
 			for (int j = 0; j < nV; j++) {
 				Qk_p[j+1] = Qk_p[j];
 
-				int idx_H = H_sparse->p[j];
+				int idx_Q = Q_sparse->p[j];
 				int idx_C = C_sparse->p[j];
 
-				while (idx_H < H_sparse->p[j+1] || idx_C < C_sparse->p[j+1]) {
-					// Only elements of H left in this column
-					if (idx_H < H_sparse->p[j+1] && idx_C >= C_sparse->p[j+1]) {
-						Qk_data.push_back(H_sparse->x[idx_H]);
-						Qk_row.push_back(H_sparse->i[idx_H]);
+				while (idx_Q < Q_sparse->p[j+1] || idx_C < C_sparse->p[j+1]) {
+					// Only elements of Q left in this column
+					if (idx_Q < Q_sparse->p[j+1] && idx_C >= C_sparse->p[j+1]) {
+						Qk_data.push_back(Q_sparse->x[idx_Q]);
+						Qk_row.push_back(Q_sparse->i[idx_Q]);
 
-						idx_H++;
+						idx_Q++;
 					}
 
 					// Only elements of C left in this column
-					else if (idx_H >= H_sparse->p[j+1] && idx_C < C_sparse->p[j+1]) {
+					else if (idx_Q >= Q_sparse->p[j+1] && idx_C < C_sparse->p[j+1]) {
 						Qk_data.push_back(rho*C_sparse->x[idx_C]);
 						Qk_row.push_back(C_sparse->i[idx_C]);
 
@@ -802,16 +802,16 @@ namespace LCQPow {
 						idx_C++;
 					}
 
-					// Element of H is in higher row than C
-					else if (H_sparse->i[idx_H] < C_sparse->i[idx_C]) {
-						Qk_data.push_back(H_sparse->x[idx_H]);
-						Qk_row.push_back(H_sparse->i[idx_H]);
+					// Element of Q is in higher row than C
+					else if (Q_sparse->i[idx_Q] < C_sparse->i[idx_C]) {
+						Qk_data.push_back(Q_sparse->x[idx_Q]);
+						Qk_row.push_back(Q_sparse->i[idx_Q]);
 
-						idx_H++;
+						idx_Q++;
 					}
 
-					// Element of C are in higher row than H
-					else if (H_sparse->i[idx_H] > C_sparse->i[idx_C]) {
+					// Element of C are in higher row than Q
+					else if (Q_sparse->i[idx_Q] > C_sparse->i[idx_C]) {
 						Qk_data.push_back(rho*C_sparse->x[idx_C]);
 						Qk_row.push_back(C_sparse->i[idx_C]);
 
@@ -822,10 +822,10 @@ namespace LCQPow {
 
 					// Add both and update index only once!
 					else {
-						Qk_data.push_back(H_sparse->x[idx_H] + rho*C_sparse->x[idx_C]);
-						Qk_row.push_back(H_sparse->i[idx_H]);
+						Qk_data.push_back(Q_sparse->x[idx_Q] + rho*C_sparse->x[idx_C]);
+						Qk_row.push_back(Q_sparse->i[idx_Q]);
 
-						idx_H++;
+						idx_Q++;
 						idx_C++;
 
 						Qk_indices_of_C.push_back(Qk_p[j+1]);
@@ -849,7 +849,7 @@ namespace LCQPow {
 			Qk_data.clear();
 			Qk_row.clear();
 		} else {
-			Utilities::WeightedMatrixAdd(1, H, rho, C, Qk, nV, nV);
+			Utilities::WeightedMatrixAdd(1, Q, rho, C, Qk, nV, nV);
 		}
 	}
 
@@ -875,7 +875,7 @@ namespace LCQPow {
 			if (ret != SUCCESSFUL_RETURN)
 				return ret;
 
-			Subsolver tmp(nV, nC + 2*nComp, H, A);
+			Subsolver tmp(nV, nC + 2*nComp, Q, A);
 			subsolver = tmp;
 		} else if (options.getQPSolver() == QPSolver::QPOASES_SPARSE) {
 			nDuals = nV + nC + 2*nComp;
@@ -895,7 +895,7 @@ namespace LCQPow {
 			if (ret != SUCCESSFUL_RETURN)
 				return ret;
 
-			Subsolver tmp(nV, nC + 2*nComp, H_sparse, A_sparse, options.getQPSolver());
+			Subsolver tmp(nV, nC + 2*nComp, Q_sparse, A_sparse, options.getQPSolver());
 			subsolver = tmp;
 
 		} else if (options.getQPSolver() == QPSolver::OSQP_SPARSE) {
@@ -928,7 +928,7 @@ namespace LCQPow {
 				return ReturnValue::INVALID_OSQP_BOX_CONSTRAINTS;
 			}
 
-			Subsolver tmp(nV, nDuals, H_sparse, A_sparse, options.getQPSolver());
+			Subsolver tmp(nV, nDuals, Q_sparse, A_sparse, options.getQPSolver());
 			subsolver = tmp;
 		} else {
 			return ReturnValue::NOT_YET_IMPLEMENTED;
@@ -939,30 +939,30 @@ namespace LCQPow {
 		memcpy(g_tilde, g, (size_t)nV*sizeof(double));
 
 		// Phi expressions
-		if (isNotNullPtr(lbS1) || isNotNullPtr(lbS2)) 
-			phi_const = Utilities::DotProduct(lbS1, lbS2, nComp);
+		if (isNotNullPtr(lbL) || isNotNullPtr(lbR)) 
+			phi_const = Utilities::DotProduct(lbL, lbR, nComp);
 
 		// g_phi
-		if (isNotNullPtr(lbS1) || isNotNullPtr(lbS2)) {
+		if (isNotNullPtr(lbL) || isNotNullPtr(lbR)) {
 			g_phi = new double[nV]();
 
-			// (S2'*lb_S1 contribution)
-			if (isNotNullPtr(lbS1)) {
+			// (R'*lb_L contribution)
+			if (isNotNullPtr(lbL)) {
 				if (sparseSolver)
-					Utilities::AddTransponsedMatrixMultiplication(S2_sparse, lbS1, g_phi);
+					Utilities::AddTransponsedMatrixMultiplication(R_sparse, lbL, g_phi);
 				else
-					Utilities::AddTransponsedMatrixMultiplication(S2, lbS1, g_phi, nComp, nV, 1);
+					Utilities::AddTransponsedMatrixMultiplication(R, lbL, g_phi, nComp, nV, 1);
 			}
 
-			// (S1'*lb_S2 contribution)
-			if (isNotNullPtr(lbS2)) {
+			// (L'*lb_R contribution)
+			if (isNotNullPtr(lbR)) {
 				if (sparseSolver)
-					Utilities::AddTransponsedMatrixMultiplication(S1_sparse, lbS2, g_phi);
+					Utilities::AddTransponsedMatrixMultiplication(L_sparse, lbR, g_phi);
 				else
-					Utilities::AddTransponsedMatrixMultiplication(S1, lbS2, g_phi, nComp, nV, 1);
+					Utilities::AddTransponsedMatrixMultiplication(L, lbR, g_phi, nComp, nV, 1);
 			}
 
-			// Sign must be negative (really have 0 <= Lx - lbS1 and 0 <= Rx - lbS2)
+			// Sign must be negative (really have 0 <= Lx - lbL and 0 <= Rx - lbR)
 			for (int i = 0; i < nV; i++)
 				g_phi[i] = -g_phi[i];
 		}
@@ -1005,23 +1005,29 @@ namespace LCQPow {
 
 	ReturnValue LCQProblem::switchToSparseMode( )
 	{
-		H_sparse = Utilities::dns_to_csc(H, nV, nV);
+
+		// Only perform this action if required
+		if (sparseSolver){
+			return SUCCESSFUL_RETURN;
+		}
+
+		Q_sparse = Utilities::dns_to_csc(Q, nV, nV);
 		A_sparse = Utilities::dns_to_csc(A, nC + 2*nComp, nV);
 
-		S1_sparse = Utilities::dns_to_csc(S1, nComp, nV);
-		S2_sparse = Utilities::dns_to_csc(S2, nComp, nV);
+		L_sparse = Utilities::dns_to_csc(L, nComp, nV);
+		R_sparse = Utilities::dns_to_csc(R, nComp, nV);
 		C_sparse = Utilities::dns_to_csc(C, nV, nV);
 
 		// Make sure that all sparse matrices are not null pointer
-		if (isNullPtr(H_sparse) || isNullPtr(A_sparse) || isNullPtr(S1_sparse) || isNullPtr(S2_sparse) || isNullPtr(C_sparse)) {
+		if (isNullPtr(Q_sparse) || isNullPtr(A_sparse) || isNullPtr(L_sparse) || isNullPtr(R_sparse) || isNullPtr(C_sparse)) {
 			return FAILED_SWITCH_TO_SPARSE;
 		}
 
 		// Clean up dense data (only if succeeded)
-		delete[] H; H = NULL;
+		delete[] Q; Q = NULL;
 		delete[] A; A = NULL;
-		delete[] S1; S1 = NULL;
-		delete[] S2; S2 = NULL;
+		delete[] L; L = NULL;
+		delete[] R; R = NULL;
 		delete[] C; C = NULL;
 
 		// Toggle sparsity flag
@@ -1033,24 +1039,30 @@ namespace LCQPow {
 
 	ReturnValue LCQProblem::switchToDenseMode( )
 	{
-		H = Utilities::csc_to_dns(H_sparse);
+
+		// Only perform this action if required
+		if (!sparseSolver){
+			return SUCCESSFUL_RETURN;
+		}
+
+		Q = Utilities::csc_to_dns(Q_sparse);
 		A = Utilities::csc_to_dns(A_sparse);
 
-		S1 = Utilities::csc_to_dns(S1_sparse);
-		S2 = Utilities::csc_to_dns(S2_sparse);
+		L = Utilities::csc_to_dns(L_sparse);
+		R = Utilities::csc_to_dns(R_sparse);
 		C = Utilities::csc_to_dns(C_sparse);
 
 		// Make sure that all sparse matrices are not null pointer
-		if (isNullPtr(H) || isNullPtr(A) || isNullPtr(S1) || isNullPtr(S2) || isNullPtr(C)) {
+		if (isNullPtr(Q) || isNullPtr(A) || isNullPtr(L) || isNullPtr(R) || isNullPtr(C)) {
 			return FAILED_SWITCH_TO_DENSE;
 		}
 
 		// Clean up sparse data (only if succeeded)
 		Utilities::ClearSparseMat(&C_sparse);
 		Utilities::ClearSparseMat(&A_sparse);
-		Utilities::ClearSparseMat(&H_sparse);
-		Utilities::ClearSparseMat(&S1_sparse);
-		Utilities::ClearSparseMat(&S2_sparse);
+		Utilities::ClearSparseMat(&Q_sparse);
+		Utilities::ClearSparseMat(&L_sparse);
+		Utilities::ClearSparseMat(&R_sparse);
 
 		// Toggle sparsity flag
 		sparseSolver = false;
@@ -1119,9 +1131,9 @@ namespace LCQPow {
 		double lin = Utilities::DotProduct(g, xk, nV);
 
 		if (sparseSolver) {
-			return lin + Utilities::QuadraticFormProduct(H_sparse, xk, nV)/2.0;
+			return lin + Utilities::QuadraticFormProduct(Q_sparse, xk, nV)/2.0;
 		} else {
-			return lin + Utilities::QuadraticFormProduct(H, xk, nV)/2.0;
+			return lin + Utilities::QuadraticFormProduct(Q, xk, nV)/2.0;
 		}
 	}
 
@@ -1278,7 +1290,7 @@ namespace LCQPow {
 				Qk_sparse->x[Qk_indices_of_C[j]] += factor*C_sparse->x[j];
 			}
 		} else {
-			Utilities::WeightedMatrixAdd(1, H, rho, C, Qk, nV, nV);
+			Utilities::WeightedMatrixAdd(1, Q, rho, C, Qk, nV, nV);
 		}
 	}
 
@@ -1337,22 +1349,22 @@ namespace LCQPow {
 
 		double* tmp = new double[nComp];
 
-		// y_S1 = y - rho*S2*xk
+		// y_L = y - rho*R*xk
 		if (sparseSolver) {
-			Utilities::MatrixMultiplication(S2_sparse, xk, tmp);
+			Utilities::MatrixMultiplication(R_sparse, xk, tmp);
 		} else {
-			Utilities::MatrixMultiplication(S2, xk, tmp, nComp, nV, 1);
+			Utilities::MatrixMultiplication(R, xk, tmp, nComp, nV, 1);
 		}
 
 		for (int i = 0; i < nComp; i++) {
 			yk[boxDualOffset + nC + i] = yk[boxDualOffset + nC + i] - rho*tmp[i];
 		}
 
-		// y_S2 = y - rho*S1*xk
+		// y_R = y - rho*L*xk
 		if (sparseSolver) {
-			Utilities::MatrixMultiplication(S1_sparse, xk, tmp);
+			Utilities::MatrixMultiplication(L_sparse, xk, tmp);
 		} else {
-			Utilities::MatrixMultiplication(S1, xk, tmp, nComp, nV, 1);
+			Utilities::MatrixMultiplication(L, xk, tmp, nComp, nV, 1);
 		}
 
 		for (int i = 0; i < nComp; i++) {
@@ -1410,28 +1422,28 @@ namespace LCQPow {
 
 	std::vector<int> LCQProblem::getWeakComplementarities( )
 	{
-		double* S1x = new double[nComp];
-		double* S2x = new double[nComp];
+		double* Lx = new double[nComp];
+		double* Rx = new double[nComp];
 
 		if (sparseSolver) {
-			Utilities::MatrixMultiplication(S1_sparse, xk, S1x);
-			Utilities::MatrixMultiplication(S2_sparse, xk, S2x);
+			Utilities::MatrixMultiplication(L_sparse, xk, Lx);
+			Utilities::MatrixMultiplication(R_sparse, xk, Rx);
 		} else {
-			Utilities::MatrixMultiplication(S1, xk, S1x, nComp, nV, 1);
-			Utilities::MatrixMultiplication(S2, xk, S2x, nComp, nV, 1);
+			Utilities::MatrixMultiplication(L, xk, Lx, nComp, nV, 1);
+			Utilities::MatrixMultiplication(R, xk, Rx, nComp, nV, 1);
 		}
 
 		std::vector<int> indices;
 
 		for (int i = 0; i < nComp; i++) {
-			if (S1x[i] <= options.getComplementarityTolerance())
-				if (S2x[i] <= options.getComplementarityTolerance())
+			if (Lx[i] <= options.getComplementarityTolerance())
+				if (Rx[i] <= options.getComplementarityTolerance())
 					indices.push_back(i);
 		}
 
 		// Free memory
-		delete[] S1x;
-		delete[] S2x;
+		delete[] Lx;
+		delete[] Rx;
 
 		return indices;
 	}
@@ -1595,9 +1607,9 @@ namespace LCQPow {
 	/// Clear allocated memory
 	void LCQProblem::clear( )
 	{
-		if (isNotNullPtr(H)) {
-			delete[] H;
-			H = NULL;
+		if (isNotNullPtr(Q)) {
+			delete[] Q;
+			Q = NULL;
 		}
 
 		if (isNotNullPtr(g)) {
@@ -1640,14 +1652,14 @@ namespace LCQPow {
 			ubA = NULL;
 		}
 
-		if (isNotNullPtr(S1)) {
-			delete[] S1;
-			S1 = NULL;
+		if (isNotNullPtr(L)) {
+			delete[] L;
+			L = NULL;
 		}
 
-		if (isNotNullPtr(S2)) {
-			delete[] S2;
-			S2 = NULL;
+		if (isNotNullPtr(R)) {
+			delete[] R;
+			R = NULL;
 		}
 
 		if (isNotNullPtr(C)) {
@@ -1655,24 +1667,24 @@ namespace LCQPow {
 			C = NULL;
 		}
 
-		if (isNotNullPtr(lbS1)) {
-			delete[] lbS1;
-			lbS1 = NULL;
+		if (isNotNullPtr(lbL)) {
+			delete[] lbL;
+			lbL = NULL;
 		}
 
-		if (isNotNullPtr(ubS1)) {
-			delete[] ubS1;
-			ubS1 = NULL;
+		if (isNotNullPtr(ubL)) {
+			delete[] ubL;
+			ubL = NULL;
 		}
 
-		if (isNotNullPtr(lbS2)) {
-			delete[] lbS2;
-			lbS2 = NULL;
+		if (isNotNullPtr(lbR)) {
+			delete[] lbR;
+			lbR = NULL;
 		}
 
-		if (isNotNullPtr(ubS2)) {
-			delete[] ubS2;
-			ubS2 = NULL;
+		if (isNotNullPtr(ubR)) {
+			delete[] ubR;
+			ubR = NULL;
 		}
 
 		if (isNotNullPtr(g_phi)) {
@@ -1742,10 +1754,10 @@ namespace LCQPow {
 
 		Utilities::ClearSparseMat(&C_sparse);
 		Utilities::ClearSparseMat(&A_sparse);
-		Utilities::ClearSparseMat(&H_sparse);
+		Utilities::ClearSparseMat(&Q_sparse);
 		Utilities::ClearSparseMat(&Qk_sparse);
-		Utilities::ClearSparseMat(&S1_sparse);
-		Utilities::ClearSparseMat(&S2_sparse);
+		Utilities::ClearSparseMat(&L_sparse);
+		Utilities::ClearSparseMat(&R_sparse);
 	}
 }
 

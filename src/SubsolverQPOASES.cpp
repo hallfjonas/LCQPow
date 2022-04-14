@@ -10,8 +10,8 @@
  *	version 2.1 of the License, or (at your option) any later version.
  *
  *	LCQPow is distributed in the hope that it will be useful,
- *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *	but WITQOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCQANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
  *	You should have received a copy of the GNU Lesser General Public
@@ -30,7 +30,7 @@ namespace LCQPow {
 
 
     SubsolverQPOASES::SubsolverQPOASES( int _nV, int _nC,
-                                        double* _H, double* _A)
+                                        double* _Q, double* _A)
     {
         nV = _nV;
         nC = _nC;
@@ -38,16 +38,16 @@ namespace LCQPow {
         isSparse = false;
         qp = qpOASES::QProblem(nV, nC);
 
-        H = new double[nV*nV];
+        Q = new double[nV*nV];
         A = new double[nC*nV];
 
-        memcpy(H, _H, (size_t)(nV*nV)*sizeof(double));
+        memcpy(Q, _Q, (size_t)(nV*nV)*sizeof(double));
         memcpy(A, _A, (size_t)(nC*nV)*sizeof(double));
     }
 
 
     SubsolverQPOASES::SubsolverQPOASES( int _nV, int _nC,
-                                        csc* _H, csc* _A)
+                                        csc* _Q, csc* _A)
     {
         nV = _nV;
         nC = _nC;
@@ -66,9 +66,9 @@ namespace LCQPow {
             qp = qpOASES::QProblem(nV, nC);
         }
 
-        if (isNotNullPtr(H_sparse)) {
-            free(H_sparse);
-            H_sparse = NULL;
+        if (isNotNullPtr(Q_sparse)) {
+            free(Q_sparse);
+            Q_sparse = NULL;
         }
 
         if (isNotNullPtr(A_sparse)) {
@@ -76,25 +76,25 @@ namespace LCQPow {
             A_sparse = NULL;
         }
 
-        H_i = new int[_H->p[_nV]];
-        H_x = new double[_H->p[_nV]];
-        H_p = new int[_nV+1];
+        Q_i = new int[_Q->p[_nV]];
+        Q_x = new double[_Q->p[_nV]];
+        Q_p = new int[_nV+1];
 
         A_i = new int[_A->p[_nV]];
         A_x = new double[_A->p[_nV]];
         A_p = new int[_nV+1];
 
-        Utilities::copyIntToIntT(H_p, _H->p, nV+1);
-        Utilities::copyIntToIntT(H_i, _H->i, _H->p[nV]);
+        Utilities::copyIntToIntT(Q_p, _Q->p, nV+1);
+        Utilities::copyIntToIntT(Q_i, _Q->i, _Q->p[nV]);
         Utilities::copyIntToIntT(A_p, _A->p, nV+1);
         Utilities::copyIntToIntT(A_i, _A->i, _A->p[nV]);
 
-        memcpy(H_x, _H->x, (size_t)_H->p[nV]*sizeof(double));
+        memcpy(Q_x, _Q->x, (size_t)_Q->p[nV]*sizeof(double));
         memcpy(A_x, _A->x, (size_t)_A->p[nV]*sizeof(double));
 
-        H_sparse = new qpOASES::SymSparseMat(nV, nV, H_i, H_p, H_x);
+        Q_sparse = new qpOASES::SymSparseMat(nV, nV, Q_i, Q_p, Q_x);
         A_sparse = new qpOASES::SparseMatrix(nC, nV, A_i, A_p, A_x);
-        H_sparse->createDiagInfo();
+        Q_sparse->createDiagInfo();
         A_sparse->createDiagInfo();
     }
 
@@ -107,9 +107,9 @@ namespace LCQPow {
 
     SubsolverQPOASES::~SubsolverQPOASES()
     {
-        if (isNotNullPtr(H)) {
-            delete[] H;
-            H = NULL;
+        if (isNotNullPtr(Q)) {
+            delete[] Q;
+            Q = NULL;
         }
 
         if (isNotNullPtr(A)) {
@@ -117,16 +117,16 @@ namespace LCQPow {
             A = NULL;
         }
 
-        if (isNotNullPtr(H_i)) {
-            delete[] H_i;
+        if (isNotNullPtr(Q_i)) {
+            delete[] Q_i;
         }
 
-        if (isNotNullPtr(H_p)) {
-            delete[] H_p;
+        if (isNotNullPtr(Q_p)) {
+            delete[] Q_p;
         }
 
-        if (isNotNullPtr(H_x)) {
-            delete[] H_x;
+        if (isNotNullPtr(Q_x)) {
+            delete[] Q_x;
         }
 
         if (isNotNullPtr(A_x)) {
@@ -141,9 +141,9 @@ namespace LCQPow {
             delete[] A_x;
         }
 
-        if (isNotNullPtr(H_sparse)) {
-            delete H_sparse;
-            H_sparse = 0;
+        if (isNotNullPtr(Q_sparse)) {
+            delete Q_sparse;
+            Q_sparse = 0;
         }
 
         if (isNotNullPtr(A_sparse)) {
@@ -186,12 +186,12 @@ namespace LCQPow {
         if (initialSolve) {
             if (isSparse) {
                 if (useSchur) {
-                    ret = qpSchur.init(H_sparse, g, A_sparse, lb, ub, lbA, ubA, nwsr, (double*)0, x0, y0);
+                    ret = qpSchur.init(Q_sparse, g, A_sparse, lb, ub, lbA, ubA, nwsr, (double*)0, x0, y0);
                 } else {
-                    ret = qp.init(H_sparse, g, A_sparse, lb, ub, lbA, ubA, nwsr, (double*)0, x0, y0);
+                    ret = qp.init(Q_sparse, g, A_sparse, lb, ub, lbA, ubA, nwsr, (double*)0, x0, y0);
                 }
             } else {
-                ret = qp.init(H, g, A, lb, ub, lbA, ubA, nwsr, (double*)0, x0, y0);
+                ret = qp.init(Q, g, A, lb, ub, lbA, ubA, nwsr, (double*)0, x0, y0);
             }
         } else {
             if (useSchur) {
@@ -232,32 +232,32 @@ namespace LCQPow {
         useSchur = rhs.useSchur;
 
         if (isSparse) {
-            H_i = new int[rhs.H_p[nV]];
-            H_x = new double[rhs.H_p[nV]];
-            H_p = new int[nV+1];
+            Q_i = new int[rhs.Q_p[nV]];
+            Q_x = new double[rhs.Q_p[nV]];
+            Q_p = new int[nV+1];
 
             A_i = new int[rhs.A_p[nV]];
             A_x = new double[rhs.A_p[nV]];
             A_p = new int[nV+1];
 
 
-            memcpy(H_p, rhs.H_p, (size_t)(nV+1)*sizeof(int));
-            memcpy(H_i, rhs.H_i, (size_t)(rhs.H_p[nV])*sizeof(int));
-            memcpy(H_x, rhs.H_x, (size_t)(rhs.H_p[nV])*sizeof(double));
+            memcpy(Q_p, rhs.Q_p, (size_t)(nV+1)*sizeof(int));
+            memcpy(Q_i, rhs.Q_i, (size_t)(rhs.Q_p[nV])*sizeof(int));
+            memcpy(Q_x, rhs.Q_x, (size_t)(rhs.Q_p[nV])*sizeof(double));
             memcpy(A_p, rhs.A_p, (size_t)(nV+1)*sizeof(int));
             memcpy(A_i, rhs.A_i, (size_t)(rhs.A_p[nV])*sizeof(int));
             memcpy(A_x, rhs.A_x, (size_t)(rhs.A_p[nV])*sizeof(double));
 
-            H_sparse = new qpOASES::SymSparseMat(nV, nV, H_i, H_p, H_x);
+            Q_sparse = new qpOASES::SymSparseMat(nV, nV, Q_i, Q_p, Q_x);
             A_sparse = new qpOASES::SparseMatrix(nC, nV, A_i, A_p, A_x);
 
-            H_sparse->createDiagInfo();
+            Q_sparse->createDiagInfo();
             A_sparse->createDiagInfo();
         } else {
-            H = new double[nV*nV];
+            Q = new double[nV*nV];
             A = new double[nC*nV];
 
-            memcpy(H, rhs.H, (size_t)(nV*nV)*sizeof(double));
+            memcpy(Q, rhs.Q, (size_t)(nV*nV)*sizeof(double));
             memcpy(A, rhs.A, (size_t)(nC*nV)*sizeof(double));
         }
 

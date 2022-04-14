@@ -37,10 +37,10 @@ namespace LCQPow {
 
             /** Constructor for sparse matrices.
              *
-             * @param H The Hessian matrix in sparse csc format.
+             * @param Q The Hessian matrix in sparse csc format.
              * @param A The linear constraint matrix in sparse csc format (should include the rows of the complementarity selector matrices).
             */
-            SubsolverOSQP(  const csc* const _H,
+            SubsolverOSQP(  const csc* const _Q,
                             const csc* const _A
                             );
 
@@ -105,7 +105,7 @@ namespace LCQPow {
             OSQPSettings *settings = NULL;          /**< OSQP settings. */
             OSQPData *data = NULL;                  /**< OSQP data. */
 
-            csc* H = NULL;                          /**< Hessian matrix in csc format (must be upper triagonal). */
+            csc* Q = NULL;                          /**< Hessian matrix in csc format (must be upper triagonal). */
             csc* A = NULL;                          /**< Constraint matrix in csc format (should contain rows of compl. sel. matrices). */
     };
 }

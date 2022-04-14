@@ -22,10 +22,10 @@ options.setStationarityTolerance(10e-3)
 lcqp.setOptions(options)
 
 # Allocate vectors
-H = np.zeros([nV, nV])
+Q = np.zeros([nV, nV])
 g = np.zeros(nV)
-S1 = np.zeros([nComp, nV])
-S2 = np.zeros([nComp, nV])
+L = np.zeros([nComp, nV])
+R = np.zeros([nComp, nV])
 A = np.zeros([nC, nV])
 lbA = np.zeros(nC)
 ubA = np.zeros(nC)
@@ -35,18 +35,18 @@ x0[0] = x_ref[0]
 x0[1] = x_ref[1]
 
 # Assign problem data
-H[0, 0] = 17 
-H[1, 1] = 17
-H[0, 1] = -15
-H[1, 0] = -15
+Q[0, 0] = 17 
+Q[1, 1] = 17
+Q[0, 1] = -15
+Q[1, 0] = -15
 
-# Regularization on H
+# Regularization on Q
 for i in range(2, nV, 1):
-    H[i, i] = 5e-12
+    Q[i, i] = 5e-12
 
 # Objective linear term
-Hx = np.array([[17, -15], [-15, 17]])
-g[:2] = - np.dot(Hx, x_ref)
+Qx = np.array([[17, -15], [-15, 17]])
+g[:2] = - np.dot(Qx, x_ref)
 
 # Constraints
 for i in range(N):
@@ -59,8 +59,8 @@ for i in range(N):
     A[N, 3+2*i] = 1.0
 
     # Complementarity constraints (lamba*theta = 0)
-    S1[i, 2+2*i] = 1.0
-    S2[i, 3+2*i] = 1.0
+    L[i, 2+2*i] = 1.0
+    R[i, 3+2*i] = 1.0
 
     # constraint bounds
     lbA[i] = 1.0
@@ -74,7 +74,7 @@ lbA[N] = 1.0
 ubA[N] = 1.0
 
 # Solve first LCQP
-retVal = lcqp.loadLCQP(H=H, g=g, S1=S1.T, S2=S2.T, A=A.T, lbA=lbA, ubA=ubA, x0=x0)
+retVal = lcqp.loadLCQP(Q=Q, g=g, L=L.T, R=R.T, A=A.T, lbA=lbA, ubA=ubA, x0=x0)
 if retVal != lcqpow.ReturnValue.SUCCESSFUL_RETURN:
     print("Failed to load LCQP.")
 
