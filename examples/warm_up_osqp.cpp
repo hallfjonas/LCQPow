@@ -79,7 +79,7 @@ int main() {
         return 1;
     }
 
-    int nDuals = lcqp.getNumerOfDuals();
+    int nDuals = lcqp.getNumberOfDuals();
 
     // Get solutions
     double* xOpt = new double[2];

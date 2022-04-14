@@ -195,14 +195,14 @@ namespace LCQPow {
 			 *
 			 * @return Returns the number of primal variables.
 			 */
-			int getNumerOfPrimals( ) const;
+			int getNumberOfPrimals( ) const;
 
 
 			/** Get the number of dual variables. This depends on the utilized subproblem solver.
 			 *
 			 * @return Returns the number of dual variables.
 			 */
-			virtual int getNumerOfDuals( ) const;
+			virtual int getNumberOfDuals( ) const;
 
 
 			/** Get the output statistics.

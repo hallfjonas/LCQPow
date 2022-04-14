@@ -161,16 +161,16 @@ PYBIND11_MODULE(LCQProblem, m) {
           py::arg("x0_file")=nullptr, py::arg("y0_file")=nullptr) 
     .def("runSolver", &LCQProblem::runSolver)
     .def("getPrimalSolution", [](const LCQProblem& self) {
-            Eigen::VectorXd xOpt(Eigen::VectorXd::Zero(self.getNumerOfPrimals()));
+            Eigen::VectorXd xOpt(Eigen::VectorXd::Zero(self.getNumberOfPrimals()));
             self.getPrimalSolution(xOpt.data());
             return xOpt;
          })
     .def("getDualSolution", [](const LCQProblem& self) {
-            Eigen::VectorXd yOpt(Eigen::VectorXd::Zero(self.getNumerOfDuals()));
+            Eigen::VectorXd yOpt(Eigen::VectorXd::Zero(self.getNumberOfDuals()));
             self.getDualSolution(yOpt.data());
             return yOpt;
          })
-    .def("getNumerOfDuals", &LCQProblem::getNumerOfDuals)
+    .def("getNumberOfDuals", &LCQProblem::getNumberOfDuals)
     .def("getOutputStatistics", &LCQProblem::getOutputStatistics)
     .def("setOptions", &LCQProblem::setOptions);
 }
