@@ -59,7 +59,7 @@
 %              stats.iters_outer : Total number of outer iterations
 %         stats.iters_subproblem : Total number of iterations taken by the QP subsolver
 %                  stats.rho_opt : Penalty parameter at solution (or its most recent value on failed call)
-%             stats.elapsed_time : Elapsed solver time (without loading the data)
+%             stats.elapsed_time : Elapsed solver time (without interface overhead)
 %                stats.exit_flag : Exit flag (0 on success, else some error according to the enum ReturnValue within Utilities.hpp)
 %             stats.qp_exit_flag : A flag indicating the most recent status flag of the QP solver.
 %

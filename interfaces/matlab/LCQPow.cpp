@@ -520,9 +520,30 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     // For debug sakes
     // printOptions( options );
 
-    // Sparsity checks
+    // Before running solver, let's allocate solution vectors
+    // 1) Primal solution vector
+    plhs[0] = mxCreateDoubleMatrix((size_t)nV, 1, mxREAL);
+    if (plhs[0] == NULL) {
+        mexPrintf("Failed to allocate output of primal solution vector.\n");
+        return;
+    }
+    
+    // 2) Dual solution vector (might be too large, but certainly large enough)
+    double* yOptTMP = NULL;
+    if (nlhs > 1) {
+        int maxDualsOut = nC + nV + 2*nComp;
+        yOptTMP = new double[maxDualsOut];
+    }
+
+    // Point to the output object
+    double* xOpt = (double*) mxGetPr(plhs[0]);
+
+    // Start time (time entire c++ code, i.e., result will not include the interface's overhead).
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
+    // Sparsity handling
     int ret = 0;
-    if (mxIsSparse(prhs[0]) || mxIsSparse(prhs[2]) || mxIsSparse(prhs[3])|| (nC > 0 && mxIsSparse(prhs[8]))) {
+    if (mxIsSparse(prhs[0])) {
         ret = LCQPSparse(lcqp, nV, nComp, nC, nrhs, prhs, x0, y0);
     } else {
         ret = LCQPDense(lcqp, nV, nComp, nC, nrhs, prhs, x0, y0);
@@ -533,52 +554,58 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         return;
     }
 
-    // Start time
-    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-
     // Run solver
     ret = lcqp.runSolver();
 
+    // Get primal solution 
+    lcqp.getPrimalSolution(xOpt);
+
+    // Get dual solution 
+    if (nlhs > 1) {
+        lcqp.getDualSolution(yOptTMP);
+    }
+
+    // Get the statistics
+    LCQPow::OutputStatistics stats;
+    if (nlhs > 2) {
+        lcqp.getOutputStatistics(stats);
+    }
+
+    // Stop the timer
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
     double elapsed_secs = (double)(end - begin).count()/1000.0/1000.0/1000.0;
-
+    
     if (ret != LCQPow::SUCCESSFUL_RETURN) {
         mexPrintf("Failed to solve LCQP (error code: %d).\n", ret);
     }
-
-    // Succeeded to solve LCQP. Obtaining solution vector
-    // 1) Primal solution vector
-    plhs[0] = mxCreateDoubleMatrix((size_t)nV, 1, mxREAL);
-    if (plhs[0] == NULL) {
-        mexPrintf("Failed to allocate output of primal solution vector.\n");
-        return;
-    }
-
-    // Point to the output object
-    double* xOpt = (double*) mxGetPr(plhs[0]);
-    lcqp.getPrimalSolution(xOpt);
-
-    // 2) Dual solution vector
+    
+    // Post-Processing
+    // If number of duals is actually smaller than nV+nC+2*nComp (e.g. OSQP solver)
     if (nlhs > 1) {
-        int nDualsOut = lcqp.getNumerOfDuals();
-
+        int nDualsOut = lcqp.getNumberOfDuals();
         if (nDualsOut <= 0) {
             mexPrintf("Failed to receive number of dual variables.\n");
             return;
         }
-
+        
+        // Copy duals to corrected size
+        double* yOpt = new double[nDualsOut];
+        for (int i = 0; i < nDualsOut; i++) 
+            yOpt[i] = yOptTMP[i];
+        
+        delete[] yOptTMP;
+        // Allocate output vector
         plhs[1] = mxCreateDoubleMatrix((size_t)nDualsOut, 1, mxREAL);
         if (plhs[1] == NULL) {
             mexPrintf("Failed to allocate output of dual solution vector.\n");
             return;
         }
 
-        // Pointer to the output object
-        double* yOpt = (double*) mxGetPr(plhs[1]);
-        lcqp.getDualSolution(yOpt);
+        // Assign dual to output
+        yOpt = (double*) mxGetPr(plhs[1]);  
     }
 
-    // 3) Output statistics
+    // Assign the output statistics
     if (nlhs > 2) {
         // assign fieldnames
         int numberStatOutputs = 6;
@@ -605,10 +632,6 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             mexPrintf("Failed to allocate output of statistics struct.\n");
             return;
         }
-
-        // Get the statistics
-        LCQPow::OutputStatistics stats;
-        lcqp.getOutputStatistics(stats);
 
         mxArray* iterTotal = mxCreateDoubleMatrix(1, 1, mxREAL);
         mxArray* iterOuter = mxCreateDoubleMatrix(1, 1, mxREAL);
