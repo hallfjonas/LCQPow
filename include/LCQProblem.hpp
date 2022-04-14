@@ -167,6 +167,13 @@ namespace LCQPow {
 			);
 
 
+			/** Switch to sparse mode (if initialized with dense data but want to use sparse solver). */
+			ReturnValue switchToSparseMode( );
+
+
+			/** Switch to dense mode (if initialized with sparse data but want to use dense solver). */
+			ReturnValue switchToDenseMode( );
+
 			/** After problem is set up, call this function and solve the LCQP.
 			 *
 			 * @returns SUCCESSFUL_RETURN if a solution is found. Otherwise the return value will indicate an occured error. */
@@ -405,11 +412,6 @@ namespace LCQPow {
 			/** Called in runSolver to initialize variables. */
 			ReturnValue initializeSolver( );
 
-			/** Switch to sparse mode (if initialized with dense data but want to use sparse solver). */
-			ReturnValue switchToSparseMode( );
-
-			/** Switch to dense mode (if initialized with sparse data but want to use dense solver). */
-			ReturnValue switchToDenseMode( );
 
 			/** Update the penalty linearization. */
 			void updateLinearization( );
