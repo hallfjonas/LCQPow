@@ -25,7 +25,24 @@
 
 namespace LCQPow {
 
-    ReturnValue MessageHandler::PrintMessage( ReturnValue ret) {
+    ReturnValue MessageHandler::PrintMessage( ReturnValue ret, MessageType type ) {
+
+        // Print the message type
+        switch (type) {
+            case MESSAGE:
+                break;
+
+            case WARNING:
+                printf("WARNING: ");
+                break;
+
+            case ERROR:
+                printf("ERROR: ");
+                break;
+            
+            default:
+                break;
+        }
 
         switch (ret) {
             case SUCCESSFUL_RETURN:
@@ -36,135 +53,139 @@ namespace LCQPow {
                 break;
 
             case LCQPOBJECT_NOT_SETUP:
-                printf("ERROR: The LCQP object has not been set up correctly.\n");
+                printf("The LCQP object has not been set up correctly.\n");
                 break;
 
             case INDEX_OUT_OF_BOUNDS:
-                printf("ERROR: Index out of bounds.\n");
+                printf("Index out of bounds.\n");
                 break;
 
             case SUBPROBLEM_SOLVER_ERROR:
-                printf("ERROR: The subproblem solver produced an error.\n");
+                printf("The subproblem solver produced an error.\n");
                 break;
 
             case UNABLE_TO_READ_FILE:
-                printf("ERROR: Unable to read file.\n");
+                printf("Unable to read file.\n");
                 break;
 
             case MAX_ITERATIONS_REACHED:
-                printf("ERROR: Maximum number of iterations reached.\n");
+                printf("Maximum number of iterations reached.\n");
                 break;
 
             case MAX_PENALTY_REACHED:
-                printf("ERROR: Maxium penalty value reached.\n");
+                printf("Maxium penalty value reached.\n");
                 break;
 
             case INITIAL_SUBPROBLEM_FAILED:
-                printf("ERROR: Failed to solve initial QP.\n");
+                printf("Failed to solve initial QP.\n");
                 break;
 
             case INVALID_ARGUMENT:
-                printf("ERROR: Invalid argument passed.\n");
+                printf("Invalid argument passed.\n");
                 break;
 
             case INVALID_NUMBER_OF_OPTIM_VARS:
-                printf("ERROR: Invalid optimization variable dimension passed (required to be > 0).\n");
+                printf("Invalid optimization variable dimension passed (required to be > 0).\n");
                 break;
 
             case INVALID_NUMBER_OF_COMP_VARS:
-                printf("ERROR: Invalid complementarity dimension passed (required to be > 0).\n");
+                printf("Invalid complementarity dimension passed (required to be > 0).\n");
                 break;
 
             case INVALID_NUMBER_OF_CONSTRAINT_VARS:
-                printf("ERROR: Invalid number of optimization variables passed (required to be >= 0).\n");
+                printf("Invalid number of optimization variables passed (required to be >= 0).\n");
                 break;
 
             case INVALID_QPSOLVER:
-                printf("ERROR: Invalid QPSolver passed.\n");
+                printf("Invalid QPSolver passed.\n");
                 break;
 
             case INVALID_COMPLEMENTARITY_TOLERANCE:
-                printf("WARNING: Ignoring invalid complementarity tolerance.\n");
+                printf("Ignoring invalid complementarity tolerance.\n");
                 break;
 
             case INVALID_INITIAL_PENALTY_VALUE:
-                printf("WARNING: Invalid argument passed (initial penalty value).\n");
+                printf("Invalid argument passed (initial penalty value).\n");
                 break;
 
             case INVALID_PENALTY_UPDATE_VALUE:
-                printf("WARNING: Ignoring invalid penalty update value.\n");
+                printf("Ignoring invalid penalty update value.\n");
                 break;
 
             case INVALID_MAX_ITERATIONS_VALUE:
-                printf("WARNING: Ignoring invalid number of maximum iterations.\n");
+                printf("Ignoring invalid number of maximum iterations.\n");
                 break;
 
             case INVALID_MAX_RHO_VALUE:
-                printf("WARNING: Ignoring invalid number of maximum penalty value.\n");
+                printf("Ignoring invalid number of maximum penalty value.\n");
+                break;
+
+            case DENSE_SPARSE_MISSMATCH:
+                printf("The solver was initialized with dense (sparse) matrices but a sparse (dense) method was chosen.\n");
                 break;
 
             case INVALID_STATIONARITY_TOLERANCE:
-                printf("WARNING: Ignoring invalid stationarity tolerance.\n");
+                printf("Ignoring invalid stationarity tolerance.\n");
                 break;
 
             case INVALID_INDEX_POINTER:
-                printf("ERROR: Invalid index pointer passed in csc format.\n");
+                printf("Invalid index pointer passed in csc format.\n");
                 break;
 
             case INVALID_INDEX_ARRAY:
-                printf("ERROR: Invalid index array passed in csc format.\n");
+                printf("Invalid index array passed in csc format.\n");
                 break;
 
             case INVALID_OSQP_BOX_CONSTRAINTS:
-                printf("ERROR: Invalid constraints passed to OSQP solver: This solver does not handle box constraints, please pass them through linear constraints.\n");
+                printf("Invalid constraints passed to OSQP solver: This solver does not handle box constraints, please pass them through linear constraints.\n");
                 break;
 
             case INVALID_TOTAL_ITER_COUNT:
-                printf("ERROR: Invalid total number of iterations delta passed to output statistics (must be non-negative integer).\n");
+                printf("Invalid total number of iterations delta passed to output statistics (must be non-negative integer).\n");
                 break;
 
             case INVALID_TOTAL_OUTER_ITER:
-                printf("ERROR: Invalid total number of outer iterations delta passed to output statistics (must be non-negative integer).\n");
+                printf("Invalid total number of outer iterations delta passed to output statistics (must be non-negative integer).\n");
                 break;
 
             case IVALID_SUBPROBLEM_ITER:
-                printf("ERROR: Invalid total number of subproblem solver iterates delta passed to output statistics (must be non-negative integer).\n");
+                printf("Invalid total number of subproblem solver iterates delta passed to output statistics (must be non-negative integer).\n");
                 break;
 
             case INVALID_RHO_OPT:
-                printf("ERROR: Invalid rho value at solution passed to output statistics (must be positive double).\n");
+                printf("Invalid rho value at solution passed to output statistics (must be positive double).\n");
                 break;
 
             case INVALID_PRINT_LEVEL_VALUE:
-                printf("WARNING: Ignoring invalid integer to be parsed to print level passed (must be in range of enum).\n");
+                printf("Ignoring invalid integer to be parsed to print level passed (must be in range of enum).\n");
                 break;
 
             case INVALID_OBJECTIVE_LINEAR_TERM:
-                printf("ERROR: Invalid objective linear term passed (must be a double array of length n).\n");
+                printf("Invalid objective linear term passed (must be a double array of length n).\n");
                 break;
 
             case INVALID_CONSTRAINT_MATRIX:
-                printf("ERROR: Invalid constraint matrix passed (matrix was null pointer but number of constraints is positive).\n");
+                printf("Invalid constraint matrix passed (matrix was null pointer but number of constraints is positive).\n");
                 break;
 
             case INVALID_COMPLEMENTARITY_MATRIX:
-                printf("ERROR: Invalid complementarity matrix passed (can not be null pointer).\n");
+                printf("Invalid complementarity matrix passed (can not be null pointer).\n");
                 break;
 
             case INVALID_ETA_VALUE:
-                printf("ERROR: Invalid etaDynamicPenalty value, which describes the fraction of loss required for complementarity progress (must be in (0,1)).");
+                printf("Invalid etaDynamicPenalty value, which describes the fraction of loss required for complementarity progress (must be in (0,1)).");
                 break;
 
             case OSQP_INITIAL_PRIMAL_GUESS_FAILED:
-                printf("ERROR: OSQP failed to use the primal initial guess.\n");
+                printf("OSQP failed to use the primal initial guess.\n");
                 break;
 
             case OSQP_INITIAL_DUAL_GUESS_FAILED:
-                printf("ERROR: OSQP failed to use the dual initial guess.\n");
+                printf("OSQP failed to use the dual initial guess.\n");
                 break;
 
             case INVALID_LOWER_COMPLEMENTARITY_BOUND:
-                printf("ERROR: Lower complementarity bound must be bounded below.\n");
+                printf("Lower complementarity bound must be bounded below.\n");
                 break;
 
             case FAILED_SYM_COMPLEMENTARITY_MATRIX:

@@ -33,9 +33,10 @@ namespace LCQPow {
             /** Print a message.
              *
              * @param ret A return value which will impact the print message.
+             * @param type The message type (will determine the message pre-print).
              *
              * @returns Simply passes the return value that was given. */
-            static ReturnValue PrintMessage( ReturnValue ret );
+            static ReturnValue PrintMessage( ReturnValue ret, MessageType type = MESSAGE );
 
 
             /** Print a solution status.

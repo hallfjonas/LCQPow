@@ -75,7 +75,7 @@ namespace LCQPow {
 
     ReturnValue Options::setStationarityTolerance( double val ) {
         if (val <= Utilities::EPS)
-            return (MessageHandler::PrintMessage(INVALID_STATIONARITY_TOLERANCE) );
+            return (MessageHandler::PrintMessage(INVALID_STATIONARITY_TOLERANCE,WARNING) );
 
         stationarityTolerance = val;
         return ReturnValue::SUCCESSFUL_RETURN;
@@ -89,7 +89,7 @@ namespace LCQPow {
 
     ReturnValue Options::setComplementarityTolerance( double val ) {
         if (val <= Utilities::EPS)
-            return (MessageHandler::PrintMessage(INVALID_COMPLEMENTARITY_TOLERANCE) ) ;
+            return (MessageHandler::PrintMessage(INVALID_COMPLEMENTARITY_TOLERANCE,WARNING) ) ;
 
         complementarityTolerance = val;
         return ReturnValue::SUCCESSFUL_RETURN;
@@ -103,7 +103,7 @@ namespace LCQPow {
 
     ReturnValue Options::setInitialPenaltyParameter( double val ) {
         if (val <= Utilities::ZERO)
-            return (MessageHandler::PrintMessage(INVALID_INITIAL_PENALTY_VALUE) );
+            return (MessageHandler::PrintMessage(INVALID_INITIAL_PENALTY_VALUE,WARNING) );
 
         initialPenaltyParameter = val;
         return ReturnValue::SUCCESSFUL_RETURN;
@@ -117,7 +117,7 @@ namespace LCQPow {
 
     ReturnValue Options::setPenaltyUpdateFactor( double val ) {
         if (val <= 1)
-            return (MessageHandler::PrintMessage(INVALID_PENALTY_UPDATE_VALUE) ) ;
+            return (MessageHandler::PrintMessage(INVALID_PENALTY_UPDATE_VALUE,WARNING) ) ;
 
         penaltyUpdateFactor = val;
         return ReturnValue::SUCCESSFUL_RETURN;
@@ -142,7 +142,7 @@ namespace LCQPow {
 
     ReturnValue Options::setMaxIterations( int val ) {
         if (val <= 0)
-            return (MessageHandler::PrintMessage(INVALID_MAX_ITERATIONS_VALUE) );
+            return (MessageHandler::PrintMessage(INVALID_MAX_ITERATIONS_VALUE,WARNING) );
 
         maxIterations = val;
         return ReturnValue::SUCCESSFUL_RETURN;
@@ -156,7 +156,7 @@ namespace LCQPow {
 
     ReturnValue Options::setMaxRho( double val ) {
         if (val <= 0)
-            return (MessageHandler::PrintMessage(INVALID_MAX_RHO_VALUE) );
+            return (MessageHandler::PrintMessage(INVALID_MAX_RHO_VALUE,WARNING) );
 
         maxRho = val;
         return ReturnValue::SUCCESSFUL_RETURN;
@@ -180,7 +180,7 @@ namespace LCQPow {
 
     ReturnValue Options::setEtaDynamicPenalty( double val ) {
         if (val <= Utilities::EPS || val >= 1)
-            return (MessageHandler::PrintMessage(INVALID_ETA_VALUE) );
+            return (MessageHandler::PrintMessage(INVALID_ETA_VALUE,WARNING) );
 
         etaDynamicPenalty = val;
         return ReturnValue::SUCCESSFUL_RETURN;
@@ -201,7 +201,7 @@ namespace LCQPow {
     ReturnValue Options::setPrintLevel( int val ) {
 
         if (val < PrintLevel::NONE || val > PrintLevel::SUBPROBLEM_SOLVER_ITERATES)
-            return (MessageHandler::PrintMessage(INVALID_PRINT_LEVEL_VALUE) );
+            return (MessageHandler::PrintMessage(INVALID_PRINT_LEVEL_VALUE,WARNING) );
 
         printLevel = (PrintLevel)val;
         return ReturnValue::SUCCESSFUL_RETURN;
@@ -232,7 +232,7 @@ namespace LCQPow {
 
     ReturnValue Options::setQPSolver( int val ) {
         if (val < QPSolver::QPOASES_DENSE || val > QPSolver::OSQP_SPARSE)
-            return (MessageHandler::PrintMessage(INVALID_QPSOLVER));
+            return (MessageHandler::PrintMessage(INVALID_QPSOLVER,WARNING));
 
         qpSolver = (QPSolver) val;
         return SUCCESSFUL_RETURN;
@@ -248,7 +248,7 @@ namespace LCQPow {
         solveZeroPenaltyFirst = true;
 
         maxIterations = 1000;
-        maxRho = 1e4;
+        maxRho = 1e8;
 
         nDynamicPenalty = 3;
         etaDynamicPenalty = 0.9;

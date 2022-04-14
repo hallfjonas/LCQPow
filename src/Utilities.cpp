@@ -605,7 +605,7 @@ namespace LCQPow {
 
                 // Ensure validity of index
                 if (sparse->i[i]*n + j >= m*n || sparse->i[i]*n + j < 0) {
-                    MessageHandler::PrintMessage( ReturnValue::INDEX_OUT_OF_BOUNDS );
+                    MessageHandler::PrintMessage( INDEX_OUT_OF_BOUNDS, ERROR );
                     return 0;
                 }
 

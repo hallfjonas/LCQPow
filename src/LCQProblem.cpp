@@ -44,20 +44,20 @@ namespace LCQPow {
 		/* consistency checks */
 		if ( _nV <= 0 )
 		{
-			MessageHandler::PrintMessage( INVALID_NUMBER_OF_OPTIM_VARS );
+			MessageHandler::PrintMessage( INVALID_NUMBER_OF_OPTIM_VARS, ERROR );
 			return;
 		}
 
 		if ( _nComp <= 0 )
 		{
-			MessageHandler::PrintMessage( INVALID_NUMBER_OF_OPTIM_VARS );
+			MessageHandler::PrintMessage( INVALID_NUMBER_OF_OPTIM_VARS, ERROR );
 			return;
 		}
 
 		if ( _nC < 0 )
 		{
 			_nC = 0;
-			MessageHandler::PrintMessage( INVALID_NUMBER_OF_CONSTRAINT_VARS );
+			MessageHandler::PrintMessage( INVALID_NUMBER_OF_CONSTRAINT_VARS, ERROR );
 			return;
 		}
 
@@ -95,17 +95,17 @@ namespace LCQPow {
 		ReturnValue ret;
 
 		if ( nV <= 0 || nComp <= 0 )
-            return( MessageHandler::PrintMessage(ReturnValue::LCQPOBJECT_NOT_SETUP) );
+            return( MessageHandler::PrintMessage(ReturnValue::LCQPOBJECT_NOT_SETUP, ERROR) );
 
 		ret = setH( _H );
 
 		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR );
 
 		ret = setG( _g );
 
 		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR );
 
 		// Only copy lb and ub to temporary variables
 		// Build them once we know what solver is used
@@ -120,22 +120,22 @@ namespace LCQPow {
 		}
 
 		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR );
 
 		ret = setConstraints( _S1, _S2, _A, _lbA, _ubA );
 
 		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR );
 
 		ret = setComplementarityBounds( _lbS1, _ubS1, _lbS2, _ubS2 );
 
 		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR );
 
 		ret = setInitialGuess( _x0, _y0 );
 
 		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR );
 
 		sparseSolver = false;
 
@@ -158,28 +158,28 @@ namespace LCQPow {
 		ret = Utilities::readFromFile( _H, nV*nV, H_file );
 		if ( ret != SUCCESSFUL_RETURN ) {
 			delete[] _H;
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR );
 		}
 
 		double* _g = new double[nV];
 		ret = Utilities::readFromFile( _g, nV, g_file );
 		if ( ret != SUCCESSFUL_RETURN ) {
 			delete[] _g;
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR );
 		}
 
 		double* _S1 = new double[nComp*nV];
 		ret = Utilities::readFromFile( _S1, nComp*nV, S1_file );
 		if ( ret != SUCCESSFUL_RETURN ) {
 			delete[] _S1;
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR );
 		}
 
 		double* _S2 = new double[nComp*nV];
 		ret = Utilities::readFromFile( _S2, nComp*nV, S2_file );
 		if ( ret != SUCCESSFUL_RETURN ) {
 			delete[] _S2;
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR );
 		}
 
 		double* _lbS1 = NULL;
@@ -188,7 +188,7 @@ namespace LCQPow {
 			ret = Utilities::readFromFile( _lbS1, nComp, lbS1_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
 				delete[] _lbS1;
-				return MessageHandler::PrintMessage( ret );
+				return MessageHandler::PrintMessage( ret, ERROR );
 			}
 		}
 
@@ -199,7 +199,7 @@ namespace LCQPow {
 			ret = Utilities::readFromFile( _ubS1, nComp, ubS1_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
 				delete[] _ubS1;
-				return MessageHandler::PrintMessage( ret );
+				return MessageHandler::PrintMessage( ret, ERROR );
 			}
 		}
 
@@ -210,7 +210,7 @@ namespace LCQPow {
 			ret = Utilities::readFromFile( _lbS2, nComp, lbS2_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
 				delete[] _lbS2;
-				return MessageHandler::PrintMessage( ret );
+				return MessageHandler::PrintMessage( ret, ERROR );
 			}
 		}
 
@@ -221,7 +221,7 @@ namespace LCQPow {
 			ret = Utilities::readFromFile( _ubS2, nComp, ubS2_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
 				delete[] _ubS2;
-				return MessageHandler::PrintMessage( ret );
+				return MessageHandler::PrintMessage( ret, ERROR );
 			}
 		}
 
@@ -231,7 +231,7 @@ namespace LCQPow {
 			ret = Utilities::readFromFile( _A, nC*nV, A_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
 				delete[] _A;
-				return MessageHandler::PrintMessage( ret );
+				return MessageHandler::PrintMessage( ret, ERROR );
 			}
 		}
 
@@ -241,7 +241,7 @@ namespace LCQPow {
 			ret = Utilities::readFromFile( _lbA, nC, lbA_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
 				delete[] _lbA;
-				return MessageHandler::PrintMessage( ret );
+				return MessageHandler::PrintMessage( ret, ERROR );
 			}
 		}
 
@@ -251,7 +251,7 @@ namespace LCQPow {
 			ret = Utilities::readFromFile( _ubA, nC, ubA_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
 				delete[] _ubA;
-				return MessageHandler::PrintMessage( ret );
+				return MessageHandler::PrintMessage( ret, ERROR );
 			}
 		}
 
@@ -261,7 +261,7 @@ namespace LCQPow {
 			ret = Utilities::readFromFile( _lb, nV, lb_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
 				delete[] _lb;
-				return MessageHandler::PrintMessage( ret );
+				return MessageHandler::PrintMessage( ret, ERROR );
 			}
 		}
 
@@ -271,7 +271,7 @@ namespace LCQPow {
 			ret = Utilities::readFromFile( _ub, nV, ub_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
 				delete[] _ub;
-				return MessageHandler::PrintMessage( ret );
+				return MessageHandler::PrintMessage( ret, ERROR );
 			}
 		}
 
@@ -281,7 +281,7 @@ namespace LCQPow {
 			ret = Utilities::readFromFile( _x0, nV, x0_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
 				delete[] _x0;
-				return MessageHandler::PrintMessage( ret );
+				return MessageHandler::PrintMessage( ret, ERROR );
 			}
 		}
 
@@ -291,7 +291,7 @@ namespace LCQPow {
 			ret = Utilities::readFromFile( _y0, nC + 2*nComp, y0_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
 				delete[] _y0;
-				return MessageHandler::PrintMessage( ret );
+				return MessageHandler::PrintMessage( ret, ERROR );
 			}
 		}
 
@@ -300,13 +300,13 @@ namespace LCQPow {
 		delete[] _H;
 
 		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR );
 
 		ret = setG( _g );
 		delete[] _g;
 
 		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR );
 
 		// Only copy lb and ub to temporary variables
 		// Build them once we know what solver is used
@@ -323,7 +323,7 @@ namespace LCQPow {
 		}
 
 		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR);
 
 		ret = setConstraints( _S1, _S2, _A, _lbA, _ubA );
 
@@ -339,12 +339,12 @@ namespace LCQPow {
 			delete[] _ubA;
 
 		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR );
 
 		ret = setComplementarityBounds( _lbS1, _ubS1, _lbS2, _ubS2 );
 
 		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR );
 
 		ret = setInitialGuess( _x0, _y0 );
 
@@ -352,7 +352,7 @@ namespace LCQPow {
 		if (isNotNullPtr(_y0)) delete[] _y0;
 
 		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR );
 
 		sparseSolver = false;
 
@@ -374,27 +374,27 @@ namespace LCQPow {
 		ret = setH( _H );
 
 		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR );
 
 		ret = setG( _g );
 
 		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR );
 
 		ret = setConstraints( _S1, _S2, _A, _lbA, _ubA );
 
 		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR );
 
 		ret = setComplementarityBounds( _lbS1, _ubS1, _lbS2, _ubS2 );
 
 		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR );
 
 		ret = setInitialGuess( _x0, _y0 );
 
 		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage( ret );
+			return MessageHandler::PrintMessage( ret, ERROR );
 
 		// Only copy lb and ub to temporary variables
 		// Build them once we know what solver is used
@@ -419,7 +419,7 @@ namespace LCQPow {
 		// Initialize variables
 		ReturnValue ret = initializeSolver();
 		if (ret != SUCCESSFUL_RETURN)
-			return MessageHandler::PrintMessage(ret);
+			return MessageHandler::PrintMessage( ret, ERROR );
 
 		// Initialization strategy
 		if (options.getSolveZeroPenaltyFirst()) {
@@ -428,14 +428,14 @@ namespace LCQPow {
 			memcpy(gk, g, (size_t)nV*sizeof(double));
 			ret = solveQPSubproblem( true );
 			if (ret != SUCCESSFUL_RETURN) {
-				return MessageHandler::PrintMessage(ret);
+				return MessageHandler::PrintMessage( ret, ERROR );
 			}
 		} else {
 			// Linearize penalty function at initial guess
 			updateLinearization();
 			ret = solveQPSubproblem( true );
 			if (ret != SUCCESSFUL_RETURN) {
-				return MessageHandler::PrintMessage(ret);
+				return MessageHandler::PrintMessage( ret, ERROR );
 			}
 		}
 
@@ -520,7 +520,7 @@ namespace LCQPow {
 			// Step computation
 			ret = solveQPSubproblem( false );
 			if (ret != SUCCESSFUL_RETURN) {
-				return MessageHandler::PrintMessage(ret);
+				return MessageHandler::PrintMessage( ret, ERROR );
 			}
 
 			// Add some +/- EPS to each coordinate
@@ -862,9 +862,7 @@ namespace LCQPow {
 			boxDualOffset = nV;
 
 			if (sparseSolver) {
-				ret = switchToDenseMode( );
-				if (ret != SUCCESSFUL_RETURN)
-					return ret;
+				return DENSE_SPARSE_MISSMATCH;
 			}
 
 			ret = setLB( lb_tmp );
@@ -884,9 +882,7 @@ namespace LCQPow {
 			boxDualOffset = nV;
 
 			if (!sparseSolver) {
-				ret = switchToSparseMode( );
-				if (ret != SUCCESSFUL_RETURN)
-					return ret;
+				return DENSE_SPARSE_MISSMATCH;
 			}
 
 			ret = setLB( lb_tmp );
@@ -925,9 +921,7 @@ namespace LCQPow {
 			}
 
 			if (!sparseSolver) {
-				ret = switchToSparseMode( );
-				if (ret != SUCCESSFUL_RETURN)
-					return ret;
+				return DENSE_SPARSE_MISSMATCH;
 			}
 
 			if (isNotNullPtr(lb_tmp) || isNotNullPtr(ub_tmp)) {
@@ -1465,13 +1459,13 @@ namespace LCQPow {
 	}
 
 
-	int LCQProblem::getNumerOfPrimals( ) const
+	int LCQProblem::getNumberOfPrimals( ) const
 	{
 		return nV;
 	}
 
 
-	int LCQProblem::getNumerOfDuals( ) const
+	int LCQProblem::getNumberOfDuals( ) const
 	{
 		return nDuals;
 	}

@@ -61,6 +61,7 @@ namespace LCQPow {
         OSQP_INITIAL_DUAL_GUESS_FAILED = 121,           /**< OSQP failed to use the dual initial guess. */
         INVALID_LOWER_COMPLEMENTARITY_BOUND = 122,      /**< Lower complementarity bound must be bounded below. */
         INVALID_MAX_RHO_VALUE = 123,                    /**< Invalid maximal penalty value. Must be a positive double. */
+        DENSE_SPARSE_MISSMATCH = 124,                   /**< Solver was initialized with dense (sparse) matrices but a sparse (dense) method was chosen. */
 
         // Algorithmic errors
         MAX_ITERATIONS_REACHED = 200,                   /**< Maximum number of iterations reached. */
@@ -80,6 +81,12 @@ namespace LCQPow {
         // Sparse matrices
         INVALID_INDEX_POINTER = 400,                    /**< Invalid index pointer for a csc matrix. */
         INVALID_INDEX_ARRAY = 401                       /**< Invalid index array for a csc matrix. */
+    };
+
+    enum MessageType {
+        MESSAGE = 0,                                    /**< Standard output. */
+        WARNING = 1,                                    /**< Program will continue. */
+        ERROR = 2                                       /**< Program should abort. */
     };
 
     enum AlgorithmStatus {

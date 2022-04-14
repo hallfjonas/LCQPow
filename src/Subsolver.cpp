@@ -52,7 +52,10 @@ namespace LCQPow {
             SubsolverOSQP tmp(H, A);
             solverOSQP = tmp;
         } else {
-            MessageHandler::PrintMessage( ReturnValue::INVALID_QPSOLVER );
+            MessageHandler::PrintMessage( INVALID_QPSOLVER, ERROR );
+
+            // Must abort here (since we can't return an error).
+            abort();
         }
     }
 
