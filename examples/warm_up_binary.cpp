@@ -61,6 +61,18 @@ int main() {
         return 1;
     }
 
+    // Must switch to sparse mode (if using a sparse solver)
+    if (options.getQPSolver() >= LCQPow::QPOASES_SPARSE) {
+        retVal = lcqp.switchToSparseMode( );
+
+        if (retVal != LCQPow::SUCCESSFUL_RETURN)
+        {
+            printf("Failed to switch to sparse mode LCQP.\n");
+            return 1;
+        }
+    }
+
+    // Run the solver
     retVal = lcqp.runSolver();
 
     if (retVal != SUCCESSFUL_RETURN)
