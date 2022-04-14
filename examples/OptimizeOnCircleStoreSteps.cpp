@@ -40,17 +40,17 @@ int main() {
     // Set up LCQP object
     LCQProblem lcqp( nV, nC, nComp );
 	Options options;
-    options.setPrintLevel(PrintLevel::INNER_LOOP_ITERATES);
+    options.setPrintLevel(PrintLevel::SUBPROBLEM_SOLVER_ITERATES);
     options.setQPSolver(QPSolver::QPOASES_SPARSE);
     // options.setStationarityTolerance( 10e-5 );
     options.setStoreSteps(true);
     lcqp.setOptions( options );
 
     // Allocate vectors
-    double* H = new double[nV*nV]();
+    double* Q = new double[nV*nV]();
     double* g = new double[nV]();
-    double* S1 = new double[nComp*nV]();
-    double* S2 = new double[nComp*nV]();
+    double* L = new double[nComp*nV]();
+    double* R = new double[nComp*nV]();
     double* A = new double[nC*nV]();
     double* lbA = new double[nC]();
     double* ubA = new double[nC]();
@@ -59,17 +59,17 @@ int main() {
     x0[1] = x_ref[1];
 
     // Assign problem data
-    H[0] = 17; H[1*nV + 1] = 17;
-    H[0*nV + 1] = -15;
-    H[1*nV + 0] = -15;
+    Q[0] = 17; Q[1*nV + 1] = 17;
+    Q[0*nV + 1] = -15;
+    Q[1*nV + 0] = -15;
 
-    // Regularization on H
+    // Regularization on Q
     for (int i = 2; i < nV; i++)
-        H[i*nV + i] = 5e-12;
+        Q[i*nV + i] = 5e-12;
 
     // Objective linear term
-    double Hx[2*2] = {17, -15, -15, 17};
-    LCQPow::Utilities::MatrixMultiplication(Hx, x_ref, g, 2, 2, 1);
+    double Qx[2*2] = {17, -15, -15, 17};
+    LCQPow::Utilities::MatrixMultiplication(Qx, x_ref, g, 2, 2, 1);
     LCQPow::Utilities::WeightedVectorAdd(-1, g, 0, g, g, 2);
 
     // Constraints
@@ -83,8 +83,8 @@ int main() {
         A[N*nV + 3 + 2*i] = 1;
 
         // Complementarity constraints (lamba*theta = 0)
-        S1[i*nV + 2 + 2*i] = 1;
-        S2[i*nV + 3 + 2*i] = 1;
+        L[i*nV + 2 + 2*i] = 1;
+        R[i*nV + 3 + 2*i] = 1;
 
         // constraint bounds
         lbA[i] = 1;
@@ -98,8 +98,8 @@ int main() {
     lbA[N] = 1;
     ubA[N] = 1;
 
-    // Solve first LCQP
-	ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2, 0, 0, 0, 0,  A, lbA, ubA, 0, 0, x0 );
+    // Load Data
+	ReturnValue retVal = lcqp.loadLCQP( Q, g, L, R, 0, 0, 0, 0,  A, lbA, ubA, 0, 0, x0 );
 
     if (retVal != SUCCESSFUL_RETURN)
     {
@@ -175,7 +175,7 @@ int main() {
 
     // Clean Up
     delete[] xOpt; delete[] yOpt;
-    delete[] H; delete[] g; delete[] S1; delete[] S2; delete[] A;
+    delete[] Q; delete[] g; delete[] L; delete[] R; delete[] A;
     delete[] lbA; delete[] ubA; delete[] x0;
 
     delete[] innerItersTMP;

@@ -29,10 +29,10 @@ int main() {
     std::cout << "Preparing sparse warm up problem...\n";
 
     /* Setup data of first QP. */
-    double H[2*2] = { 2.0, 0.0, 0.0, 2.0 };
+    double Q[2*2] = { 2.0, 0.0, 0.0, 2.0 };
     double g[2] = { -2.0, -2.0 };
-    double S1[1*2] = {1.0, 0.0};
-    double S2[1*2] = {0.0, 1.0};
+    double L[1*2] = {1.0, 0.0};
+    double R[1*2] = {0.0, 1.0};
 
     int nV = 2;
     int nC = 0;
@@ -46,7 +46,7 @@ int main() {
 	lcqp.setOptions( options );
 
     // Solve first LCQP
-	ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2 );
+	ReturnValue retVal = lcqp.loadLCQP( Q, g, L, R );
 
     if (retVal != SUCCESSFUL_RETURN)
     {

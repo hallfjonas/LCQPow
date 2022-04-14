@@ -45,16 +45,16 @@ int main() {
     }
 
     // Required files
-    std::string H_file = inputdir + "/" + "H.txt";
+    std::string Q_file = inputdir + "/" + "Q.txt";
     std::string g_file = inputdir + "/" + "g.txt";
     std::string lb_file = inputdir + "/" + "lb.txt";
     std::string ub_file = inputdir + "/" + "ub.txt";
-    std::string S1_file = inputdir + "/" + "S1.txt";
-    std::string S2_file = inputdir + "/" + "S2.txt";
-    std::string lb_S1_file = inputdir + "/" + "lb_S1.txt";
-    std::string lb_S2_file = inputdir + "/" + "lb_S2.txt";
-    std::string ub_S1_file = inputdir + "/" + "ub_S1.txt";
-    std::string ub_S2_file = inputdir + "/" + "ub_S2.txt";
+    std::string L_file = inputdir + "/" + "L.txt";
+    std::string R_file = inputdir + "/" + "R.txt";
+    std::string lb_L_file = inputdir + "/" + "lbL.txt";
+    std::string lb_R_file = inputdir + "/" + "lbR.txt";
+    std::string ub_L_file = inputdir + "/" + "ubL.txt";
+    std::string ub_R_file = inputdir + "/" + "ubR.txt";
 
     int nV = 0;
     int nC = 0;
@@ -67,8 +67,8 @@ int main() {
     while (std::getline(lbfile, line))
         nV++;
 
-    std::ifstream S1file(S1_file);
-    while (std::getline(S1file, line))
+    std::ifstream Lfile(L_file);
+    while (std::getline(Lfile, line))
         nComp++;
 
     nComp = nComp/nV;
@@ -122,15 +122,15 @@ int main() {
 
     LCQPow::LCQProblem lcqp( nV, nC, nComp );
 
-    LCQPow::Options opts;
-    opts.setPrintLevel( LCQPow::PrintLevel::INNER_LOOP_ITERATES );
-    opts.setQPSolver( LCQPow::QPSolver::QPOASES_SPARSE);
-    lcqp.setOptions( opts );
+    LCQPow::Options options;
+    options.setPrintLevel( LCQPow::PrintLevel::INNER_LOOP_ITERATES );
+    options.setQPSolver( LCQPow::QPSolver::QPOASES_SPARSE);
+    lcqp.setOptions( options );
 
-    // Run solver
-	LCQPow::ReturnValue ret = lcqp.loadLCQP( &H_file[0], &g_file[0], &S1_file[0], &S2_file[0], &lb_S1_file[0], &ub_S1_file[0], &lb_S2_file[0], &ub_S2_file[0], Af, lbAf, ubAf, &lb_file[0], &ub_file[0], x0f, y0f );
+    // Load data
+	LCQPow::ReturnValue retVal = lcqp.loadLCQP( &Q_file[0], &g_file[0], &L_file[0], &R_file[0], &lb_L_file[0], &ub_L_file[0], &lb_R_file[0], &ub_R_file[0], Af, lbAf, ubAf, &lb_file[0], &ub_file[0], x0f, y0f );
 
-    if (ret != LCQPow::SUCCESSFUL_RETURN)
+    if (retVal != LCQPow::SUCCESSFUL_RETURN)
     {
         printf("Failed to load LCQP.\n");
         return 1;

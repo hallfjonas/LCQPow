@@ -29,10 +29,10 @@ int main() {
     std::cout << "Preparing warm up problem with a simple inequality constraint...\n";
 
     /* Setup data of first QP. */
-    double H[2*2] = { 2.0, 0.0, 0.0, 2.0 };
+    double Q[2*2] = { 2.0, 0.0, 0.0, 2.0 };
     double g[2] = { -2.0, -2.0 };
-    double S1[1*2] = {1.0, 0.0};
-    double S2[1*2] = {0.0, 1.0};
+    double L[1*2] = {1.0, 0.0};
+    double R[1*2] = {0.0, 1.0};
     double A[1*2] = {1.0, -1.0};
     double lbA[1] = { -0.5 };
     double ubA[1] = {  INFINITY };
@@ -47,8 +47,8 @@ int main() {
     options.setPrintLevel(PrintLevel::INNER_LOOP_ITERATES);
 	lcqp.setOptions( options );
 
-    // Solve first LCQP
-	ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2, 0, 0, 0, 0, A, lbA, ubA );
+    // Load data
+	ReturnValue retVal = lcqp.loadLCQP( Q, g, L, R, 0, 0, 0, 0, A, lbA, ubA );
 
     if (retVal != SUCCESSFUL_RETURN)
     {

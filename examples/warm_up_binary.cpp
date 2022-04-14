@@ -29,15 +29,15 @@ int main() {
     std::cout << "Preparing dense warm up problem...\n";
 
     /* Setup data of first QP. */
-    double H[2*2] = { 2.0, 0.0, 0.0, 2.0 };
+    double Q[2*2] = { 2.0, 0.0, 0.0, 2.0 };
     double g[2] = { -2.0, -2.0 };
 
     // 0 <= x _|_ y >= 0
     // 0 <= x _|_ 0.5 - x >= 0
-    double S1[2*2] = {1.0, 0.0, 1.0, 0.0};
-    double S2[2*2] = {0.0, 1.0, -1.0, 0.0};
-    double lbS1[2] = {0.0, 0.0};
-    double lbS2[2] = {0.0, -0.5};
+    double L[2*2] = {1.0, 0.0, 1.0, 0.0};
+    double R[2*2] = {0.0, 1.0, -1.0, 0.0};
+    double lbL[2] = {0.0, 0.0};
+    double lbR[2] = {0.0, -0.5};
 
     double x0[2] = {0.0, 0.0};
 
@@ -53,7 +53,7 @@ int main() {
 	lcqp.setOptions( options );
 
     // Solve first LCQP
-	ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2, lbS1, 0, lbS2, 0, 0, 0, 0, 0, 0, x0);
+	ReturnValue retVal = lcqp.loadLCQP( Q, g, L, R, lbL, 0, lbR, 0, 0, 0, 0, 0, 0, x0);
 
     if (retVal != SUCCESSFUL_RETURN)
     {
@@ -87,7 +87,7 @@ int main() {
     options.setSolveZeroPenaltyFirst(false);
     options.setInitialPenaltyParameter(10.0);
 	lcqp.setOptions( options );
-	retVal = lcqp.loadLCQP( H, g, S1, S2, lbS1, 0, lbS2, 0, 0, 0, 0, 0, 0, x0);
+	retVal = lcqp.loadLCQP( Q, g, L, R, lbL, 0, lbR, 0, 0, 0, 0, 0, 0, x0);
 
     if (retVal != SUCCESSFUL_RETURN)
     {

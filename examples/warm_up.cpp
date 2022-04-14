@@ -29,10 +29,10 @@ int main() {
     std::cout << "Preparing dense warm up problem...\n";
 
     /* Setup data of first QP. */
-    double H[2*2] = { 2.0, 0.0, 0.0, 2.0 };
+    double Q[2*2] = { 2.0, 0.0, 0.0, 2.0 };
     double g[2] = { -2.0, -2.0 };
-    double S1[1*2] = {1.0, 0.0};
-    double S2[1*2] = {0.0, 1.0};
+    double L[1*2] = {1.0, 0.0};
+    double R[1*2] = {0.0, 1.0};
 
     double x0[2] = {1.0, 1.0};
     double y0[4] = {0.0, 0.0, 0.0, 0.0};
@@ -48,8 +48,8 @@ int main() {
     options.setQPSolver(QPSolver::QPOASES_DENSE);
 	lcqp.setOptions( options );
 
-    // Solve first LCQP
-	ReturnValue retVal = lcqp.loadLCQP( H, g, S1, S2, 0, 0, 0, 0, 0, 0, 0, 0, 0, x0, y0);
+    // Load data
+	ReturnValue retVal = lcqp.loadLCQP( Q, g, L, R, 0, 0, 0, 0, 0, 0, 0, 0, 0, x0, y0);
 
     if (retVal != SUCCESSFUL_RETURN)
     {
