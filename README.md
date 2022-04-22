@@ -73,6 +73,13 @@ Navigate your MATLAB editor to the directory `<LCQPow-dir>/interfaces/matlab/exa
 
 Type `help LCQPow` in order to obtain the documentation of our MATLAB interface.
 
+## Sparse vs Dense
+The most tested version of LCQPow uses qpOASES with dense linear algebra. There exist two alternatives:
+  - using OSQP, which exploits sparsity naturally,
+  - or using qpOASES Schur complement method (uses sparse linear solver MA57).
+
+Usage of the qpOASES sparse method relies on some Matlab libraries (libmwma57.so, libmwlapack.so, libmwblas.so, libmwmetis.so), which are automatically detected and linked if they exist.
+
 ## License
 The file LICENSE contains a copy of the GNU Lesser General Public License (v2.1). Please read it carefully before using LCQPow!
 

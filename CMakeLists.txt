@@ -156,26 +156,48 @@ if (${QPOASES_SCHUR})
     )
 
     set(
-        LAPACK_LIB
+        LIB_LAPACK
         "${MATLAB_LIBDIR}/libmwlapack.so"
     )
 
     set(
-        BLAS_LIB
+        LIB_BLAS
         "${MATLAB_LIBDIR}/libmwblas.so"
     )
 
     set(
-        qpOASES_MAKE_ARGS
-        ${qpOASES_MAKE_ARGS} LIB_SOLVER=${LIB_SOLVER} LIB_BLAS=${BLAS_LIB} LIB_LAPACK=${LAPACK_LIB} LINKHSL=${LINKHSL}
+        LIB_METIS
+        "${MATLAB_LIBDIR}/libmwmetis.so"
     )
 
-    message(
-        "Located the following dependencies for Schur Comeplement Method:\n"
-        "MA57   ${LIB_SOLVER}\n"
-        "BLAS   ${BLAS_LIB}\n"
-        "LAPACK ${LAPACK_LIB}"
+    set(
+        sparse_libs
+        "${LIB_SOLVER} ${LIB_BLAS} ${LIB_LAPACK} ${LIB_METIS}"
     )
+
+    set(
+        qpOASES_MAKE_ARGS
+        ${qpOASES_MAKE_ARGS} LIB_SOLVER=${LIB_SOLVER} LIB_BLAS=${LIB_BLAS} LIB_LAPACK=${LIB_LAPACK} LINKHSL=${LINKHSL}
+    )
+
+    if(NOT EXISTS ${LIB_SOLVER} OR NOT EXISTS ${LIB_BLAS} OR NOT EXISTS ${LIB_LAPACK} OR NOT EXISTS ${LIB_METIS})
+        message(
+            FATAL_ERROR
+            "Failed to locate one of the following dependencies for Schur Complement Method:\n"
+            "MA57   ${LIB_SOLVER}\n"
+            "BLAS   ${LIB_BLAS}\n"
+            "LAPACK ${LIB_LAPACK}\n"
+            "METIS  ${LIB_METIS}"
+        )
+    else()
+        message(
+            "Located the following dependencies for Schur Comeplement Method:\n"
+            "MA57   ${LIB_SOLVER}\n"
+            "BLAS   ${LIB_BLAS}\n"
+            "LAPACK ${LIB_LAPACK}\n"
+            "METIS  ${LIB_METIS}"
+        ) 
+    endif()
 endif()
 
 set(
@@ -298,6 +320,20 @@ if (${QPOASES_SCHUR})
         ${PROJECT_NAME}-shared
         PRIVATE ${Matlab_LIBRARIES}
     )
+
+    get_filename_component(LIB_SOLVER_NAME ${LIB_SOLVER} NAME)
+    get_filename_component(LIB_BLAS_NAME ${LIB_BLAS} NAME)
+    get_filename_component(LIB_LAPACK_NAME ${LIB_LAPACK} NAME)
+    get_filename_component(LIB_METIS_NAME ${LIB_METIS} NAME)
+
+
+    ADD_CUSTOM_TARGET(link_schur ALL 
+        COMMAND ${CMAKE_COMMAND} -E create_symlink ${LIB_SOLVER} lib/${LIB_SOLVER_NAME}
+        COMMAND ${CMAKE_COMMAND} -E create_symlink ${LIB_BLAS} lib/${LIB_BLAS_NAME}
+        COMMAND ${CMAKE_COMMAND} -E create_symlink ${LIB_LAPACK} lib/${LIB_LAPACK_NAME}
+        COMMAND ${CMAKE_COMMAND} -E create_symlink ${LIB_METIS} lib/${LIB_METIS_NAME}
+    )
+
 endif()
 
 ## Build examples -----------------------------------------------------------------------
@@ -472,41 +508,7 @@ if (${UNIT_TESTS})
     target_link_libraries(
         RunUnitTests
         PUBLIC ${PROJECT_NAME}-shared
-        PRIVATE ${qpoases_lib} ${osqp_lib} ${gtest_lib}
+        PRIVATE ${qpoases_lib} ${osqp_lib} ${gtest_lib} ${LIB_SOLVER}
         PRIVATE -lpthread
     )
 endif()
-
-# ## Build documentation
-# if (${BUILD_DOCUMENTATION})
-#     find_package(
-#         Doxygen
-#         REQUIRED dot
-#     )
-
-#     if (DOXYGEN_FOUND)
-#         message(
-#             STATUS
-#             "Found doxygen: Building documentation."
-#         )
-
-#         doxygen_add_docs(
-#             doxy
-#             "include"
-#         )
-
-#         set(DOXYGEN_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../docs")
-
-#         set(DOXYGEN_GENERATE_HTML YES)
-#         set(DOXYGEN_GENERATE_MAN YES)
-
-#         set(DOXYGEN_PROJECT_BRIEF "LCQPow -- A Linear Complementarity Quadratic Programming Solver")
-#     else()
-#         message(
-#             WARNING
-#             "Could not find doxygen: Not building documentation."
-#         )
-#     endif()
-# endif()
-
-## End of cmake file --------------------------------------------------------------------
