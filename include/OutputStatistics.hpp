@@ -2,7 +2,7 @@
  *	This file is part of LCQPow.
  *
  *	LCQPow -- A Solver for Quadratic Programs with Commplementarity Constraints.
- *	Copyright (C) 2020 - 2021 by Jonas Hall et al.
+ *	Copyright (C) 2020 - 2022 by Jonas Hall et al.
  *
  *	LCQPow is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
@@ -20,8 +20,8 @@
  */
 
 
-#ifndef LCQPow_OUTPUTSTATISTICS_HPP
-#define LCQPow_OUTPUTSTATISTICS_HPP
+#ifndef LCQPOW_OUTPUTSTATISTICS_HPP
+#define LCQPOW_OUTPUTSTATISTICS_HPP
 
 #include "Utilities.hpp"
 #include <vector>
@@ -30,8 +30,10 @@ namespace LCQPow {
 
     class OutputStatistics {
         public:
+
             /** Default constructor. */
             OutputStatistics( );
+
 
             /** Assignment operator.
              *
@@ -43,11 +45,13 @@ namespace LCQPow {
             /** Resets the statistics. */
             void reset( );
 
+
             /** Update total iteration counter.
              *
              * @return Success or specifies the invalid argument.
             */
             ReturnValue updateIterTotal( int delta_iter );
+
 
             /** Update total outer iteration counter.
              *
@@ -55,11 +59,13 @@ namespace LCQPow {
             */
             ReturnValue updateIterOuter( int delta_iter );
 
+
             /** Update total number of working set changes counter.
              *
              * @return Success or specifies the invalid argument.
             */
             ReturnValue updateSubproblemIter( int delta_iter );
+
 
             /** Update rho at solution.
              *
@@ -67,17 +73,20 @@ namespace LCQPow {
             */
             ReturnValue updateRhoOpt( double _rho );
 
+
             /** Update the solution status.
              *
              * @return Success or specifies the invalid argument.
             */
             ReturnValue updateSolutionStatus( AlgorithmStatus _status );
 
+
             /** Update the QP solver exit flag.
              *
              * @return Success.
             */
             ReturnValue updateQPSolverExitFlag( int _flag );
+
 
             /** Update tracking vectors.
              *
@@ -94,90 +103,114 @@ namespace LCQPow {
                 double meritVals
             );
 
+
             /** Get the total number of iterations. */
             int getIterTotal( ) const;
+
 
             /** Get the total number of outer iterations. */
             int getIterOuter( ) const;
 
+
             /** Get the total number of subproblem iterations. */
             int getSubproblemIter( ) const;
+
 
             /** Get the penalty parameter at the optimal solution (if found). */
             double getRhoOpt( ) const;
 
+
             /** Get the solution status (if solved it will return the stationarity type). */
             AlgorithmStatus getSolutionStatus( ) const;
+
 
             /** Get the most recent exit flag of the QP solver. */
             int getQPSolverExitFlag( ) const;
 
+
             /** Get values of inner loop iterates.*/
             int* getInnerIters( ) const;
+
 
             /** Get values of inner loop iterates.*/
             std::vector<int> getInnerItersStdVec( ) const;
 
+
             /** Get values of subsolver iterates.*/
             int* getSubproblemIters( ) const;
+
 
             /** Get values of subsolver iterates.*/
             std::vector<int> getSubproblemItersStdVec( ) const;
 
+
             /** Get accumulated number of subsolver iterates.*/
             int* getAccuSubproblemIters( ) const;
+
 
             /** Get accumulated number of subsolver iterates.*/
             std::vector<int> getAccuSubproblemItersStdVec( ) const;
 
+
             /** Get values of alpha.*/
             double* getStepLength( ) const;
+
 
             /** Get values of alpha.*/
             std::vector<double> getStepLengthStdVec( ) const;
 
+
             /** Get values of norm of pk.*/
             double* getStepSize( ) const;
+
 
             /** Get values of norm of pk.*/
             std::vector<double> getStepSizeStdVec( ) const;
 
+
             /** Get Lagrangian's gradient violaton values.*/
             double* getStatVals( ) const;
+
 
             /** Get Lagrangian's gradient violaton values.*/
             std::vector<double> getStatValsStdVec( ) const;
 
+
             /** Get objective function values.*/
             double* getObjVals( ) const;
+
 
             /** Get objective function values.*/
             std::vector<double> getObjValsStdVec( ) const;
 
+
             /** Get penalty function values.*/
             double* getPhiVals( ) const;
+
 
             /** Get penalty function values.*/
             std::vector<double> getPhiValsStdVec( ) const;
 
+
             /** Get merit function values.*/
             double* getMeritVals( ) const;
+
 
             /** Get merit function values.*/
             std::vector<double> getMeritValsStdVec( ) const;
 
         private:
-            int iterTotal = 0;                                 /**< Total number of iterations, i.e., total number of inner iterations. */
-            int iterOuter = 0;                                 /**< Total number of outer iterations, i.e., number of penalty updates. */
-            int subproblemIter = 0;                            /**< Total number of subsolver iterations. */
-            double rhoOpt = 0.0;                               /**< Value of penalty parameter at the final iterate. */
-            AlgorithmStatus status = PROBLEM_NOT_SOLVED;       /**< Status of the solver. This is set to the solution type on success. */
-            int qpSolver_exit_flag = 0;                        /**< The exit flag of the most recent QP solved (refer to the respective QP solver docs for meanings). */
+            int iterTotal = 0;                                  /**< Total number of iterations, i.e., total number of inner iterations. */
+            int iterOuter = 0;                                  /**< Total number of outer iterations, i.e., number of penalty updates. */
+            int subproblemIter = 0;                             /**< Total number of subsolver iterations. */
+            double rhoOpt = 0.0;                                /**< Value of penalty parameter at the final iterate. */
+            AlgorithmStatus status = PROBLEM_NOT_SOLVED;        /**< Status of the solver. This is set to the solution type on success. */
+            int qpSolver_exit_flag = 0;                         /**< The exit flag of the most recent QP solved (refer to the respective QP solver docs for meanings). */
 
             // Tracking vectors
-            std::vector<int>    innerIters;                    /**< Number of inner iterations (accumulated per inner loop). */
-            std::vector<int>    subproblemIters;               /**< Number of subsolver iterations for each inner loop. */
-            std::vector<int>    accuSubproblemIters;          /**< Accumulated number of subsolver iterations. */
+            std::vector<int>    innerIters;                     /**< Number of inner iterations (accumulated per inner loop). */
+            std::vector<int>    subproblemIters;                /**< Number of subsolver iterations for each inner loop. */
+            std::vector<int>    accuSubproblemIters;            /**< Accumulated number of subsolver iterations. */
             std::vector<double> stepLength;                     /**< Track values of alpha. */
             std::vector<double> stepSize;                       /**< Track norm of pk. */
             std::vector<double> statVals;                       /**< Track values of Lagrangian's gradient violation. */
@@ -187,4 +220,4 @@ namespace LCQPow {
     };
 }
 
-#endif  // LCQPow_OUTPUTSTATISTICS_HPP
+#endif  // LCQPOW_OUTPUTSTATISTICS_HPP

@@ -2,7 +2,7 @@
  *	This file is part of LCQPow.
  *
  *	LCQPow -- A Solver for Quadratic Programs with Commplementarity Constraints.
- *	Copyright (C) 2020 - 2021 by Jonas Hall et al.
+ *	Copyright (C) 2020 - 2022 by Jonas Hall et al.
  *
  *	LCQPow is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
@@ -19,20 +19,23 @@
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef LCQPow_SUBSOLVERBASE_HPP
-#define LCQPow_SUBSOLVERBASE_HPP
+#ifndef LCQPOW_SUBSOLVERBASE_HPP
+#define LCQPOW_SUBSOLVERBASE_HPP
 
 #include "Utilities.hpp"
 
 namespace LCQPow {
     class SubsolverBase {
+
         public:
+
 			/** Get the primal and dual solution.
              *
              * @param x Pointer to the (assumed to be allocated) primal solution vector.
              * @param y Pointer to the (assumed to be allocated) dual solution vector.
             */
             virtual void getSolution( double* x, double* y ) = 0;
+
 
             /** Abstract method for solving the QP.
              *
@@ -55,4 +58,4 @@ namespace LCQPow {
     };
 }
 
-#endif  // LCQPow_SUBSOLVERBASE_HPP
+#endif  // LCQPOW_SUBSOLVERBASE_HPP

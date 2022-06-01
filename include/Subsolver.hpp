@@ -2,7 +2,7 @@
  *	This file is part of LCQPow.
  *
  *	LCQPow -- A Solver for Quadratic Programs with Commplementarity Constraints.
- *	Copyright (C) 2020 - 2021 by Jonas Hall et al.
+ *	Copyright (C) 2020 - 2022 by Jonas Hall et al.
  *
  *	LCQPow is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
@@ -19,8 +19,8 @@
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef LCQPow_SUBSOLVER_HPP
-#define LCQPow_SUBSOLVER_HPP
+#ifndef LCQPOW_SUBSOLVER_HPP
+#define LCQPOW_SUBSOLVER_HPP
 
 #include "SubsolverQPOASES.hpp"
 #include "SubsolverOSQP.hpp"
@@ -28,9 +28,12 @@
 namespace LCQPow {
 
     class Subsolver {
+
         public:
+
 			/** Default constructor. */
 			Subsolver( );
+
 
             /** Constructor for dense matrices (qpOASES).
              *
@@ -43,6 +46,7 @@ namespace LCQPow {
                         int nC,
                         double* Q,
                         double* A );
+
 
             /** Constructor for sparse matrices (qpOASES/OSQP).
              *
@@ -58,17 +62,22 @@ namespace LCQPow {
                         csc* A,
                         QPSolver qpSolver);
 
+
             /** Copy constructor. */
             Subsolver(const Subsolver& rhs);
+
 
             /** Assignment operator (deep copy). */
             virtual Subsolver& operator=(const Subsolver& rhs);
 
+
             /** Write solution to x and y. */
             void getSolution( double* x, double* y );
 
+
             /** Options of subproblem solver. */
             void setPrintLevel( PrintLevel printLevel );
+
 
             /** Abstract method for solving the QP. */
             ReturnValue solve(  bool initialSolve, int& iterations, int& exit_flag,
@@ -77,7 +86,9 @@ namespace LCQPow {
                                 const double* x0 = 0, const double* y0 = 0,
                                 const double* lb = 0, const double* ub = 0);
 
+
         protected:
+
             /** Copies all members from given rhs object. */
             void copy(const Subsolver& rhs);
 
@@ -95,4 +106,4 @@ namespace LCQPow {
     };
 }
 
-#endif  // LCQPow_SUBSOLVER_HPP
+#endif  // LCQPOW_SUBSOLVER_HPP

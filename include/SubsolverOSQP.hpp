@@ -2,7 +2,7 @@
  *	This file is part of LCQPow.
  *
  *	LCQPow -- A Solver for Quadratic Programs with Commplementarity Constraints.
- *	Copyright (C) 2020 - 2021 by Jonas Hall et al.
+ *	Copyright (C) 2020 - 2022 by Jonas Hall et al.
  *
  *	LCQPow is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
@@ -19,8 +19,8 @@
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef LCQPow_SUBSOLVEROSQP_HPP
-#define LCQPow_SUBSOLVEROSQP_HPP
+#ifndef LCQPOW_SUBSOLVEROSQP_HPP
+#define LCQPOW_SUBSOLVEROSQP_HPP
 
 #include "SubsolverBase.hpp"
 
@@ -31,9 +31,12 @@ extern "C" {
 
 namespace LCQPow {
     class SubsolverOSQP : public SubsolverBase {
+
         public:
-			/** Default constructor. */
+		
+        	/** Default constructor. */
 			SubsolverOSQP( );
+
 
             /** Constructor for sparse matrices.
              *
@@ -44,23 +47,30 @@ namespace LCQPow {
                             const csc* const _A
                             );
 
+
             /** Copy constructor. */
             SubsolverOSQP(const SubsolverOSQP& rhs);
+
 
             /** Destructor. */
             ~SubsolverOSQP( );
 
+
             /** Clear memory. */
             void clear();
+
 
             /** Assignment operator (deep copy). */
             virtual SubsolverOSQP& operator=(const SubsolverOSQP& rhs);
 
+
             /** Set OSQP settings. */
             void setOptions( OSQPSettings* settings );
 
+
             /** Set print level. */
             void setPrintlevl( bool verbose );
+
 
             /** Implementation for applying the subsolver to solve the QP.
              *
@@ -80,6 +90,7 @@ namespace LCQPow {
                                 const double* const x0 = 0, const double* const y0 = 0,
                                 const double* const _lb = 0, const double* const _ub = 0);
 
+
 			/** Get the primal and dual solution.
              *
              * @param x Pointer to the (assumed to be allocated) primal solution vector.
@@ -87,16 +98,21 @@ namespace LCQPow {
             */
             void getSolution( double* x, double* y );
 
+
         protected:
+
             /** Copies all members from given rhs object. */
             void copy(const SubsolverOSQP& rhs);
 
+
         private:
-			/** Checks wheather the ptr is null. */
+
+			/** Checks if the ptr is null. */
 			template <typename PtrType>
 		    static bool isNotNullPtr(PtrType ptr) { 
 				  return (ptr != NULL && ptr != nullptr);
 			}
+
 
             int nV;                                 /**< Number of optimization variables. */
             int nC;                                 /**< Number of constraints. */
@@ -110,4 +126,4 @@ namespace LCQPow {
     };
 }
 
-#endif  // LCQPow_SUBSOLVEROSQP_HPP
+#endif  // LCQPOW_SUBSOLVEROSQP_HPP

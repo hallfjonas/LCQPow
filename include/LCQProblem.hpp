@@ -2,7 +2,7 @@
  *	This file is part of LCQPow.
  *
  *	LCQPow -- A Solver for Quadratic Programs with Commplementarity Constraints.
- *	Copyright (C) 2020 - 2021 by Jonas Hall et al.
+ *	Copyright (C) 2020 - 2022 by Jonas Hall et al.
  *
  *	LCQPow is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
@@ -20,8 +20,8 @@
  */
 
 
-#ifndef LCQPow_LCQPROBLEM_HPP
-#define LCQPow_LCQPROBLEM_HPP
+#ifndef LCQPOW_LCQPROBLEM_HPP
+#define LCQPOW_LCQPROBLEM_HPP
 
 #include "Utilities.hpp"
 #include "Subsolver.hpp"
@@ -38,6 +38,9 @@ namespace LCQPow {
 	class LCQProblem
 	{
 
+		/**
+		 *	PUBLIC METHODS
+		 */
 		public:
 
 			/** Default constructor. */
@@ -67,6 +70,10 @@ namespace LCQPow {
 			 * @param _g The obective's linear term.
 			 * @param _L The matrix selecting the left hand side of the complementarity pairs.
 			 * @param _R The matrix selecting the right hand side of the complementarity pairs.
+			 * @param _lbL The lower bounds associated to the complementarity matrix `_L`. A `NULL` leads to zero bounds.
+			 * @param _ubL The upper bounds associated to the complementarity matrix `_L`. A `NULL` pointer can be passed if no upper bounds exist.
+			 * @param _lbR The lower bounds associated to the complementarity matrix `_R`. A `NULL` leads to zero boudns.
+			 * @param _ubR The upper bounds associated to the complementarity matrix `_R`. A `NULL` pointer can be passed if no upper bounds exist.
 			 * @param _A The constraint matrix. A `NULL` pointer can be passed if no linear constraints exist.
 			 * @param _lbA The lower bounds associated to the constraint matrix `_A`. A `NULL` pointer can be passed if no lower bounds exist.
 			 * @param _ubA The upper bounds associated to the constraint matrix `_A`. A `NULL` pointer can be passed if no upper bounds exist.
@@ -103,6 +110,10 @@ namespace LCQPow {
 			 * @param g_file The obective's linear term.
 			 * @param L_file The matrix selecting the left hand side of the complementarity pairs.
 			 * @param R_file The matrix selecting the right hand side of the complementarity pairs.
+			 * @param lbL_file The lower bounds associated to the complementarity matrix `_L`. A `NULL` leads to zero bounds.
+			 * @param ubL_file The upper bounds associated to the complementarity matrix `_L`. A `NULL` pointer can be passed if no upper bounds exist.
+			 * @param lbR_file The lower bounds associated to the complementarity matrix `_R`. A `NULL` leads to zero boudns.
+			 * @param ubR_file The upper bounds associated to the complementarity matrix `_R`. A `NULL` pointer can be passed if no upper bounds exist.
 			 * @param A_file The constraint matrix. A `NULL` pointer can be passed if no linear constraints exist.
 			 * @param lbA_file The lower bounds associated to the constraint matrix `_A`. A `NULL` pointer can be passed if no lower bounds exist.
 			 * @param ubA_file The upper bounds associated to the constraint matrix `_A`. A `NULL` pointer can be passed if no upper bounds exist.
@@ -138,6 +149,10 @@ namespace LCQPow {
 			 * @param _g The objective's linear term.
 			 * @param _L LHS of complementarity product in csc sparse format.
 			 * @param _R RHS of complementarity product in csc sparse format.
+			 * @param _lbL The lower bounds associated to the complementarity matrix `_L`. A `NULL` leads to zero bounds.
+			 * @param _ubL The upper bounds associated to the complementarity matrix `_L`. A `NULL` pointer can be passed if no upper bounds exist.
+			 * @param _lbR The lower bounds associated to the complementarity matrix `_R`. A `NULL` leads to zero boudns.
+			 * @param _ubR The upper bounds associated to the complementarity matrix `_R`. A `NULL` pointer can be passed if no upper bounds exist.
 			 * @param _A Constraint matrix in csc sparse format.
 			 * @param _lbA The constraints lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
 			 * @param _ubA The constraints upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
@@ -192,7 +207,7 @@ namespace LCQPow {
 
 			/** Writes the dual solution vector.
 			 *
-			 * @param yOpt A pointer to the desired dual solution storage vector.
+			 * @param yOpt A pointer to the desired dual solution storage vector (assumed to be allocated).
 			 *
 			 * @returns If the problem was solved successfully the stationarity type is passed. Else PROBLEM_NOT_SOLVED is returned.
 			 */
@@ -227,9 +242,9 @@ namespace LCQPow {
 			inline void setOptions(	const Options& _options	);
 
 
-		/*
-		*	PROTECTED MEMBER FUNCTIONS
-		*/
+		/**
+    	 *	PROTECTED METHODS
+		 */
 		protected:
 			/** Clears all memory. */
 			void clear( );
@@ -347,6 +362,7 @@ namespace LCQPow {
 			 */
 			ReturnValue setC( );
 
+
 			/** Sets the initial guess x0 and y0.
 			 *
 			 * @param _x0 The primal initial guess.
@@ -357,57 +373,30 @@ namespace LCQPow {
 				const double* const _y0
 			);
 
-			/** TODO: Write description. */
-			inline ReturnValue setSparseMatrix(
-				const double* const _M_data,
-				const int _M_nnx,
-				const int* const _M_i,
-				const int* const _M_p,
-				qpOASES::SparseMatrix Mat
-			);
-
-			/** TODO: Write description. */
-			inline ReturnValue setSparseMatrix(
-				const double* const _M_data,
-				const int _M_nnx,
-				const int* const _M_i,
-				const int* const _M_p,
-				qpOASES::SymSparseMat Mat
-			);
-
 
 			/** Set Qk. */
 			void setQk( );
 
 
-			/** Returns the NLP stationarity vector.
-			 *
-			 * @param x_eval The point at which the stationarity should be evaluated (TODO: why no y_eval?).
-			 * @param penVal The current penalty value.
-			 * @param g_original The original objective linear term.
-			 *
-			 * @returns The stationarity vector.
-			 */
-			double* getPenaltyStationarity(
-				const double* const x_eval,
-				const double penVal,
-				const double* const g_original
-			);
-
-
-		/*
-		*	PROTECTED MEMBER VARIABLES
-		*/
+		/**
+		 *	PROTECTED MEMBER VARIABLES
+		 */
 		protected:
 			Options options;						/**< Class for algorithmic options. */
 
+
+		/**
+	     *	PRIVATE STUFF
+		 */
 		private:
 
-			/** Checks wheather the ptr is null. */
+			/** Checks if the ptr is null. */
 			template <typename PtrType>
 		    static bool isNullPtr(PtrType ptr) { 
 				return (ptr == 0 || ptr == nullptr);
 			}
+
+			/** Checks if the ptr is not null. */
 			template <typename PtrType>
 		    static bool isNotNullPtr(PtrType ptr) { 
 				  return (ptr != NULL && ptr != nullptr);
@@ -559,4 +548,4 @@ namespace LCQPow {
 
 #include "LCQProblem.ipp"
 
-#endif	/* LCQPow_LCQPROBLEM_HPP */
+#endif	/* LCQPOW_LCQPROBLEM_HPP */

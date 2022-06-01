@@ -2,7 +2,7 @@
  *	This file is part of LCQPow.
  *
  *	LCQPow -- A Solver for Quadratic Programs with Commplementarity Constraints.
- *	Copyright (C) 2020 - 2021 by Jonas Hall et al.
+ *	Copyright (C) 2020 - 2022 by Jonas Hall et al.
  *
  *	LCQPow is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
@@ -20,8 +20,8 @@
  */
 
 
-#ifndef LCQPow_OPTIONS_HPP
-#define LCQPow_OPTIONS_HPP
+#ifndef LCQPOW_OPTIONS_HPP
+#define LCQPOW_OPTIONS_HPP
 
 #include "Utilities.hpp"
 
@@ -34,14 +34,17 @@ namespace LCQPow {
             /** Default constructor. */
             Options( );
 
+
             /** Copy constructor (deep copy).
              *
              * @param rhs The object to be copied.
             */
             Options( const Options& rhs );
 
+
             /** Destructor. */
             ~Options( );
+
 
             /** Assignment operator.
              *
@@ -49,83 +52,110 @@ namespace LCQPow {
             */
             Options& operator=( const Options& rhs );
 
+
             /** Sets all options to default values. */
             void setToDefault( );
+
 
             /** Get stationarity tolerance. */
             double getStationarityTolerance( );
 
+
             /** Set stationarity tolerance. */
             ReturnValue setStationarityTolerance( double val );
+
 
             /** Get complementarity tolerance. */
             double getComplementarityTolerance( );
 
+
             /** Set complementarity tolerance. */
             ReturnValue setComplementarityTolerance( double val );
+
 
             /** Get initial penalty parameter. */
             double getInitialPenaltyParameter( );
 
+
             /** Set complementarity tolerance. */
             ReturnValue setInitialPenaltyParameter( double val );
+
 
             /** Get penalty parameter update factor. */
             double getPenaltyUpdateFactor( );
 
+
             /** Set penalty parameter update factor. */
             ReturnValue setPenaltyUpdateFactor( double val );
+
 
             /** Get whether to solve for (complement.) unconstrained global minumum first. */
             bool getSolveZeroPenaltyFirst( );
 
+
             /** Set whether to solve for (complement.) unconstrained global minumum first. */
             ReturnValue setSolveZeroPenaltyFirst( bool val );
+
 
             /** Get maximum number of iterations. */
             int getMaxIterations( );
 
+
             /** Set maximum number of iterations. */
             ReturnValue setMaxIterations( int val );
+
 
             /** Get maximum penalty value. */
             double getMaxRho( );
 
+
             /** Set maximum penalty value. */
             ReturnValue setMaxRho( double val );
+
 
             /** Get number of previous complementarity values to check against (Leyffer strategy). */
             int getNDynamicPenalty( );
 
+
             /** Set number of previous complementarity values to check against (Leyffer strategy). */
             ReturnValue setNDynamicPenalty( int val );
+
 
             /** Get fraction required for complementarity loss (Leyffer strategy). */
             double getEtaDynamicPenalty( );
 
+
             /** Get fraction required for complementarity loss (Leyffer strategy). */
             ReturnValue setEtaDynamicPenalty( double val );
+
 
             /** Get print level. */
             PrintLevel getPrintLevel( );
 
+
             /** Set print level. */
             ReturnValue setPrintLevel( PrintLevel val );
+
 
             /** Set print level (using an integer). */
             ReturnValue setPrintLevel( int val );
 
+
             /** Get whether to store information per iterate. */
             bool getStoreSteps( );
+
 
             /** Set whether to store information per iterate. */
             ReturnValue setStoreSteps( bool val );
 
+
             /** Get QP solver. */
             QPSolver getQPSolver( );
 
+
             /** Set print level. */
             ReturnValue setQPSolver( QPSolver val );
+
 
             /** Set print level (using an integer). */
             ReturnValue setQPSolver( int val );
@@ -143,8 +173,8 @@ namespace LCQPow {
             int maxIterations;                          /**< Maximum number of iterations to be performed. */
             double maxRho;                              /**< Maximum penalty value. */
 
-            int nDynamicPenalty;                             /**< Number of previous iterates to compare complementarity loss (only enabled if positive). */
-            double etaDynamicPenalty;                        /**< Parameter describing fraction of required complementarity loss. */
+            int nDynamicPenalty;                        /**< Number of previous iterates to compare complementarity loss (only enabled if positive). */
+            double etaDynamicPenalty;                   /**< Parameter describing fraction of required complementarity loss. */
 
             PrintLevel printLevel;                      /**< Print level. */
 
@@ -154,4 +184,4 @@ namespace LCQPow {
     };
 }
 
-#endif  // LCQPow_UTILITIES_HPP
+#endif  // LCQPOW_UTILITIES_HPP

@@ -2,7 +2,7 @@
  *	This file is part of LCQPow.
  *
  *	LCQPow -- A Solver for Quadratic Programs with Commplementarity Constraints.
- *	Copyright (C) 2020 - 2021 by Jonas Hall et al.
+ *	Copyright (C) 2020 - 2022 by Jonas Hall et al.
  *
  *	LCQPow is free software; you can redistribute it and/or
  *	modify it under the terms of the GNU Lesser General Public
@@ -19,15 +19,17 @@
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef LCQPow_SUBSOLVERQPOASES_HPP
-#define LCQPow_SUBSOLVERQPOASES_HPP
+#ifndef LCQPOW_SUBSOLVERQPOASES_HPP
+#define LCQPOW_SUBSOLVERQPOASES_HPP
 
 #include "SubsolverBase.hpp"
 #include <qpOASES.hpp>
 
 namespace LCQPow {
     class SubsolverQPOASES : public SubsolverBase {
+
         public:
+
 			/** Default constructor. */
 			SubsolverQPOASES( );
 
@@ -103,19 +105,23 @@ namespace LCQPow {
             */
             void getSolution( double* x, double* y );
 
+
         protected:
+
             /** Copies all members from given rhs object. */
             void copy(const SubsolverQPOASES& rhs);
 
+
         private:
+
 			/** Checks wheather the ptr is null. */
 			template <typename PtrType>
 		    static bool isNotNullPtr(PtrType ptr) { 
 				  return (ptr != NULL && ptr != nullptr);
 			}
 
-            int nV;                                   /**< Number of optimization variables. */
-            int nC;                                   /**< Total number of dual variables. */
+            int nV;                                     /**< Number of optimization variables. */
+            int nC;                                     /**< Total number of dual variables. */
 
             bool isSparse = false;                      /**< A flag storing whether data is given in sparse or dense format. */
             bool useSchur = false;                      /**< A flag indicating whether to use the Shur Complement method. */
@@ -127,12 +133,12 @@ namespace LCQPow {
             qpOASES::SparseMatrix* A_sparse = NULL;     /**< Constraint matrix as qpOASES sparse matrix (should contain rows of compl. sel. matrices). */
 
             double* Q_x = NULL;                         /**< Hessian matrix sparse data (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
-            int* Q_i = NULL;                          /**< Hessian matrix sparse rows (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
-            int* Q_p = NULL;                          /**< Hessian matrix sparse col pointers (required because one cannot copy a symmetric(sprase) qpOASES mat                           rix). */
+            int* Q_i = NULL;                            /**< Hessian matrix sparse rows (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
+            int* Q_p = NULL;                            /**< Hessian matrix sparse col pointers (required because one cannot copy a symmetric(sprase) qpOASES mat                           rix). */
 
             double* A_x = NULL;                         /**< Constraint matrix sparse data (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
-            int* A_i = NULL;                          /**< Constraint matrix sparse rows (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
-            int* A_p = NULL;                          /**< Constraint matrix sparse col pointers (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
+            int* A_i = NULL;                            /**< Constraint matrix sparse rows (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
+            int* A_p = NULL;                            /**< Constraint matrix sparse col pointers (required because one cannot copy a symmetric(sprase) qpOASES matrix). */
 
             qpOASES::QProblem qp;                       /**< Store a QP class and call it sequentially (using its hotstart functionality). */
             qpOASES::SQProblemSchur qpSchur;            /**< Store a Schur Complement QP class and call it sequentially (using its hotstart functionality). */
@@ -140,4 +146,4 @@ namespace LCQPow {
     };
 }
 
-#endif  // LCQPow_SUBSOLVERQPOASES_HPP
+#endif  // LCQPOW_SUBSOLVERQPOASES_HPP
