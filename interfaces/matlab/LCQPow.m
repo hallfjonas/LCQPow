@@ -1,6 +1,6 @@
 % This file is part of LCQPow.
 % LCQPow -- A Solver for Quadratic Programs with Commplementarity Constraints.
-% Copyright (C) 2020 - 2021 by Jonas Hall et al.
+% Copyright (C) 2020 - 2022 by Jonas Hall et al.
 %
 % LCQPow is free software; you can redistribute it and/or
 % modify it under the terms of the GNU Lesser General Public
