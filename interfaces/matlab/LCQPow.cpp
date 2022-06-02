@@ -582,27 +582,30 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     // Post-Processing
     // If number of duals is actually smaller than nV+nC+2*nComp (e.g. OSQP solver)
     if (nlhs > 1) {
+
+        // Allocate output vector
         int nDualsOut = lcqp.getNumberOfDuals();
+        plhs[1] = mxCreateDoubleMatrix((size_t)nDualsOut, 1, mxREAL);
+
+        // Creater pointer to output
+        double* yOpt = (double*) mxGetPr(plhs[1]);  
+
+        // Assign dual output
         if (nDualsOut <= 0) {
             mexPrintf("Failed to receive number of dual variables.\n");
             return;
         }
         
         // Copy duals to corrected size
-        double* yOpt = new double[nDualsOut];
         for (int i = 0; i < nDualsOut; i++) 
             yOpt[i] = yOptTMP[i];
         
         delete[] yOptTMP;
-        // Allocate output vector
-        plhs[1] = mxCreateDoubleMatrix((size_t)nDualsOut, 1, mxREAL);
+
         if (plhs[1] == NULL) {
             mexPrintf("Failed to allocate output of dual solution vector.\n");
             return;
         }
-
-        // Assign dual to output
-        yOpt = (double*) mxGetPr(plhs[1]);  
     }
 
     // Assign the output statistics
