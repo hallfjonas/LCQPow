@@ -18,5 +18,3 @@ done
 
 # Run unit tests
 build/bin/tests/RunUnitTests
-
-rm -r build
