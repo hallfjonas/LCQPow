@@ -10,8 +10,8 @@ cmake ..
 make
 cd ..
 
-# Run examples
-for f in ./build/bin/examples/*; do
+# Run all test examples
+for f in ./build/bin/tests/*; do
     echo "Running $f"
     $f
 done

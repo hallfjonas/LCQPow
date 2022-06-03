@@ -511,4 +511,39 @@ if (${UNIT_TESTS})
         PRIVATE ${qpoases_lib} ${osqp_lib} ${gtest_lib} ${LIB_SOLVER}
         PRIVATE -lpthread
     )
+
+    # Build examples for testing
+    aux_source_directory(test/examples TEST_FILES)
+
+    FOREACH(ELEMENT ${TEST_FILES})
+        # get filename w/o dir and extension
+        get_filename_component(EXAMPLE_NAME ${ELEMENT} NAME_WE)
+
+        # save to example test name
+        set(EXAMPLE_TEST_NAME "${EXAMPLE_NAME}_TEST")
+
+        # generate executable target
+        add_executable(${EXAMPLE_TEST_NAME} ${ELEMENT})
+
+        # link libraries
+        target_link_libraries(
+            ${EXAMPLE_TEST_NAME}
+            PUBLIC ${PROJECT_NAME}-shared
+            PRIVATE ${qpoases_lib} ${osqp_lib}
+        )
+
+        if (${QPOASES_SCHUR})
+            target_link_libraries(
+                ${EXAMPLE_TEST_NAME}
+                PRIVATE ${Matlab_LIBRARIES}
+            )
+        endif()
+
+        # specify output directory
+        set_target_properties(
+            ${EXAMPLE_TEST_NAME}
+            PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
+        )
+    endforeach()
 endif()

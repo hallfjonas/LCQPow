@@ -54,7 +54,6 @@ TEST(UtilitiesTest, MatrixMultiplicationTest) {
     ASSERT_EQ(C[7], 7);
 }
 
-
 // Testing transposed matrix multiplications
 TEST(UtilitiesTest, TransposedMatrixMultiplicationTest) {
     // A = [1 0 2; 3 1 1]
@@ -308,7 +307,7 @@ TEST(UtilitiesTest, CSCtoDNS) {
     delete[] T_full;
 }
 
-// Testing csc to dns and vice versa
+// Testing matrix format change (csc to dns and vice versa)
 TEST(UtilitiesTest, SparseDenseBackAndForth) {
 
     int numExp = 100;
@@ -351,6 +350,7 @@ TEST(UtilitiesTest, SparseDenseBackAndForth) {
     }
 }
 
+// Testing csc to triangular
 TEST(UtilitesTest, CSCtoTriangular) {
     double M_data[4] = { 2.0, 3.0, 3.0, 2.0 };
     int M_i[4] = {0, 1, 0, 1};
@@ -385,7 +385,7 @@ TEST(UtilitesTest, CSCtoTriangular) {
     ASSERT_DOUBLE_EQ(M_triag->nzmax, 3);
 }
 
-
+// Testing solver data storage (sparse to dense and vice versa) 
 TEST(LoadDataTest, DenseToSparse) {
 
     double Q[2*2] = { 2.0, 0.0, 0.0, 2.0 };
