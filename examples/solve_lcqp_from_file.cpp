@@ -37,7 +37,7 @@ int main() {
 
     std::cout << "Preparing OCP loaded from file...\n";
 
-    std::string inputdir = "examples/example_data/ocp";
+    std::string inputdir = "examples/example_data";
 
     if (!PathExists(inputdir)) {
         printf("Input directory does not exist.");
