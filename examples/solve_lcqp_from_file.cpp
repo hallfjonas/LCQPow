@@ -35,9 +35,9 @@ bool PathExists(const std::string &s)
 
 int main() {
 
-    std::cout << "Preparing optimization problem loaded from file...\n";
+    std::cout << "Preparing OCP loaded from file...\n";
 
-    std::string inputdir = "examples/example_data/one_ivocp_example";
+    std::string inputdir = "examples/example_data/ocp";
 
     if (!PathExists(inputdir)) {
         printf("Input directory does not exist.");
@@ -51,6 +51,10 @@ int main() {
     std::string ub_file = inputdir + "/" + "ub.txt";
     std::string L_file = inputdir + "/" + "L.txt";
     std::string R_file = inputdir + "/" + "R.txt";
+    std::string lb_L_file = inputdir + "/" + "lbL.txt";
+    std::string lb_R_file = inputdir + "/" + "lbR.txt";
+    std::string ub_L_file = inputdir + "/" + "ubL.txt";
+    std::string ub_R_file = inputdir + "/" + "ubR.txt";
 
     int nV = 0;
     int nC = 0;
@@ -124,7 +128,7 @@ int main() {
     lcqp.setOptions( options );
 
     // Load data
-	LCQPow::ReturnValue retVal = lcqp.loadLCQP( &Q_file[0], &g_file[0], &L_file[0], &R_file[0], 0, 0, 0, 0, Af, lbAf, ubAf, &lb_file[0], &ub_file[0], x0f, y0f );
+	LCQPow::ReturnValue retVal = lcqp.loadLCQP( &Q_file[0], &g_file[0], &L_file[0], &R_file[0], &lb_L_file[0], &ub_L_file[0], &lb_R_file[0], &ub_R_file[0], Af, lbAf, ubAf, &lb_file[0], &ub_file[0], x0f, y0f );
 
     if (retVal != LCQPow::SUCCESSFUL_RETURN)
     {
