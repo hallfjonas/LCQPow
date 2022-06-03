@@ -1333,6 +1333,7 @@ namespace LCQPow {
 
 	void LCQProblem::storeSteps( ) {
 		stats.updateTrackingVectors(
+			xk,
 			innerIter,
 			qpIterk,
 			alphak,
@@ -1340,7 +1341,8 @@ namespace LCQPow {
 			Utilities::MaxAbs(statk, nV),
 			getObj(),
 			getPhi(),
-			getMerit()
+			getMerit(),
+			nV
 		);
 	}
 

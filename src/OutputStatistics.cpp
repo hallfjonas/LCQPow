@@ -36,6 +36,8 @@ namespace LCQPow {
         rhoOpt = rhs.rhoOpt;
         status = rhs.status;
 
+        xSteps = rhs.xSteps;
+
         innerIters = rhs.innerIters;
         subproblemIters = rhs.subproblemIters;
         accuSubproblemIters = rhs.accuSubproblemIters;
@@ -58,6 +60,10 @@ namespace LCQPow {
         rhoOpt = 0.0;
         status = PROBLEM_NOT_SOLVED;
 
+        for (size_t i = 0; i < xSteps.size(); i++) 
+            xSteps[i].clear();
+
+        xSteps.clear();
         innerIters.clear();
         subproblemIters.clear();
         accuSubproblemIters.clear();
@@ -121,6 +127,7 @@ namespace LCQPow {
 
 
     ReturnValue OutputStatistics::updateTrackingVectors(
+                double* thisxSteps,  
                 int thisInnerIter,
                 int thisSubproblemIter,
                 double thisStepLength,
@@ -128,9 +135,15 @@ namespace LCQPow {
                 double statVal,
                 double objVal,
                 double phiVal,
-                double meritVal
+                double meritVal,
+                int nV
             )
     {
+        std::vector<double> xkStored;
+        for (int i = 0; i < nV; i++)
+            xkStored.push_back(thisxSteps[i]);
+        xSteps.push_back(xkStored);
+
         innerIters.push_back(thisInnerIter);
         subproblemIters.push_back(thisSubproblemIter);
         if (accuSubproblemIters.size() == 0)
@@ -351,6 +364,12 @@ namespace LCQPow {
     std::vector<double> OutputStatistics::getMeritValsStdVec( ) const
     {
         return meritVals;
+    }
+
+
+    std::vector<std::vector<double>> OutputStatistics::getxStepsStdVec( ) const
+    {
+        return xSteps;
     }
 
 }

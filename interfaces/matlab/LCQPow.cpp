@@ -616,18 +616,18 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         if (options.getStoreSteps()) {
             const char* fieldnames[] = {
                 "iters_total", "iters_outer", "iters_subproblem", "rho_opt", "elapsed_time", "exit_flag",
-                "innerIters", "subproblemIters", "accumulatedSubproblemIters", "stepLength", "stepSize",
-                "statVals", "objVals", "phiVals", "meritVals"
+                "innerIters", "xSteps", "accumulatedSubproblemIters", "stepLength", "stepSize",
+                "statVals", "objVals", "phiVals", "meritVals", "subproblemIters"
             };
-            numberStatOutputs += 9;
+            numberStatOutputs += 10;
 
             // Allocate memory
-            plhs[2] = mxCreateStructMatrix(1,1,numberStatOutputs, fieldnames);
+            plhs[2] = mxCreateStructMatrix(1, 1, numberStatOutputs, fieldnames);
         } else {
             const char* fieldnames[] = {"iters_total", "iters_outer", "iters_subproblem", "rho_opt", "elapsed_time", "exit_flag"};
 
             // Allocate memory
-            plhs[2] = mxCreateStructMatrix(1,1,numberStatOutputs, fieldnames);
+            plhs[2] = mxCreateStructMatrix(1, 1, numberStatOutputs, fieldnames);
         }
 
         // assert that allocation went ok
@@ -673,6 +673,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         if (options.getStoreSteps()) {
 
             if (stats.getIterTotal() > 0) {
+                mxArray* xStepsArr = mxCreateDoubleMatrix((mwSize)(stats.getIterTotal()*nV), 1, mxREAL);
                 mxArray* innerItersArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
                 mxArray* subproblemItersArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
                 mxArray* accuSubproblemItersArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
@@ -683,6 +684,10 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 mxArray* phiValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
                 mxArray* meritValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
 
+                printf("Iterations: %d\n", stats.getIterTotal());
+                printf("Iterations*nV: %d", stats.getIterTotal()*nV);
+
+                double* xSteps = (double*) mxGetPr(xStepsArr);
                 double* innerIters = (double*) mxGetPr(innerItersArr);
                 double* subproblemIters = (double*) mxGetPr(subproblemItersArr);
                 double* accuSubproblemIters = (double*) mxGetPr(accuSubproblemItersArr);
@@ -693,6 +698,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 double* phiVals = (double*) mxGetPr(phiValsArr);
                 double* meritVals = (double*) mxGetPr(meritValsArr);
 
+                std::vector<std::vector<double>> xStepsTMP = stats.getxStepsStdVec( );
                 int* innerItersTMP = stats.getInnerIters( );
                 int* subproblemItersTMP = stats.getSubproblemIters( );
                 int* accuSubproblemItersTMP = stats.getAccuSubproblemIters( );
@@ -704,6 +710,12 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 double* meritValsTMP = stats.getMeritVals( );
 
                 for (int i = 0; i < stats.getIterTotal(); i++) {
+                    printf("Hello.\n");
+                    for (int j = 0; j < nV; j++) {
+                        xSteps[i*nV+j] = xStepsTMP[i][j];
+                        printf("Bello.\n");
+                    }
+
                     innerIters[i] = innerItersTMP[i];
                     subproblemIters[i] = subproblemItersTMP[i];
                     accuSubproblemIters[i] = accuSubproblemItersTMP[i];
@@ -715,7 +727,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                     meritVals[i] = meritValsTMP[i];
                 }
 
-                mxSetFieldByNumber(plhs[2], 0, 7, innerItersArr);
+                mxSetFieldByNumber(plhs[2], 0, 7, xStepsArr);
                 mxSetFieldByNumber(plhs[2], 0, 8, subproblemItersArr);
                 mxSetFieldByNumber(plhs[2], 0, 9, accuSubproblemItersArr);
                 mxSetFieldByNumber(plhs[2], 0, 10, stepLengthArr);
@@ -724,6 +736,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 mxSetFieldByNumber(plhs[2], 0, 13, objValsArr);
                 mxSetFieldByNumber(plhs[2], 0, 14, phiValsArr);
                 mxSetFieldByNumber(plhs[2], 0, 15, meritValsArr);
+                mxSetFieldByNumber(plhs[2], 0, 16, innerItersArr);
 
                 delete[] innerItersTMP;
                 delete[] subproblemItersTMP;
@@ -734,6 +747,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 delete[] objValsTMP;
                 delete[] phiValsTMP;
                 delete[] meritValsTMP;
+                xStepsTMP.clear();
             }
         }
     }

@@ -93,6 +93,7 @@ namespace LCQPow {
              * @return Success or specifies the invalid argument.
              */
             ReturnValue updateTrackingVectors(
+                double* xStep,
                 int innerIters,
                 int subproblemIters,
                 double stepLength,
@@ -100,7 +101,8 @@ namespace LCQPow {
                 double statVals,
                 double objVals,
                 double phiVals,
-                double meritVals
+                double meritVals,
+                int nV
             );
 
 
@@ -199,6 +201,10 @@ namespace LCQPow {
             /** Get merit function values.*/
             std::vector<double> getMeritValsStdVec( ) const;
 
+
+            /** Get primal iterates. */
+            std::vector<std::vector<double>> getxStepsStdVec ( ) const;
+
         private:
             int iterTotal = 0;                                  /**< Total number of iterations, i.e., total number of inner iterations. */
             int iterOuter = 0;                                  /**< Total number of outer iterations, i.e., number of penalty updates. */
@@ -211,6 +217,7 @@ namespace LCQPow {
             std::vector<int>    innerIters;                     /**< Number of inner iterations (accumulated per inner loop). */
             std::vector<int>    subproblemIters;                /**< Number of subsolver iterations for each inner loop. */
             std::vector<int>    accuSubproblemIters;            /**< Accumulated number of subsolver iterations. */
+            std::vector<std::vector<double>> xSteps;            /**< Primal iterates. */
             std::vector<double> stepLength;                     /**< Track values of alpha. */
             std::vector<double> stepSize;                       /**< Track norm of pk. */
             std::vector<double> statVals;                       /**< Track values of Lagrangian's gradient violation. */
