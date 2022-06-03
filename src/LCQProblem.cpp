@@ -524,7 +524,8 @@ namespace LCQPow {
 			}
 
 			// Add some +/- EPS to each coordinate
-			perturbStep();
+			if (options.getPerturbStep())
+				perturbStep();
 
 			// Step length computation
 			getOptimalStepLength( );

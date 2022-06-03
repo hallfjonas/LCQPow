@@ -46,6 +46,7 @@
 %        initialPenaltyParameter : Start value for complementarity penalty term.
 %            penaltyUpdateFactor : Factor for updating penaltised complementarity term.
 %          solveZeroPenaltyFirst : Flag indicating whether first QP should ignore penalization.
+%                    perturbStep : Flag indicating whether to perform step perturbation.
 %                  maxIterations : Maximum number of iterations to be performed.
 %                         maxRho : Maximum penalty value.
 %                     printLevel : The amount of output to be printed.

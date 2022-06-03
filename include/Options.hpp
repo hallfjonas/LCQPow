@@ -97,6 +97,14 @@ namespace LCQPow {
             ReturnValue setSolveZeroPenaltyFirst( bool val );
 
 
+            /** Get whether to perform step perturbation. */
+            bool getPerturbStep( );
+
+
+            /** Set whether to perform step perturbation. */
+            ReturnValue setPerturbStep( bool val );
+
+
             /** Get maximum number of iterations. */
             int getMaxIterations( );
 
@@ -169,6 +177,8 @@ namespace LCQPow {
             double penaltyUpdateFactor;	                /**< Factor for updating penaltised complementarity term. */
 
             bool solveZeroPenaltyFirst;                 /**< Flag indicating whether first QP should ignore penalization. */
+
+            bool perturbStep;                           /**< Flag whether to perform step perturbation. */
 
             int maxIterations;                          /**< Maximum number of iterations to be performed. */
             double maxRho;                              /**< Maximum penalty value. */

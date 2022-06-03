@@ -58,6 +58,7 @@ namespace LCQPow {
         initialPenaltyParameter = rhs.initialPenaltyParameter;
         penaltyUpdateFactor = rhs.penaltyUpdateFactor;
         solveZeroPenaltyFirst = rhs.solveZeroPenaltyFirst;
+        perturbStep = rhs.perturbStep;
         maxIterations = rhs.maxIterations;
         maxRho = rhs.maxRho;
         nDynamicPenalty = rhs.nDynamicPenalty;
@@ -131,6 +132,17 @@ namespace LCQPow {
 
     ReturnValue Options::setSolveZeroPenaltyFirst( bool val ) {
         solveZeroPenaltyFirst = val;
+        return ReturnValue::SUCCESSFUL_RETURN;
+    }
+
+
+    bool Options::getPerturbStep( ) {
+        return perturbStep;
+    }
+
+
+    ReturnValue Options::setPerturbStep( bool val ) {
+        perturbStep = val;
         return ReturnValue::SUCCESSFUL_RETURN;
     }
 
@@ -246,6 +258,8 @@ namespace LCQPow {
     	penaltyUpdateFactor  = 2.0;
 
         solveZeroPenaltyFirst = true;
+
+        perturbStep = true;
 
         maxIterations = 1000;
         maxRho = 1e8;

@@ -102,6 +102,7 @@ void printOptions( Options options ) {
     mexPrintf("     stati tol: %g \n", options.getStationarityTolerance());
     mexPrintf("      max iter: %d \n", options.getMaxIterations());
     mexPrintf("solve zero pen: %d \n", (int) options.getSolveZeroPenaltyFirst());
+    mexPrintf("  perturb step: %d \n", (int) options.getPerturbStep());
     mexPrintf("          prnt: %d \n\n", options.getPrintLevel());
 }
 
@@ -388,7 +389,8 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             "etaDynamicPenalty",
             "printLevel",
             "storeSteps",
-            "qpSolver"
+            "qpSolver",
+            "perturbStep"
         };
 
         mxArray* dual_guess_field;
@@ -438,6 +440,15 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 
                 bool* fld_ptr_bool = (bool*) mxGetPr(field);
                 options.setSolveZeroPenaltyFirst( fld_ptr_bool[0] );
+                continue;
+            }
+
+            if ( strcmp(name, "perturbStep") == 0 ) {
+                if (!checkDimensionAndTypeBool(field, 1, 1, "params.perturbStep")) return;
+
+                bool* fld_ptr_bool = (bool*) mxGetPr(field);
+                options.setPerturbStep( fld_ptr_bool[0] );
+
                 continue;
             }
 
