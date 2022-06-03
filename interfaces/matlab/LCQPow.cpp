@@ -696,9 +696,6 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 mxArray* phiValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
                 mxArray* meritValsArr = mxCreateDoubleMatrix((mwSize)stats.getIterTotal(), 1, mxREAL);
 
-                printf("Iterations: %d\n", stats.getIterTotal());
-                printf("Iterations*nV: %d", stats.getIterTotal()*nV);
-
                 double* xSteps = (double*) mxGetPr(xStepsArr);
                 double* innerIters = (double*) mxGetPr(innerItersArr);
                 double* subproblemIters = (double*) mxGetPr(subproblemItersArr);
