@@ -483,8 +483,8 @@ namespace LCQPow {
 
 			double* lb = NULL;						/**< Lower bound vector (on variables). */
 			double* ub = NULL;						/**< Upper bound vector (on variables). */
-			double* lb_tmp = NULL;						/**< Temporary box constraints. */
-			double* ub_tmp = NULL;						/**< Temporary box constraints. */
+			double* lb_tmp = NULL;					/**< Temporary box constraints. */
+			double* ub_tmp = NULL;					/**< Temporary box constraints. */
 
 			double* A = NULL;						/**< Constraint matrix. */
 			double* lbA = NULL;						/**< Lower bound vector (on constraints). */
@@ -493,10 +493,10 @@ namespace LCQPow {
 			double* L = NULL;						/**< LHS of complementarity product. */
 			double* R = NULL;						/**< RHS of complementarity product. */
 			double* C = NULL;						/**< Complementarity matrix (L'*R + R'*L). */
-			double* lbL = NULL;					/**< LHS Complementarity lower bounds. */
-			double* ubL = NULL;					/**< LHS Complementarity upper bounds. */
-			double* lbR = NULL;					/**< RHS Complementarity lower bounds. */
-			double* ubR = NULL;					/**< RHS Complementarity upper bounds. */
+			double* lbL = NULL;						/**< LHS Complementarity lower bounds. */
+			double* ubL = NULL;						/**< LHS Complementarity upper bounds. */
+			double* lbR = NULL;						/**< RHS Complementarity lower bounds. */
+			double* ubR = NULL;						/**< RHS Complementarity upper bounds. */
 			double* g_phi = NULL;					/**< Linear Term of phi -(l_L'*R + l_R'*L). */
 			double phi_const = 0;					/**< Constant phi expression (l_L'*l_R). */
 
