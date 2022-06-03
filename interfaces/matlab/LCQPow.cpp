@@ -391,6 +391,9 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             "qpSolver"
         };
 
+        mxArray* dual_guess_field;
+        bool dual_guess_passed = false;
+
         for (auto name : params_fieldnames) {
             mxArray* field = mxGetField(prhs[structIdx], 0, name);
             double* fld_ptr;
@@ -502,17 +505,26 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             }
 
             if ( strcmp(name, "y0") == 0 ) {
-                // TODO: This is just a heuristic right now (OSQP does not take box constraints, but we don't know th QP solver yet...)
-                int nDualsIn1 = nV + nC + 2*nComp;
-                int nDualsIn2 = nC + 2*nComp;
-
-                if (!checkDimensionAndTypeDouble(field, nDualsIn1, 1, "params.y0") && !checkDimensionAndTypeDouble(field, nDualsIn2, 1, "params.y0")) return;
-
-                y0 = (double*) mxGetPr(field);
-                continue;
+                dual_guess_passed = true;
+                dual_guess_field = field;
             }
         }
+
+        if (dual_guess_passed) {            
+            LCQPow::QPSolver sol = options.getQPSolver();
+
+            if (sol < LCQPow::QPSolver::OSQP_SPARSE) {
+                int nDualsIn = nV + nC + 2*nComp;
+                if (!checkDimensionAndTypeDouble(dual_guess_field, nDualsIn, 1, "params.y0")) return;
+            } else {
+                int nDualsIn = nC + 2*nComp;
+                 if (!checkDimensionAndTypeDouble(dual_guess_field, nDualsIn, 1, "params.y0")) return;
+            }
+            
+            y0 = (double*) mxGetPr(dual_guess_field);
+        }
     }
+
 
     // Set options and print them
     lcqp.setOptions( options );
@@ -710,10 +722,8 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 double* meritValsTMP = stats.getMeritVals( );
 
                 for (int i = 0; i < stats.getIterTotal(); i++) {
-                    printf("Hello.\n");
                     for (int j = 0; j < nV; j++) {
                         xSteps[i*nV+j] = xStepsTMP[i][j];
-                        printf("Bello.\n");
                     }
 
                     innerIters[i] = innerItersTMP[i];
