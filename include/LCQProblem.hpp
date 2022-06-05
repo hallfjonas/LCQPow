@@ -390,18 +390,6 @@ namespace LCQPow {
 		 */
 		private:
 
-			/** Checks if the ptr is null. */
-			template <typename PtrType>
-		    static bool isNullPtr(PtrType ptr) { 
-				return (ptr == 0 || ptr == nullptr);
-			}
-
-			/** Checks if the ptr is not null. */
-			template <typename PtrType>
-		    static bool isNotNullPtr(PtrType ptr) { 
-				  return (ptr != NULL && ptr != nullptr);
-			}
-
 			/** Called in runSolver to initialize variables. */
 			ReturnValue initializeSolver( );
 

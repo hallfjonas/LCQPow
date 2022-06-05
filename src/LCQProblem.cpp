@@ -109,12 +109,12 @@ namespace LCQPow {
 
 		// Only copy lb and ub to temporary variables
 		// Build them once we know what solver is used
-		if (isNotNullPtr(_lb)) {
+		if (Utilities::isNotNullPtr(_lb)) {
 			lb_tmp = new double[nV];
 			memcpy(lb_tmp, _lb, (size_t) nV*sizeof(double));
 		}
 
-		if (isNotNullPtr(_ub)) {
+		if (Utilities::isNotNullPtr(_ub)) {
 			ub_tmp = new double[nV];
 			memcpy(ub_tmp, _ub, (size_t) nV*sizeof(double));
 		}
@@ -183,7 +183,7 @@ namespace LCQPow {
 		}
 
 		double* _lbL = NULL;
-		if (isNotNullPtr(lbL_file)) {
+		if (Utilities::isNotNullPtr(lbL_file)) {
 			_lbL = new double[nComp];
 			ret = Utilities::readFromFile( _lbL, nComp, lbL_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
@@ -193,7 +193,7 @@ namespace LCQPow {
 		}
 
 		double* _ubL = NULL;
-		if (isNotNullPtr(ubL_file)) {
+		if (Utilities::isNotNullPtr(ubL_file)) {
 			_ubL = new double[nComp];
 
 			ret = Utilities::readFromFile( _ubL, nComp, ubL_file );
@@ -204,7 +204,7 @@ namespace LCQPow {
 		}
 
 		double* _lbR = NULL;
-		if (isNotNullPtr(lbR_file)) {
+		if (Utilities::isNotNullPtr(lbR_file)) {
 			_lbR = new double[nComp];
 
 			ret = Utilities::readFromFile( _lbR, nComp, lbR_file );
@@ -215,7 +215,7 @@ namespace LCQPow {
 		}
 
 		double* _ubR = NULL;
-		if (isNotNullPtr(ubR_file)) {
+		if (Utilities::isNotNullPtr(ubR_file)) {
 			_ubR = new double[nComp];
 
 			ret = Utilities::readFromFile( _ubR, nComp, ubR_file );
@@ -226,7 +226,7 @@ namespace LCQPow {
 		}
 
 		double* _A = NULL;
-		if (isNotNullPtr(A_file)) {
+		if (Utilities::isNotNullPtr(A_file)) {
 			_A = new double[nC*nV];
 			ret = Utilities::readFromFile( _A, nC*nV, A_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
@@ -236,7 +236,7 @@ namespace LCQPow {
 		}
 
 		double* _lbA = NULL;
-		if (isNotNullPtr(lbA_file)) {
+		if (Utilities::isNotNullPtr(lbA_file)) {
 			_lbA = new double[nC];
 			ret = Utilities::readFromFile( _lbA, nC, lbA_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
@@ -246,7 +246,7 @@ namespace LCQPow {
 		}
 
 		double* _ubA = NULL;
-		if (isNotNullPtr(ubA_file)) {
+		if (Utilities::isNotNullPtr(ubA_file)) {
 			_ubA = new double[nC];
 			ret = Utilities::readFromFile( _ubA, nC, ubA_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
@@ -256,7 +256,7 @@ namespace LCQPow {
 		}
 
 		double* _lb = NULL;
-		if (isNotNullPtr(lb_file)) {
+		if (Utilities::isNotNullPtr(lb_file)) {
 			_lb = new double[nV];
 			ret = Utilities::readFromFile( _lb, nV, lb_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
@@ -266,7 +266,7 @@ namespace LCQPow {
 		}
 
 		double* _ub = NULL;
-		if (isNotNullPtr(ub_file)) {
+		if (Utilities::isNotNullPtr(ub_file)) {
 			_ub = new double[nV];
 			ret = Utilities::readFromFile( _ub, nV, ub_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
@@ -276,7 +276,7 @@ namespace LCQPow {
 		}
 
 		double* _x0 = NULL;
-		if (isNotNullPtr(x0_file)) {
+		if (Utilities::isNotNullPtr(x0_file)) {
 			_x0 = new double[nV];
 			ret = Utilities::readFromFile( _x0, nV, x0_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
@@ -286,7 +286,7 @@ namespace LCQPow {
 		}
 
 		double* _y0 = NULL;
-		if (isNotNullPtr(y0_file)) {
+		if (Utilities::isNotNullPtr(y0_file)) {
 			_y0 = new double[nC + 2*nComp];
 			ret = Utilities::readFromFile( _y0, nC + 2*nComp, y0_file );
 			if ( ret != SUCCESSFUL_RETURN ) {
@@ -310,13 +310,13 @@ namespace LCQPow {
 
 		// Only copy lb and ub to temporary variables
 		// Build them once we know what solver is used
-		if (isNotNullPtr(_lb)) {
+		if (Utilities::isNotNullPtr(_lb)) {
 			lb_tmp = new double[nV];
 			memcpy(lb_tmp, _lb, (size_t) nV*sizeof(double));
 			delete[] _lb;
 		}
 
-		if (isNotNullPtr(_ub)) {
+		if (Utilities::isNotNullPtr(_ub)) {
 			ub_tmp = new double[nV];
 			memcpy(ub_tmp, _ub, (size_t) nV*sizeof(double));
 			delete[] _ub;
@@ -329,13 +329,13 @@ namespace LCQPow {
 
 		delete[] _L; delete[] _R;
 
-		if (isNotNullPtr(_A)) 
+		if (Utilities::isNotNullPtr(_A)) 
 			delete[] _A;
 
-		if (isNotNullPtr(_lbA)) 
+		if (Utilities::isNotNullPtr(_lbA)) 
 			delete[] _lbA;
 
-		if (isNotNullPtr(_ubA)) 
+		if (Utilities::isNotNullPtr(_ubA)) 
 			delete[] _ubA;
 
 		if (ret != SUCCESSFUL_RETURN)
@@ -348,8 +348,8 @@ namespace LCQPow {
 
 		ret = setInitialGuess( _x0, _y0 );
 
-		if (isNotNullPtr(_x0)) delete[] _x0;
-		if (isNotNullPtr(_y0)) delete[] _y0;
+		if (Utilities::isNotNullPtr(_x0)) delete[] _x0;
+		if (Utilities::isNotNullPtr(_y0)) delete[] _y0;
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret, ERROR );
@@ -398,12 +398,12 @@ namespace LCQPow {
 
 		// Only copy lb and ub to temporary variables
 		// Build them once we know what solver is used
-		if (isNotNullPtr(_lb)) {
+		if (Utilities::isNotNullPtr(_lb)) {
 			lb_tmp = new double[nV];
 			memcpy(lb_tmp, _lb, (size_t) nV*sizeof(double));
 		}
 
-		if (isNotNullPtr(_ub)) {
+		if (Utilities::isNotNullPtr(_ub)) {
 			ub_tmp = new double[nV];
 			memcpy(ub_tmp, _ub, (size_t) nV*sizeof(double));
 		}
@@ -539,7 +539,7 @@ namespace LCQPow {
 		if ( nV == 0 || nComp == 0 )
 			return LCQPOBJECT_NOT_SETUP;
 
-		if ( isNullPtr(A_new) && nC > 0)
+		if ( Utilities::isNullPtr(A_new) && nC > 0)
 			return INVALID_CONSTRAINT_MATRIX;
 
 		// Set up new constraint matrix (A; L; R)
@@ -558,7 +558,7 @@ namespace LCQPow {
 		lbA = new double[nC + 2*nComp];
 		ubA = new double[nC + 2*nComp];
 
-		if (isNotNullPtr(lbA_new)) 
+		if (Utilities::isNotNullPtr(lbA_new)) 
 		{
 			for (int i = 0; i < nC; i++)
 				lbA[i] = lbA_new[i];
@@ -569,7 +569,7 @@ namespace LCQPow {
 				lbA[i] = -INFINITY;
 		}
 
-		if (isNotNullPtr(ubA_new)) 
+		if (Utilities::isNotNullPtr(ubA_new)) 
 		{
 			for (int i = 0; i < nC; i++)
 				ubA[i] = ubA_new[i];
@@ -581,7 +581,7 @@ namespace LCQPow {
 		}
 
 		// Set complementarities
-		if ( isNullPtr(L_new) || isNullPtr(R_new) )
+		if ( Utilities::isNullPtr(L_new) || Utilities::isNullPtr(R_new) )
 			return INVALID_COMPLEMENTARITY_MATRIX;
 
 		L = new double[nComp*nV];
@@ -610,8 +610,8 @@ namespace LCQPow {
 		// Get number of elements
 		int tmpA_nnx = L_sparse->p[nV] + R_sparse->p[nV];
 
-		if (isNotNullPtr(A_new)) {
-			tmpA_nnx += isNotNullPtr(A_new->p) ? A_new->p[nV] : 0;
+		if (Utilities::isNotNullPtr(A_new)) {
+			tmpA_nnx += Utilities::isNotNullPtr(A_new->p) ? A_new->p[nV] : 0;
 		}
 
 		// Data array
@@ -631,7 +631,7 @@ namespace LCQPow {
 			tmpA_p[i+1] = tmpA_p[i];
 
 			// First handle rows of A
-			if (isNotNullPtr(A_new)) {
+			if (Utilities::isNotNullPtr(A_new)) {
 				for (int j = A_new->p[i]; j < A_new->p[i+1]; j++) {
 					tmpA_data[index_data] = A_new->x[j];
 					tmpA_i[index_data] = A_new->i[j];
@@ -664,7 +664,7 @@ namespace LCQPow {
 		lbA = new double[nC + 2*nComp];
 		ubA = new double[nC + 2*nComp];
 
-		if (isNotNullPtr(lbA_new)) 
+		if (Utilities::isNotNullPtr(lbA_new)) 
 		{
 			for (int i = 0; i < nC; i++)
 				lbA[i] = lbA_new[i];
@@ -675,7 +675,7 @@ namespace LCQPow {
 				lbA[i] = -INFINITY;
 		}
 
-		if (isNotNullPtr(ubA_new)) 
+		if (Utilities::isNotNullPtr(ubA_new)) 
 		{
 			for (int i = 0; i < nC; i++)
 				ubA[i] = ubA_new[i];
@@ -688,7 +688,7 @@ namespace LCQPow {
 
 		C_sparse = Utilities::MatrixSymmetrizationProduct(L_sparse, R_sparse);
 
-		if (isNullPtr(C_sparse)) {
+		if (Utilities::isNullPtr(C_sparse)) {
 			return FAILED_SYM_COMPLEMENTARITY_MATRIX;
 		}
 
@@ -698,25 +698,25 @@ namespace LCQPow {
 
 	ReturnValue LCQProblem::setComplementarityBounds(const double* const lbL_new, const double* const ubL_new, const double* const lbR_new, const double* const ubR_new) {
 
-		if (isNotNullPtr(lbL_new )) {
+		if (Utilities::isNotNullPtr(lbL_new )) {
 			lbL = new double[nComp];
 		}
 
-		if (isNotNullPtr(ubL_new )) {
+		if (Utilities::isNotNullPtr(ubL_new )) {
 			ubL = new double[nComp];
 		}
 
-		if (isNotNullPtr(lbR_new )) {
+		if (Utilities::isNotNullPtr(lbR_new )) {
 			lbR = new double[nComp];
 		}
 
-		if (isNotNullPtr(ubR_new )) {
+		if (Utilities::isNotNullPtr(ubR_new )) {
 			ubR = new double[nComp];
 		}
 
 		// Bounds on Lx
 		for (int i = 0; i < nComp; i++) {
-			if (isNotNullPtr(lbL_new )) { 
+			if (Utilities::isNotNullPtr(lbL_new )) { 
 				if (lbL_new[i] <= -INFINITY)
 					return INVALID_LOWER_COMPLEMENTARITY_BOUND;
 
@@ -726,7 +726,7 @@ namespace LCQPow {
 				lbA[nC + i] = 0;
 			}
 
-			if (isNotNullPtr(ubL_new )) { 
+			if (Utilities::isNotNullPtr(ubL_new )) { 
 				ubL[i] = ubL_new[i];
 				ubA[nC + i] = ubL_new[i];
 			} else {
@@ -736,7 +736,7 @@ namespace LCQPow {
 
 		// Bounds on Rx
 		for (int i = 0; i < nComp; i++) {
-			if (isNotNullPtr(lbR_new )) { 
+			if (Utilities::isNotNullPtr(lbR_new )) { 
 				if (lbR_new[i] <= -INFINITY)
 					return INVALID_LOWER_COMPLEMENTARITY_BOUND;
 
@@ -746,7 +746,7 @@ namespace LCQPow {
 				lbA[nC + nComp + i] = 0;
 			}
 
-			if (isNotNullPtr(ubR_new )) { 
+			if (Utilities::isNotNullPtr(ubR_new )) { 
 				ubR[i] = ubR_new[i];
 				ubA[nC + nComp + i] = ubR_new[i];
 			} else {
@@ -900,7 +900,7 @@ namespace LCQPow {
 			subsolver = tmp;
 
 		} else if (options.getQPSolver() == QPSolver::OSQP_SPARSE) {
-			if (isNotNullPtr(lb) || isNotNullPtr(ub)) {
+			if (Utilities::isNotNullPtr(lb) || Utilities::isNotNullPtr(ub)) {
 				return INVALID_OSQP_BOX_CONSTRAINTS;
 			}
 
@@ -908,7 +908,7 @@ namespace LCQPow {
 			boxDualOffset = 0;
 
 			// If solving with OSQP we ignore the dual guess on the box constraints
-			if (isNotNullPtr(yk)) {
+			if (Utilities::isNotNullPtr(yk)) {
 				double* yk_tmp = new double[nDuals];
 
 				// Shift the duals
@@ -925,7 +925,7 @@ namespace LCQPow {
 				return DENSE_SPARSE_MISSMATCH;
 			}
 
-			if (isNotNullPtr(lb_tmp) || isNotNullPtr(ub_tmp)) {
+			if (Utilities::isNotNullPtr(lb_tmp) || Utilities::isNotNullPtr(ub_tmp)) {
 				return ReturnValue::INVALID_OSQP_BOX_CONSTRAINTS;
 			}
 
@@ -940,15 +940,15 @@ namespace LCQPow {
 		memcpy(g_tilde, g, (size_t)nV*sizeof(double));
 
 		// Phi expressions
-		if (isNotNullPtr(lbL) || isNotNullPtr(lbR)) 
+		if (Utilities::isNotNullPtr(lbL) || Utilities::isNotNullPtr(lbR)) 
 			phi_const = Utilities::DotProduct(lbL, lbR, nComp);
 
 		// g_phi
-		if (isNotNullPtr(lbL) || isNotNullPtr(lbR)) {
+		if (Utilities::isNotNullPtr(lbL) || Utilities::isNotNullPtr(lbR)) {
 			g_phi = new double[nV]();
 
 			// (R'*lb_L contribution)
-			if (isNotNullPtr(lbL)) {
+			if (Utilities::isNotNullPtr(lbL)) {
 				if (sparseSolver)
 					Utilities::AddTransponsedMatrixMultiplication(R_sparse, lbL, g_phi);
 				else
@@ -956,7 +956,7 @@ namespace LCQPow {
 			}
 
 			// (L'*lb_R contribution)
-			if (isNotNullPtr(lbR)) {
+			if (Utilities::isNotNullPtr(lbR)) {
 				if (sparseSolver)
 					Utilities::AddTransponsedMatrixMultiplication(L_sparse, lbR, g_phi);
 				else
@@ -986,12 +986,12 @@ namespace LCQPow {
 		srand( (unsigned int)time( NULL ) );
 
 		// Clean up temporary box constraints
-		if (isNotNullPtr(lb_tmp)) {
+		if (Utilities::isNotNullPtr(lb_tmp)) {
 			delete[] lb_tmp;
 			lb_tmp = NULL;
 		}
 
-		if (isNotNullPtr(ub_tmp)) {
+		if (Utilities::isNotNullPtr(ub_tmp)) {
 			delete[] ub_tmp;
 			ub_tmp = NULL;
 		}
@@ -1020,7 +1020,7 @@ namespace LCQPow {
 		C_sparse = Utilities::dns_to_csc(C, nV, nV);
 
 		// Make sure that all sparse matrices are not null pointer
-		if (isNullPtr(Q_sparse) || isNullPtr(A_sparse) || isNullPtr(L_sparse) || isNullPtr(R_sparse) || isNullPtr(C_sparse)) {
+		if (Utilities::isNullPtr(Q_sparse) || Utilities::isNullPtr(A_sparse) || Utilities::isNullPtr(L_sparse) || Utilities::isNullPtr(R_sparse) || Utilities::isNullPtr(C_sparse)) {
 			return FAILED_SWITCH_TO_SPARSE;
 		}
 
@@ -1054,7 +1054,7 @@ namespace LCQPow {
 		C = Utilities::csc_to_dns(C_sparse);
 
 		// Make sure that all sparse matrices are not null pointer
-		if (isNullPtr(Q) || isNullPtr(A) || isNullPtr(L) || isNullPtr(R) || isNullPtr(C)) {
+		if (Utilities::isNullPtr(Q) || Utilities::isNullPtr(A) || Utilities::isNullPtr(L) || Utilities::isNullPtr(R) || Utilities::isNullPtr(C)) {
 			return FAILED_SWITCH_TO_DENSE;
 		}
 
@@ -1092,11 +1092,11 @@ namespace LCQPow {
 		stats.updateQPSolverExitFlag(qpSolverExitFlag);
 
 		// If no initial guess was passed, then need to allocate memory
-		if (isNullPtr(xk)) {
+		if (Utilities::isNullPtr(xk)) {
 			xk = new double[nV];
 		}
 
-		if (isNullPtr(yk)) {
+		if (Utilities::isNullPtr(yk)) {
 			yk = new double[nDuals];
 		}
 
@@ -1143,7 +1143,7 @@ namespace LCQPow {
 		double phi_lin = 0;
 
 		// Linear term
-		if (isNotNullPtr(g_phi))
+		if (Utilities::isNotNullPtr(g_phi))
 			phi_lin += Utilities::DotProduct(g_phi, xk, nV);
 
 		// Quadratic term
@@ -1178,7 +1178,7 @@ namespace LCQPow {
 		updateQk();
 
 		// Update g_tilde = g + rho*g_phi
-		if (isNotNullPtr(g_phi)) {
+		if (Utilities::isNotNullPtr(g_phi)) {
 			Utilities::WeightedVectorAdd(1.0, g, rho, g_phi, g_tilde, nV);
 		}
 	}
@@ -1233,7 +1233,7 @@ namespace LCQPow {
 		Utilities::WeightedVectorAdd(1, statk, -1, constr_statk, statk, nV);
 
 		// 3) Box constraint contribution
-		if (isNotNullPtr(lb) || isNotNullPtr(ub)) {
+		if (Utilities::isNotNullPtr(lb) || Utilities::isNotNullPtr(ub)) {
 			for (int i = 0; i < nV; i++)
 				box_statk[i] = yk[i];
 
@@ -1454,7 +1454,7 @@ namespace LCQPow {
 
 	AlgorithmStatus LCQProblem::getPrimalSolution( double* const xOpt ) const
 	{
-		if (isNotNullPtr(xOpt) && isNotNullPtr(xk)) {
+		if (Utilities::isNotNullPtr(xOpt) && Utilities::isNotNullPtr(xk)) {
 			for (int i = 0; i < nV; i++)
 				xOpt[i] = xk[i];
 		}
@@ -1465,7 +1465,7 @@ namespace LCQPow {
 
 	AlgorithmStatus LCQProblem::getDualSolution( double* const yOpt ) const
 	{
-		if (isNotNullPtr(yOpt) && isNotNullPtr(yk)) {
+		if (Utilities::isNotNullPtr(yOpt) && Utilities::isNotNullPtr(yk)) {
 			for (int i = 0; i < nDuals; i++)
 				yOpt[i] = yk[i];
 		}
@@ -1610,147 +1610,147 @@ namespace LCQPow {
 	/// Clear allocated memory
 	void LCQProblem::clear( )
 	{
-		if (isNotNullPtr(Q)) {
+		if (Utilities::isNotNullPtr(Q)) {
 			delete[] Q;
 			Q = NULL;
 		}
 
-		if (isNotNullPtr(g)) {
+		if (Utilities::isNotNullPtr(g)) {
 			delete[] g;
 			g = NULL;
 		}
 
-		if (isNotNullPtr(lb)) {
+		if (Utilities::isNotNullPtr(lb)) {
 			delete[] lb;
 			lb = NULL;
 		}
 
-		if (isNotNullPtr(ub)) {
+		if (Utilities::isNotNullPtr(ub)) {
 			delete[] ub;
 			ub = NULL;
 		}
 
-		if (isNotNullPtr(lb_tmp)) {
+		if (Utilities::isNotNullPtr(lb_tmp)) {
 			delete[] lb_tmp;
 			lb_tmp = NULL;
 		}
 
-		if (isNotNullPtr(ub_tmp)) {
+		if (Utilities::isNotNullPtr(ub_tmp)) {
 			delete[] ub_tmp;
 			ub_tmp = NULL;
 		}
 
-		if (isNotNullPtr(A)) {
+		if (Utilities::isNotNullPtr(A)) {
 			delete[] A;
 			A = NULL;
 		}
 
-		if (isNotNullPtr(lbA)) {
+		if (Utilities::isNotNullPtr(lbA)) {
 			delete[] lbA;
 			lbA = NULL;
 		}
 
-		if (isNotNullPtr(ubA)) {
+		if (Utilities::isNotNullPtr(ubA)) {
 			delete[] ubA;
 			ubA = NULL;
 		}
 
-		if (isNotNullPtr(L)) {
+		if (Utilities::isNotNullPtr(L)) {
 			delete[] L;
 			L = NULL;
 		}
 
-		if (isNotNullPtr(R)) {
+		if (Utilities::isNotNullPtr(R)) {
 			delete[] R;
 			R = NULL;
 		}
 
-		if (isNotNullPtr(C)) {
+		if (Utilities::isNotNullPtr(C)) {
 			delete[] C;
 			C = NULL;
 		}
 
-		if (isNotNullPtr(lbL)) {
+		if (Utilities::isNotNullPtr(lbL)) {
 			delete[] lbL;
 			lbL = NULL;
 		}
 
-		if (isNotNullPtr(ubL)) {
+		if (Utilities::isNotNullPtr(ubL)) {
 			delete[] ubL;
 			ubL = NULL;
 		}
 
-		if (isNotNullPtr(lbR)) {
+		if (Utilities::isNotNullPtr(lbR)) {
 			delete[] lbR;
 			lbR = NULL;
 		}
 
-		if (isNotNullPtr(ubR)) {
+		if (Utilities::isNotNullPtr(ubR)) {
 			delete[] ubR;
 			ubR = NULL;
 		}
 
-		if (isNotNullPtr(g_phi)) {
+		if (Utilities::isNotNullPtr(g_phi)) {
 			delete[] g_phi;
 			g_phi = NULL;
 		}
 
-		if (isNotNullPtr(gk)) {
+		if (Utilities::isNotNullPtr(gk)) {
 			delete[] gk;
 			gk = NULL;
 		}
 
-		if (isNotNullPtr(g_tilde)) {
+		if (Utilities::isNotNullPtr(g_tilde)) {
 			delete[] g_tilde;
 			g_tilde = NULL;
 		}
 
-		if (isNotNullPtr(xk)) {
+		if (Utilities::isNotNullPtr(xk)) {
 			delete[] xk;
 			xk = NULL;
 		}
 
-		if (isNotNullPtr(yk)) {
+		if (Utilities::isNotNullPtr(yk)) {
 			delete[] yk;
 			yk = NULL;
 		}
 
-		if (isNotNullPtr(yk_A)) {
+		if (Utilities::isNotNullPtr(yk_A)) {
 			delete[] yk_A;
 			yk_A = NULL;
 		}
 
-		if (isNotNullPtr(xnew)) {
+		if (Utilities::isNotNullPtr(xnew)) {
 			delete[] xnew;
 			xnew = NULL;
 		}
 
-		if (isNotNullPtr(pk)) {
+		if (Utilities::isNotNullPtr(pk)) {
 			delete[] pk;
 			pk = NULL;
 		}
 
-		if (isNotNullPtr(Qk)) {
+		if (Utilities::isNotNullPtr(Qk)) {
 			delete[] Qk;
 			Qk = NULL;
 		}
 
-		if (isNotNullPtr(statk)) {
+		if (Utilities::isNotNullPtr(statk)) {
 			delete[] statk;
 			statk = NULL;
 		}
 
-		if (isNotNullPtr(constr_statk)) {
+		if (Utilities::isNotNullPtr(constr_statk)) {
 			delete[] constr_statk;
 			constr_statk = NULL;
 		}
 
-		if (isNotNullPtr(box_statk)) {
+		if (Utilities::isNotNullPtr(box_statk)) {
 			delete[] box_statk;
 			box_statk = NULL;
 		}
 
-		if (isNotNullPtr(lk_tmp)) {
+		if (Utilities::isNotNullPtr(lk_tmp)) {
 			delete[] lk_tmp;
 			lk_tmp = NULL;
 		}

@@ -325,6 +325,24 @@ namespace LCQPow {
             static double getMin(double x, double y);
 
 
+            /** Get the index of an integer value within a sorted list. */
+            static int getIndexOfIn(int val, int* sorted_lst, int beg, int end);
+
+
+            /** Checks if the ptr is null. */
+			template <typename PtrType>
+		    static bool isNullPtr(PtrType ptr) { 
+				return (ptr == 0 || ptr == nullptr);
+			}
+
+
+			/** Checks if the ptr is not null. */
+			template <typename PtrType>
+		    static bool isNotNullPtr(PtrType ptr) { 
+				  return (ptr != NULL && ptr != nullptr);
+			}
+
+
             /** Numerical value of machine precision (min eps, s.t. 1+eps > 1).
              *	Note: this value has to be positive! */
             #ifdef __USE_SINGLE_PRECISION__
@@ -348,26 +366,6 @@ namespace LCQPow {
             /** Maximum number of characters within a string.
              *	Note: this value should be at least 41! */
             constexpr static uint MAX_STRING_LENGTH = 160;
-
-
-        private:
-
-            /** Get the index of an integer value within a sorted list. */
-            static int getIndexOfIn(int val, int* sorted_lst, int beg, int end);
-
-
-			/** Checks if the ptr is null. */
-			template <typename PtrType>
-		    static bool isNullPtr(PtrType ptr) { 
-				return (ptr == 0 || ptr == nullptr);
-			}
-
-
-            /** Checks if the ptr is not null. */
-			template <typename PtrType>
-		    static bool isNotNullPtr(PtrType ptr) { 
-				return (ptr != 0 && ptr != nullptr);
-			}
     };
 }
 
