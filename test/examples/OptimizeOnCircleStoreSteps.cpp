@@ -40,7 +40,7 @@ int main() {
     // Set up LCQP object
     LCQProblem lcqp( nV, nC, nComp );
 	Options options;
-    options.setPrintLevel(PrintLevel::SUBPROBLEM_SOLVER_ITERATES);
+    options.setPrintLevel(PrintLevel::INNER_LOOP_ITERATES);
     options.setQPSolver(QPSolver::QPOASES_SPARSE);
     // options.setStationarityTolerance( 10e-5 );
     options.setStoreSteps(true);

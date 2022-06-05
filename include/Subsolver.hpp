@@ -25,6 +25,11 @@
 #include "SubsolverQPOASES.hpp"
 #include "SubsolverOSQP.hpp"
 
+extern "C" {
+    #include <osqp.h>
+}
+
+
 namespace LCQPow {
 
     class Subsolver {
@@ -75,10 +80,6 @@ namespace LCQPow {
             void getSolution( double* x, double* y );
 
 
-            /** Options of subproblem solver. */
-            void setPrintLevel( PrintLevel printLevel );
-
-
             /** Abstract method for solving the QP. */
             ReturnValue solve(  bool initialSolve, int& iterations, int& exit_flag,
                                 const double* g,
@@ -86,6 +87,14 @@ namespace LCQPow {
                                 const double* x0 = 0, const double* y0 = 0,
                                 const double* lb = 0, const double* ub = 0);
 
+
+            /** Setting the user options. */
+            void setOptions( qpOASES::Options& options );
+
+
+            /** Setting the user options. */
+            void setOptions( OSQPSettings* settings );
+            
 
         protected:
 
@@ -100,9 +109,6 @@ namespace LCQPow {
             // The different solvers
         	SubsolverQPOASES solverQPOASES;         /**< When using qpOASES. */
 			SubsolverOSQP solverOSQP;				/**< When using OSQP. */
-
-            // Options and settings
-            qpOASES::Options optionsQPOASES;        /**< Options for the qpOASES solver. */
     };
 }
 

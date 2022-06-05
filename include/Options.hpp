@@ -168,6 +168,24 @@ namespace LCQPow {
             /** Set print level (using an integer). */
             ReturnValue setQPSolver( int val );
 
+
+			/** Pass options for qpOASES. */
+			ReturnValue setqpOASESOptions( const qpOASES::Options& _options );
+			
+            
+            /** Get options for qpOASES. */
+			qpOASES::Options& getqpOASESOptions( );
+
+
+			/** Get options for OSQP. */
+			ReturnValue setOSQPOptions( OSQPSettings *_options );
+			
+
+			/** Pass options for OSQP. */
+			OSQPSettings* getOSQPOptions( );
+			
+
+
         protected:
             void copy( const Options& rhs );            /**< Copy each property. */
 
@@ -191,6 +209,8 @@ namespace LCQPow {
             bool storeSteps;                            /**< Whether to store detailed information for each iterate (time consuming). */
 
             QPSolver qpSolver;                          /**< The QP solver to be used. */
+			qpOASES::Options qpOASES_opts;			    /**< qpOASES options. */
+			OSQPSettings *OSQP_opts = NULL;			    /**< OSQP options. */	
     };
 }
 

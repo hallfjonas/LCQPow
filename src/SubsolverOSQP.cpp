@@ -40,18 +40,9 @@ namespace LCQPow {
         nV = _Q->n;
         nC = _A->m;
 
-        // Allocate memory for settings
-        settings = (OSQPSettings *)c_malloc(sizeof(OSQPSettings));
-
         // Copy matrices
         Q = Utilities::copyCSC(_Q, true);
         A = Utilities::copyCSC(_A);
-
-        // Define solver settings
-        osqp_set_default_settings(settings);
-        settings->eps_prim_inf = Utilities::EPS;
-        settings->verbose = false;
-        settings->polish = true;
     }
 
 
@@ -120,14 +111,8 @@ namespace LCQPow {
 
     void SubsolverOSQP::setOptions( OSQPSettings* _settings )
     {
-        settings = copy_settings(_settings);
-    }
-
-
-    void SubsolverOSQP::setPrintlevl( bool verbose )
-    {
-        if (isNotNullPtr(settings))
-            settings->verbose = verbose;
+        if (Utilities::isNotNullPtr(_settings))
+            settings = copy_settings(_settings);
     }
 
 

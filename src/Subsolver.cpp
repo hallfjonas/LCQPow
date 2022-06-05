@@ -23,6 +23,10 @@
 #include "MessageHandler.hpp"
 #include <cstring>
 
+extern "C" {
+    #include <osqp.h>
+}
+
 namespace LCQPow {
 
 
@@ -87,21 +91,6 @@ namespace LCQPow {
     }
 
 
-    void Subsolver::setPrintLevel( PrintLevel printLevel )
-    {
-        if (qpSolver == QPSolver::QPOASES_DENSE || qpSolver == QPSolver::QPOASES_SPARSE) {
-            if (printLevel < PrintLevel::SUBPROBLEM_SOLVER_ITERATES)
-                optionsQPOASES.printLevel =  qpOASES::PrintLevel::PL_NONE;
-            else
-                optionsQPOASES.printLevel =  qpOASES::PrintLevel::PL_MEDIUM;
-
-            solverQPOASES.setOptions( optionsQPOASES );
-        } else if (qpSolver == QPSolver::OSQP_SPARSE) {
-            solverOSQP.setPrintlevl(printLevel >= PrintLevel::SUBPROBLEM_SOLVER_ITERATES);
-        }
-    }
-
-
     ReturnValue Subsolver::solve(   bool initialSolve, int& iterations, int& exit_flag,
                                     const double* g,
                                     const double* lbA, const double* ubA,
@@ -118,6 +107,18 @@ namespace LCQPow {
         }
 
         return ret;
+    }
+
+
+    void Subsolver::setOptions( qpOASES::Options& options ) 
+    {
+        solverQPOASES.setOptions( options );
+    }
+
+
+    void Subsolver::setOptions( OSQPSettings* settings )
+    {
+        solverOSQP.setOptions( settings );
     }
 
 

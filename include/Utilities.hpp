@@ -116,7 +116,6 @@ namespace LCQPow {
         NONE = 0,                                       /**< No Output. */
         OUTER_LOOP_ITERATES = 1,                        /**< Print stats for each outer loop iterate. */
         INNER_LOOP_ITERATES = 2,                        /**< Print stats for each inner loop iterate. */
-        SUBPROBLEM_SOLVER_ITERATES = 3                  /**< Print stats for each inner loop (and possibly output of subproblem solver). */
     };
 
 

@@ -68,10 +68,6 @@ namespace LCQPow {
             void setOptions( OSQPSettings* settings );
 
 
-            /** Set print level. */
-            void setPrintlevl( bool verbose );
-
-
             /** Implementation for applying the subsolver to solve the QP.
              *
              * @param initialSolver A flag indicating whether the call should initialize the sequence.

@@ -976,8 +976,11 @@ namespace LCQPow {
 		totalIter = 0;
 		algoStat = AlgorithmStatus::PROBLEM_NOT_SOLVED;
 
-		// Initialize subproblem solver
-		subsolver.setPrintLevel( options.getPrintLevel() );
+		// Set solver options
+		if (options.getQPSolver() < QPSolver::OSQP_SPARSE)
+			subsolver.setOptions(options.getOSQPOptions());
+		else
+			subsolver.setOptions(options.getqpOASESOptions());
 
 		// Reset output statistics
 		stats.reset();

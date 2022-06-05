@@ -200,10 +200,13 @@ namespace LCQPow {
 
     int* OutputStatistics::getInnerIters( ) const
     {
+        printf("innerIters size: %d", (int)innerIters.size());
+
+        // TODO: Invalid read?
         if(innerIters.size() == 0)
             return NULL;
 
-        int* vals = new int[innerIters.size()];
+        int* vals = new int[(int)innerIters.size()];
         for (size_t i = 0; i < innerIters.size(); i++)
             vals[i] = innerIters[i];
 
