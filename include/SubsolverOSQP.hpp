@@ -68,10 +68,6 @@ namespace LCQPow {
             void setOptions( OSQPSettings* settings );
 
 
-            /** Set print level. */
-            void setPrintlevl( bool verbose );
-
-
             /** Implementation for applying the subsolver to solve the QP.
              *
              * @param initialSolver A flag indicating whether the call should initialize the sequence.
@@ -106,13 +102,6 @@ namespace LCQPow {
 
 
         private:
-
-			/** Checks if the ptr is null. */
-			template <typename PtrType>
-		    static bool isNotNullPtr(PtrType ptr) { 
-				  return (ptr != NULL && ptr != nullptr);
-			}
-
 
             int nV;                                 /**< Number of optimization variables. */
             int nC;                                 /**< Number of constraints. */

@@ -40,18 +40,9 @@ namespace LCQPow {
         nV = _Q->n;
         nC = _A->m;
 
-        // Allocate memory for settings
-        settings = (OSQPSettings *)c_malloc(sizeof(OSQPSettings));
-
         // Copy matrices
         Q = Utilities::copyCSC(_Q, true);
         A = Utilities::copyCSC(_A);
-
-        // Define solver settings
-        osqp_set_default_settings(settings);
-        settings->eps_prim_inf = Utilities::EPS;
-        settings->verbose = false;
-        settings->polish = true;
     }
 
 
@@ -71,18 +62,18 @@ namespace LCQPow {
     {
         osqp_cleanup(work);
 
-        if (isNotNullPtr(data)) {
-            if (isNotNullPtr(data->l)) {
+        if (Utilities::isNotNullPtr(data)) {
+            if (Utilities::isNotNullPtr(data->l)) {
                 free(data->l);
                 data->l = NULL;
             }
 
-            if (isNotNullPtr(data->u)) {
+            if (Utilities::isNotNullPtr(data->u)) {
                 free(data->u);
                 data->u = NULL;
             }
 
-            if (isNotNullPtr(data->q)) {
+            if (Utilities::isNotNullPtr(data->q)) {
                 free(data->q);
                 data->q = NULL;
             }
@@ -91,17 +82,17 @@ namespace LCQPow {
             data = NULL;
         }
 
-        if (isNotNullPtr(Q)) {
+        if (Utilities::isNotNullPtr(Q)) {
             Utilities::ClearSparseMat(Q);
             Q = NULL;
         }
 
-        if (isNotNullPtr(A)) {
+        if (Utilities::isNotNullPtr(A)) {
             Utilities::ClearSparseMat(A);
             A = NULL;
         }
 
-        if (isNotNullPtr(settings)) {
+        if (Utilities::isNotNullPtr(settings)) {
             c_free(settings);
             settings = NULL;
         }
@@ -120,14 +111,8 @@ namespace LCQPow {
 
     void SubsolverOSQP::setOptions( OSQPSettings* _settings )
     {
-        settings = copy_settings(_settings);
-    }
-
-
-    void SubsolverOSQP::setPrintlevl( bool verbose )
-    {
-        if (isNotNullPtr(settings))
-            settings->verbose = verbose;
+        if (Utilities::isNotNullPtr(_settings))
+            settings = copy_settings(_settings);
     }
 
 
@@ -138,7 +123,7 @@ namespace LCQPow {
                                         const double* const _lb, const double* const _ub )
     {
         // Make sure that lb and ub are null pointers, as OSQP does not handle box constraints
-        if (isNotNullPtr(_lb) || isNotNullPtr(_ub)) {
+        if (Utilities::isNotNullPtr(_lb) || Utilities::isNotNullPtr(_ub)) {
             return ReturnValue::INVALID_OSQP_BOX_CONSTRAINTS;
         }
 
@@ -161,12 +146,12 @@ namespace LCQPow {
             data->u = u;
             osqp_setup(&work, data, settings);
 
-            if (isNotNullPtr(x0))
+            if (Utilities::isNotNullPtr(x0))
                 if (osqp_warm_start_x(work, x0) != 0)
                     return ReturnValue::OSQP_INITIAL_PRIMAL_GUESS_FAILED;
 
 
-            if (isNotNullPtr(y0))
+            if (Utilities::isNotNullPtr(y0))
                 if (osqp_warm_start_y(work, y0) != 0)
                     return ReturnValue::OSQP_INITIAL_DUAL_GUESS_FAILED;
         } else {
@@ -199,7 +184,7 @@ namespace LCQPow {
     {
         OSQPSolution *sol(work->solution);
 
-        if (isNotNullPtr(sol->x)) {
+        if (Utilities::isNotNullPtr(sol->x)) {
             memcpy(x, sol->x, (size_t)nV*(sizeof(double)));
         }
 
@@ -220,11 +205,11 @@ namespace LCQPow {
         Q = copy_csc_mat(rhs.Q);
         A = copy_csc_mat(rhs.A);
 
-        if (isNotNullPtr(rhs.settings)) {
+        if (Utilities::isNotNullPtr(rhs.settings)) {
             settings = copy_settings(rhs.settings);
         }
 
-        if (isNotNullPtr(rhs.data)) {
+        if (Utilities::isNotNullPtr(rhs.data)) {
             double* l = (double*)malloc((size_t)nC*sizeof(double));
             double* u = (double*)malloc((size_t)nC*sizeof(double));
             double* g = (double*)malloc((size_t)nV*sizeof(double));

@@ -38,7 +38,12 @@ namespace LCQPow {
 
 
     Options::~Options( )
-    { }
+    { 
+        if (Utilities::isNotNullPtr(OSQP_opts)) {
+            c_free(OSQP_opts);
+            OSQP_opts = NULL;
+        }
+    }
 
 
     Options& Options::operator=( const Options& rhs )
@@ -66,6 +71,9 @@ namespace LCQPow {
         printLevel = rhs.printLevel;
         storeSteps = rhs.storeSteps;
         qpSolver = rhs.qpSolver;
+        qpOASES_opts = rhs.qpOASES_opts;
+
+        setOSQPOptions(rhs.OSQP_opts);
     }
 
 
@@ -154,7 +162,7 @@ namespace LCQPow {
 
     ReturnValue Options::setMaxIterations( int val ) {
         if (val <= 0)
-            return (MessageHandler::PrintMessage(INVALID_MAX_ITERATIONS_VALUE,WARNING) );
+            return MessageHandler::PrintMessage(INVALID_MAX_ITERATIONS_VALUE,WARNING);
 
         maxIterations = val;
         return ReturnValue::SUCCESSFUL_RETURN;
@@ -212,7 +220,7 @@ namespace LCQPow {
 
     ReturnValue Options::setPrintLevel( int val ) {
 
-        if (val < PrintLevel::NONE || val > PrintLevel::SUBPROBLEM_SOLVER_ITERATES)
+        if (val < PrintLevel::NONE || val > PrintLevel::OUTER_LOOP_ITERATES)
             return (MessageHandler::PrintMessage(INVALID_PRINT_LEVEL_VALUE,WARNING) );
 
         printLevel = (PrintLevel)val;
@@ -251,6 +259,41 @@ namespace LCQPow {
     }
 
 
+	ReturnValue Options::setqpOASESOptions( const qpOASES::Options& _options )
+	{
+		qpOASES_opts = _options;
+        return SUCCESSFUL_RETURN;
+	}
+
+
+	qpOASES::Options& Options::getqpOASESOptions( )
+	{
+		return qpOASES_opts;
+	}
+
+
+	ReturnValue Options::setOSQPOptions( OSQPSettings *_options )
+	{
+		
+        if (Utilities::isNotNullPtr(_options)) {
+            if (Utilities::isNotNullPtr(OSQP_opts)) {
+                c_free(OSQP_opts);    
+            }
+			OSQP_opts = copy_settings(_options);
+        } else {
+            OSQP_opts = NULL;
+        }
+
+        return SUCCESSFUL_RETURN;
+	}
+
+
+	OSQPSettings* Options::getOSQPOptions( )
+	{
+		return OSQP_opts;
+	}
+
+
     void Options::setToDefault( ) {
         complementarityTolerance = 1.0e3 * Utilities::EPS;
         stationarityTolerance  = 1.0e6 * Utilities::EPS;
@@ -272,5 +315,21 @@ namespace LCQPow {
         storeSteps = false;
 
         qpSolver = QPSolver::QPOASES_DENSE;
+
+		// Initialize some deault subproblem solver options
+        // qpOASES
+		qpOASES_opts.setToDefault();
+        qpOASES_opts.printLevel = qpOASES::PrintLevel::PL_NONE;
+        
+        // OSQP
+        if (Utilities::isNotNullPtr(OSQP_opts)) {
+            c_free(OSQP_opts);
+            OSQP_opts = NULL;
+        }
+        OSQP_opts = (OSQPSettings *)c_malloc(sizeof(OSQPSettings));
+        osqp_set_default_settings(OSQP_opts);
+        OSQP_opts->eps_prim_inf = Utilities::EPS;
+        OSQP_opts->verbose = false;
+        OSQP_opts->polish = true;
     }
 }

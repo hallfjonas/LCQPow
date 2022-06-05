@@ -68,7 +68,6 @@ PYBIND11_MODULE(Utilities, m) {
     .value("NONE", PrintLevel::NONE)
     .value("OUTER_LOOP_ITERATES", PrintLevel::OUTER_LOOP_ITERATES)
     .value("INNER_LOOP_ITERATES", PrintLevel::INNER_LOOP_ITERATES)
-    .value("SUBPROBLEM_SOLVER_ITERATES", PrintLevel::SUBPROBLEM_SOLVER_ITERATES)
     .export_values();
 
   py::enum_<QPSolver>(m, "QPSolver", py::arithmetic())

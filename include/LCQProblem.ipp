@@ -41,7 +41,7 @@ namespace LCQPow {
 		if ( nV == 0 )
 			return LCQPOBJECT_NOT_SETUP;
 
-		if ( isNullPtr(g_new) )
+		if ( Utilities::isNullPtr(g_new) )
 			return INVALID_OBJECTIVE_LINEAR_TERM;
 
 		g = new double[nV];
@@ -58,7 +58,7 @@ namespace LCQPow {
 
 		lb = new double[nV];
 
-		if (isNotNullPtr(lb_new))
+		if (Utilities::isNotNullPtr(lb_new))
 		{
 			memcpy( lb, lb_new, (size_t)nV*sizeof(double) );
 		}
@@ -97,7 +97,7 @@ namespace LCQPow {
 
 		ub = new double[nV];
 
-		if (isNotNullPtr(ub_new))
+		if (Utilities::isNotNullPtr(ub_new))
 		{
 			memcpy( ub, ub_new, (size_t)nV*sizeof(double) );
 		}
@@ -137,11 +137,11 @@ namespace LCQPow {
 
 		xk = new double[nV]();
 
-		if (isNotNullPtr(_x0)) {
+		if (Utilities::isNotNullPtr(_x0)) {
 			memcpy(xk, _x0, (size_t)nV*sizeof(double));
 		}
 
-		if (isNotNullPtr(_y0)) {
+		if (Utilities::isNotNullPtr(_y0)) {
 			// If user passes dual constraints, let us for now assume they have all of the constraint guesses:
 			//    1) box, 2) Linear, 3) Complementarity
 			int dualGuessLength = nV + nC + 2*nComp;
