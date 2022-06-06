@@ -26,60 +26,48 @@
 using namespace LCQPow;
 
 int main() {
-    std::cout << "Preparing OSQP warm up problem...\n";
+    std::cout << "Preparing dense warm up problem...\n";
 
     /* Setup data of first QP. */
-    double Q_data[2] = { 2.0, 2.0 };
-    int Q_i[2] = {0, 1};
-    int Q_p[3] = {0, 1, 2};
-
+    double Q[2*2] = { 2.0, 0.0, 0.0, 2.0 };
     double g[2] = { -2.0, -2.0 };
+    double L[1*2] = {1.0, 0.0};
+    double R[1*2] = {0.0, 1.0};
 
-    double L_data[1] = { 1.0 };
-    int L_i[1] = {0};
-    int L_p[3] = {0, 1, 1};
-
-    double R_data[1] = { 1.0 };
-    int R_i[1] = {0};
-    int R_p[3] = {0, 0, 1};
+    double x0[2] = {1.0, 1.0};
+    double y0[4] = {0.0, 0.0, 0.0, 0.0};
 
     int nV = 2;
     int nC = 0;
     int nComp = 1;
 
-    csc* Q = LCQPow::Utilities::createCSC(nV, nV, Q_p[nV], Q_data, Q_i, Q_p);
-    csc* L = LCQPow::Utilities::createCSC(nComp, nV, L_p[nV], L_data, L_i, L_p);
-    csc* R = LCQPow::Utilities::createCSC(nComp, nV, R_p[nV], R_data, R_i, R_p);
-
+    // Load data
     LCQProblem lcqp( nV, nC, nComp );
-
-	Options options;
-    options.setPrintLevel(PrintLevel::INNER_LOOP_ITERATES);
-    options.setQPSolver(QPSolver::OSQP_SPARSE);
-	lcqp.setOptions( options );
-
-    // Solve first LCQP
-	ReturnValue retVal = lcqp.loadLCQP(Q, g, L, R);
-
-    free(Q); Q = NULL;
-    free(L); L = NULL;
-    free(R); R = NULL;
-
+	ReturnValue retVal = lcqp.loadLCQP( Q, g, L, R, 0, 0, 0, 0, 0, 0, 0, 0, 0, x0, y0 );
     if (retVal != SUCCESSFUL_RETURN)
     {
         printf("Failed to load LCQP.\n");
         return 1;
     }
 
-    // Must switch to sparse mode (if using a sparse solver)
-    if (options.getQPSolver() < LCQPow::QPOASES_SPARSE) {
-        retVal = lcqp.switchToDenseMode( );
+    // LCQPow options
+	Options options;
 
-        if (retVal != LCQPow::SUCCESSFUL_RETURN)
-        {
-            printf("Failed to switch to sparse mode LCQP.\n");
-            return 1;
-        }
+    // Settings (OSQP)
+    OSQPSettings* settings = (OSQPSettings *)c_malloc(sizeof(OSQPSettings));
+    osqp_set_default_settings(settings);
+    settings->verbose = true;
+    settings->polish = true;
+    options.setOSQPOptions(settings);
+    options.setQPSolver(QPSolver::OSQP_SPARSE);
+    lcqp.setOptions( options );
+
+    // Switch to sparse mode
+    retVal = lcqp.switchToSparseMode( );
+    if (retVal != LCQPow::SUCCESSFUL_RETURN)
+    {
+        printf("Failed to switch to sparse mode LCQP.\n");
+        return 1;
     }
 
     // Run the solver
@@ -91,22 +79,18 @@ int main() {
         return 1;
     }
 
-    int nDuals = lcqp.getNumberOfDuals();
-
     // Get solutions
     double* xOpt = new double[2];
-	double* yOpt = new double[nDuals];
+	double* yOpt = new double[nV + nC + 2*nComp];
+    LCQPow::OutputStatistics stats;
 	lcqp.getPrimalSolution( xOpt );
 	lcqp.getDualSolution( yOpt );
+    lcqp.getOutputStatistics( stats );
+	printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g, %g, %g ]; i = %d; k = %d; rho = %g; WSR = %d \n\n",
+			xOpt[0],xOpt[1],yOpt[0],yOpt[1],yOpt[2],yOpt[3],
+            stats.getIterTotal(), stats.getIterOuter(), stats.getRhoOpt(), stats.getSubproblemIter() );
 
-    if (nDuals == 2) {
-        printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g ]; \n\n",
-			xOpt[0],xOpt[1],yOpt[0],yOpt[1]);
-    } else if (nDuals == 4) {
-        printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g, %g, %g ]; \n\n",
-			xOpt[0],xOpt[1],yOpt[0],yOpt[1],yOpt[2],yOpt[3]);
-    }
-
+    // Clean Up
     delete[] xOpt; delete[] yOpt;
 
     return 0;

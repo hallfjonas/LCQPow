@@ -50,14 +50,14 @@ int main() {
         return 1;
     }
 
+    // Settings (qpOASES)
+    qpOASES::Options opts;
+    opts.printLevel = qpOASES::PrintLevel::PL_HIGH;
+    
     // LCQPow options
 	Options options;
-
-    // Settings (OSQP)
-    OSQPSettings* settings = (OSQPSettings *)c_malloc(sizeof(OSQPSettings));
-    settings->verbose = true;
-    options.setOSQPOptions(settings);
-    options.setQPSolver(QPSolver::OSQP_SPARSE);
+    options.setqpOASESOptions(opts);
+    options.setQPSolver(QPSolver::QPOASES_SPARSE);
     lcqp.setOptions( options );
 
     // Switch to sparse mode
@@ -67,22 +67,6 @@ int main() {
         printf("Failed to switch to sparse mode LCQP.\n");
         return 1;
     }
-
-    // Run the solver
-    retVal = lcqp.runSolver();
-
-    if (retVal != SUCCESSFUL_RETURN)
-    {
-        printf("Failed to solve LCQP.\n");
-        return 1;
-    }
-
-    // Settings (qpOASES)
-    qpOASES::Options opts;
-    opts.printLevel = qpOASES::PrintLevel::PL_HIGH;
-    options.setqpOASESOptions(opts);
-    options.setQPSolver(QPSolver::QPOASES_SPARSE);
-    lcqp.setOptions( options );
 
     // Run the solver
     retVal = lcqp.runSolver();
