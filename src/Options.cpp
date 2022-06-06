@@ -274,14 +274,13 @@ namespace LCQPow {
 
 	ReturnValue Options::setOSQPOptions( OSQPSettings *_options )
 	{
-		
-        if (Utilities::isNotNullPtr(_options)) {
-            if (Utilities::isNotNullPtr(OSQP_opts)) {
-                c_free(OSQP_opts);    
-            }
-			OSQP_opts = copy_settings(_options);
-        } else {
+		if (Utilities::isNotNullPtr(OSQP_opts)) {
+            c_free(OSQP_opts);    
             OSQP_opts = NULL;
+        }
+
+        if (Utilities::isNotNullPtr(_options)) {
+			OSQP_opts = copy_settings(_options);
         }
 
         return SUCCESSFUL_RETURN;
