@@ -26,7 +26,7 @@
 using namespace LCQPow;
 
 int main() {
-    std::cout << "Preparing dense warm up problem...\n";
+    std::cout << "Preparing OSQP warm up problem (with adapted OSQP settings)...\n";
 
     /* Setup data of first QP. */
     double Q[2*2] = { 2.0, 0.0, 0.0, 2.0 };
