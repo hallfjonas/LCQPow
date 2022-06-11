@@ -274,7 +274,6 @@ namespace LCQPow {
 
 	ReturnValue Options::setOSQPOptions( OSQPSettings *_options )
 	{
-		
         if (Utilities::isNotNullPtr(_options)) {
             if (Utilities::isNotNullPtr(OSQP_opts)) {
                 c_free(OSQP_opts);    
@@ -290,7 +289,7 @@ namespace LCQPow {
 
 	OSQPSettings* Options::getOSQPOptions( )
 	{
-		return OSQP_opts;
+        return OSQP_opts;
 	}
 
 
