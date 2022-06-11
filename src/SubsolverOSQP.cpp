@@ -150,6 +150,7 @@ namespace LCQPow {
             data->q = g;
             data->l = l;
             data->u = u;
+
             osqp_setup(&work, data, settings);
 
             if (Utilities::isNotNullPtr(x0))
