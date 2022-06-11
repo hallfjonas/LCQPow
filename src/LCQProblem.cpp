@@ -30,6 +30,7 @@
 #include <string>
 #include <math.h>
 #include <stdlib.h>
+
 #include <qpOASES.hpp>
 
 using qpOASES::QProblem;
@@ -978,9 +979,9 @@ namespace LCQPow {
 
 		// Set solver options
 		if (options.getQPSolver() < QPSolver::OSQP_SPARSE)
-			subsolver.setOptions(options.getOSQPOptions());
-		else
 			subsolver.setOptions(options.getqpOASESOptions());
+		else
+			subsolver.setOptions(options.getOSQPOptions());
 
 		// Reset output statistics
 		stats.reset();
