@@ -200,9 +200,6 @@ namespace LCQPow {
 
     int* OutputStatistics::getInnerIters( ) const
     {
-        printf("innerIters size: %d", (int)innerIters.size());
-
-        // TODO: Invalid read?
         if(innerIters.size() == 0)
             return NULL;
 
