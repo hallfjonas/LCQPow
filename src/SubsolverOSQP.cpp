@@ -111,8 +111,14 @@ namespace LCQPow {
 
     void SubsolverOSQP::setOptions( OSQPSettings* _settings )
     {
-        if (Utilities::isNotNullPtr(_settings))
+        if (Utilities::isNotNullPtr(_settings)) {
+            if (Utilities::isNotNullPtr(settings)) {
+                c_free(settings);    
+            }
             settings = copy_settings(_settings);
+        } else {
+            settings = NULL;
+        }
     }
 
 
@@ -205,9 +211,7 @@ namespace LCQPow {
         Q = copy_csc_mat(rhs.Q);
         A = copy_csc_mat(rhs.A);
 
-        if (Utilities::isNotNullPtr(rhs.settings)) {
-            settings = copy_settings(rhs.settings);
-        }
+        setOptions(rhs.settings);
 
         if (Utilities::isNotNullPtr(rhs.data)) {
             double* l = (double*)malloc((size_t)nC*sizeof(double));
