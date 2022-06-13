@@ -19,6 +19,15 @@
  *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/*
+ *	This file contains parts of qpOASES.
+ *
+ *	qpOASES -- An Implementation of the Online Active Set Strategy.
+ *	Copyright (C) 2007-2017 by Hans Joachim Ferreau, Andreas Potschka,
+ *	Christian Kirches et al. All rights reserved.
+ *
+ */
+
 #include "LCQProblem.hpp"
 using LCQPow::LCQProblem;
 using LCQPow::Options;
@@ -266,6 +275,179 @@ int LCQPDense(LCQProblem& lcqp, int nV, int nComp, int nC, int nrhs, const mxArr
 }
 
 
+/* 
+ * QPOASES OPTIONS HANDLING
+ */
+/*
+ *	h a s O p t i o n s V a l u e
+ */
+qpOASES::BooleanType hasOptionsValue( const mxArray* optionsPtr, const char* const optionString, double** optionValue )
+{
+	mxArray* optionName = mxGetField( optionsPtr,0,optionString );
+
+	if ( optionName == 0 )
+	{
+		char msg[qpOASES::MAX_STRING_LENGTH];
+		snprintf(msg, qpOASES::MAX_STRING_LENGTH, "Option struct does not contain entry '%s', using default value instead!", optionString );
+		mexWarnMsgTxt( msg );
+		return qpOASES::BT_FALSE;
+	}
+
+	if ( ( mxIsEmpty(optionName) == false ) && ( mxIsScalar( optionName ) == true ) )
+	{
+		*optionValue = mxGetPr( optionName );
+		return qpOASES::BT_TRUE;
+	}
+	else
+	{
+		char msg[qpOASES::MAX_STRING_LENGTH];
+		snprintf(msg, qpOASES::MAX_STRING_LENGTH, "Option '%s' is not a scalar, using default value instead!", optionString );
+		mexWarnMsgTxt( msg );
+		return qpOASES::BT_FALSE;
+	}
+}
+
+
+/*
+ *	s e t u p q p O A S E S O p t i o n s
+ */
+void setupqpOASESOptions( qpOASES::Options* options, const mxArray* optionsPtr )
+{
+	double* optionValue;
+	qpOASES::int_t optionValueInt;
+
+	/* Check for correct number of option entries;
+	 * may occur, e.g., if user types options.<misspelledName> = <someValue>; */
+	if ( mxGetNumberOfFields(optionsPtr) != 31 )
+		mexWarnMsgTxt( "Options might be set incorrectly as struct has wrong number of entries!\n         Type 'help qpOASES_options' for further information." );
+
+	if ( hasOptionsValue( optionsPtr,"printLevel",&optionValue ) == qpOASES::BT_TRUE )
+	{
+        #ifdef __SUPPRESSANYOUTPUT__
+        options->printLevel = qpOASES::PL_NONE;
+        #else
+		optionValueInt = (qpOASES::int_t)*optionValue;
+		options->printLevel = (REFER_NAMESPACE_QPOASES PrintLevel)optionValueInt;
+        if ( options->printLevel < qpOASES::PL_DEBUG_ITER )
+            options->printLevel = qpOASES::PL_DEBUG_ITER;
+        if ( options->printLevel > qpOASES::PL_HIGH )
+            options->printLevel = qpOASES::PL_HIGH;       
+        #endif
+	}
+
+	if ( hasOptionsValue( optionsPtr,"enableRamping",&optionValue ) == qpOASES::BT_TRUE )
+	{
+		optionValueInt = (qpOASES::int_t)*optionValue;
+		options->enableRamping = (REFER_NAMESPACE_QPOASES BooleanType)optionValueInt;
+	}
+
+	if ( hasOptionsValue( optionsPtr,"enableFarBounds",&optionValue ) == qpOASES::BT_TRUE )
+	{
+		optionValueInt = (qpOASES::int_t)*optionValue;
+		options->enableFarBounds = (REFER_NAMESPACE_QPOASES BooleanType)optionValueInt;
+	}
+
+	if ( hasOptionsValue( optionsPtr,"enableFlippingBounds",&optionValue ) == qpOASES::BT_TRUE )
+	{
+		optionValueInt = (qpOASES::int_t)*optionValue;
+		options->enableFlippingBounds = (REFER_NAMESPACE_QPOASES BooleanType)optionValueInt;
+	}
+
+	if ( hasOptionsValue( optionsPtr,"enableRegularisation",&optionValue ) == qpOASES::BT_TRUE )
+	{
+		optionValueInt = (qpOASES::int_t)*optionValue;
+		options->enableRegularisation = (REFER_NAMESPACE_QPOASES BooleanType)optionValueInt;
+	}
+
+	if ( hasOptionsValue( optionsPtr,"enableFullLITests",&optionValue ) == qpOASES::BT_TRUE )
+	{
+		optionValueInt = (qpOASES::int_t)*optionValue;
+		options->enableFullLITests = (REFER_NAMESPACE_QPOASES BooleanType)optionValueInt;
+	}
+
+	if ( hasOptionsValue( optionsPtr,"enableNZCTests",&optionValue ) == qpOASES::BT_TRUE )
+	{
+		optionValueInt = (qpOASES::int_t)*optionValue;
+		options->enableNZCTests = (REFER_NAMESPACE_QPOASES BooleanType)optionValueInt;
+	}
+
+	if ( hasOptionsValue( optionsPtr,"enableDriftCorrection",&optionValue ) == qpOASES::BT_TRUE )
+		options->enableDriftCorrection = (qpOASES::int_t)*optionValue;
+
+	if ( hasOptionsValue( optionsPtr,"enableCholeskyRefactorisation",&optionValue ) == qpOASES::BT_TRUE )
+		options->enableCholeskyRefactorisation = (qpOASES::int_t)*optionValue;
+
+	if ( hasOptionsValue( optionsPtr,"enableEqualities",&optionValue ) == qpOASES::BT_TRUE )
+	{
+		optionValueInt = (qpOASES::int_t)*optionValue;
+		options->enableEqualities = (REFER_NAMESPACE_QPOASES BooleanType)optionValueInt;
+	}
+
+	if ( hasOptionsValue( optionsPtr,"terminationTolerance",&optionValue ) == qpOASES::BT_TRUE )
+		options->terminationTolerance = *optionValue;
+
+	if ( hasOptionsValue( optionsPtr,"boundTolerance",&optionValue ) == qpOASES::BT_TRUE )
+		options->boundTolerance = *optionValue;
+
+	if ( hasOptionsValue( optionsPtr,"boundRelaxation",&optionValue ) == qpOASES::BT_TRUE )
+		options->boundRelaxation = *optionValue;
+
+	if ( hasOptionsValue( optionsPtr,"epsNum",&optionValue ) == qpOASES::BT_TRUE )
+		options->epsNum = *optionValue;
+
+	if ( hasOptionsValue( optionsPtr,"epsDen",&optionValue ) == qpOASES::BT_TRUE )
+		options->epsDen = *optionValue;
+
+	if ( hasOptionsValue( optionsPtr,"maxPrimalJump",&optionValue ) == qpOASES::BT_TRUE )
+		options->maxPrimalJump = *optionValue;
+
+	if ( hasOptionsValue( optionsPtr,"maxDualJump",&optionValue ) == qpOASES::BT_TRUE )
+		options->maxDualJump = *optionValue;
+
+	if ( hasOptionsValue( optionsPtr,"initialRamping",&optionValue ) == qpOASES::BT_TRUE )
+		options->initialRamping = *optionValue;
+
+	if ( hasOptionsValue( optionsPtr,"finalRamping",&optionValue ) == qpOASES::BT_TRUE )
+		options->finalRamping = *optionValue;
+
+	if ( hasOptionsValue( optionsPtr,"initialFarBounds",&optionValue ) == qpOASES::BT_TRUE )
+		options->initialFarBounds = *optionValue;
+
+	if ( hasOptionsValue( optionsPtr,"growFarBounds",&optionValue ) == qpOASES::BT_TRUE )
+		options->growFarBounds = *optionValue;
+
+	if ( hasOptionsValue( optionsPtr,"initialStatusBounds",&optionValue ) == qpOASES::BT_TRUE )
+	{
+		optionValueInt = (qpOASES::int_t)*optionValue;
+		if ( optionValueInt < -1 ) 
+			optionValueInt = -1;
+		if ( optionValueInt > 1 ) 
+			optionValueInt = 1;
+		options->initialStatusBounds = (REFER_NAMESPACE_QPOASES SubjectToStatus)optionValueInt;
+	}
+
+	if ( hasOptionsValue( optionsPtr,"epsFlipping",&optionValue ) == qpOASES::BT_TRUE )
+		options->epsFlipping = *optionValue;
+
+	if ( hasOptionsValue( optionsPtr,"numRegularisationSteps",&optionValue ) == qpOASES::BT_TRUE )
+		options->numRegularisationSteps = (qpOASES::int_t)*optionValue;
+
+	if ( hasOptionsValue( optionsPtr,"epsRegularisation",&optionValue ) == qpOASES::BT_TRUE )
+		options->epsRegularisation = *optionValue;
+
+	if ( hasOptionsValue( optionsPtr,"numRefinementSteps",&optionValue ) == qpOASES::BT_TRUE )
+		options->numRefinementSteps = (qpOASES::int_t)*optionValue;
+
+	if ( hasOptionsValue( optionsPtr,"epsIterRef",&optionValue ) == qpOASES::BT_TRUE )
+		options->epsIterRef = *optionValue;
+
+	if ( hasOptionsValue( optionsPtr,"epsLITests",&optionValue ) == qpOASES::BT_TRUE )
+		options->epsLITests = *optionValue;
+
+	if ( hasOptionsValue( optionsPtr,"epsNZCTests",&optionValue ) == qpOASES::BT_TRUE )
+		options->epsNZCTests = *optionValue;
+}
+
 void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 {
     // Validate number of output arguments
@@ -390,7 +572,8 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             "printLevel",
             "storeSteps",
             "qpSolver",
-            "perturbStep"
+            "perturbStep",
+            "qpOASES_options"
         };
 
         mxArray* dual_guess_field;
@@ -518,6 +701,12 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             if ( strcmp(name, "y0") == 0 ) {
                 dual_guess_passed = true;
                 dual_guess_field = field;
+            }
+
+            if ( strcmp(name, "qpOASES_options") == 0) {
+                qpOASES::Options opts;
+                setupqpOASESOptions(&opts, field);
+                options.setqpOASESOptions(opts);
             }
         }
 
