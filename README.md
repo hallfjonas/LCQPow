@@ -93,7 +93,7 @@ Also bug reports, source code enhancements or success stories are most welcome!
 
 
 ## Credits
-The design of this software project is in large parts inspired by that of [qpOASES](https://github.com/coin-or/qpOASES). This includes the object-oriented design, and the specific classes introduces (though each of the classes are quite different from qpOASES itself). Some code snippets may have more similarity to the code of qpOASES compared to others (in particular constructors and destructors may be very similar). Additionally, some files contain one-to-one code snippets copied from qpOASES (e.g., the matlab interface contains code that parses qpOASES options). In such files the copyright header is included. For the above reasons, we chose to match our license with that of qpOASES.
+The design of this software project is in large parts inspired by that of [qpOASES](https://github.com/coin-or/qpOASES). This includes the object-oriented design, and the specific classes introduces (though each of the classes are quite different from qpOASES itself). Some code snippets may have more similarity to the code of qpOASES than others (in particular constructors and destructors may be very similar). Additionally, some files contain one-to-one code snippets copied from qpOASES (e.g., the matlab interface contains code that parses qpOASES options). In such files the copyright header is included. For the above reasons, we chose to match our license with that of qpOASES.
 
 ## Logo Design
 Thank you Johanna Schmidt for designing this logo!
