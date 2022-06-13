@@ -50,8 +50,8 @@
 %                  maxIterations : Maximum number of iterations to be performed.
 %                         maxRho : Maximum penalty value.
 %                     printLevel : The amount of output to be printed.
-%                     nDynamicPenalty : The number of complementarity values to be compared in Leyffer check.
-%                   etaDynamicPenalty : Complementarity reduction factor required in at least one of the lastet nDynamicPenalty steps.
+%                nDynamicPenalty : The number of complementarity values to be compared in Leyffer check.
+%              etaDynamicPenalty : Complementarity reduction factor required in at least one of the lastet nDynamicPenalty steps.
 %
 % III) The outputs consist of primal and dual solutions and a statistics struct:
 %                              x : The primal solution (or last iterate on failed call)
