@@ -275,9 +275,10 @@ int LCQPDense(LCQProblem& lcqp, int nV, int nComp, int nC, int nrhs, const mxArr
 }
 
 
-/* 
- * QPOASES OPTIONS HANDLING
- */
+/******************************/ 
+/** QPOASES OPTIONS HANDLING **/
+/******************************/
+
 /*
  *	h a s O p t i o n s V a l u e
  */
@@ -448,6 +449,9 @@ void setupqpOASESOptions( qpOASES::Options* options, const mxArray* optionsPtr )
 		options->epsNZCTests = *optionValue;
 }
 
+/*
+ *  The main mex function
+ */
 void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
 {
     // Validate number of output arguments
