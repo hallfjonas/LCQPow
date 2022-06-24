@@ -45,7 +45,6 @@ int main() {
     options.setStationarityTolerance( 10e-3 );
     lcqp.setOptions( options );
 
-
     // Allocate vectors
     double* Q = new double[nV*nV]();
     double* g = new double[nV]();
