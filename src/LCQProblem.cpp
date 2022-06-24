@@ -330,19 +330,45 @@ namespace LCQPow {
 
 		delete[] _L; delete[] _R;
 
-		if (Utilities::isNotNullPtr(_A)) 
+		if (Utilities::isNotNullPtr(_A)) {
 			delete[] _A;
+			_A = NULL;
+		}
 
-		if (Utilities::isNotNullPtr(_lbA)) 
+		if (Utilities::isNotNullPtr(_lbA)) {
 			delete[] _lbA;
+			_lbA = NULL;
+		}
 
-		if (Utilities::isNotNullPtr(_ubA)) 
+		if (Utilities::isNotNullPtr(_ubA)) {
 			delete[] _ubA;
+			_ubA = NULL;
+		}
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret, ERROR );
 
 		ret = setComplementarityBounds( _lbL, _ubL, _lbR, _ubR );
+
+		if (Utilities::isNotNullPtr(_lbL)) {
+			delete[] _lbL;
+			_lbL = NULL;
+		}
+
+		if (Utilities::isNotNullPtr(_ubL)) {
+			delete[] _ubL;
+			_ubL = NULL;
+		}
+
+		if (Utilities::isNotNullPtr(_lbR)) {
+			delete[] _lbR;
+			_lbR = NULL;
+		}
+
+		if (Utilities::isNotNullPtr(_ubR)) {
+			delete[] _ubR;
+			_ubR = NULL;
+		}
 
 		if (ret != SUCCESSFUL_RETURN)
 			return MessageHandler::PrintMessage( ret, ERROR );
