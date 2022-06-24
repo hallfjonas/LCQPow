@@ -52,6 +52,8 @@ TEST(UtilitiesTest, MatrixMultiplicationTest) {
     ASSERT_EQ(C[5], -1);
     ASSERT_EQ(C[6], -1);
     ASSERT_EQ(C[7], 7);
+
+    delete[] A; delete[] B; delete[] C;
 }
 
 // Testing transposed matrix multiplications
@@ -71,6 +73,8 @@ TEST(UtilitiesTest, TransposedMatrixMultiplicationTest) {
     ASSERT_EQ(C[0], 68);
     ASSERT_EQ(C[1], -10);
     ASSERT_EQ(C[2], 186);
+
+    delete[] A; delete[] B; delete[] C;
 }
 
 // Testing the matrix symmetrization product
@@ -95,6 +99,8 @@ TEST(UtilitiesTest, MatrixSymmetrization) {
     ASSERT_EQ(C[6], 2);
     ASSERT_EQ(C[7], -1);
     ASSERT_EQ(C[8], 2);
+
+    delete[] A; delete[] B; delete[] C;
 }
 
 // Testing standard and symmetrization matrix multiplications
@@ -115,8 +121,11 @@ TEST(UtilitiesTest, AffineTransformation) {
     double* d = new double[m];
 
     LCQPow::Utilities::AffineLinearTransformation(alpha, A, b, c, d, m, n);
+
     ASSERT_EQ(d[0], 5);
     ASSERT_EQ(d[1], 11);
+
+    delete[] A; delete[] b; delete[] c; delete[] d;
 }
 
 // Testing matrix add
@@ -138,12 +147,15 @@ TEST(UtilitiesTest, MatrixAdd) {
     double* C = new double[m*n];
 
     LCQPow::Utilities::WeightedMatrixAdd(alpha, A, beta, B, C, m, n);
+
     ASSERT_EQ(C[0], 1);
     ASSERT_EQ(C[1], -1);
     ASSERT_EQ(C[2], -3);
     ASSERT_EQ(C[3], 1);
     ASSERT_EQ(C[4], -9);
     ASSERT_EQ(C[5], 0);
+
+    delete[] A; delete[] B; delete[] C;
 }
 
 // Testing vector add
@@ -164,10 +176,14 @@ TEST(UtilitiesTest, VectorAdd) {
     double* d = new double[m];
 
     LCQPow::Utilities::WeightedVectorAdd(alpha, a, beta, b, d, m);
+
+
     ASSERT_EQ(d[0], -10);
     ASSERT_EQ(d[1], 0);
     ASSERT_EQ(d[2], 4);
     ASSERT_EQ(d[3], 3);
+    
+    delete[] a; delete[] b; delete[] d;
 }
 
 // Testing Quadratic Form Product
@@ -181,7 +197,10 @@ TEST(UtilitiesTest, QuadraticFormProduct) {
     double* Q = new double[m*m] { 0, 1, 0, 1, 2, 1, 0, 1, 0 };
 
     double ret = LCQPow::Utilities::QuadraticFormProduct(Q, p, m);
+
     ASSERT_EQ(ret, 24);
+    
+    delete[] p; delete[] Q;
 }
 
 // Testing dot product
@@ -195,7 +214,10 @@ TEST(UtilitiesTest, DotProduct) {
     double* b = new double[m] { 10, 2, 0, 3 };
 
     double ret = LCQPow::Utilities::DotProduct(a, b, m);
+
     ASSERT_EQ(ret, 11);
+
+    delete[] a; delete[] b;
 }
 
 // Testing 1 norm
@@ -213,12 +235,14 @@ TEST(UtilitiesTest, MaxAbs) {
     a = new double[m] { 0, -1, 2, 0 };
     ret = LCQPow::Utilities::MaxAbs(a, m);
     ASSERT_EQ(ret, 2);
+    delete[] a;
 
     // a = [0; -4; 2; 0]
     // ret = 4
     a = new double[m] { 0, -4, 2, 0 };
     ret = LCQPow::Utilities::MaxAbs(a, m);
     ASSERT_EQ(ret, 4);
+    delete[] a;
 }
 
 // Testing Options constructors, default settings, consistency
