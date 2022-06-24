@@ -11,9 +11,9 @@ make
 cd ..
 
 # Run all test examples
-for f in ./build/bin/tests/*; do
+for f in ./build/bin/tests/*_TEST; do
     echo "Running $f"
-    $f
+    $f >> test/test.log
 done
 
 # Run unit tests
