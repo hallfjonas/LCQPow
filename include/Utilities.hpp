@@ -338,7 +338,7 @@ namespace LCQPow {
 			/** Checks if the ptr is not null. */
 			template <typename PtrType>
 		    static bool isNotNullPtr(PtrType ptr) { 
-				  return (ptr != NULL && ptr != nullptr);
+                return (ptr != NULL && ptr != nullptr);
 			}
 
 
