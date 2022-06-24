@@ -35,7 +35,6 @@ int main() {
     double R[1*2] = {0.0, 1.0};
 
     double x0[2] = {1.0, 1.0};
-    double y0[4] = {0.0, 0.0, 0.0, 0.0};
     
     int nV = 2;
     int nC = 0;
@@ -43,7 +42,7 @@ int main() {
 
     // Load data
     LCQProblem lcqp( nV, nC, nComp );
-	ReturnValue retVal = lcqp.loadLCQP( Q, g, L, R, 0, 0, 0, 0, 0, 0, 0, 0, 0, x0, y0 );
+	ReturnValue retVal = lcqp.loadLCQP( Q, g, L, R, 0, 0, 0, 0, 0, 0, 0, 0, 0, x0 );
     if (retVal != SUCCESSFUL_RETURN)
     {
         printf("Failed to load LCQP.\n");
