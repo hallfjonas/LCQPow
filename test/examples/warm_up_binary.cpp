@@ -81,28 +81,6 @@ int main() {
         return 1;
     }
 
-    // Solve another LCQP
-    x0[0] = 0.0;
-    x0[1] = 3000;
-    options.setSolveZeroPenaltyFirst(false);
-    options.setInitialPenaltyParameter(10.0);
-	lcqp.setOptions( options );
-	retVal = lcqp.loadLCQP( Q, g, L, R, lbL, 0, lbR, 0, 0, 0, 0, 0, 0, x0);
-
-    if (retVal != SUCCESSFUL_RETURN)
-    {
-        printf("Failed to load LCQP.\n");
-        return 1;
-    }
-
-    retVal = lcqp.runSolver();
-
-    if (retVal != SUCCESSFUL_RETURN)
-    {
-        printf("Failed to solve LCQP.\n");
-        return 1;
-    }
-
     // Get solutions
     double* xOpt = new double[2];
 	double* yOpt = new double[nV + nC + 2*nComp];
