@@ -41,20 +41,9 @@ PROFILING           ON  / [OFF]
 QPOASES_SCHUR       ON  / [OFF]
 ```
 
-3. To test the build you can **run the test examples**
-```
-$ bin/examples/warm_up
-$ bin/examples/warm_up_sparse
-$ bin/examples/warm_up_osqp
-$ bin/examples/OptimizeOnCircle
-```
+3. To test the build you can **run the examples** in the directory `<LCQPow-dir>/examples`.
 
-## Python Interface
-Thanks to a contribution by [Sotaro Katayama](https://github.com/mayataka) you can call the solver through its python interface. Doing so can be en/disabled by setting the respective cmake flag. The python interface requires the **Python 3 development** package as well as **Eigen3**. Make sure these are installed. On Ubuntu this can be achieved by running
-```
-apt install libeigen3-dev
-apt-get install python3-dev
-```
+4. Even more examples, in particular variations of the options, can be found in `<LCQPow-dir>/test/examples` directory. Those are not included in the examples directory in order to keep the example set neatly arranged.
 
 ## MATLAB Interface
 The **MATLAB interface** is built automatically if matlab is successfully detected by CMake. Make sure that your **linker can locate the created libraries**, e.g. by exporting the library path in **the same shell as the one you call matlab in**:
@@ -72,6 +61,15 @@ addpath("<LCQPow-dir>/build/lib")
 Navigate your MATLAB editor to the directory `<LCQPow-dir>/interfaces/matlab/examples` and play with any of the provided codes.
 
 Type `help LCQPow` in order to obtain the documentation of our MATLAB interface.
+
+## Python Interface
+Thanks to a contribution by [Sotaro Katayama](https://github.com/mayataka) you can call the solver through its python interface. Doing so can be en/disabled by setting the respective cmake flag. The python interface requires the **Python 3 development** package as well as **Eigen3**. Make sure these are installed. On Ubuntu this can be achieved by running
+```
+apt install libeigen3-dev
+apt-get install python3-dev
+```
+
+Remark: unlike the matlab interface this is more in an experimental stage.
 
 ## Sparse vs Dense
 The most tested version of LCQPow uses qpOASES with dense linear algebra. There exist two alternatives:
