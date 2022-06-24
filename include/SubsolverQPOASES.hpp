@@ -112,6 +112,9 @@ namespace LCQPow {
             void copy(const SubsolverQPOASES& rhs);
 
 
+            /** Clear the memory. */
+            void clear( );
+
         private:
 
             int nV;                                     /**< Number of optimization variables. */

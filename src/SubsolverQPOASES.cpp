@@ -107,49 +107,7 @@ namespace LCQPow {
 
     SubsolverQPOASES::~SubsolverQPOASES()
     {
-        if (Utilities::isNotNullPtr(Q)) {
-            delete[] Q;
-            Q = NULL;
-        }
-
-        if (Utilities::isNotNullPtr(A)) {
-            delete[] A;
-            A = NULL;
-        }
-
-        if (Utilities::isNotNullPtr(Q_i)) {
-            delete[] Q_i;
-        }
-
-        if (Utilities::isNotNullPtr(Q_p)) {
-            delete[] Q_p;
-        }
-
-        if (Utilities::isNotNullPtr(Q_x)) {
-            delete[] Q_x;
-        }
-
-        if (Utilities::isNotNullPtr(A_x)) {
-            delete[] A_i;
-        }
-
-        if (Utilities::isNotNullPtr(A_p)) {
-            delete[] A_p;
-        }
-
-        if (Utilities::isNotNullPtr(A_x)) {
-            delete[] A_x;
-        }
-
-        if (Utilities::isNotNullPtr(Q_sparse)) {
-            delete Q_sparse;
-            Q_sparse = 0;
-        }
-
-        if (Utilities::isNotNullPtr(A_sparse)) {
-            delete A_sparse;
-            A_sparse = 0;
-        }
+        clear();
     }
 
 
@@ -225,6 +183,9 @@ namespace LCQPow {
 
     void SubsolverQPOASES::copy(const SubsolverQPOASES& rhs)
     {
+
+        clear();
+
         nV = rhs.nV;
         nC = rhs.nC;
 
@@ -265,6 +226,54 @@ namespace LCQPow {
             qpSchur = rhs.qpSchur;
         } else {
             qp = rhs.qp;
+        }
+    }
+
+
+    void SubsolverQPOASES::clear() 
+    {
+        if (Utilities::isNotNullPtr(Q)) {
+            delete[] Q;
+            Q = NULL;
+        }
+
+        if (Utilities::isNotNullPtr(A)) {
+            delete[] A;
+            A = NULL;
+        }
+
+        if (Utilities::isNotNullPtr(Q_i)) {
+            delete[] Q_i;
+        }
+
+        if (Utilities::isNotNullPtr(Q_p)) {
+            delete[] Q_p;
+        }
+
+        if (Utilities::isNotNullPtr(Q_x)) {
+            delete[] Q_x;
+        }
+
+        if (Utilities::isNotNullPtr(A_x)) {
+            delete[] A_i;
+        }
+
+        if (Utilities::isNotNullPtr(A_p)) {
+            delete[] A_p;
+        }
+
+        if (Utilities::isNotNullPtr(A_x)) {
+            delete[] A_x;
+        }
+
+        if (Utilities::isNotNullPtr(Q_sparse)) {
+            delete Q_sparse;
+            Q_sparse = 0;
+        }
+
+        if (Utilities::isNotNullPtr(A_sparse)) {
+            delete A_sparse;
+            A_sparse = 0;
         }
     }
 }
