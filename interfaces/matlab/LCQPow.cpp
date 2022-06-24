@@ -34,6 +34,10 @@ using LCQPow::Options;
 
 #include "qpOASES.hpp"
 
+extern "C" {
+    #include <osqp.h>
+}
+
 #include <mex.h>
 #include <chrono>
 
@@ -280,9 +284,9 @@ int LCQPDense(LCQProblem& lcqp, int nV, int nComp, int nC, int nrhs, const mxArr
 /******************************/
 
 /*
- *	h a s O p t i o n s V a l u e
+ *	has options value
  */
-qpOASES::BooleanType hasOptionsValue( const mxArray* optionsPtr, const char* const optionString, double** optionValue )
+bool hasOptionsValue( const mxArray* optionsPtr, const char* const optionString, double** optionValue )
 {
 	mxArray* optionName = mxGetField( optionsPtr,0,optionString );
 
@@ -297,7 +301,7 @@ qpOASES::BooleanType hasOptionsValue( const mxArray* optionsPtr, const char* con
 	if ( ( mxIsEmpty(optionName) == false ) && ( mxIsScalar( optionName ) == true ) )
 	{
 		*optionValue = mxGetPr( optionName );
-		return qpOASES::BT_TRUE;
+		return true;
 	}
 	else
 	{
@@ -308,9 +312,37 @@ qpOASES::BooleanType hasOptionsValue( const mxArray* optionsPtr, const char* con
 	}
 }
 
+/*
+ *	has options value
+ */
+bool hasOptionsValue( const mxArray* optionsPtr, const char* const optionString, char** optionValue )
+{
+	mxArray* optionName = mxGetField( optionsPtr,0,optionString );
+
+	if ( optionName == 0 )
+	{
+		char msg[qpOASES::MAX_STRING_LENGTH];
+		snprintf(msg, qpOASES::MAX_STRING_LENGTH, "Option struct does not contain entry '%s', using default value instead!", optionString );
+		mexWarnMsgTxt( msg );
+		return qpOASES::BT_FALSE;
+	}
+
+	if ( ( mxIsEmpty(optionName) == false ) && ( mxIsChar( optionName ) == true ) )
+	{
+		*optionValue = mxArrayToString( optionName );
+		return true;
+	}
+	else
+	{
+		char msg[qpOASES::MAX_STRING_LENGTH];
+		snprintf(msg, qpOASES::MAX_STRING_LENGTH, "Option '%s' is not a scalar, using default value instead!", optionString );
+		mexWarnMsgTxt( msg );
+		return qpOASES::BT_FALSE;
+	}
+}
 
 /*
- *	s e t u p q p O A S E S O p t i o n s
+ *	setup qpOASES options
  */
 void setupqpOASESOptions( qpOASES::Options* options, const mxArray* optionsPtr )
 {
@@ -320,9 +352,9 @@ void setupqpOASESOptions( qpOASES::Options* options, const mxArray* optionsPtr )
 	/* Check for correct number of option entries;
 	 * may occur, e.g., if user types options.<misspelledName> = <someValue>; */
 	if ( mxGetNumberOfFields(optionsPtr) != 31 )
-		mexWarnMsgTxt( "Options might be set incorrectly as struct has wrong number of entries!\n         Type 'help qpOASES_options' for further information." );
+		mexWarnMsgTxt( "qpOASES options might be set incorrectly as struct has wrong number of entries!\n" );
 
-	if ( hasOptionsValue( optionsPtr,"printLevel",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "printLevel", &optionValue) )
 	{
         #ifdef __SUPPRESSANYOUTPUT__
         options->printLevel = qpOASES::PL_NONE;
@@ -336,88 +368,88 @@ void setupqpOASESOptions( qpOASES::Options* options, const mxArray* optionsPtr )
         #endif
 	}
 
-	if ( hasOptionsValue( optionsPtr,"enableRamping",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "enableRamping", &optionValue) )
 	{
 		optionValueInt = (qpOASES::int_t)*optionValue;
 		options->enableRamping = (REFER_NAMESPACE_QPOASES BooleanType)optionValueInt;
 	}
 
-	if ( hasOptionsValue( optionsPtr,"enableFarBounds",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "enableFarBounds", &optionValue) )
 	{
 		optionValueInt = (qpOASES::int_t)*optionValue;
 		options->enableFarBounds = (REFER_NAMESPACE_QPOASES BooleanType)optionValueInt;
 	}
 
-	if ( hasOptionsValue( optionsPtr,"enableFlippingBounds",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "enableFlippingBounds", &optionValue) )
 	{
 		optionValueInt = (qpOASES::int_t)*optionValue;
 		options->enableFlippingBounds = (REFER_NAMESPACE_QPOASES BooleanType)optionValueInt;
 	}
 
-	if ( hasOptionsValue( optionsPtr,"enableRegularisation",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "enableRegularisation", &optionValue) )
 	{
 		optionValueInt = (qpOASES::int_t)*optionValue;
 		options->enableRegularisation = (REFER_NAMESPACE_QPOASES BooleanType)optionValueInt;
 	}
 
-	if ( hasOptionsValue( optionsPtr,"enableFullLITests",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "enableFullLITests", &optionValue) )
 	{
 		optionValueInt = (qpOASES::int_t)*optionValue;
 		options->enableFullLITests = (REFER_NAMESPACE_QPOASES BooleanType)optionValueInt;
 	}
 
-	if ( hasOptionsValue( optionsPtr,"enableNZCTests",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "enableNZCTests", &optionValue) )
 	{
 		optionValueInt = (qpOASES::int_t)*optionValue;
 		options->enableNZCTests = (REFER_NAMESPACE_QPOASES BooleanType)optionValueInt;
 	}
 
-	if ( hasOptionsValue( optionsPtr,"enableDriftCorrection",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "enableDriftCorrection", &optionValue) )
 		options->enableDriftCorrection = (qpOASES::int_t)*optionValue;
 
-	if ( hasOptionsValue( optionsPtr,"enableCholeskyRefactorisation",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "enableCholeskyRefactorisation", &optionValue) )
 		options->enableCholeskyRefactorisation = (qpOASES::int_t)*optionValue;
 
-	if ( hasOptionsValue( optionsPtr,"enableEqualities",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "enableEqualities", &optionValue) )
 	{
 		optionValueInt = (qpOASES::int_t)*optionValue;
 		options->enableEqualities = (REFER_NAMESPACE_QPOASES BooleanType)optionValueInt;
 	}
 
-	if ( hasOptionsValue( optionsPtr,"terminationTolerance",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "terminationTolerance", &optionValue) )
 		options->terminationTolerance = *optionValue;
 
-	if ( hasOptionsValue( optionsPtr,"boundTolerance",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "boundTolerance", &optionValue) )
 		options->boundTolerance = *optionValue;
 
-	if ( hasOptionsValue( optionsPtr,"boundRelaxation",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "boundRelaxation", &optionValue) )
 		options->boundRelaxation = *optionValue;
 
-	if ( hasOptionsValue( optionsPtr,"epsNum",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "epsNum", &optionValue) )
 		options->epsNum = *optionValue;
 
-	if ( hasOptionsValue( optionsPtr,"epsDen",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "epsDen", &optionValue) )
 		options->epsDen = *optionValue;
 
-	if ( hasOptionsValue( optionsPtr,"maxPrimalJump",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "maxPrimalJump", &optionValue) )
 		options->maxPrimalJump = *optionValue;
 
-	if ( hasOptionsValue( optionsPtr,"maxDualJump",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "maxDualJump", &optionValue) )
 		options->maxDualJump = *optionValue;
 
-	if ( hasOptionsValue( optionsPtr,"initialRamping",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "initialRamping", &optionValue) )
 		options->initialRamping = *optionValue;
 
-	if ( hasOptionsValue( optionsPtr,"finalRamping",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "finalRamping", &optionValue) )
 		options->finalRamping = *optionValue;
 
-	if ( hasOptionsValue( optionsPtr,"initialFarBounds",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "initialFarBounds", &optionValue) )
 		options->initialFarBounds = *optionValue;
 
-	if ( hasOptionsValue( optionsPtr,"growFarBounds",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "growFarBounds", &optionValue) )
 		options->growFarBounds = *optionValue;
 
-	if ( hasOptionsValue( optionsPtr,"initialStatusBounds",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "initialStatusBounds", &optionValue) )
 	{
 		optionValueInt = (qpOASES::int_t)*optionValue;
 		if ( optionValueInt < -1 ) 
@@ -427,26 +459,109 @@ void setupqpOASESOptions( qpOASES::Options* options, const mxArray* optionsPtr )
 		options->initialStatusBounds = (REFER_NAMESPACE_QPOASES SubjectToStatus)optionValueInt;
 	}
 
-	if ( hasOptionsValue( optionsPtr,"epsFlipping",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "epsFlipping", &optionValue) )
 		options->epsFlipping = *optionValue;
 
-	if ( hasOptionsValue( optionsPtr,"numRegularisationSteps",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "numRegularisationSteps", &optionValue) )
 		options->numRegularisationSteps = (qpOASES::int_t)*optionValue;
 
-	if ( hasOptionsValue( optionsPtr,"epsRegularisation",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "epsRegularisation", &optionValue) )
 		options->epsRegularisation = *optionValue;
 
-	if ( hasOptionsValue( optionsPtr,"numRefinementSteps",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "numRefinementSteps", &optionValue) )
 		options->numRefinementSteps = (qpOASES::int_t)*optionValue;
 
-	if ( hasOptionsValue( optionsPtr,"epsIterRef",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "epsIterRef", &optionValue) )
 		options->epsIterRef = *optionValue;
 
-	if ( hasOptionsValue( optionsPtr,"epsLITests",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "epsLITests", &optionValue) )
 		options->epsLITests = *optionValue;
 
-	if ( hasOptionsValue( optionsPtr,"epsNZCTests",&optionValue ) == qpOASES::BT_TRUE )
+	if ( hasOptionsValue(optionsPtr, "epsNZCTests", &optionValue) )
 		options->epsNZCTests = *optionValue;
+}
+
+
+/*
+ *  setup OSQP options
+ */
+void setupOSQPOptions(OSQPSettings* settings, const mxArray* optionsPtr)
+{
+
+	/* Check for correct number of option entries;
+	 * may occur, e.g., if user types options.<misspelledName> = <someValue>; */
+	if ( mxGetNumberOfFields(optionsPtr) != 22 )
+		mexWarnMsgTxt( "OSQP Options might be set incorrectly as struct has wrong number of entries!\n" );
+
+	double* optionValue;
+    
+    if ( hasOptionsValue(optionsPtr, "rho", &optionValue) )
+        settings->rho = (c_float) *optionValue;
+
+    if ( hasOptionsValue(optionsPtr, "sigma", &optionValue) )
+        settings->sigma = (c_float) *optionValue;
+        
+    if ( hasOptionsValue(optionsPtr, "scaling", &optionValue) )
+        settings->scaling = (c_int) *optionValue;
+
+    if ( hasOptionsValue(optionsPtr, "adaptive_rho", &optionValue) )
+        settings->adaptive_rho = (c_int) *optionValue;
+
+    if ( hasOptionsValue(optionsPtr, "adaptive_rho_interval", &optionValue) )
+        settings->adaptive_rho_interval = (c_int) *optionValue;
+
+    if ( hasOptionsValue(optionsPtr, "adaptive_rho_tolerance", &optionValue) )
+        settings->adaptive_rho_tolerance = (c_float) *optionValue;
+
+    if ( hasOptionsValue(optionsPtr, "adaptive_rho_fraction", &optionValue) )
+        settings->adaptive_rho_fraction = (c_float) *optionValue;
+
+    if ( hasOptionsValue(optionsPtr, "max_iter", &optionValue) )
+        settings->max_iter = (c_int) *optionValue;
+
+    if ( hasOptionsValue(optionsPtr, "eps_abs", &optionValue) )
+        settings->eps_abs = (c_float) *optionValue;
+
+    if ( hasOptionsValue(optionsPtr, "eps_rel", &optionValue) )
+        settings->eps_rel = (c_float) *optionValue;
+
+    if ( hasOptionsValue(optionsPtr, "eps_prim_inf", &optionValue) )
+        settings->eps_prim_inf = (c_float) *optionValue;
+
+    if ( hasOptionsValue(optionsPtr, "eps_dual_inf", &optionValue) )
+        settings->eps_dual_inf = (c_float) *optionValue;
+        
+    if ( hasOptionsValue(optionsPtr, "alpha", &optionValue) )
+        settings->alpha = (c_float) *optionValue;
+        
+    char* optionStr;
+    if ( hasOptionsValue(optionsPtr, "linsys_solver", &optionStr) ) {
+        mexWarnMsgTxt("Setting OSQP solver through matlab interface currently not supported (will use qdldl).");
+    }
+        
+    if ( hasOptionsValue(optionsPtr, "delta", &optionValue) )
+        settings->delta = (c_float) *optionValue;
+        
+    if ( hasOptionsValue(optionsPtr, "polish", &optionValue) )
+        settings->polish = (c_int) *optionValue;
+
+    if ( hasOptionsValue(optionsPtr, "polish_refine_iter", &optionValue) )
+        settings->polish_refine_iter = (c_int) *optionValue;
+
+    if ( hasOptionsValue(optionsPtr, "verbose", &optionValue) )
+        settings->verbose = (c_int) *optionValue;
+
+    if ( hasOptionsValue(optionsPtr, "scaled_termination", &optionValue) )
+        settings->scaled_termination = (c_int) *optionValue;
+
+    if ( hasOptionsValue(optionsPtr, "check_termination", &optionValue) )
+        settings->check_termination = (c_int) *optionValue;
+
+    if ( hasOptionsValue(optionsPtr, "warm_start", &optionValue) )
+        settings->warm_start = (c_int) *optionValue;
+
+    if ( hasOptionsValue(optionsPtr, "time_limit", &optionValue) )
+        settings->time_limit = (c_float) *optionValue;
 }
 
 /*
@@ -577,7 +692,8 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             "storeSteps",
             "qpSolver",
             "perturbStep",
-            "qpOASES_options"
+            "qpOASES_options",
+            "OSQP_options"
         };
 
         mxArray* dual_guess_field;
@@ -711,6 +827,14 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 qpOASES::Options opts;
                 setupqpOASESOptions(&opts, field);
                 options.setqpOASESOptions(opts);
+            }
+
+            if ( strcmp(name, "OSQP_options") == 0) {
+                OSQPSettings* opts = (OSQPSettings *)c_malloc(sizeof(OSQPSettings));
+                osqp_set_default_settings(opts);
+                setupOSQPOptions(opts, field);
+                options.setOSQPOptions(opts);
+                c_free(opts);
             }
         }
 
