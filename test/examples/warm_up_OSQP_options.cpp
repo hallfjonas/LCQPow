@@ -36,7 +36,7 @@ int main() {
 
     double x0[2] = {1.0, 1.0};
     double y0[4] = {0.0, 0.0, 0.0, 0.0};
-
+    
     int nV = 2;
     int nC = 0;
     int nComp = 1;
@@ -56,10 +56,13 @@ int main() {
     // Settings (OSQP)
     OSQPSettings* settings = (OSQPSettings *)c_malloc(sizeof(OSQPSettings));
     osqp_set_default_settings(settings);
-    settings->verbose = true;
+    settings->verbose = false;
     settings->polish = true;
     options.setOSQPOptions(settings);
+    c_free(settings);
     options.setQPSolver(QPSolver::OSQP_SPARSE);
+
+    // Pass settings to solver
     lcqp.setOptions( options );
 
     // Switch to sparse mode
@@ -86,8 +89,8 @@ int main() {
 	lcqp.getPrimalSolution( xOpt );
 	lcqp.getDualSolution( yOpt );
     lcqp.getOutputStatistics( stats );
-	printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g, %g, %g ]; i = %d; k = %d; rho = %g; WSR = %d \n\n",
-			xOpt[0],xOpt[1],yOpt[0],yOpt[1],yOpt[2],yOpt[3],
+	printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g ]; i = %d; k = %d; rho = %g; WSR = %d \n\n",
+			xOpt[0],xOpt[1],yOpt[0],yOpt[1],
             stats.getIterTotal(), stats.getIterOuter(), stats.getRhoOpt(), stats.getSubproblemIter() );
 
     // Clean Up
