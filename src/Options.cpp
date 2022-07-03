@@ -220,7 +220,7 @@ namespace LCQPow {
 
     ReturnValue Options::setPrintLevel( int val ) {
 
-        if (val < PrintLevel::NONE || val > PrintLevel::OUTER_LOOP_ITERATES)
+        if (val < PrintLevel::NONE || val > PrintLevel::INNER_LOOP_ITERATES)
             return (MessageHandler::PrintMessage(INVALID_PRINT_LEVEL_VALUE,WARNING) );
 
         printLevel = (PrintLevel)val;
