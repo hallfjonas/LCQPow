@@ -114,11 +114,11 @@ namespace LCQPow {
 
 
             /** Get maximum penalty value. */
-            double getMaxRho( );
+            double getMaxPenaltyParameter( );
 
 
             /** Set maximum penalty value. */
-            ReturnValue setMaxRho( double val );
+            ReturnValue setMaxPenaltyParameter( double val );
 
 
             /** Get number of previous complementarity values to check against (Leyffer strategy). */
@@ -199,7 +199,7 @@ namespace LCQPow {
             bool perturbStep;                           /**< Flag whether to perform step perturbation. */
 
             int maxIterations;                          /**< Maximum number of iterations to be performed. */
-            double maxRho;                              /**< Maximum penalty value. */
+            double maxPenaltyParameter;                 /**< Maximum penalty value. */
 
             int nDynamicPenalty;                        /**< Number of previous iterates to compare complementarity loss (only enabled if positive). */
             double etaDynamicPenalty;                   /**< Parameter describing fraction of required complementarity loss. */

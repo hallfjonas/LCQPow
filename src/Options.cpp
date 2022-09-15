@@ -65,7 +65,7 @@ namespace LCQPow {
         solveZeroPenaltyFirst = rhs.solveZeroPenaltyFirst;
         perturbStep = rhs.perturbStep;
         maxIterations = rhs.maxIterations;
-        maxRho = rhs.maxRho;
+        maxPenaltyParameter = rhs.maxPenaltyParameter;
         nDynamicPenalty = rhs.nDynamicPenalty;
         etaDynamicPenalty = rhs.etaDynamicPenalty;
         printLevel = rhs.printLevel;
@@ -169,16 +169,16 @@ namespace LCQPow {
     }
 
 
-    double Options::getMaxRho( ) {
-        return maxRho;
+    double Options::getMaxPenaltyParameter( ) {
+        return maxPenaltyParameter;
     }
 
 
-    ReturnValue Options::setMaxRho( double val ) {
+    ReturnValue Options::setMaxPenaltyParameter( double val ) {
         if (val <= 0)
             return (MessageHandler::PrintMessage(INVALID_MAX_RHO_VALUE,WARNING) );
 
-        maxRho = val;
+        maxPenaltyParameter = val;
         return ReturnValue::SUCCESSFUL_RETURN;
     }
 
@@ -304,7 +304,7 @@ namespace LCQPow {
         perturbStep = true;
 
         maxIterations = 1000;
-        maxRho = 1e8;
+        maxPenaltyParameter = 1e8;
 
         nDynamicPenalty = 3;
         etaDynamicPenalty = 0.9;

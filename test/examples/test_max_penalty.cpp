@@ -46,7 +46,7 @@ int main() {
 	Options options;
     options.setPrintLevel(PrintLevel::INNER_LOOP_ITERATES);
     options.setQPSolver(QPSolver::QPOASES_DENSE);
-    options.setMaxRho( 1 );
+    options.setMaxPenaltyParameter( 1 );
 	lcqp.setOptions( options );
 
     // Load data

@@ -22,7 +22,7 @@ lcqp = lcqpow.LCQProblem(nV=nV, nC=nC, nComp=nComp)
 options = lcqpow.Options()
 options.setPrintLevel(lcqpow.PrintLevel.INNER_LOOP_ITERATES)
 options.setQPSolver(lcqpow.QPSolver.QPOASES_DENSE)
-options.setMaxRho(1.0)
+options.setMaxPenaltyParameter(1.0)
 lcqp.setOptions(options)
 
 retVal = lcqp.loadLCQP(Q=Q, g=g, L=L, R=R, x0=x0, y0=y0)

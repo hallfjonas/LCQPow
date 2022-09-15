@@ -685,7 +685,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             "penaltyUpdateFactor",
             "solveZeroPenaltyFirst",
             "maxIterations",
-            "maxRho",
+            "maxPenaltyParameter",
             "nDynamicPenalty",
             "etaDynamicPenalty",
             "printLevel",
@@ -763,11 +763,11 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
                 continue;
             }
 
-            if ( strcmp(name, "maxRho") == 0 ) {
-                if (!checkDimensionAndTypeDouble(field, 1, 1, "params.maxRho")) return;
+            if ( strcmp(name, "maxPenaltyParameter") == 0 ) {
+                if (!checkDimensionAndTypeDouble(field, 1, 1, "params.maxPenaltyParameter")) return;
 
                 fld_ptr = (double*) mxGetPr(field);
-                options.setMaxRho( (int)fld_ptr[0] );
+                options.setMaxPenaltyParameter( (int)fld_ptr[0] );
                 continue;
             }
 

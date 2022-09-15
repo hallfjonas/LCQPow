@@ -538,7 +538,7 @@ namespace LCQPow {
 				return MAX_ITERATIONS_REACHED;
 
 			// (Failed) termination condition due to penalty value
-			if ( rho > options.getMaxRho() )
+			if ( rho > options.getMaxPenaltyParameter() )
 				return MAX_PENALTY_REACHED;
 
 			// gk = new linearization + g

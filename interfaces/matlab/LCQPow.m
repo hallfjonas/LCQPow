@@ -48,7 +48,7 @@
 %          solveZeroPenaltyFirst : Flag indicating whether first QP should ignore penalization.
 %                    perturbStep : Flag indicating whether to perform step perturbation.
 %                  maxIterations : Maximum number of iterations to be performed.
-%                         maxRho : Maximum penalty value.
+%            maxPenaltyParameter : Maximum penalty value.
 %                     printLevel : The amount of output to be printed.
 %                nDynamicPenalty : The number of complementarity values to be compared in Leyffer check.
 %              etaDynamicPenalty : Complementarity reduction factor required in at least one of the lastet nDynamicPenalty steps.
