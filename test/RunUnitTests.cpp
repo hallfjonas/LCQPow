@@ -459,6 +459,48 @@ TEST(LoadDataTest, DenseToSparse) {
     ASSERT_EQ(retVal, LCQPow::SUCCESSFUL_RETURN);   
 }
 
+// Testing output statistics
+TEST(OutputStatisticsTest, CheckQPReturnFlag) {
+    double Q[2*2] = { 2.0, 0.0, 0.0, 2.0 };
+    double g[2] = { -2.0, -2.0 };
+    double L[1*2] = {1.0, 0.0};
+    double R[1*2] = {0.0, 1.0};
+    
+    // Make problem infeasible
+    double A[1*2] = {1.0, 0.0};
+    double lbA[1] = {0.0};
+    double ubA[1] = {-1.0};
+
+    // Set the dimensionns
+    int nV = 2;
+    int nC = 1;
+    int nComp = 1;
+
+    // Initialize the problem
+    LCQPow::LCQProblem lcqp( nV, nC, nComp );
+
+    // Hide output
+	LCQPow::Options options;
+    options.setPrintLevel(LCQPow::PrintLevel::NONE);
+    lcqp.setOptions( options );
+    
+    // Load dense data
+    LCQPow::ReturnValue retVal = lcqp.loadLCQP( Q, g, L, R, (double*)0, (double*)0, (double*)0, (double*)0, A, lbA, ubA );
+    ASSERT_EQ(retVal, LCQPow::SUCCESSFUL_RETURN);
+    
+    // Run solver
+    retVal = lcqp.runSolver();
+    ASSERT_EQ(retVal, LCQPow::SUBPROBLEM_SOLVER_ERROR);
+    
+    // Retrieve stats
+    LCQPow::OutputStatistics stats;
+    lcqp.getOutputStatistics(stats);
+
+    // Retrieve qp solver exit flag
+    int qp_ext_flag = stats.getQPSolverExitFlag();
+    ASSERT_TRUE(qp_ext_flag != 0);
+}
+
 // Testing LCQPow solver set up
 TEST(SolverTest, RunWarmUp) {
     double Q[2*2] = { 2.0, 0.0, 0.0, 2.0 };

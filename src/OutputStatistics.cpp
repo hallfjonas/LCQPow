@@ -35,6 +35,7 @@ namespace LCQPow {
         subproblemIter = rhs.subproblemIter;
         rhoOpt = rhs.rhoOpt;
         status = rhs.status;
+        qpSolver_exit_flag = rhs.qpSolver_exit_flag;        
 
         xSteps = rhs.xSteps;
 
@@ -59,6 +60,7 @@ namespace LCQPow {
         subproblemIter = 0;
         rhoOpt = 0.0;
         status = PROBLEM_NOT_SOLVED;
+        qpSolver_exit_flag = 0;
 
         for (size_t i = 0; i < xSteps.size(); i++) 
             xSteps[i].clear();

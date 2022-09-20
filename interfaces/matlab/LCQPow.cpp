@@ -951,11 +951,11 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     // Assign the output statistics
     if (nlhs > 2) {
         // assign fieldnames
-        int numberStatOutputs = 6;
+        int numberStatOutputs = 7;
 
         if (options.getStoreSteps()) {
             const char* fieldnames[] = {
-                "iters_total", "iters_outer", "iters_subproblem", "rho_opt", "elapsed_time", "exit_flag",
+                "iters_total", "iters_outer", "iters_subproblem", "rho_opt", "elapsed_time", "exit_flag", "qp_exit_flag",
                 "innerIters", "xSteps", "accumulatedSubproblemIters", "stepLength", "stepSize",
                 "statVals", "objVals", "phiVals", "meritVals", "subproblemIters"
             };
@@ -964,7 +964,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             // Allocate memory
             plhs[2] = mxCreateStructMatrix(1, 1, numberStatOutputs, fieldnames);
         } else {
-            const char* fieldnames[] = {"iters_total", "iters_outer", "iters_subproblem", "rho_opt", "elapsed_time", "exit_flag"};
+            const char* fieldnames[] = {"iters_total", "iters_outer", "iters_subproblem", "rho_opt", "elapsed_time", "exit_flag", "qp_exit_flag"};
 
             // Allocate memory
             plhs[2] = mxCreateStructMatrix(1, 1, numberStatOutputs, fieldnames);
