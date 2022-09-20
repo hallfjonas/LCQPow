@@ -244,26 +244,32 @@ namespace LCQPow {
 
         if (Utilities::isNotNullPtr(Q_i)) {
             delete[] Q_i;
+            Q_i = NULL;
         }
 
         if (Utilities::isNotNullPtr(Q_p)) {
-            delete[] Q_p;
+            delete[] Q_p;;
+            Q_p = NULL;
         }
 
         if (Utilities::isNotNullPtr(Q_x)) {
             delete[] Q_x;
-        }
-
-        if (Utilities::isNotNullPtr(A_x)) {
-            delete[] A_i;
-        }
-
-        if (Utilities::isNotNullPtr(A_p)) {
-            delete[] A_p;
+            Q_x = NULL;
         }
 
         if (Utilities::isNotNullPtr(A_x)) {
             delete[] A_x;
+            A_x = NULL;
+        }
+
+        if (Utilities::isNotNullPtr(A_p)) {
+            delete[] A_p;
+            A_p = NULL;
+        }
+
+        if (Utilities::isNotNullPtr(A_x)) {
+            delete[] A_x;
+            A_x = NULL;
         }
 
         if (Utilities::isNotNullPtr(Q_sparse)) {
