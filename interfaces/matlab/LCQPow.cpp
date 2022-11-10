@@ -951,11 +951,11 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
     // Assign the output statistics
     if (nlhs > 2) {
         // assign fieldnames
-        int numberStatOutputs = 7;
+        int numberStatOutputs = 8;
 
         if (options.getStoreSteps()) {
             const char* fieldnames[] = {
-                "iters_total", "iters_outer", "iters_subproblem", "rho_opt", "elapsed_time", "exit_flag", "qp_exit_flag",
+                "iters_total", "iters_outer", "iters_subproblem", "rho_opt", "elapsed_time", "exit_flag", "solution_type", "qp_exit_flag",
                 "innerIters", "xSteps", "accumulatedSubproblemIters", "stepLength", "stepSize",
                 "statVals", "objVals", "phiVals", "meritVals", "subproblemIters"
             };
@@ -964,7 +964,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
             // Allocate memory
             plhs[2] = mxCreateStructMatrix(1, 1, numberStatOutputs, fieldnames);
         } else {
-            const char* fieldnames[] = {"iters_total", "iters_outer", "iters_subproblem", "rho_opt", "elapsed_time", "exit_flag", "qp_exit_flag"};
+            const char* fieldnames[] = {"iters_total", "iters_outer", "iters_subproblem", "rho_opt", "elapsed_time", "exit_flag", "solution_type", "qp_exit_flag"};
 
             // Allocate memory
             plhs[2] = mxCreateStructMatrix(1, 1, numberStatOutputs, fieldnames);
@@ -982,6 +982,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         mxArray* rhoOpt = mxCreateDoubleMatrix(1, 1, mxREAL);
         mxArray* elapsed_time = mxCreateDoubleMatrix(1, 1, mxREAL);
         mxArray* exit_flag = mxCreateDoubleMatrix(1,1, mxREAL);
+        mxArray* solution_type = mxCreateDoubleMatrix(1,1, mxREAL);
         mxArray* qp_exit_flag = mxCreateDoubleMatrix(1,1, mxREAL);
 
         double* itrTot = mxGetPr(iterTotal);
@@ -990,6 +991,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         double* rOpt = mxGetPr(rhoOpt);
         double* elapsed = mxGetPr(elapsed_time);
         double* ex_flag = mxGetPr(exit_flag);
+        double* sol_type = mxGetPr(solution_type);
         double* qp_ex_flag = mxGetPr(qp_exit_flag);
 
         itrTot[0] = stats.getIterTotal();
@@ -998,6 +1000,7 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         rOpt[0] = stats.getRhoOpt();
         elapsed[0] = elapsed_secs;
         ex_flag[0] = ret;
+        sol_type[0] = stats.getSolutionStatus();
         qp_ex_flag[0] = stats.getQPSolverExitFlag();
 
         // assign values to struct
@@ -1007,7 +1010,8 @@ void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] )
         mxSetFieldByNumber(plhs[2], 0, 3, rhoOpt);
         mxSetFieldByNumber(plhs[2], 0, 4, elapsed_time);
         mxSetFieldByNumber(plhs[2], 0, 5, exit_flag);
-        mxSetFieldByNumber(plhs[2], 0, 6, qp_exit_flag);
+        mxSetFieldByNumber(plhs[2], 0, 6, solution_type);
+        mxSetFieldByNumber(plhs[2], 0, 7, qp_exit_flag);
 
         // Tracking values
         if (options.getStoreSteps()) {
