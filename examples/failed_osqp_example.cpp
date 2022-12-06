@@ -115,9 +115,10 @@ int main() {
     // Switch to qpOASES to compare to succeeded convergence
     // options.setQPSolver( LCQPow::QPSolver::QPOASES_DENSE );
     options.setQPSolver( LCQPow::QPSolver::OSQP_SPARSE );
-    
+        
     // Turn off dynamic penalty updates
-    // options.setNDynamicPenalty(0);
+    options.setNDynamicPenalty(0);
+    options.setMaxIterations(50);
 
     lcqp.setOptions( options );
 
@@ -146,7 +147,17 @@ int main() {
 
     if (retVal != LCQPow::SUCCESSFUL_RETURN)
     {
-        printf("Failed to solve LCQP.\n");
+        printf("Failed to solve LCQP (%d).\n", retVal);
+
+        // Get QP solver exit flag
+        if (retVal == LCQPow::ReturnValue::SUBPROBLEM_SOLVER_ERROR) {
+            LCQPow::OutputStatistics stats;
+            lcqp.getOutputStatistics(stats);
+
+            int qpExitFlag = stats.getQPSolverExitFlag();
+            printf("QP Solver exit flag: %d\n", qpExitFlag);
+        }
+
         return 1;
     }
 
