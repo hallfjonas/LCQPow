@@ -1,9 +1,0 @@
-{
-  "printLevel": 0,
-  "initialPenaltyParameter": 1E-5,
-  "penaltyUpdateFactor": 2,
-  "maxPenaltyParameter": 1.0E+7,
-  "complementarityTolerance": 1E-6,
-  "stationarityTolerance": 1E-7,
-  "qpSolver": 2
-}
