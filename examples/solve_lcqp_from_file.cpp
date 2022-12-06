@@ -37,7 +37,7 @@ int main() {
 
     std::cout << "Preparing OCP loaded from file...\n";
 
-    std::string inputdir = "examples/example_data";
+    std::string inputdir = "test/examples/FailedOSQPExample";
 
     if (!PathExists(inputdir)) {
         printf("Input directory does not exist.");
@@ -63,8 +63,8 @@ int main() {
     // Count dimensions
     std::string line;
 
-    std::ifstream lbfile(lb_file);
-    while (std::getline(lbfile, line))
+    std::ifstream Qfile(Q_file);
+    while (std::getline(Qfile, line))
         nV++;
 
     std::ifstream Lfile(L_file);
@@ -124,7 +124,7 @@ int main() {
 
     LCQPow::Options options;
     options.setPrintLevel( LCQPow::PrintLevel::INNER_LOOP_ITERATES );
-    options.setQPSolver( LCQPow::QPSolver::QPOASES_SPARSE);
+    options.setQPSolver( LCQPow::QPSolver::OSQP_SPARSE);
     lcqp.setOptions( options );
 
     // Load data
