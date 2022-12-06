@@ -30,9 +30,11 @@ int main() {
 
     /* Setup data of first QP. */
     double Q[2*2] = { 2.0, 0.0, 0.0, 2.0 };
-    double g[2] = { -2.0, -2.0 };
+    double g[2] = { -4.0, -4.0 };
     double L[1*2] = {1.0, 0.0};
     double R[1*2] = {0.0, 1.0};
+    double lbL[1] = {1.0};
+    double lbR[1] = {1.0};
 
     double x0[2] = {1.0, 1.0};
     double y0[4] = {0.0, 0.0, 0.0, 0.0};
@@ -45,11 +47,11 @@ int main() {
 
 	Options options;
     options.setPrintLevel(PrintLevel::INNER_LOOP_ITERATES);
-    options.setQPSolver(QPSolver::QPOASES_DENSE);
+    options.setQPSolver(QPSolver::OSQP_SPARSE);
 	lcqp.setOptions( options );
 
     // Load data
-	ReturnValue retVal = lcqp.loadLCQP( Q, g, L, R, 0, 0, 0, 0, 0, 0, 0, 0, 0, x0, y0);
+	ReturnValue retVal = lcqp.loadLCQP( Q, g, L, R, lbL, 0, lbR, 0, 0, 0, 0, 0, 0, x0, y0);
 
     if (retVal != SUCCESSFUL_RETURN)
     {
@@ -91,13 +93,14 @@ int main() {
             stats.getIterTotal(), stats.getIterOuter(), stats.getRhoOpt(), stats.getSubproblemIter() );
         delete[] yOpt;
     } else {
-	    double* yOpt = new double[nV + nC + 2*nComp];
+        double* yOpt = new double[nV + nC + 2*nComp];
 	    lcqp.getDualSolution( yOpt );
 	    printf( "\nxOpt = [ %g, %g ];  yOpt = [ %g, %g, %g, %g ]; i = %d; k = %d; rho = %g; WSR = %d \n\n",
 			xOpt[0],xOpt[1],yOpt[0],yOpt[1],yOpt[2],yOpt[3],
             stats.getIterTotal(), stats.getIterOuter(), stats.getRhoOpt(), stats.getSubproblemIter() );
         delete[] yOpt;
     }
+
     // Clean Up
     delete[] xOpt;
 
