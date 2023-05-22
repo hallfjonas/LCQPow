@@ -82,7 +82,7 @@ int main() {
         // Convex combination constraint (sum theta = 1)
         A[N*nV + 3 + 2*i] = 1;
 
-        // Complementarity constraints (lamba*theta = 0)
+        // Complementarity constraints (lambda*theta = 0)
         L[i*nV + 2 + 2*i] = 1;
         R[i*nV + 3 + 2*i] = 1;
 
