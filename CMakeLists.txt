@@ -27,16 +27,25 @@ project(lcqpow CXX)
 
 set(CXX_STANDARD 11)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+# set some default flags
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -pedantic")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
+# set install prefix
+set(
+    CMAKE_INSTALL_PREFIX
+    "${CMAKE_BINARY_DIR}"
+)
+
 ## Options ------------------------------------------------------------------------------
 option(
     BUILD_EXAMPLES
     "Option to build examples"
-    ON
-)
-
-option(
-    BUILD_DOCUMENTATION
-    "Option to build documentation"
     ON
 )
 
@@ -59,68 +68,26 @@ option(
 )
 
 option(
+    BUILD_MATLAB_INTERFACE
+    "Option to build Matlab interface"
+    ON
+)
+
+option(
     BUILD_PYTHON_INTERFACE
     "Option to build Python interface"
     ON
 )
 
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
-endif()
-
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -pedantic")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-
-## Paths & Packages ---------------------------------------------------------------------
-# 1) Install Prefix
-set(
-    CMAKE_INSTALL_PREFIX
-    "${CMAKE_BINARY_DIR}"
-)
-
-# 2) Locate Matlab and modify default values of interface & Schur
-find_package(Matlab)
-
-if (${Matlab_FOUND})
-    set(
-        BUILD_MATLAB_INTERFACE ON
-        CACHE BOOL
-        "Build matlab interface"
-    )
-
-    get_filename_component(
-        MATLAB_LIBDIR
-        ${Matlab_MEX_LIBRARY}
-        DIRECTORY
-    )
-
-else()
-    set(
-        BUILD_MATLAB_INTERFACE OFF
-        CACHE BOOL
-        "Build matlab interface"
-    )
-
-    if (${QPOASES_SCHUR})
-        message(
-            FATAL_ERROR
-            "qpOASES with Schur Complement method is currently only supported in combination with matlab, which can not be located."
-        )
-    endif()
-endif()
-
-## Print Options ------------------------------------------------------------------------
-
+# print options
 message(
-    "BUILD TYPE         ${CMAKE_BUILD_TYPE}\n"
-    "EXAMPLES           ${BUILD_EXAMPLES}\n"
-    "MATLAB INTERFACE   ${BUILD_MATLAB_INTERFACE}\n"
-    "PYTHON INTERFACE   ${BUILD_PYTHON_INTERFACE}\n"
-    "DOCUMENTATION      ${BUILD_DOCUMENTATION}\n"
-    "UNIT_TESTS         ${UNIT_TESTS}\n"
-    "PROFILING          ${PROFILING}\n"
-    "QPOASES_SCHUR      ${QPOASES_SCHUR}\n"
+    "CMAKE_BUILD_TYPE           ${CMAKE_BUILD_TYPE}\n"
+    "EXAMPLES                   ${BUILD_EXAMPLES}\n"
+    "BUILD_MATLAB_INTERFACE     ${BUILD_MATLAB_INTERFACE}\n"
+    "BUILD_PYTHON_INTERFACE     ${BUILD_PYTHON_INTERFACE}\n"
+    "UNIT_TESTS                 ${UNIT_TESTS}\n"
+    "PROFILING                  ${PROFILING}\n"
+    "QPOASES_SCHUR              ${QPOASES_SCHUR}\n"
 )
 
 ## ADD ALL EXTERNAL PROJECTS ------------------------------------------------------------
@@ -371,79 +338,105 @@ if (${BUILD_EXAMPLES})
 endif()
 
 ## Build Matlab interface ---------------------------------------------------------------
-
 if (${BUILD_MATLAB_INTERFACE})
 
-    if (${QPOASES_SCHUR})
-        set(
-            MA57_lib
-            -lmwma57
+    # Ensure cmake can locate matlab and set matlab paths
+    find_package(Matlab)        
+    if (NOT ${Matlab_FOUND})
+
+        # throw error if schur is enabled
+        if (${QPOASES_SCHUR})
+            message(
+                FATAL_ERROR
+                "qpOASES with Schur Complement method is currently only supported in combination with matlab, which can not be located."
+            )
+        endif()
+
+        # send warning that the matlab interface could not be built
+        message(
+            WARNING
+            "Unable to build Matlab interface (Matlab was not found)."
         )
+    
+    # if found, then build interface
+    else()
+        get_filename_component(
+            MATLAB_LIBDIR
+            ${Matlab_MEX_LIBRARY}
+            DIRECTORY
+        )
+
+        if (${QPOASES_SCHUR})
+            set(
+                MA57_lib
+                -lmwma57
+            )
+        endif()
+
+        set(
+            MATLAB_INTERFACE_DIR
+            ${CMAKE_SOURCE_DIR}/interfaces/matlab
+        )
+
+        set(
+            MATLAB_INTERFACE_NAME
+            LCQPow
+        )
+
+        set(
+            MATLAB_INTERFACE_DESTINATION
+            ${CMAKE_BINARY_DIR}/lib
+        )
+
+        matlab_add_mex(
+            NAME matlab_interface
+            SRC ${MATLAB_INTERFACE_DIR}/${MATLAB_INTERFACE_NAME}.cpp
+            OUTPUT_NAME ${MATLAB_INTERFACE_DESTINATION}/${MATLAB_INTERFACE_NAME}
+            LINK_TO "-llcqpow -lqpOASES -losqp -lmwblas -lmwlapack -lmwma57"
+        )
+
+        target_link_directories(
+            matlab_interface
+            PUBLIC ${CMAKE_BINARY_DIR}/lib
+        )
+
+        target_compile_options(
+            matlab_interface
+            PUBLIC -D${DEF_SOLVER}
+            PUBLIC -D__USE_LONG_FINTS__
+            PUBLIC -D__MATLAB__
+            PUBLIC -D__NO_COPYRIGHT__
+            PUBLIC -D__cpluplus
+            PUBLIC -O
+            PUBLIC -largeArrayDims
+            PUBLIC -lmwblas
+            PUBLIC -lmwlapack
+            PUBLIC -lmwma57
+            PUBLIC -llcqpow
+            PUBLIC -lqpOASES
+            PUBLIC -losqp
+        )
+
+        target_include_directories(
+            matlab_interface
+            PRIVATE include
+            SYSTEM ${osqp_include}
+            SYSTEM ${qpoases_include}
+        )
+
+        file(
+            COPY ${MATLAB_INTERFACE_DIR}/${MATLAB_INTERFACE_NAME}.m
+            DESTINATION ${MATLAB_INTERFACE_DESTINATION}
+        )
+    
     endif()
-
-    set(
-        MATLAB_INTERFACE_DIR
-        ${CMAKE_SOURCE_DIR}/interfaces/matlab
-    )
-
-    set(
-        MATLAB_INTERFACE_NAME
-        LCQPow
-    )
-
-    set(
-        MATLAB_INTERFACE_DESTINATION
-        ${CMAKE_BINARY_DIR}/lib
-    )
-
-
-    matlab_add_mex(
-        NAME matlab_interface
-        SRC ${MATLAB_INTERFACE_DIR}/${MATLAB_INTERFACE_NAME}.cpp
-        OUTPUT_NAME ${MATLAB_INTERFACE_DESTINATION}/${MATLAB_INTERFACE_NAME}
-        LINK_TO "-llcqpow -lqpOASES -losqp -lmwblas -lmwlapack -lmwma57"
-    )
-
-    target_link_directories(
-        matlab_interface
-        PUBLIC ${CMAKE_BINARY_DIR}/lib
-    )
-
-    target_compile_options(
-        matlab_interface
-        PUBLIC -D${DEF_SOLVER}
-        PUBLIC -D__USE_LONG_FINTS__
-        PUBLIC -D__MATLAB__
-        PUBLIC -D__NO_COPYRIGHT__
-        PUBLIC -D__cpluplus
-        PUBLIC -O
-        PUBLIC -largeArrayDims
-        PUBLIC -lmwblas
-        PUBLIC -lmwlapack
-        PUBLIC -lmwma57
-        PUBLIC -llcqpow
-        PUBLIC -lqpOASES
-        PUBLIC -losqp
-    )
-
-    target_include_directories(
-        matlab_interface
-        PRIVATE include
-        SYSTEM ${osqp_include}
-        SYSTEM ${qpoases_include}
-    )
-
-    file(
-        COPY ${MATLAB_INTERFACE_DIR}/${MATLAB_INTERFACE_NAME}.m
-        DESTINATION ${MATLAB_INTERFACE_DESTINATION}
-    )
 
 endif()
 
 
 ## Build Python interface ---------------------------------------------------------------
-
 if (${BUILD_PYTHON_INTERFACE})
+    
     add_subdirectory(external/pybind11)
     add_subdirectory(interfaces/python/lcqpow)
 
@@ -476,8 +469,8 @@ if (${BUILD_PYTHON_INTERFACE})
         COPY ${PROJECT_SOURCE_DIR}/examples/example_data
         DESTINATION ${PYTHON_INTERFACE_DESTINATION}
     )
+    
 endif()
-
 
 ## Build unit tests ---------------------------------------------------------------------
 if (${UNIT_TESTS})
