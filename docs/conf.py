@@ -14,35 +14,30 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
-import subprocess, os
+import os
+import sys
+import datetime
 
-def configureDoxyfile(input_dir, output_dir):
+import recommonmark
+from recommonmark.transform import AutoStructify
 
-	with open('Doxyfile.in', 'r') as file :
-		filedata = file.read()
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.txt': 'markdown',
+    '.md': 'markdown',
+}
 
-	filedata = filedata.replace('@DOXYGEN_INPUT_DIR@', input_dir)
-	filedata = filedata.replace('@DOXYGEN_OUTPUT_DIR@', output_dir)
-	
-	with open('Doxyfile', 'w') as file:
-		file.write(filedata)
+templates_path = ['_templates']
+master_doc = 'index'
 
-# Check if we're running on Read the Docs' servers
-read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
-
-breathe_projects = {}
-if read_the_docs_build:
-	input_dir = '../include'
-	output_dir = 'build'
-	configureDoxyfile(input_dir, output_dir)
-	subprocess.call('doxygen', shell=True)
-	breathe_projects['LCQPow'] = output_dir + '/xml'
-
+breathe_projects = { "LCQPow": "build/xml/" }
+breathe_default_project = "LCQPow"
 
 # -- Project information -----------------------------------------------------
 
 project = 'LCQPow'
-copyright = '2020, Jonas Hall'
+now = datetime.datetime.now()
+copyright = '2020 - ' + str(now.year) + ' Jonas Hall'
 author = 'Jonas Hall'
 
 
@@ -65,18 +60,47 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
+# -- GraphViz configuration --------------------------------------------------
+graphviz_output_format = 'svg'
 
 # -- Options for HTML output -------------------------------------------------
+
+exclude_patterns = ['_build', 'README.md', 'Thumbs.db', '.DS_Store', 'env', 'requirements.txt', 'memory_management.md']
+pygments_style = 'sphinx'
+todo_include_todos = True
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
+# html_theme = 'alabaster'
 
+html_theme_options = {
+    'canonical_url': '',
+    'analytics_id': 'UA-XXXXXXX-1',  #  Provided by Google in your dashboard
+    'logo_only': False,
+    'display_version': True,
+    'prev_next_buttons_location': 'bottom',
+    'style_external_links': False,
+    # 'vcs_pageview_mode': '',
+    # Toc options
+    'collapse_navigation': True,
+    'sticky_navigation': True,
+    'navigation_depth': 4,
+    'includehidden': True,
+    'titles_only': False
+}
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-# Breathe Configuration
-breathe_default_project = "LCQPow"
+def setup(app):
+    app.add_config_value('recommonmark_config', {
+            'enable_auto_toc_tree': True,
+            'auto_toc_tree_section': 'Contents',
+            'enable_eval_rst': True,
+            'enable_inline_math':True,
+            'enable_math':True
+            }, True)
+    app.add_transform(AutoStructify)
