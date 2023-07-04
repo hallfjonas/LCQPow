@@ -1,9 +1,3 @@
-%% Run a simple warm up problem
-% Clean up and load libraries
-clear all; clc; close all;
-
-addpath(fullfile(pwd, ".."));
-
 % Simple QP
 Q = [2*100^2 0; 0 2];
 g = [-200; -2];

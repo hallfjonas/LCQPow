@@ -1,8 +1,3 @@
-%% Run an edges problem
-% Clean up and load interface
-clear all; clc; close all;
-addpath(fullfile(pwd, "../../../build/lib"))
-
 %% Build the LCQP
 %
 %   min   (x-xk)'*Q*(x-xk)

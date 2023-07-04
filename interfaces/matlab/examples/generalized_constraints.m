@@ -1,11 +1,4 @@
 %% Run a simple warm up problem
-% Clean up and load libraries
-clear all; clc; close all;
-
-%% Path to mex function (c++ solver)
-addpath("~/LCQPow/build/lib");
-
-% Simple QP
 Q = [2 0; 0 2];
 g = [-2; -2];
 L = [-1 0];
