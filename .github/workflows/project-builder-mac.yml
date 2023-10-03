@@ -1,0 +1,10 @@
+on: [push]
+
+jobs:
+  build_and_test:
+    runs-on: macos-latest
+    name: LCQP Build Job
+    steps:
+      - name: Build action step
+        id: build
+        uses: hallfjonas/LCQPow_actions@master
