@@ -1,9 +1,9 @@
 name: Build & Test (ubuntu)
 
-on: 
+on:
   push:
     branches-ignore:
-      - 'main'      
+      - 'main'
 
 jobs:
   build:
@@ -12,8 +12,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        submodules: 'true'
     - name: install pre-reqs
-      run: brew install cmake
+      run: apt-get install -y build-essential cmake libeigen3-dev python3-dev
     - name: build step
       run: mkdir build; cd build; cmake -DBUILD_PYTHON_INTERFACE=OFF ..; make;
     - name: run tests
