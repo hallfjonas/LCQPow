@@ -163,7 +163,7 @@ if (${QPOASES_SCHUR})
             "BLAS   ${LIB_BLAS}\n"
             "LAPACK ${LIB_LAPACK}\n"
             "METIS  ${LIB_METIS}"
-        ) 
+        )
     endif()
 endif()
 
@@ -185,11 +185,12 @@ ExternalProject_Add(
     BUILD_IN_SOURCE ON
     BUILD_COMMAND make ${qpOASES_MAKE_ARGS} src;
     INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
-    INSTALL_COMMAND install(
-        DIRECTORY "${CMAKE_BINARY_DIR}/external/src/qpoases/bin/"
-        DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
-        FILES_MATCHING PATTERN "libqpOASES.*"
-    )
+)
+
+install(
+    DIRECTORY ${CMAKE_BINARY_DIR}/external/src/qpoases/bin/
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+    FILES_MATCHING PATTERN "*ibqpOASES.*"
 )
 
 set(qpoases_lib "-L${CMAKE_BINARY_DIR}/lib -lqpOASES")
@@ -306,7 +307,7 @@ if (${QPOASES_SCHUR})
     get_filename_component(LIB_METIS_NAME ${LIB_METIS} NAME)
 
 
-    ADD_CUSTOM_TARGET(link_schur ALL 
+    ADD_CUSTOM_TARGET(link_schur ALL
         COMMAND ${CMAKE_COMMAND} -E create_symlink ${LIB_SOLVER} lib/${LIB_SOLVER_NAME}
         COMMAND ${CMAKE_COMMAND} -E create_symlink ${LIB_BLAS} lib/${LIB_BLAS_NAME}
         COMMAND ${CMAKE_COMMAND} -E create_symlink ${LIB_LAPACK} lib/${LIB_LAPACK_NAME}
@@ -353,7 +354,7 @@ endif()
 if (${BUILD_MATLAB_INTERFACE})
 
     # Ensure cmake can locate matlab and set matlab paths
-    find_package(Matlab)        
+    find_package(Matlab)
     if (NOT ${Matlab_FOUND})
 
         # throw error if schur is enabled
@@ -369,7 +370,7 @@ if (${BUILD_MATLAB_INTERFACE})
             WARNING
             "Unable to build Matlab interface (Matlab was not found)."
         )
-    
+
     # if found, then build interface
     else()
         get_filename_component(
@@ -440,7 +441,7 @@ if (${BUILD_MATLAB_INTERFACE})
             COPY ${MATLAB_INTERFACE_DIR}/${MATLAB_INTERFACE_NAME}.m
             DESTINATION ${MATLAB_INTERFACE_DESTINATION}
         )
-    
+
     endif()
 
 endif()
@@ -448,7 +449,7 @@ endif()
 
 ## Build Python interface ---------------------------------------------------------------
 if (${BUILD_PYTHON_INTERFACE})
-    
+
     add_subdirectory(external/pybind11)
     add_subdirectory(interfaces/python/lcqpow)
 
@@ -481,7 +482,7 @@ if (${BUILD_PYTHON_INTERFACE})
         COPY ${PROJECT_SOURCE_DIR}/examples/example_data
         DESTINATION ${PYTHON_INTERFACE_DESTINATION}
     )
-    
+
 endif()
 
 ## Build unit tests ---------------------------------------------------------------------
