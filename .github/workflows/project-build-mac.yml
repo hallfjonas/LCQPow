@@ -13,8 +13,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: install pre-reqs
-      run: brew install cmake
+      run: brew install cmake eigen3
     - name: build step
-      run: mkdir build; cd build; cmake ..; make;
+      run: mkdir build; cd build; cmake -DBUILD_PYTHON_INTERFACE=OFF ..; make;
     - name: run tests
       run: sh test.sh
