@@ -188,7 +188,7 @@ ExternalProject_Add(
     INSTALL_COMMAND install(
         DIRECTORY "${CMAKE_BINARY_DIR}/external/src/qpoases/bin/"
         DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
-        FILES_MATCHING PATTERN "libqpOASES.*")
+        FILES_MATCHING PATTERN "libqpOASES.*"
     )
 )
 
