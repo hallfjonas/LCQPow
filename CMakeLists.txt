@@ -90,6 +90,18 @@ message(
     "QPOASES_SCHUR              ${QPOASES_SCHUR}\n"
 )
 
+## Some helper functions
+function( CopyFiles TARGET_DIR OUTPUT_DIR TARGET_PATTERN)
+
+    file(GLOB TARGET_FILES
+        ${OUTPUT_DIR}/${TARGET_PATTERN}
+    )
+    file(COPY ${TARGET_FILES} DESTINATION ${})
+
+endfunction()
+
+file(COPY ${MY_PUBLIC_HEADERS} DESTINATION myDestination)
+
 ## ADD ALL EXTERNAL PROJECTS ------------------------------------------------------------
 # external modules
 include(ExternalProject)
@@ -184,13 +196,11 @@ ExternalProject_Add(
     CONFIGURE_COMMAND mkdir -p bin;
     BUILD_IN_SOURCE ON
     BUILD_COMMAND make ${qpOASES_MAKE_ARGS} src;
-    INSTALL_COMMAND ""
-)
-
-install(
-    DIRECTORY ${CMAKE_BINARY_DIR}/external/src/qpoases/bin/
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-    FILES_MATCHING PATTERN "*libqpOASES.*"
+    INSTALL_COMMAND CopyFiles(
+        "${CMAKE_BINARY_DIR}/external/src/qpoases/bin/"
+        "${CMAKE_INSTALL_PREFIX}/lib"
+        "*libqpOASES.*"
+    )
 )
 
 set(qpoases_lib "-L${CMAKE_BINARY_DIR}/lib -lqpOASES")
@@ -205,13 +215,11 @@ ExternalProject_Add(
         -DDLONG=OFF
         -DBUILD_SHARED_LIBS=ON
     BUILD_COMMAND cmake --build .
-    INSTALL_COMMAND ""
-)
-
-install(
-    DIRECTORY ${CMAKE_BINARY_DIR}/external/src/osqp-build/out/
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-    FILES_MATCHING PATTERN "*libosqp.*"
+    INSTALL_COMMAND CopyFiles(
+        "${CMAKE_BINARY_DIR}/external/src/osqp-build/out/"
+        "${CMAKE_INSTALL_PREFIX}/lib"
+        "*libosqp.*"
+    )
 )
 
 set(osqp_lib "-L${CMAKE_BINARY_DIR}/lib -losqp")
@@ -222,13 +230,11 @@ ExternalProject_Add(
     gtest
     DOWNLOAD_COMMAND cp -a ${CMAKE_SOURCE_DIR}/external/googletest/. ${CMAKE_BINARY_DIR}/external/src/gtest
     PREFIX external
-    INSTALL_COMMAND ""
-)
-
-install(
-    DIRECTORY ${CMAKE_BINARY_DIR}/external/src/gtest-build/lib/
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-    FILES_MATCHING PATTERN "*libgtest.*"
+    INSTALL_COMMAND CopyFiles(
+        "${CMAKE_BINARY_DIR}/external/src/gtest-build/lib/"
+        "${CMAKE_INSTALL_PREFIX}/lib"
+        "*libgtest.*"
+    )
 )
 
 set(gtest_lib "-L${CMAKE_BINARY_DIR}/external/src/gtest-build/out -lgtest")
