@@ -184,7 +184,7 @@ ExternalProject_Add(
     CONFIGURE_COMMAND mkdir -p bin;
     BUILD_IN_SOURCE ON
     BUILD_COMMAND make ${qpOASES_MAKE_ARGS} src;
-    INSTALL_COMMAND TRUE
+    INSTALL_COMMAND ""
 )
 
 install(
