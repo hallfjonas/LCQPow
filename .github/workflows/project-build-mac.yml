@@ -1,0 +1,24 @@
+name: Build & Test (macos)
+
+on: 
+  push:
+    branches-ignore:
+      - 'main'      
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: install pre-reqs
+      run: sudo apt-get update && sudo apt-get -y install cmake
+    - name: create and switch to build dir
+      run: mkdir build; cd build;
+    - name: configure step
+      run: cmake ..
+    - name: make
+      run: make
+    - name: run tests
+      run: cd ..; sh test.sh
