@@ -190,7 +190,7 @@ ExternalProject_Add(
 install(
     DIRECTORY ${CMAKE_BINARY_DIR}/external/src/qpoases/bin/
     DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-    FILES_MATCHING PATTERN "*ibqpOASES.*"
+    FILES_MATCHING PATTERN "*libqpOASES.*"
 )
 
 set(qpoases_lib "-L${CMAKE_BINARY_DIR}/lib -lqpOASES")
@@ -205,11 +205,13 @@ ExternalProject_Add(
         -DDLONG=OFF
         -DBUILD_SHARED_LIBS=ON
     BUILD_COMMAND cmake --build .
-    INSTALL_COMMAND install(
-        DIRECTORY "${CMAKE_BINARY_DIR}/external/src/osqp-build/out/"
-        DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
-        FILES_MATCHING PATTERN "libosqp.*"
-    )
+    INSTALL_COMMAND ""
+)
+
+install(
+    DIRECTORY ${CMAKE_BINARY_DIR}/external/src/osqp-build/out/
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+    FILES_MATCHING PATTERN "*libosqp.*"
 )
 
 set(osqp_lib "-L${CMAKE_BINARY_DIR}/lib -losqp")
@@ -220,11 +222,13 @@ ExternalProject_Add(
     gtest
     DOWNLOAD_COMMAND cp -a ${CMAKE_SOURCE_DIR}/external/googletest/. ${CMAKE_BINARY_DIR}/external/src/gtest
     PREFIX external
-    INSTALL_COMMAND install(
-        DIRECTORY "${CMAKE_BINARY_DIR}/external/src/gtest-build/lib/"
-        DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
-        FILES_MATCHING PATTERN "libgtest.*"
-    )
+    INSTALL_COMMAND ""
+)
+
+install(
+    DIRECTORY ${CMAKE_BINARY_DIR}/external/src/gtest-build/lib/
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+    FILES_MATCHING PATTERN "*libgtest.*"
 )
 
 set(gtest_lib "-L${CMAKE_BINARY_DIR}/external/src/gtest-build/out -lgtest")
