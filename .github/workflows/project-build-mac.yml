@@ -17,6 +17,6 @@ jobs:
     - name: install pre-reqs
       run: brew install cmake
     - name: build step
-      run: mkdir build; cd build; cmake -DBUILD_PYTHON_INTERFACE=OFF ..; make;
+      run: mkdir build; cd build; cmake -DBUILD_PYTHON_INTERFACE=OFF -DCMAKE_CXX_COMPILER=$(brew --prefix llvm)/bin/clang++..; make;
     - name: run tests
       run: sh test.sh
