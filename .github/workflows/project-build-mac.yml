@@ -15,8 +15,8 @@ jobs:
       with:
         submodules: recursive
     - name: install pre-reqs
-      run: brew install cmake
+      run: brew install gcc cmake
     - name: build step
-      run: mkdir build; cd build; cmake -DBUILD_PYTHON_INTERFACE=OFF -DCMAKE_CXX_COMPILER=$(brew --prefix llvm)/bin/clang++ ..; make;
+      run: mkdir build; cd build; cmake -DBUILD_PYTHON_INTERFACE=OFF ..; make;
     - name: run tests
       run: sh test.sh
