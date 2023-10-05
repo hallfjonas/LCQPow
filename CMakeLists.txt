@@ -26,6 +26,7 @@ cmake_minimum_required(VERSION 3.13)
 project(lcqpow CXX)
 
 set(CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++")
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)  
 if (POLICY CMP0025)
