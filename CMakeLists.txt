@@ -28,10 +28,6 @@ project(lcqpow CXX)
 set(CXX_STANDARD 11)
 set(CXX_STANDARD_REQUIRED ON)
 
-if (POLICY CMP0025)
-  cmake_policy(SET CMP0025 NEW)
-endif ()
-
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
