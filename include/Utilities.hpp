@@ -364,7 +364,7 @@ namespace LCQPow {
 
             /** Maximum number of characters within a string.
              *	Note: this value should be at least 41! */
-            constexpr static uint MAX_STRING_LENGTH = 160;
+            constexpr static unsigned int MAX_STRING_LENGTH = 160;
     };
 }
 
