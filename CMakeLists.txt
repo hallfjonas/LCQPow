@@ -26,9 +26,8 @@ cmake_minimum_required(VERSION 3.13)
 project(lcqpow CXX)
 
 set(CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++")
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)  
+set(CXX_STANDARD_REQUIRED ON)
+
 if (POLICY CMP0025)
   cmake_policy(SET CMP0025 NEW)
 endif ()
@@ -38,7 +37,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # set some default flags
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -pedantic")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
