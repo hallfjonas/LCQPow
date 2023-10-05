@@ -17,6 +17,6 @@ jobs:
     - name: install pre-reqs
       run: brew install gcc cmake
     - name: build step
-      run: mkdir build; cd build; CXX="gcc-11" CC="gcc-11" cmake -DBUILD_PYTHON_INTERFACE=OFF -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ ..; make;
+      run: mkdir build; cd build; cmake -DBUILD_PYTHON_INTERFACE=OFF ..; make;
     - name: run tests
       run: sh test.sh
