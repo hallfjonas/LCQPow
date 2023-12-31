@@ -436,39 +436,48 @@ endif()
 
 ## Build Python interface ---------------------------------------------------------------
 if (${BUILD_PYTHON_INTERFACE})
+
+    find_package(Eigen3)
+
+    if (Eigen3_found)
+        add_subdirectory(external/pybind11)
+        add_subdirectory(interfaces/python/lcqpow)
+
+        set(
+            PYTHON_INTERFACE_DIR
+            ${CMAKE_SOURCE_DIR}/interfaces/python
+        )
+
+        set(
+            PYTHON_INTERFACE_NAME
+            lcqpow
+        )
+
+        set(
+            PYTHON_INTERFACE_DESTINATION
+            ${CMAKE_BINARY_DIR}/interfaces/python
+        )
+
+        file(
+            COPY ${PYTHON_INTERFACE_DIR}/${PYTHON_INTERFACE_NAME}/__init__.py
+            DESTINATION ${PYTHON_INTERFACE_DESTINATION}/${PYTHON_INTERFACE_NAME}
+        )
+
+        file(
+            COPY ${PYTHON_INTERFACE_DIR}/examples/
+            DESTINATION ${PYTHON_INTERFACE_DESTINATION}
+        )
+
+        file(
+            COPY ${PROJECT_SOURCE_DIR}/examples/example_data
+            DESTINATION ${PYTHON_INTERFACE_DESTINATION}
+        )
     
-    add_subdirectory(external/pybind11)
-    add_subdirectory(interfaces/python/lcqpow)
+    else()
 
-    set(
-        PYTHON_INTERFACE_DIR
-        ${CMAKE_SOURCE_DIR}/interfaces/python
-    )
+        message(WARNING "Eigen3 not found. Skipping installation of python interface.")
 
-    set(
-        PYTHON_INTERFACE_NAME
-        lcqpow
-    )
-
-    set(
-        PYTHON_INTERFACE_DESTINATION
-        ${CMAKE_BINARY_DIR}/interfaces/python
-    )
-
-    file(
-        COPY ${PYTHON_INTERFACE_DIR}/${PYTHON_INTERFACE_NAME}/__init__.py
-        DESTINATION ${PYTHON_INTERFACE_DESTINATION}/${PYTHON_INTERFACE_NAME}
-    )
-
-    file(
-        COPY ${PYTHON_INTERFACE_DIR}/examples/
-        DESTINATION ${PYTHON_INTERFACE_DESTINATION}
-    )
-
-    file(
-        COPY ${PROJECT_SOURCE_DIR}/examples/example_data
-        DESTINATION ${PYTHON_INTERFACE_DESTINATION}
-    )
+    endif()
     
 endif()
 

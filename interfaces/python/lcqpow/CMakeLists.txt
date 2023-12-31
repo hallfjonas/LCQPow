@@ -1,4 +1,3 @@
-find_package(Eigen3 REQUIRED)
 
 macro(pybind11_add_lcqpow_module MODULE)
   pybind11_add_module(
