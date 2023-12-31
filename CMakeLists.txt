@@ -355,7 +355,7 @@ if (${BUILD_MATLAB_INTERFACE})
         # send warning that the matlab interface could not be built
         message(
             WARNING
-            "Unable to build Matlab interface (Matlab was not found)."
+            "Matlab not found. Skipping installation of Matlab interface."
         )
     
     # if found, then build interface
