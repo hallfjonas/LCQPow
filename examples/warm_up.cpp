@@ -46,6 +46,7 @@ int main() {
 	Options options;
     options.setPrintLevel(PrintLevel::INNER_LOOP_ITERATES);
     options.setQPSolver(QPSolver::QPOASES_DENSE);
+    // options.setPerturbStep(false);       // uncomment: then algorithm converges to C-stationary solution
 	lcqp.setOptions( options );
 
     // Load data
