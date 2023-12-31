@@ -1417,8 +1417,8 @@ namespace LCQPow {
 		bool m_stationary = true;
 
 		for (int i : weakComp) {
-			double dualProd = yk_A[nC + i]*yk_A[nC + nComp + i];
-			double dualMin = std::min(yk_A[nC + i], yk_A[nC + nComp + i]);
+			double dualProd = yk[boxDualOffset + nC + i]*yk[boxDualOffset + nC + nComp + i];
+			double dualMin = std::min(yk[boxDualOffset + nC + i], yk[boxDualOffset + nC + nComp + i]);
 
 			// Check failure of s-stationarity
 			if (dualMin < 0)
@@ -1469,8 +1469,8 @@ namespace LCQPow {
 		std::vector<int> indices;
 
 		for (int i = 0; i < nComp; i++) {
-			if (Lx[i] <= options.getComplementarityTolerance())
-				if (Rx[i] <= options.getComplementarityTolerance())
+			if (Lx[i] <= std::sqrt(options.getComplementarityTolerance()))
+				if (Rx[i] <= std::sqrt(options.getComplementarityTolerance()))
 					indices.push_back(i);
 		}
 
