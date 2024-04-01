@@ -268,18 +268,17 @@ set_target_properties(
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 )
 
-target_include_directories(${PROJECT_NAME}-shared SYSTEM PRIVATE
+target_include_directories(${PROJECT_NAME}-shared SYSTEM
     PUBLIC ${qpoases_include}
     PUBLIC ${osqp_include}
 )
 target_link_libraries(${PROJECT_NAME}-shared
-    qpoases_lib
-    osqp_lib
+    PUBLIC qpoases_lib
+    PUBLIC osqp_lib
 )
 
 if (${QPOASES_SCHUR})
-    target_link_libraries(
-        ${PROJECT_NAME}-shared
+    target_link_libraries(${PROJECT_NAME}-shared
         PRIVATE ${Matlab_LIBRARIES}
     )
 
