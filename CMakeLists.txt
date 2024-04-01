@@ -102,6 +102,26 @@ set(
 
 if (${QPOASES_SCHUR})
 
+    find_package(Matlab)
+    if (NOT ${Matlab_FOUND})
+        # throw error if schur is enabled and matlab not found
+        message(
+            FATAL_ERROR
+            "qpOASES with Schur Complement method is currently only supported in combination with matlab, which can not be located."
+        )
+    endif()
+    
+    message(
+        "qpOASES Matlab found"
+    )
+
+    # if found, then set some variables
+    get_filename_component(
+        MATLAB_LIBDIR
+        ${Matlab_MEX_LIBRARY}
+        DIRECTORY
+    )
+
     set(
         LIB_SOLVER
         "${MATLAB_LIBDIR}/libmwma57.so"
@@ -341,17 +361,8 @@ endif()
 if (${BUILD_MATLAB_INTERFACE})
 
     # Ensure cmake can locate matlab and set matlab paths
-    find_package(Matlab)        
+    find_package(Matlab)
     if (NOT ${Matlab_FOUND})
-
-        # throw error if schur is enabled
-        if (${QPOASES_SCHUR})
-            message(
-                FATAL_ERROR
-                "qpOASES with Schur Complement method is currently only supported in combination with matlab, which can not be located."
-            )
-        endif()
-
         # send warning that the matlab interface could not be built
         message(
             WARNING
