@@ -28,11 +28,8 @@
 #include "OutputStatistics.hpp"
 #include "Options.hpp"
 
-#include <qpOASES.hpp>
 #include <vector>
 #include <deque>
-
-using qpOASES::QProblem;
 
 namespace LCQPow {
 	class LCQProblem

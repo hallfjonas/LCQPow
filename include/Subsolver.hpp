@@ -25,11 +25,6 @@
 #include "SubsolverQPOASES.hpp"
 #include "SubsolverOSQP.hpp"
 
-extern "C" {
-    #include <osqp.h>
-}
-
-
 namespace LCQPow {
 
     class Subsolver {
