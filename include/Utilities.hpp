@@ -23,11 +23,7 @@
 #ifndef LCQPOW_UTILITIES_HPP
 #define LCQPOW_UTILITIES_HPP
 
-extern "C" {
-    #include <osqp.h>
-}
-
-#include <qpOASES.hpp>
+class csc;
 
 namespace LCQPow {
 
@@ -338,7 +334,7 @@ namespace LCQPow {
 			/** Checks if the ptr is not null. */
 			template <typename PtrType>
 		    static bool isNotNullPtr(PtrType ptr) { 
-                return (ptr != NULL && ptr != nullptr);
+                return (ptr != nullptr && ptr != nullptr);
 			}
 
 

@@ -210,7 +210,7 @@ namespace LCQPow {
 
             QPSolver qpSolver;                          /**< The QP solver to be used. */
 			qpOASES::Options qpOASES_opts;			    /**< qpOASES options. */
-			OSQPSettings *OSQP_opts = NULL;			    /**< OSQP options. */	
+			OSQPSettings *OSQP_opts = nullptr;			    /**< OSQP options. */	
     };
 }
 

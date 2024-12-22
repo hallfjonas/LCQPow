@@ -44,10 +44,10 @@ namespace LCQPow {
              * @param _g The (potentially) updated objective linear component.
              * @param _lbA The (potentially) updated lower bounds of the linear constraints.
              * @param _ubA The (potentially) updated upper bounds of the linear constraints.
-             * @param _x0 The primal initial guess. NULL pointer can be passed.
-             * @param _y0 The dual initial guess. NULL pointer can be passed.
-             * @param _lb The (potentially) updated lower box constraints. NULL pointer can be passed.
-             * @param _ub The (potentially) updated upper box constraints. NULL pointer can be passed.
+             * @param _x0 The primal initial guess. nullptr pointer can be passed.
+             * @param _y0 The dual initial guess. nullptr pointer can be passed.
+             * @param _lb The (potentially) updated lower box constraints. nullptr pointer can be passed.
+             * @param _ub The (potentially) updated upper box constraints. nullptr pointer can be passed.
             */
             virtual ReturnValue solve(  bool initialSolve, int& iterations, int& exit_flag,
                                         const double* const _g,

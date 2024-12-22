@@ -75,8 +75,8 @@ namespace LCQPow {
              * @param _g The (potentially) updated objective linear component.
              * @param _lbA The (potentially) updated lower bounds of the linear constraints.
              * @param _ubA The (potentially) updated upper bounds of the linear constraints.
-             * @param _x0 The primal initial guess. NULL pointer can be passed.
-             * @param _y0 The dual initial guess. NULL pointer can be passed.
+             * @param _x0 The primal initial guess. nullptr pointer can be passed.
+             * @param _y0 The dual initial guess. nullptr pointer can be passed.
              * @param _lb This entry is ignored in this solver (only required in declaration due to inflexibility of abstract classes).
              * @param _ub This entry is ignored in this solver (only required in declaration due to inflexibility of abstract classes).
             */
@@ -106,12 +106,12 @@ namespace LCQPow {
             int nV;                                 /**< Number of optimization variables. */
             int nC;                                 /**< Number of constraints. */
 
-            OSQPWorkspace *work = NULL;             /**< OSQP workspace. */
-            OSQPSettings *settings = NULL;          /**< OSQP settings. */
-            OSQPData *data = NULL;                  /**< OSQP data. */
+            OSQPWorkspace *work = nullptr;             /**< OSQP workspace. */
+            OSQPSettings *settings = nullptr;          /**< OSQP settings. */
+            OSQPData *data = nullptr;                  /**< OSQP data. */
 
-            csc* Q = NULL;                          /**< Hessian matrix in csc format (must be upper triagonal). */
-            csc* A = NULL;                          /**< Constraint matrix in csc format (should contain rows of compl. sel. matrices). */
+            csc* Q = nullptr;                          /**< Hessian matrix in csc format (must be upper triagonal). */
+            csc* A = nullptr;                          /**< Constraint matrix in csc format (should contain rows of compl. sel. matrices). */
     };
 }
 

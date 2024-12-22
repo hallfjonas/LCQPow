@@ -67,17 +67,17 @@ namespace LCQPow {
 			 * @param _g The obective's linear term.
 			 * @param _L The matrix selecting the left hand side of the complementarity pairs.
 			 * @param _R The matrix selecting the right hand side of the complementarity pairs.
-			 * @param _lbL The lower bounds associated to the complementarity matrix `_L`. A `NULL` leads to zero bounds.
-			 * @param _ubL The upper bounds associated to the complementarity matrix `_L`. A `NULL` pointer can be passed if no upper bounds exist.
-			 * @param _lbR The lower bounds associated to the complementarity matrix `_R`. A `NULL` leads to zero boudns.
-			 * @param _ubR The upper bounds associated to the complementarity matrix `_R`. A `NULL` pointer can be passed if no upper bounds exist.
-			 * @param _A The constraint matrix. A `NULL` pointer can be passed if no linear constraints exist.
-			 * @param _lbA The lower bounds associated to the constraint matrix `_A`. A `NULL` pointer can be passed if no lower bounds exist.
-			 * @param _ubA The upper bounds associated to the constraint matrix `_A`. A `NULL` pointer can be passed if no upper bounds exist.
-			 * @param _lb The box constraint's lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
-			 * @param _ub The box constraint's upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
-			 * @param _x0 The initial guess for the optimal primal solution vector. If a `NULL` pointer is passed the zero vector is used.
-			 * @param _y0 The initial guess for the optimal dual solution vector. If a `NULL` pointer is passed, then the initialization depends on the subsolver and its options.
+			 * @param _lbL The lower bounds associated to the complementarity matrix `_L`. A `nullptr` leads to zero bounds.
+			 * @param _ubL The upper bounds associated to the complementarity matrix `_L`. A `nullptr` pointer can be passed if no upper bounds exist.
+			 * @param _lbR The lower bounds associated to the complementarity matrix `_R`. A `nullptr` leads to zero boudns.
+			 * @param _ubR The upper bounds associated to the complementarity matrix `_R`. A `nullptr` pointer can be passed if no upper bounds exist.
+			 * @param _A The constraint matrix. A `nullptr` pointer can be passed if no linear constraints exist.
+			 * @param _lbA The lower bounds associated to the constraint matrix `_A`. A `nullptr` pointer can be passed if no lower bounds exist.
+			 * @param _ubA The upper bounds associated to the constraint matrix `_A`. A `nullptr` pointer can be passed if no upper bounds exist.
+			 * @param _lb The box constraint's lower bounds. A `nullptr` pointer can be passed if no lower bounds exist.
+			 * @param _ub The box constraint's upper bounds. A `nullptr` pointer can be passed if no upper bounds exist.
+			 * @param _x0 The initial guess for the optimal primal solution vector. If a `nullptr` pointer is passed the zero vector is used.
+			 * @param _y0 The initial guess for the optimal dual solution vector. If a `nullptr` pointer is passed, then the initialization depends on the subsolver and its options.
 			 *
 			 * @returns SUCCESSFUL_RETURN if a solution is found. Otherwise the return value will indicate an occured error.
 			*/
@@ -107,17 +107,17 @@ namespace LCQPow {
 			 * @param g_file The obective's linear term.
 			 * @param L_file The matrix selecting the left hand side of the complementarity pairs.
 			 * @param R_file The matrix selecting the right hand side of the complementarity pairs.
-			 * @param lbL_file The lower bounds associated to the complementarity matrix `_L`. A `NULL` leads to zero bounds.
-			 * @param ubL_file The upper bounds associated to the complementarity matrix `_L`. A `NULL` pointer can be passed if no upper bounds exist.
-			 * @param lbR_file The lower bounds associated to the complementarity matrix `_R`. A `NULL` leads to zero boudns.
-			 * @param ubR_file The upper bounds associated to the complementarity matrix `_R`. A `NULL` pointer can be passed if no upper bounds exist.
-			 * @param A_file The constraint matrix. A `NULL` pointer can be passed if no linear constraints exist.
-			 * @param lbA_file The lower bounds associated to the constraint matrix `_A`. A `NULL` pointer can be passed if no lower bounds exist.
-			 * @param ubA_file The upper bounds associated to the constraint matrix `_A`. A `NULL` pointer can be passed if no upper bounds exist.
-			 * @param lb_file The box constraint's lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
-			 * @param ub_file The box constraint's upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
-			 * @param x0_file The initial guess for the optimal primal solution vector. If a `NULL` pointer is passed the zero vector is used.
-			 * @param y0_file The initial guess for the optimal dual solution vector. If a `NULL` pointer is passed, then the initialization depends on the subsolver and its options.
+			 * @param lbL_file The lower bounds associated to the complementarity matrix `_L`. A `nullptr` leads to zero bounds.
+			 * @param ubL_file The upper bounds associated to the complementarity matrix `_L`. A `nullptr` pointer can be passed if no upper bounds exist.
+			 * @param lbR_file The lower bounds associated to the complementarity matrix `_R`. A `nullptr` leads to zero boudns.
+			 * @param ubR_file The upper bounds associated to the complementarity matrix `_R`. A `nullptr` pointer can be passed if no upper bounds exist.
+			 * @param A_file The constraint matrix. A `nullptr` pointer can be passed if no linear constraints exist.
+			 * @param lbA_file The lower bounds associated to the constraint matrix `_A`. A `nullptr` pointer can be passed if no lower bounds exist.
+			 * @param ubA_file The upper bounds associated to the constraint matrix `_A`. A `nullptr` pointer can be passed if no upper bounds exist.
+			 * @param lb_file The box constraint's lower bounds. A `nullptr` pointer can be passed if no lower bounds exist.
+			 * @param ub_file The box constraint's upper bounds. A `nullptr` pointer can be passed if no upper bounds exist.
+			 * @param x0_file The initial guess for the optimal primal solution vector. If a `nullptr` pointer is passed the zero vector is used.
+			 * @param y0_file The initial guess for the optimal dual solution vector. If a `nullptr` pointer is passed, then the initialization depends on the subsolver and its options.
 			 *
 			 * @returns SUCCESSFUL_RETURN if a solution is found. Otherwise the return value will indicate an occured error.
 			*/
@@ -146,17 +146,17 @@ namespace LCQPow {
 			 * @param _g The objective's linear term.
 			 * @param _L LHS of complementarity product in csc sparse format.
 			 * @param _R RHS of complementarity product in csc sparse format.
-			 * @param _lbL The lower bounds associated to the complementarity matrix `_L`. A `NULL` leads to zero bounds.
-			 * @param _ubL The upper bounds associated to the complementarity matrix `_L`. A `NULL` pointer can be passed if no upper bounds exist.
-			 * @param _lbR The lower bounds associated to the complementarity matrix `_R`. A `NULL` leads to zero boudns.
-			 * @param _ubR The upper bounds associated to the complementarity matrix `_R`. A `NULL` pointer can be passed if no upper bounds exist.
+			 * @param _lbL The lower bounds associated to the complementarity matrix `_L`. A `nullptr` leads to zero bounds.
+			 * @param _ubL The upper bounds associated to the complementarity matrix `_L`. A `nullptr` pointer can be passed if no upper bounds exist.
+			 * @param _lbR The lower bounds associated to the complementarity matrix `_R`. A `nullptr` leads to zero boudns.
+			 * @param _ubR The upper bounds associated to the complementarity matrix `_R`. A `nullptr` pointer can be passed if no upper bounds exist.
 			 * @param _A Constraint matrix in csc sparse format.
-			 * @param _lbA The constraints lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
-			 * @param _ubA The constraints upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
-			 * @param _lb The box constraints lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
-			 * @param _ub The box constraints upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
-			 * @param _x0 The initial guess for the optimal primal solution vector. If a `NULL` pointer is passed the zero vector is used.
-			 * @param _y0 The initial guess for the optimal dual solution vector. If a `NULL` pointer is passed, then the initialization depends on the subsolver and its options.
+			 * @param _lbA The constraints lower bounds. A `nullptr` pointer can be passed if no lower bounds exist.
+			 * @param _ubA The constraints upper bounds. A `nullptr` pointer can be passed if no upper bounds exist.
+			 * @param _lb The box constraints lower bounds. A `nullptr` pointer can be passed if no lower bounds exist.
+			 * @param _ub The box constraints upper bounds. A `nullptr` pointer can be passed if no upper bounds exist.
+			 * @param _x0 The initial guess for the optimal primal solution vector. If a `nullptr` pointer is passed the zero vector is used.
+			 * @param _y0 The initial guess for the optimal dual solution vector. If a `nullptr` pointer is passed, then the initialization depends on the subsolver and its options.
 			 *
 			 * @returns SUCCESSFUL_RETURN if a solution is found. Otherwise the return value will indicate an occured error.
 			*/
@@ -342,8 +342,8 @@ namespace LCQPow {
 			 * @param L_new LHS of complementarity product in csc sparse format.
 			 * @param R_new RHS of complementarity product in csc sparse format.
 			 * @param A_new Constraint matrix in csc sparse format.
-			 * @param lbA The constraint's lower bounds. A `NULL` pointer can be passed if no lower bounds exist.
-			 * @param ubA The constraint's upper bounds. A `NULL` pointer can be passed if no upper bounds exist.
+			 * @param lbA The constraint's lower bounds. A `nullptr` pointer can be passed if no lower bounds exist.
+			 * @param ubA The constraint's upper bounds. A `nullptr` pointer can be passed if no upper bounds exist.
 			 */
 			ReturnValue setConstraints(
 				const csc* const L_new,
@@ -462,47 +462,47 @@ namespace LCQPow {
 			int nDuals; 							/**< Number of duals variables. */
 			int boxDualOffset;						/**< Offset for linear constraint duals (i.e. 0 if no BC (Box Constraints) exist nV if BC exist). */
 
-			double* Q = NULL;						/**< Objective Hessian term. */
+			double* Q = nullptr;						/**< Objective Hessian term. */
 
-			double* g = NULL;						/**< Objective linear term. */
+			double* g = nullptr;						/**< Objective linear term. */
 
-			double* lb = NULL;						/**< Lower bound vector (on variables). */
-			double* ub = NULL;						/**< Upper bound vector (on variables). */
-			double* lb_tmp = NULL;					/**< Temporary box constraints. */
-			double* ub_tmp = NULL;					/**< Temporary box constraints. */
+			double* lb = nullptr;						/**< Lower bound vector (on variables). */
+			double* ub = nullptr;						/**< Upper bound vector (on variables). */
+			double* lb_tmp = nullptr;					/**< Temporary box constraints. */
+			double* ub_tmp = nullptr;					/**< Temporary box constraints. */
 
-			double* A = NULL;						/**< Constraint matrix. */
-			double* lbA = NULL;						/**< Lower bound vector (on constraints). */
-			double* ubA = NULL;						/**< Upper bound vector (on constraints). */
+			double* A = nullptr;						/**< Constraint matrix. */
+			double* lbA = nullptr;						/**< Lower bound vector (on constraints). */
+			double* ubA = nullptr;						/**< Upper bound vector (on constraints). */
 
-			double* L = NULL;						/**< LHS of complementarity product. */
-			double* R = NULL;						/**< RHS of complementarity product. */
-			double* C = NULL;						/**< Complementarity matrix (L'*R + R'*L). */
-			double* lbL = NULL;						/**< LHS Complementarity lower bounds. */
-			double* ubL = NULL;						/**< LHS Complementarity upper bounds. */
-			double* lbR = NULL;						/**< RHS Complementarity lower bounds. */
-			double* ubR = NULL;						/**< RHS Complementarity upper bounds. */
-			double* g_phi = NULL;					/**< Linear Term of phi -(l_L'*R + l_R'*L). */
+			double* L = nullptr;						/**< LHS of complementarity product. */
+			double* R = nullptr;						/**< RHS of complementarity product. */
+			double* C = nullptr;						/**< Complementarity matrix (L'*R + R'*L). */
+			double* lbL = nullptr;						/**< LHS Complementarity lower bounds. */
+			double* ubL = nullptr;						/**< LHS Complementarity upper bounds. */
+			double* lbR = nullptr;						/**< RHS Complementarity lower bounds. */
+			double* ubR = nullptr;						/**< RHS Complementarity upper bounds. */
+			double* g_phi = nullptr;					/**< Linear Term of phi -(l_L'*R + l_R'*L). */
 			double phi_const = 0;					/**< Constant phi expression (l_L'*l_R). */
 
 			double rho; 							/**< Current penalty value. */
 
-			double* g_tilde = NULL;					/**< Current linear terms (g + rhok*g_phi). Updated once per inner loop. */
-			double* gk = NULL;						/**< Current objective linear term. */
+			double* g_tilde = nullptr;					/**< Current linear terms (g + rhok*g_phi). Updated once per inner loop. */
+			double* gk = nullptr;						/**< Current objective linear term. */
 
-			double* xk = NULL;						/**< Current primal iterate. */
-			double* yk = NULL;						/**< Current dual vector. */
-			double* yk_A = NULL;					/**< Current dual vector w.r.t A. */
-			double* xnew = NULL;					/**< Current qpSubproblem solution. */
-			double* pk = NULL;						/**< xnew - xk. */
+			double* xk = nullptr;						/**< Current primal iterate. */
+			double* yk = nullptr;						/**< Current dual vector. */
+			double* yk_A = nullptr;					/**< Current dual vector w.r.t A. */
+			double* xnew = nullptr;					/**< Current qpSubproblem solution. */
+			double* pk = nullptr;						/**< xnew - xk. */
 
 			double alphak; 							/**< Optimal step length. */
-			double* lk_tmp = NULL;					/**< An auxiliar vector to help compute lkj. */
+			double* lk_tmp = nullptr;					/**< An auxiliar vector to help compute lkj. */
 
-			double* Qk = NULL;						/**< Q + rho*C, required for stationarity and optimal step length. */
-			double* statk = NULL;					/**< Stationarity of current iterate. */
-			double* constr_statk = NULL;			/**< Constraint contribution to stationarity equation. */
-			double* box_statk = NULL;				/**< Box Constraint contribution to stationarity equation. */
+			double* Qk = nullptr;						/**< Q + rho*C, required for stationarity and optimal step length. */
+			double* statk = nullptr;					/**< Stationarity of current iterate. */
+			double* constr_statk = nullptr;			/**< Constraint contribution to stationarity equation. */
+			double* box_statk = nullptr;				/**< Box Constraint contribution to stationarity equation. */
 
 			int outerIter;							/**< Outer iterate counter. */
 			int innerIter;							/**< Inner iterate counter. */
@@ -514,12 +514,12 @@ namespace LCQPow {
 
 			bool sparseSolver = false;				/**< Whether to use sparse algebra or dense. */
 
-			csc* Q_sparse = NULL;					/**< Sparse objective Hessian matrix. */
-			csc* A_sparse = NULL;					/**< Sparse constraint matrix. */
-			csc* L_sparse = NULL;					/**< Sparse L. */
-			csc* R_sparse = NULL;					/**< Sparse R. */
-			csc* C_sparse = NULL;					/**< Sparse C. */
-			csc* Qk_sparse = NULL;					/**< Sparse Qk. */
+			csc* Q_sparse = nullptr;					/**< Sparse objective Hessian matrix. */
+			csc* A_sparse = nullptr;					/**< Sparse constraint matrix. */
+			csc* L_sparse = nullptr;					/**< Sparse L. */
+			csc* R_sparse = nullptr;					/**< Sparse R. */
+			csc* C_sparse = nullptr;					/**< Sparse C. */
+			csc* Qk_sparse = nullptr;					/**< Sparse Qk. */
 			std::vector<int> Qk_indices_of_C;		/**< Remember the indices of Qk corresponding to C (for fast Qk update). */
 
 			std::deque<double> complHistory; 		/**< Vector containing the previous complementarity values. */

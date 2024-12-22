@@ -32,8 +32,12 @@
 #include <stdlib.h>
 
 #include <qpOASES.hpp>
-
 using qpOASES::QProblem;
+
+extern "C" {
+    #include <osqp.h>
+}
+
 
 namespace LCQPow {
 
