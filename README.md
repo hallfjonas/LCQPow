@@ -2,7 +2,10 @@
 
 LCQPow is a open-source solver for Quadratic Programs with Complementarity Constraints. The approach is based on a standard penalty homotopy reformulated using sequential convex programming. The convex sequence derives from linearizing the (necessarily) nonconvex penalty function. This leads to a constant objective Hessian matrix throughout all iterates, and thus enables us to solve the linear complementarity quadratic program with a single factorization of the KKT matrix (by using qpOASES).
 
-The entire strategy is presented in detail in [this paper](https://ieeexplore.ieee.org/abstract/document/9439931).
+The software is presented in two papers:
+* [the detailed description of the software](https://link.springer.com/article/10.1007/s12532-024-00272-w), and
+* [the original introduction of the algorithm](https://ieeexplore.ieee.org/abstract/document/9439931).
+
 
 ## Requirements
 * Build process is currently only tested on Ubuntu >= 18.04
